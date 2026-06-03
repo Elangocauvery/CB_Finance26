@@ -1619,8 +1619,8 @@ document.addEventListener('copy', e=>{
       <div style="background:#fff3e0;border:1px solid #ff980044;border-radius:10px;padding:14px;cursor:help;" title="FII controls 25%+ of Nifty float. Sustained FII buying (3+ months) = bull signal. Sustained selling = headwind even in good economy. Sector note: IT and banking see maximum FII impact.">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:20px;">🌍</span><span style="font-size:12px;font-weight:800;color:#1a1e2e;flex:1;">FII Activity</span><span id="ri-fii">🟡</span></div>
         <div style="font-size:14px;font-weight:900;color:#b35c00;margin-bottom:5px;" id="ri-fii-label">Neutral</div>
-        <div style="font-size:10px;color:#4a5070;line-height:1.6;">Foreign investors control 25%+ of the market. When they sell, prices fall regardless of fundamentals. <em>(hover)</em></div>
-        <div style="margin-top:6px;font-size:9px;font-weight:700;color:#b35c00;background:#fff8f0;padding:3px 7px;border-radius:5px;">IT + Banking most affected by FII flows</div>
+        <div style="font-size:10px;color:#4a5070;line-height:1.6;">FIIs hold <strong>14.2% of NSE mkt cap</strong> (↓ from 21% in 2021). DIIs now outweigh at 18%. But FII flow still sets daily price direction. <em>(hover)</em></div>
+        <div style="margin-top:6px;font-size:9px;font-weight:700;color:#b35c00;background:#fff8f0;padding:3px 7px;border-radius:5px;">IT + Banking most FII-influenced · Watch monthly net flow, not daily</div>
       </div>
 
       <div style="background:#e6f4ef;border:1px solid #00a85444;border-radius:10px;padding:14px;cursor:help;" title="Corporate earnings are the ultimate driver of stock prices over 3-5 years. When 60%+ of Nifty companies beat estimates for 2+ quarters, it signals a genuine earnings upgrade cycle — the best time to be invested. Sector note: Watch banking NPA cycle, IT large deal wins, FMCG volume recovery.">
@@ -1656,6 +1656,30 @@ document.addEventListener('copy', e=>{
         <div style="font-size:14px;font-weight:900;color:#006b30;margin-bottom:5px;" id="ri-capex-label">Strong</div>
         <div style="font-size:10px;color:#4a5070;line-height:1.6;">Rs.11L Cr budget capex drives order books. Roads, rail, defence, power all getting funded. <em>(hover)</em></div>
         <div style="margin-top:6px;font-size:9px;font-weight:700;color:#006b30;background:#f0fff8;padding:3px 7px;border-radius:5px;">Capital Goods · Cement · Defence · Power most linked</div>
+      </div>
+
+      <!-- SIP Card -->
+      <div style="background:#e6f4ef;border:1px solid #00a85444;border-radius:10px;padding:14px;cursor:help;" title="SIP flows Rs.26,000Cr+/month in 2025. 8Cr+ active SIP accounts. When FIIs sell, SIPs absorb — this is India's structural market floor. Rising SIP stoppage rate = retail fear indicator. AMC sector directly benefits from SIP growth.">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:20px;">🏠</span><span style="font-size:12px;font-weight:800;color:#1a1e2e;flex:1;">SIP / Retail Flows</span><span id="ri-sip">🟢</span></div>
+        <div style="font-size:14px;font-weight:900;color:#006b30;margin-bottom:5px;" id="ri-sip-label">Strong — Rs.26,000Cr+/month</div>
+        <div style="font-size:10px;color:#4a5070;line-height:1.6;">India's structural market floor. Rs.26,000Cr+ monthly in 2025 absorbs FII selling. 8Cr+ active accounts. <em>(hover)</em></div>
+        <div style="margin-top:6px;font-size:9px;font-weight:700;color:#006b30;background:#f0fff8;padding:3px 7px;border-radius:5px;">AMC · Brokers/Wealth directly benefits · Watch stoppage rate</div>
+      </div>
+
+      <!-- DII Card -->
+      <div style="background:#e3f2fd;border:1px solid #1976d244;border-radius:10px;padding:14px;cursor:help;" title="DIIs (MFs + LIC + Banks) now hold ~18% of Nifty vs FII 14.2%. Structural shift since 2021. When both FII AND DII sell together — genuine danger signal. LIC buying supports NTPC, SBI, ONGC. MF buying supports mid-caps.">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:20px;">🏛</span><span style="font-size:12px;font-weight:800;color:#1a1e2e;flex:1;">DII Activity (MF + LIC)</span><span id="ri-dii">🟢</span></div>
+        <div style="font-size:14px;font-weight:900;color:#1565c0;margin-bottom:5px;" id="ri-dii-label">Strong — DIIs hold 18% of Nifty</div>
+        <div style="font-size:10px;color:#4a5070;line-height:1.6;">DIIs now outweigh FIIs (18% vs 14.2%). Consistent net buyers since 2021. Danger only when both FII + DII sell. <em>(hover)</em></div>
+        <div style="margin-top:6px;font-size:9px;font-weight:700;color:#1565c0;background:#e3f2fd;padding:3px 7px;border-radius:5px;">FII 14.2% + DII 18% = 32% institutional · Retail holds rest</div>
+      </div>
+
+      <!-- Monsoon Card -->
+      <div style="background:#fce8e8;border:1px solid #e5393544;border-radius:10px;padding:14px;cursor:help;" title="2025 Monsoon forecast: BELOW NORMAL (El Nino effect). 10% rainfall deficit = +1.5-2% food CPI. Rural income falls, FMCG volumes shrink, MFI slippages rise, 2W sales slow. RBI cannot cut rates aggressively. Sectors: FMCG rural, 2W, agri-inputs, MFI worst hit.">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:20px;">🌧</span><span style="font-size:12px;font-weight:800;color:#1a1e2e;flex:1;">Monsoon (Jun–Sep 2025)</span><span id="ri-monsoon">🔴</span></div>
+        <div style="font-size:14px;font-weight:900;color:#b71c1c;margin-bottom:5px;" id="ri-monsoon-label">Below Normal — Headwind 2025</div>
+        <div style="font-size:10px;color:#4a5070;line-height:1.6;"><strong>2025 forecast: BELOW NORMAL.</strong> Food inflation risk. Rural income hit. FMCG, 2W, MFI most exposed. RBI rate cut constrained. <em>(hover)</em></div>
+        <div style="margin-top:6px;font-size:9px;font-weight:700;color:#b71c1c;background:#fce8e8;padding:3px 7px;border-radius:5px;">⚠️ FMCG rural · 2-Wheelers · Agri inputs · MFI / SFB slippage risk</div>
       </div>
 
     </div>
@@ -2370,14 +2394,41 @@ const MACRO_INDICATORS=[
     {label:"Euphoric — PE above 28x (high risk of correction)",score:-2,cls:"neg"}
    ],default:3},
   {name:"FII / FPI Flow Trend",icon:"🌍",
-   tooltip:"Foreign Institutional Investors move billions into and out of India based on global factors. Sustained FII buying = fuel for bull markets. FII selling = markets can fall even when fundamentals are good.",
+   tooltip:"FIIs currently hold ~14.2% of NSE-listed market cap (down from 21% in 2021 — DIIs and retail have filled the gap). Despite lower holding, FII flows still set daily price direction. Sustained FII outflow = headwind even with strong domestic flows. Watch monthly net figures, not just daily noise.",
    options:[
-    {label:"Heavy Buying — FII net buyers >₹15,000Cr/month",score:2,cls:"pos"},
-    {label:"Buying — FII net positive",score:1,cls:"pos"},
-    {label:"Neutral — FII flows balanced",score:0,cls:"neu"},
-    {label:"Selling — FII net sellers",score:-1,cls:"neg"},
-    {label:"Heavy Selling — FII dumping >₹15,000Cr/month",score:-2,cls:"neg"}
-   ],default:1}
+    {label:"Heavy Inflow — FII net >₹15,000Cr/month (14.2% holding, rising)",score:2,cls:"pos"},
+    {label:"Inflow — FII net positive (holding stable)",score:1,cls:"pos"},
+    {label:"Neutral — FII flows balanced (DII absorbing)",score:0,cls:"neu"},
+    {label:"Outflow — FII net sellers (holding declining)",score:-1,cls:"neg"},
+    {label:"Heavy Outflow — FII dumping >₹15,000Cr/month",score:-2,cls:"neg"}
+   ],default:2},
+  {name:"SIP / Domestic Retail Flows",icon:"🏠",
+   tooltip:"SIP (Systematic Investment Plan) flows represent India's domestic retail investors putting money monthly into mutual funds. At Rs.26,000Cr+/month (2025), SIPs have become the single most important cushion against FII selling. Even during FII exits, strong SIP flows absorb supply and support markets. Watch for SIP stoppage rate — if investors start pausing SIPs, it signals retail fear.",
+   options:[
+    {label:"Surge — SIP >₹25,000Cr/month, new registrations accelerating",score:3,cls:"pos"},
+    {label:"Strong — SIP Rs.20,000–25,000Cr/month, stable",score:2,cls:"pos"},
+    {label:"Healthy — SIP Rs.15,000–20,000Cr/month, growing",score:1,cls:"pos"},
+    {label:"Slowing — SIP growth stagnant, stoppage rate rising",score:-1,cls:"neg"},
+    {label:"Weak — SIP cancellations rising, retail fear evident",score:-2,cls:"neg"}
+   ],default:1},
+  {name:"DII (Domestic Institutions) Activity",icon:"🏛",
+   tooltip:"DIIs (Mutual Funds, Insurance Cos, Banks) now hold ~18% of Nifty vs FII's 14.2%. When FIIs sell, DIIs absorb — this has fundamentally changed India's market structure. Strong DII inflows = market resilience even during FII selling. Watch AMFI MF data and LIC deployment. DIIs have been consistent net buyers since 2021.",
+   options:[
+    {label:"Aggressive Deployment — DIIs net >₹20,000Cr/month",score:3,cls:"pos"},
+    {label:"Strong — DIIs net positive, absorbing FII sales",score:2,cls:"pos"},
+    {label:"Moderate — DIIs buying selectively",score:1,cls:"pos"},
+    {label:"Cautious — DIIs slowing deployment, cash building",score:-1,cls:"neg"},
+    {label:"Selling — DIIs also net sellers (very rare, extreme signal)",score:-3,cls:"neg"}
+   ],default:1},
+  {name:"Monsoon (June–September)",icon:"🌧",
+   tooltip:"Monsoon is the single biggest macro variable unique to India. 60% of agriculture depends on it. Below-normal monsoon → food inflation rises → rural income falls → FMCG/NBFC/2W/agri volumes shrink → RBI cannot cut rates aggressively. A 10% deficit year historically adds 1.5–2% to food inflation. El Niño years (2023, 2025 forecast) typically bring below-normal monsoon.",
+   options:[
+    {label:"Excess — >110% of Long Period Average (LPA) — flooding risk",score:-1,cls:"neg"},
+    {label:"Above Normal — 105–110% LPA (ideal for agriculture)",score:2,cls:"pos"},
+    {label:"Normal — 96–105% LPA (comfortable)",score:1,cls:"pos"},
+    {label:"Below Normal — 90–96% LPA (food inflation risk)",score:-1,cls:"neg"},
+    {label:"Deficient — Below 90% LPA (drought, rural stress, inflation spike)",score:-3,cls:"neg"}
+   ],default:3}
 ];
 const ALLOC_MATRIX=[
   {minScore:12,eq:70,debt:10,gold:10,cash:10,stance:"Aggressively Bullish",desc:"Early bull — deploy capital aggressively across all quality sectors",cycle:"earlyBull",color:"#00e676"},
@@ -2428,7 +2479,14 @@ const SECTORS={
   "Textiles":       {score:45,trend:"↓ Weak",     tc:"red",    weight:1, phase:"Slowdown",  phaseCls:"phase-slowdown"},
   "Recycling/ESG":  {score:62,trend:"↑ Emerging", tc:"yellow", weight:1, phase:"Recovery",  phaseCls:"phase-recovery"},
   "Diversified":    {score:60,trend:"↔ Mixed",    tc:"yellow", weight:2, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
-  "IT Services":    {score:48,trend:"↓ Weak",     tc:"red",    weight:3, phase:"Slowdown",  phaseCls:"phase-slowdown"}
+  "IT Services":    {score:48,trend:"↓ Weak",     tc:"red",    weight:3, phase:"Slowdown",  phaseCls:"phase-slowdown"},
+  "Telecom":        {score:55,trend:"↔ Mixed",    tc:"yellow", weight:2, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
+  "Auto":           {score:62,trend:"↑ Selective",tc:"yellow", weight:3, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
+  "Metals":         {score:50,trend:"↔ Cyclical", tc:"yellow", weight:2, phase:"Slowdown",  phaseCls:"phase-slowdown"},
+  "Chemicals":      {score:65,trend:"↑ Improving",tc:"yellow", weight:2, phase:"Recovery",  phaseCls:"phase-recovery"},
+  "Real Estate":    {score:60,trend:"↑ Improving",tc:"yellow", weight:2, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
+  "Adani Group":    {score:62,trend:"↔ Mixed",    tc:"yellow", weight:2, phase:"Expansion", phaseCls:"phase-expansion"},
+  "Reliance Group": {score:66,trend:"↑ Strong",   tc:"yellow", weight:3, phase:"Expansion", phaseCls:"phase-expansion"}
 };
 const COMPANIES={
   "Power":[
@@ -4227,6 +4285,112 @@ const SECTOR_ASSET = {
   'Textiles':'Equity','Recycling/ESG':'Equity','Diversified':'Equity',
   'Gold':'Gold','Silver':'Gold',
   'Liquid/Cash':'Cash',
+  "Telecom":[
+    {name:"Bharti Airtel",       g:4,m:4,d:3,v:3,t:4,r:4,note:"#1 telecom; ARPU rising; Africa ops strong"},
+    {name:"Reliance Jio (Jio Financial / RJIL)",g:4,m:3,d:3,v:3,t:4,r:3,note:"Jio dominates data; 5G leader; JioFinance spinoff"},
+    {name:"Vodafone Idea (Vi)",   g:2,m:1,d:1,v:3,t:2,r:1,note:"Survival mode; debt crisis; AGR dues; high risk"},
+    {name:"Indus Towers",        g:3,m:4,d:3,v:3,t:4,r:4,note:"Tower infra monopoly; Vi recovery key risk"},
+    {name:"MTNL",                g:1,m:1,d:2,v:3,t:2,r:1,note:"PSU; loss-making; Delhi+Mumbai only"},
+    {name:"BSNL (unlisted)",     g:1,m:1,d:3,v:3,t:2,r:1,note:"PSU; 4G rollout underway; restructuring"},
+    {name:"Tata Communications", g:3,m:3,d:3,v:3,t:4,r:3,note:"Enterprise connectivity + cloud + media"},
+    {name:"HFCL",               g:4,m:3,d:3,v:3,t:4,r:3,note:"Optical fibre + defence comms; 5G infra"},
+    {name:"Sterlite Technologies",g:3,m:3,d:3,v:3,t:4,r:3,note:"Optical fibre cables + network solutions"},
+    {name:"ITI Limited",         g:3,m:2,d:3,v:3,t:3,r:2,note:"PSU telecom equipment; defence overlap"}
+  ],
+  "Auto":[
+    {name:"Maruti Suzuki",       g:3,m:4,d:5,v:3,t:4,r:5,note:"#1 passenger car; SUV + CNG + hybrid push"},
+    {name:"Tata Motors",         g:4,m:3,d:3,v:3,t:4,r:3,note:"JLR turnaround + India EVs; diversified"},
+    {name:"Hyundai Motor India", g:3,m:4,d:5,v:3,t:4,r:4,note:"#2 PV; premium mix improving; recently listed"},
+    {name:"Mahindra & Mahindra", g:4,m:4,d:4,v:3,t:4,r:4,note:"SUV dominance + tractors + EV pipeline"},
+    {name:"Bajaj Auto",          g:3,m:5,d:5,v:3,t:4,r:5,note:"Premium 2W + exports + EV (Chetak)"},
+    {name:"Hero MotoCorp",       g:2,m:4,d:5,v:3,t:3,r:4,note:"Mass 2W; rural dependent; EV pivot slow"},
+    {name:"TVS Motor Company",   g:4,m:4,d:4,v:3,t:4,r:4,note:"Premium 2W + EV + international"},
+    {name:"Eicher Motors",       g:3,m:5,d:5,v:3,t:4,r:5,note:"Royal Enfield premium niche; VECV trucks"},
+    {name:"Ashok Leyland",       g:3,m:3,d:4,v:3,t:3,r:3,note:"CV leader; Hinduja group"},
+    {name:"Tata Advanced Systems",g:4,m:3,d:4,v:3,t:4,r:3,note:"Commercial EVs + defence vehicles"},
+    {name:"Force Motors",        g:3,m:3,d:5,v:3,t:3,r:3,note:"LCV + SUV niche; BMW engine assembly"},
+    {name:"Motherson Sumi",      g:3,m:3,d:3,v:3,t:3,r:3,note:"Global auto components; wiring harness"},
+    {name:"Sona BLW (Sona Comstar)",g:4,m:4,d:5,v:3,t:4,r:4,note:"EV drivetrain + starter motors"},
+    {name:"Minda Industries",    g:4,m:3,d:4,v:3,t:4,r:3,note:"Auto components + EV tech"},
+    {name:"Bharat Forge",        g:3,m:3,d:3,v:3,t:3,r:3,note:"Forging + defence + EV axles; exports"},
+    {name:"Exide Industries",    g:3,m:3,d:4,v:3,t:3,r:3,note:"Lead-acid + Li-ion battery JV; EVs"},
+    {name:"Amara Raja Energy",   g:3,m:3,d:4,v:3,t:3,r:3,note:"Batteries + EV charging infra"},
+    {name:"Greaves Cotton",      g:3,m:2,d:4,v:3,t:4,r:3,note:"Ampere EV + engines + aftermarket"},
+    {name:"Olectra Greentech",   g:4,m:2,d:3,v:2,t:4,r:2,note:"Electric buses; growing order book"},
+    {name:"KPIT Technologies",   g:4,m:4,d:5,v:2,t:5,r:4,note:"Auto software; ADAS + EV niche"}
+  ],
+  "Metals":[
+    {name:"Tata Steel",          g:3,m:3,d:3,v:3,t:3,r:3,note:"India #1 + Europe ops; cyclical"},
+    {name:"JSW Steel",           g:3,m:3,d:3,v:3,t:3,r:3,note:"India #2; capacity expansion; Sajjan Jindal"},
+    {name:"SAIL (Steel Authority)",g:2,m:2,d:3,v:4,t:2,r:2,note:"PSU steel; low margins; capex heavy"},
+    {name:"Hindalco Industries", g:3,m:3,d:3,v:3,t:3,r:3,note:"Aluminium + Novelis (US auto sheet)"},
+    {name:"Vedanta",             g:3,m:4,d:2,v:3,t:3,r:3,note:"Zinc + oil + aluminium; high debt; dividend"},
+    {name:"Hindustan Zinc",      g:3,m:5,d:5,v:3,t:3,r:5,note:"World's 2nd largest Zn producer; Vedanta sub"},
+    {name:"National Aluminium (NALCO)",g:3,m:3,d:5,v:3,t:3,r:3,note:"PSU aluminium; dividend player"},
+    {name:"NMDC",                g:3,m:4,d:5,v:3,t:3,r:4,note:"India's largest iron ore miner; PSU"},
+    {name:"Coal India",          g:2,m:4,d:5,v:3,t:2,r:4,note:"PSU coal monopoly; dividend; ESG risk"},
+    {name:"Jindal Steel & Power",g:3,m:3,d:3,v:3,t:3,r:3,note:"Steel + power; Naveen Jindal group"},
+    {name:"JSW Energy",          g:4,m:3,d:3,v:3,t:4,r:3,note:"Merchant + long-term PPA; RE pivot"},
+    {name:"Welspun Corp",        g:3,m:3,d:4,v:3,t:3,r:3,note:"Steel pipes; oil + gas infra"},
+    {name:"APL Apollo Tubes",    g:4,m:4,d:4,v:3,t:4,r:4,note:"Structural steel tubes; construction boom"},
+    {name:"Ratnamani Metals",    g:3,m:4,d:5,v:3,t:3,r:4,note:"SS + CS pipes; oil + gas + chemical"},
+    {name:"Hindustan Copper",    g:3,m:3,d:4,v:3,t:3,r:3,note:"PSU copper mining + smelting"},
+    {name:"Lloyds Metals",       g:4,m:4,d:4,v:3,t:3,r:4,note:"Iron ore + sponge iron; growing"}
+  ],
+  "Chemicals":[
+    {name:"Asian Paints (Chemicals div.)",g:2,m:4,d:5,v:2,t:3,r:4,note:"See Paints sector for main listing"},
+    {name:"PI Industries",       g:4,m:4,d:5,v:3,t:4,r:4,note:"Agro-chem CSM + domestic; export moat"},
+    {name:"SRF Limited",         g:3,m:4,d:4,v:3,t:4,r:4,note:"Fluorochemicals + packaging + specialty"},
+    {name:"Deepak Nitrite",      g:3,m:4,d:5,v:3,t:4,r:4,note:"Basic + fine + specialty chemicals"},
+    {name:"Navin Fluorine",      g:4,m:4,d:5,v:3,t:4,r:4,note:"Fluorine chemistry; CDMO + CRAMS"},
+    {name:"Aarti Industries",    g:3,m:3,d:4,v:3,t:4,r:3,note:"Benzene derivatives; pharma + agro API"},
+    {name:"Vinati Organics",     g:3,m:4,d:5,v:3,t:4,r:5,note:"ATBS + IBB global leader; niche"},
+    {name:"UPL Limited",         g:3,m:3,d:2,v:3,t:3,r:2,note:"Agro-chem; debt concern post Arysta"},
+    {name:"Bayer CropScience",   g:2,m:4,d:5,v:3,t:3,r:4,note:"MNC agro; crop protection + seeds"},
+    {name:"Sumitomo Chemical",   g:3,m:4,d:5,v:3,t:4,r:4,note:"MNC agro + specialty chemicals"},
+    {name:"Gujarat Fluorochemicals",g:4,m:4,d:4,v:3,t:4,r:4,note:"Fluoropolymers + EV battery chemicals"},
+    {name:"Clean Science & Tech",g:4,m:5,d:5,v:3,t:4,r:5,note:"Niche functional chemicals; very high ROCE"},
+    {name:"Galaxy Surfactants",  g:3,m:4,d:5,v:3,t:3,r:4,note:"Surfactants for FMCG; domestic + export"},
+    {name:"Tata Chemicals",      g:3,m:3,d:3,v:3,t:3,r:3,note:"Soda ash + lithium battery materials"},
+    {name:"NOCIL",               g:3,m:4,d:5,v:3,t:3,r:4,note:"Rubber chemicals; sole Indian producer"}
+  ],
+  "Real Estate":[
+    {name:"DLF Limited",         g:4,m:4,d:4,v:3,t:4,r:3,note:"Premium residential + Gurgaon commercial"},
+    {name:"Godrej Properties",   g:4,m:3,d:4,v:3,t:4,r:3,note:"Pan-India launches; Godrej brand trust"},
+    {name:"Prestige Estates",    g:4,m:3,d:3,v:3,t:4,r:3,note:"South + Mumbai; diversified RE"},
+    {name:"Oberoi Realty",       g:4,m:4,d:5,v:3,t:4,r:4,note:"Mumbai luxury; debt-free; high margins"},
+    {name:"Phoenix Mills",       g:4,m:4,d:3,v:3,t:4,r:4,note:"Retail malls + residential; consumption play"},
+    {name:"Brigade Enterprises", g:3,m:3,d:3,v:3,t:4,r:3,note:"South India residential + commercial"},
+    {name:"Sobha Limited",       g:3,m:3,d:3,v:3,t:3,r:3,note:"South India quality builder; plotted dev"},
+    {name:"Lodha (Macrotech)",   g:4,m:3,d:3,v:3,t:4,r:3,note:"Mumbai mass + premium; fastest launches"},
+    {name:"Raymond Realty",      g:4,m:3,d:4,v:3,t:4,r:3,note:"Mumbai Thane micro-city; new listing"},
+    {name:"Mahindra Lifespace",  g:3,m:3,d:4,v:3,t:3,r:3,note:"Affordable + industrial parks"},
+    {name:"Kolte-Patil",         g:3,m:3,d:4,v:3,t:3,r:3,note:"Pune + Mumbai residential"},
+    {name:"Signature Global",    g:4,m:3,d:3,v:3,t:4,r:3,note:"Affordable NCR housing; fast growth"}
+  ],
+  "Adani Group":[
+    {name:"Adani Enterprises",   g:4,m:3,d:3,v:2,t:4,r:3,note:"Holding + incubator: airports, data centres, roads, solar"},
+    {name:"Adani Ports & SEZ",   g:4,m:4,d:3,v:3,t:4,r:4,note:"India's largest port operator; 15 ports + logistics"},
+    {name:"Adani Green Energy",  g:5,m:3,d:2,v:2,t:5,r:3,note:"Largest solar IPP; 20GW+ target; high debt"},
+    {name:"Adani Energy Solutions",g:4,m:3,d:3,v:3,t:5,r:3,note:"Power transmission lines + smart meters"},
+    {name:"Adani Total Gas",     g:4,m:4,d:3,v:2,t:4,r:4,note:"City gas distribution + CNG + PNG"},
+    {name:"Adani Power",         g:3,m:3,d:3,v:3,t:4,r:3,note:"Thermal power; merchant + PPA mix"},
+    {name:"Ambuja Cements",      g:3,m:3,d:4,v:3,t:4,r:3,note:"Adani group cement; #2 by capacity"},
+    {name:"ACC",                 g:3,m:3,d:4,v:3,t:4,r:3,note:"Adani group cement; pan-India"},
+    {name:"Adani Wilmar",        g:3,m:2,d:4,v:3,t:3,r:2,note:"Fortune edible oil + food products"},
+    {name:"NDTV (Adani)",        g:2,m:2,d:4,v:3,t:3,r:2,note:"News media; Adani acquired 64% stake"},
+    {name:"Adani Bravura (New Listed)",g:3,m:3,d:3,v:3,t:4,r:3,note:"Recently listed Adani entity"},
+    {name:"Mumbai Airport (MIAL)",g:4,m:3,d:3,v:3,t:4,r:3,note:"CSIA Mumbai; Adani group concession"},
+    {name:"Navi Mumbai Airport", g:4,m:2,d:3,v:3,t:5,r:2,note:"Greenfield; under construction; 2026 opening"}
+  ],
+  "Reliance Group":[
+    {name:"Reliance Industries",  g:4,m:4,d:3,v:3,t:5,r:4,note:"O2C + Jio + Retail + Green Energy; India's largest co"},
+    {name:"Reliance Jio Platforms",g:4,m:3,d:3,v:3,t:4,r:3,note:"Telecom + digital services; 500Mn users"},
+    {name:"Reliance Retail Ventures",g:4,m:3,d:3,v:3,t:5,r:3,note:"India's largest retailer; JioMart + stores"},
+    {name:"Jio Financial Services",g:4,m:2,d:5,v:3,t:5,r:2,note:"Fintech: lending + insurance + broking; early stage"},
+    {name:"Reliance Power",       g:2,m:1,d:2,v:3,t:2,r:1,note:"ADAG group; NOT Mukesh — stressed entity"},
+    {name:"Reliance Infrastructure",g:2,m:1,d:2,v:3,t:2,r:1,note:"ADAG group; debt-laden; separate from RIL"}
+  ]
 };
 
 let zhHoldings = [];
@@ -4755,8 +4919,9 @@ const ALL_SECTORS = [
   'New Age Tech','Retail','FMCG','Cement','Gold/Jewellery',
   'Hotels/Tourism','Hospitals','Paints','Textiles','Recycling/ESG',
   'Diversified','IT Services',
-  'Chemicals','Auto','Metals','Real Estate','Telecom','Consumer Durables',
-  'Gold','Silver','Liquid/Cash','Other'
+  'Telecom','Auto','Metals','Chemicals','Real Estate',
+  'Adani Group','Reliance Group',
+  'Consumer Durables','Gold','Silver','Liquid/Cash','Other'
 ];
 
 let myPortfolio = []; // [{symbol, name, sector, qty, avg, ltp}]
@@ -4806,7 +4971,14 @@ const SECTOR_TYPE = {
   "FMCG":"consumer","Retail":"consumer",
   "AMC":"fin_svc","Brokers/Wealth":"fin_svc",
   "Hospitals":"hospital",
-  "Hotels/Tourism":"hotel"
+  "Hotels/Tourism":"hotel",
+  "Telecom":        "mfg",
+  "Auto":           "mfg",
+  "Metals":         "mfg",
+  "Chemicals":      "mfg",
+  "Real Estate":    "mfg",
+  "Adani Group":    "mfg",
+  "Reliance Group": "mfg"
 };
 
 const SECTOR_FACTORS = {
@@ -5042,7 +5214,39 @@ const MCAP_RANK={
   "Premier Explosives":308,"Dynamatic Technologies":309,"Mishra Dhatu Nigam":310,
   "Bharat Forge":311,"Titagarh Rail Systems":312,"Lemon Tree Hotels":313,
   "ICICI Lombard":314,"Asirvad Micro Finance":315,"Jana SFB":316,
-  "Suryoday SFB":317,"Utkarsh SFB":318
+  "Suryoday SFB":317,"Utkarsh SFB":318,
+  // Telecom
+  "Indus Towers":72,"Bharti Airtel":4,"Tata Communications":118,
+  "Vodafone Idea (Vi)":319,"HFCL":119,"Sterlite Technologies":124,
+  // Auto
+  "Maruti Suzuki":22,"Tata Motors":19,"Mahindra & Mahindra":320,
+  "Bajaj Auto":35,"Hero MotoCorp":321,"TVS Motor Company":322,
+  "Eicher Motors":56,"Ashok Leyland":323,"Motherson Sumi":324,
+  "Sona BLW (Sona Comstar)":325,"Minda Industries":326,"Exide Industries":327,
+  "Amara Raja Energy":328,"Olectra Greentech":329,"Greaves Cotton":330,
+  // Metals
+  "Tata Steel":331,"JSW Steel":31,"SAIL (Steel Authority)":332,
+  "Hindalco Industries":33,"Vedanta":48,"Hindustan Zinc":333,
+  "National Aluminium (NALCO)":334,"NMDC":335,"Coal India":43,
+  "Jindal Steel & Power":336,"APL Apollo Tubes":337,"Ratnamani Metals":338,
+  "Hindustan Copper":339,"Lloyds Metals":340,"Welspun Corp":341,
+  // Chemicals
+  "PI Industries":342,"SRF Limited":343,"Deepak Nitrite":344,
+  "Navin Fluorine":345,"Aarti Industries":346,"Vinati Organics":347,
+  "UPL Limited":348,"Gujarat Fluorochemicals":349,"Clean Science & Tech":350,
+  "Galaxy Surfactants":351,"Tata Chemicals":352,"NOCIL":353,
+  // Real Estate
+  "DLF Limited":354,"Godrej Properties":355,"Prestige Estates":356,
+  "Oberoi Realty":357,"Phoenix Mills":358,"Brigade Enterprises":359,
+  "Sobha Limited":360,"Lodha (Macrotech)":361,"Signature Global":362,
+  // Adani Group
+  "Adani Enterprises":363,"Adani Ports & SEZ":23,"Adani Power":364,
+  "Adani Wilmar":365,"NDTV (Adani)":366,
+  // Reliance Group
+  "Reliance Industries":1,"Jio Financial Services":367,
+  "Reliance Power":368,"Reliance Infrastructure":369,
+  // Hyundai
+  "Hyundai Motor India":370
 };
 
 function getMCapRank(name){
