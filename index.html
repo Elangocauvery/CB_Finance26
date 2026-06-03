@@ -1303,7 +1303,7 @@ body{padding-bottom:52px;}
     <h1>&#127919; Which Sectors Should I Invest In?</h1>
     <p>23 sectors scored — Green = Buy Now &nbsp;|&nbsp; Yellow = Wait &nbsp;|&nbsp; Red = Avoid for 3–5 years</p>
     <div class="header-meta">
-      <span class="badge">&#9989; Buy Now: <span id="sc-nStrong">—</span></span>
+      <span class="badge">Strong (≥70): <span id="sc-nStrong">—</span></span>
       <span class="badge">&#9203; Watch: <span id="sc-nWatch">—</span></span>
       <span class="badge">&#10060; Avoid: <span id="sc-nSkip">—</span></span>
     </div>
@@ -1335,8 +1335,8 @@ body{padding-bottom:52px;}
     </div>
     <div class="screener-legend">
       <span><span class="leg-dot" style="background:var(--green)"></span>Buy Now (score ≥70)</span>
-      <span><span class="leg-dot" style="background:var(--yellow)"></span>Watch (score 50–69)</span>
-      <span><span class="leg-dot" style="background:var(--red)"></span>Skip (&lt;50)</span>
+      <span><span class="leg-dot" style="background:var(--yellow)"></span>Score 50–69</span>
+      <span><span class="leg-dot" style="background:var(--red)"></span>Score <50</span>
       <span style="color:var(--text-muted);margin-left:6px;">Each sector scored out of 100 — above 70 is buyable</span>
     </div>
     <div id="screenerTableDiv" class="table-scroll"></div>
@@ -1444,7 +1444,38 @@ body{padding-bottom:52px;}
         <tbody id="companyMasterBody"></tbody>
       </table>
     </div>
-    <div style="margin-top:10px;padding:10px 12px;background:#fff8f0;border-left:3px solid #ff7c00;border-radius:8px;font-size:11px;font-weight:600;color:#5a3a00;">
+    <!-- SCORING LEGEND -->
+    <div style="background:#f8f9fe;border:1px solid #dde1ec;border-radius:10px;padding:14px 16px;margin-bottom:14px;">
+      <div style="font-size:12px;font-weight:800;color:#1a1e2e;margin-bottom:10px;">📐 How is the Score Calculated?</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px;">
+        <div style="background:#fff;border:1px solid #e0e4f0;border-radius:8px;padding:9px 11px;">
+          <div style="font-size:11px;font-weight:800;color:#1565c0;">📈 Revenue Growth — 25%</div>
+          <div style="font-size:10px;color:#6b7498;margin-top:3px;line-height:1.6;">1=&lt;5% · 2=5–10% · 3=10–15% · 4=15–25% · 5=&gt;25%</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e0e4f0;border-radius:8px;padding:9px 11px;">
+          <div style="font-size:11px;font-weight:800;color:#006b30;">💰 Profit Margin — 20%</div>
+          <div style="font-size:10px;color:#6b7498;margin-top:3px;line-height:1.6;">1=&lt;5% · 2=5–10% · 3=10–15% · 4=15–25% · 5=&gt;25%</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e0e4f0;border-radius:8px;padding:9px 11px;">
+          <div style="font-size:11px;font-weight:800;color:#b71c1c;">🏦 Debt Level — 20%</div>
+          <div style="font-size:10px;color:#6b7498;margin-top:3px;line-height:1.6;">1=Very High · 3=Medium · 5=Debt-Free</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e0e4f0;border-radius:8px;padding:9px 11px;">
+          <div style="font-size:11px;font-weight:800;color:#b35c00;">🏷️ Valuation / PE — 20%</div>
+          <div style="font-size:10px;color:#6b7498;margin-top:3px;line-height:1.6;">1=Very Expensive · 3=Fair · 5=Very Cheap</div>
+        </div>
+        <div style="background:#fff;border:1px solid #e0e4f0;border-radius:8px;padding:9px 11px;">
+          <div style="font-size:11px;font-weight:800;color:#7b1fa2;">🌬️ Sector Tailwind — 15%</div>
+          <div style="font-size:10px;color:#6b7498;margin-top:3px;line-height:1.6;">1=Headwind · 3=Neutral · 5=Strong Tailwind</div>
+        </div>
+        <div style="background:#e6f4ef;border:1px solid #00a854;border-radius:8px;padding:9px 11px;">
+          <div style="font-size:11px;font-weight:800;color:#006b30;">🎯 Score Formula</div>
+          <div style="font-size:10px;color:#004d20;margin-top:3px;line-height:1.6;">Score = (G×25%+M×20%+D×20%+V×20%+T×15%)×20<br>≥75 High · 55–74 Medium · &lt;55 Low</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:#6b7498;font-weight:600;">💡 <strong>Sector score = average of its top 3 companies.</strong> Change any factor below → score updates live → sector score updates → heatmap updates.</div>
+    </div>
+    <div style="margin-top:0;padding:10px 12px;background:#fff8f0;border-left:3px solid #ff7c00;border-radius:8px;font-size:11px;font-weight:600;color:#5a3a00;">
       &#128161; <strong>Tip:</strong> CB Score ≥75 = Strong Buy, 55–74 = Watch, &lt;55 = Skip. Edit any field directly. Add your own companies. Changes update the allocation breakdown instantly.
     </div>
   </div>
@@ -2076,30 +2107,439 @@ const SECTORS={
   "IT Services":    {score:48,trend:"↓ Weak",     tc:"red",    weight:3, phase:"Slowdown",  phaseCls:"phase-slowdown"}
 };
 const COMPANIES={
-  "Power":[{name:"NTPC",score:89,roce:"Strong",debt:"Low",val:"Reasonable",growth:"18%"},{name:"Power Grid Corp",score:85,roce:"High",debt:"Low",val:"Fair",growth:"15%"},{name:"Tata Power",score:80,roce:"Moderate",debt:"Medium",val:"Expensive",growth:"22%"},{name:"Adani Green",score:75,roce:"Moderate",debt:"High",val:"Expensive",growth:"28%"},{name:"Torrent Power",score:72,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"14%"}],
-  "Defence":[{name:"HAL",score:91,roce:"Strong",debt:"Low",val:"Fair",growth:"20%"},{name:"BEL",score:86,roce:"High",debt:"Low",val:"Reasonable",growth:"18%"},{name:"Data Patterns",score:77,roce:"Moderate",debt:"Low",val:"Expensive",growth:"25%"},{name:"Paras Defence",score:72,roce:"Moderate",debt:"Low",val:"Expensive",growth:"30%"},{name:"Garden Reach",score:70,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"20%"}],
-  "Capital Goods":[{name:"L&T",score:88,roce:"Strong",debt:"Low",val:"Fair",growth:"18%"},{name:"Siemens India",score:84,roce:"High",debt:"Low",val:"Expensive",growth:"20%"},{name:"ABB India",score:82,roce:"High",debt:"Low",val:"Expensive",growth:"22%"},{name:"Thermax",score:78,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"16%"},{name:"Kalpataru Proj",score:74,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"15%"}],
-  "Pharma":[{name:"Sun Pharma",score:88,roce:"Strong",debt:"Low",val:"Fair",growth:"18%"},{name:"Dr Reddy's",score:85,roce:"High",debt:"Low",val:"Reasonable",growth:"16%"},{name:"Cipla",score:82,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"14%"},{name:"Natco Pharma",score:78,roce:"Moderate",debt:"Low",val:"Cheap",growth:"20%"},{name:"Gland Pharma",score:72,roce:"Strong",debt:"Low",val:"Reasonable",growth:"12%"}],
-  "Banking":[{name:"HDFC Bank",score:89,roce:"Strong",debt:"Low",val:"Fair",growth:"16%"},{name:"ICICI Bank",score:86,roce:"High",debt:"Low",val:"Fair",growth:"18%"},{name:"SBI",score:81,roce:"Moderate",debt:"Medium",val:"Cheap",growth:"14%"},{name:"Kotak Mahindra",score:78,roce:"Strong",debt:"Low",val:"Expensive",growth:"15%"},{name:"Axis Bank",score:76,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"16%"}],
-  "Infra/Cement":[{name:"UltraTech Cement",score:82,roce:"Strong",debt:"Low",val:"Reasonable",growth:"14%"},{name:"Larsen ECC",score:79,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"16%"},{name:"Shree Cement",score:76,roce:"High",debt:"Low",val:"Expensive",growth:"12%"},{name:"IRB Infra",score:68,roce:"Moderate",debt:"High",val:"Cheap",growth:"18%"}],
-  "Brokers/Wealth":[{name:"Angel One",score:78,roce:"High",debt:"Low",val:"Reasonable",growth:"22%",note:"Discount broker + wealth pivot"},{name:"ICICI Securities",score:76,roce:"High",debt:"Low",val:"Reasonable",growth:"18%",note:"Full-service + digital"},{name:"360 One WAM",score:80,roce:"High",debt:"Low",val:"Reasonable",growth:"25%",note:"HNI wealth management"},{name:"Nuvama Wealth",score:74,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"20%",note:"Edelweiss wealth spinoff"},{name:"Motilal Oswal",score:72,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"16%",note:"Broking + AMC + housing"}],
-  "AMC":[{name:"HDFC AMC",score:85,roce:"Very High",debt:"Low",val:"Expensive",growth:"20%",note:"#1 AMC by AUM; asset-light, high ROE"},{name:"Nippon AMC",score:80,roce:"High",debt:"Low",val:"Reasonable",growth:"18%",note:"Strong ETF + retail franchise"},{name:"UTI AMC",score:70,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"14%",note:"PSU AMC; re-rating potential"},{name:"Mirae Asset AMC",score:72,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"22%",note:"Aggressive SIP growth"},{name:"Aditya Birla AMC",score:73,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"16%",note:"Balanced fund house"}],
-  "Insurance":[{name:"HDFC Life",score:80,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"18%",note:"VNB margin leader"},{name:"SBI Life",score:78,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"16%",note:"Bancassurance moat"},{name:"ICICI Prudential Life",score:75,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"15%",note:"ULIP to protection pivot"},{name:"Star Health",score:68,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"22%",note:"Health insurance leader"},{name:"New India Assurance",score:60,roce:"Low",debt:"Low",val:"Cheap",growth:"10%",note:"PSU general insurance"}],
-  "NBFC":[{name:"Bajaj Finance",score:86,roce:"Strong",debt:"Medium",val:"Expensive",growth:"22%",note:"Consumer credit powerhouse"},{name:"Chola Fin",score:78,roce:"High",debt:"Medium",val:"Reasonable",growth:"20%",note:"Vehicle + home finance"},{name:"Muthoot Finance",score:74,roce:"High",debt:"Low",val:"Reasonable",growth:"16%",note:"Gold loan dominant"},{name:"Poonawalla Fincorp",score:70,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"25%",note:"Clean book; MSME focus"},{name:"Manappuram Finance",score:65,roce:"Moderate",debt:"Medium",val:"Cheap",growth:"14%",note:"Gold + microfinance"}],
-  "SFB/MicroFin":[{name:"AU Small Finance Bank",score:72,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"22%",note:"Premium SFB; aspires to universal"},{name:"Equitas SFB",score:60,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"16%",note:"Micro + SME lending"},{name:"Ujjivan SFB",score:58,roce:"Moderate",debt:"Low",val:"Cheap",growth:"14%",note:"MFI-to-SFB; rural focus"},{name:"CreditAccess Grameen",score:62,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"18%",note:"Karnataka-base MFI"},{name:"Spandana Sphoorty",score:55,roce:"Moderate",debt:"Medium",val:"Cheap",growth:"12%",note:"MFI; rural Andhra focus"}],
-  "New Age Tech":[{name:"Zomato",score:68,roce:"Improving",debt:"Low",val:"Expensive",growth:"35%",note:"Food delivery + Blinkit quick commerce"},{name:"Swiggy",score:60,roce:"Negative",debt:"Low",val:"Expensive",growth:"30%",note:"Food delivery; profitability path unclear"},{name:"Nykaa",score:62,roce:"Moderate",debt:"Low",val:"Expensive",growth:"22%",note:"Beauty e-commerce; omnichannel"},{name:"Paytm",score:48,roce:"Negative",debt:"Low",val:"Reasonable",growth:"15%",note:"Fintech; RBI actions impacted"},{name:"Meesho (unlisted)",score:55,roce:"Improving",debt:"Low",val:"N/A",growth:"28%",note:"Social commerce; Tier 2-3 cities"},{name:"Urban Company",score:52,roce:"Improving",debt:"Low",val:"N/A",growth:"25%",note:"Home services platform; pre-IPO"}],
-  "Retail":[{name:"Trent",score:80,roce:"High",debt:"Low",val:"Expensive",growth:"30%",note:"Zudio mass fashion; fastest growing"},{name:"Avenue Supermarts (DMart)",score:82,roce:"Strong",debt:"Low",val:"Expensive",growth:"18%",note:"EDLP grocery leader; irreplaceable"},{name:"Aditya Birla Fashion",score:60,roce:"Low",debt:"High",val:"Reasonable",growth:"14%",note:"Pantaloons + premium brands"},{name:"Vedant Fashions",score:68,roce:"High",debt:"Low",val:"Reasonable",growth:"15%",note:"Manyavar ethnic wear — monopoly niche"},{name:"V-Mart",score:55,roce:"Moderate",debt:"Low",val:"Cheap",growth:"12%",note:"Value retail for Bharat; recovery play"}],
-  "FMCG":[{name:"Hindustan Unilever",score:80,roce:"High",debt:"Low",val:"Expensive",growth:"8%"},{name:"ITC",score:78,roce:"High",debt:"Low",val:"Reasonable",growth:"10%"},{name:"Britannia",score:74,roce:"High",debt:"Low",val:"Reasonable",growth:"9%"},{name:"Godrej Consumer",score:72,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"12%"},{name:"Tata Consumer",score:73,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"14%"},{name:"Marico",score:70,roce:"High",debt:"Low",val:"Reasonable",growth:"8%"},{name:"Ujala/Jyothy Labs",score:65,roce:"High",debt:"Low",val:"Reasonable",growth:"10%"}],
-  "Cement":[{name:"UltraTech Cement",score:84,roce:"Strong",debt:"Low",val:"Reasonable",growth:"14%",note:"Consolidator; India's largest"},{name:"Shree Cement",score:79,roce:"High",debt:"Low",val:"Expensive",growth:"12%",note:"Lowest cost producer"},{name:"Ambuja Cements",score:72,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"15%",note:"Adani group; distribution push"},{name:"Dalmia Bharat",score:68,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"14%",note:"East India focus; expanding"},{name:"JK Cement",score:65,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"12%",note:"White + grey cement"}],
-  "Gold/Jewellery":[{name:"Titan Company",score:82,roce:"High",debt:"Low",val:"Expensive",growth:"18%",note:"Tanishq: premium jewellery + watches"},{name:"Kalyan Jewellers",score:72,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"22%",note:"Pan-India franchise expansion"},{name:"Senco Gold",score:65,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"18%",note:"East India dominant; growing"},{name:"PC Jeweller",score:50,roce:"Low",debt:"High",val:"Cheap",growth:"8%",note:"Turnaround story; debt risk"},{name:"Malabar Gold (unlisted)",score:70,roce:"Moderate",debt:"Low",val:"N/A",growth:"20%",note:"South India leader; IPO expected"}],
-  "Hotels/Tourism":[{name:"Indian Hotels (Taj)",score:80,roce:"High",debt:"Low",val:"Expensive",growth:"22%",note:"Premium hotels + Qmin + Ama"},{name:"EIH (Oberoi)",score:76,roce:"High",debt:"Low",val:"Expensive",growth:"18%",note:"Ultra-luxury; ARPOB leaders"},{name:"Lemon Tree Hotels",score:70,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"20%",note:"Mid-market; asset-light pivot"},{name:"Chalet Hotels",score:68,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"18%",note:"Business hotels in metros"},{name:"Mahindra Holidays",score:62,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"14%",note:"Club Mahindra timeshare model"}],
-  "Hospitals":[{name:"Apollo Hospitals",score:85,roce:"Strong",debt:"Low",val:"Expensive",growth:"22%",note:"AHLL + Pharmacy + Digital — full ecosystem"},{name:"Max Healthcare",score:80,roce:"High",debt:"Low",val:"Expensive",growth:"20%",note:"Delhi NCR leader; ARPOB best-in-class"},{name:"Fortis Healthcare",score:72,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"16%",note:"Pan-India network; turnaround"},{name:"Narayana Hrudayalaya",score:74,roce:"High",debt:"Low",val:"Reasonable",growth:"18%",note:"Cardiac + Tier 2 expansion"},{name:"Global Health (Medanta)",score:70,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"18%",note:"North India super-specialty"}],
-  "Paints":[{name:"Asian Paints",score:74,roce:"Very High",debt:"Low",val:"Expensive",growth:"10%",note:"#1 paint; pricing power but growth slowing"},{name:"Berger Paints",score:68,roce:"High",debt:"Low",val:"Expensive",growth:"9%",note:"#2; competitive pressure rising"},{name:"Kansai Nerolac",score:62,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"8%",note:"Industrial + auto OEM paints"},{name:"Indigo Paints",score:58,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"12%",note:"Challenger brand; niche products"},{name:"Grasim (Birla Opus)",score:60,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"15%",note:"Disruptive new entrant; scale building"}],
-  "Textiles":[{name:"Page Industries",score:72,roce:"Very High",debt:"Low",val:"Expensive",growth:"10%",note:"Jockey licensee; premium innerwear"},{name:"KPR Mill",score:65,roce:"High",debt:"Low",val:"Reasonable",growth:"14%",note:"Integrated textile; garment exports"},{name:"Vardhman Textiles",score:60,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"10%",note:"Yarn + fabric + garment"},{name:"Welspun Living",score:55,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"12%",note:"Home textiles exports"},{name:"Himatsingka Seide",score:48,roce:"Low",debt:"High",val:"Cheap",growth:"8%",note:"Bed linen + design brands"}],
-  "Recycling/ESG":[{name:"Gravita India",score:70,roce:"High",debt:"Low",val:"Reasonable",growth:"22%",note:"Lead recycling + aluminium; global"},{name:"Minda Corporation",score:62,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"16%",note:"Auto component + EV parts"},{name:"Antique Finance (ESG fund)",score:55,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"14%",note:"ESG-focused portfolio"},{name:"Eclerx Services",score:68,roce:"High",debt:"Low",val:"Reasonable",growth:"14%",note:"Process outsourcing; ESG reporting"},{name:"Aavas Financiers",score:65,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"18%",note:"Affordable housing — green segment"}],
-  "Diversified":[{name:"Varun Beverages",score:78,roce:"High",debt:"Medium",val:"Reasonable",growth:"20%",note:"PepsiCo bottler; franchise strength"},{name:"Azad Engineering",score:70,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"28%",note:"Aerospace + energy precision parts"},{name:"IEX (Indian Energy Exchange)",score:72,roce:"Very High",debt:"Low",val:"Expensive",growth:"16%",note:"Power market exchange; monopoly"},{name:"Westlife Foodworld",score:60,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"14%",note:"McDonald's franchisee W+S India"},{name:"G R Infraprojects",score:65,roce:"High",debt:"Low",val:"Reasonable",growth:"16%",note:"Road + railway EPC"}],
-  "IT Services":[{name:"TCS",score:84,roce:"Strong",debt:"Low",val:"Fair",growth:"8%"},{name:"HCL Tech",score:74,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"10%"},{name:"Infosys",score:72,roce:"High",debt:"Low",val:"Reasonable",growth:"7%"},{name:"Wipro",score:63,roce:"Moderate",debt:"Low",val:"Cheap",growth:"5%"}]
+  "Power":[
+    {name:"NTPC",              g:4,m:4,d:4,v:4,t:5,note:"India's largest; 72GW capacity; RE pivot"},
+    {name:"Power Grid Corp",   g:3,m:4,d:4,v:4,t:5,note:"Monopoly T&D; regulated 15.5% ROE"},
+    {name:"NHPC",              g:3,m:4,d:4,v:4,t:5,note:"Hydro PSU; stable regulated returns"},
+    {name:"SJVN",              g:3,m:3,d:4,v:4,t:5,note:"Expanding into solar + hydro mix"},
+    {name:"CESC",              g:2,m:3,d:3,v:3,t:4,note:"Kolkata distribution utility"},
+    {name:"Tata Power",        g:4,m:3,d:3,v:3,t:5,note:"Solar + distribution; diversified"},
+    {name:"Adani Green",       g:5,m:3,d:2,v:2,t:5,note:"Largest solar IPP; high debt"},
+    {name:"Adani Energy Solutions",g:4,m:3,d:3,v:3,t:5,note:"Transmission + smart metering"},
+    {name:"Torrent Power",     g:3,m:3,d:3,v:3,t:4,note:"Regulated + merchant + RE mix"},
+    {name:"JSW Energy",        g:4,m:3,d:3,v:3,t:4,note:"Merchant + long-term PPA"},
+    {name:"Waaree Energies",   g:5,m:3,d:4,v:3,t:5,note:"Largest module maker; US export"},
+    {name:"Premier Energies",  g:4,m:3,d:4,v:3,t:5,note:"Solar cells + modules; PLI beneficiary"},
+    {name:"KPI Green Energy",  g:5,m:3,d:3,v:3,t:5,note:"EPC + IPP hybrid; Gujarat base"},
+    {name:"Websol Energy",     g:4,m:3,d:3,v:3,t:4,note:"Solar cell manufacturing; turnaround"},
+    {name:"KEC International", g:4,m:3,d:3,v:3,t:5,note:"T&D EPC; global order book"},
+    {name:"Genus Power",       g:5,m:3,d:4,v:3,t:5,note:"Smart meters; 250Mn unit rollout"},
+    {name:"Hitachi Energy India",g:4,m:4,d:5,v:2,t:5,note:"HVDC transformers; niche leader"},
+    {name:"Voltamp Transformers",g:4,m:4,d:5,v:3,t:5,note:"Small-cap; high ROE transformer"},
+    {name:"Transformers & Rectifiers",g:4,m:3,d:4,v:3,t:5,note:"Ultra HV specialist"},
+    {name:"Sterling & Wilson",  g:4,m:2,d:3,v:3,t:4,note:"Solar EPC; large scale projects"}
+  ],
+  "Defence":[
+    {name:"HAL",               g:4,m:5,d:5,v:3,t:5,note:"Monopoly fighter + helicopter OEM"},
+    {name:"BEL",               g:4,m:4,d:5,v:4,t:5,note:"Radar + EW + comms; Rs.70,000Cr backlog"},
+    {name:"Mazagon Dock",      g:4,m:4,d:5,v:3,t:5,note:"Submarine + destroyer monopoly"},
+    {name:"Garden Reach",      g:4,m:3,d:5,v:3,t:5,note:"Frigates + patrol vessels"},
+    {name:"Cochin Shipyard",   g:4,m:3,d:5,v:3,t:5,note:"Aircraft carrier + commercial ship"},
+    {name:"Bharat Dynamics",   g:4,m:4,d:5,v:3,t:5,note:"Missile systems; DRDO partner"},
+    {name:"Data Patterns",     g:4,m:4,d:5,v:2,t:5,note:"Defence electronics; niche"},
+    {name:"Paras Defence",     g:4,m:3,d:5,v:2,t:5,note:"Optics + EMP; drone focus"},
+    {name:"Astra Microwave",   g:4,m:3,d:5,v:3,t:5,note:"Microwave components for radar"},
+    {name:"Zen Technologies",  g:4,m:3,d:5,v:2,t:4,note:"Training simulators + counter-drone"},
+    {name:"MTAR Technologies", g:4,m:4,d:5,v:2,t:5,note:"Precision parts for HAL, ISRO"},
+    {name:"ideaForge Technology",g:4,m:3,d:5,v:2,t:5,note:"Military-grade UAV leader"},
+    {name:"Solar Industries",  g:4,m:4,d:4,v:3,t:4,note:"Commercial explosives + defence ammo"},
+    {name:"Premier Explosives", g:3,m:3,d:4,v:3,t:4,note:"Micro-cap; DRDO partnerships"},
+    {name:"Dynamatic Technologies",g:3,m:3,d:3,v:3,t:4,note:"Aerospace structures; Airbus supplier"},
+    {name:"Mishra Dhatu Nigam",g:3,m:3,d:5,v:3,t:4,note:"PSU; special alloys for defence"},
+    {name:"Bharat Forge",      g:3,m:3,d:3,v:3,t:4,note:"Defence + auto forging; exports"},
+    {name:"Titagarh Rail Systems",g:4,m:3,d:4,v:3,t:4,note:"Rail wagons + defence vehicles"}
+  ],
+  "Capital Goods":[
+    {name:"L&T",               g:4,m:4,d:3,v:3,t:5,note:"Largest EPC conglomerate; record order book"},
+    {name:"BHEL",              g:3,m:2,d:3,v:3,t:4,note:"PSU heavy electrical; revival under way"},
+    {name:"Siemens India",     g:4,m:4,d:5,v:2,t:5,note:"Grid tech + factory automation"},
+    {name:"ABB India",         g:4,m:4,d:5,v:2,t:5,note:"Switchgear + transformer leader"},
+    {name:"Thermax",           g:3,m:3,d:5,v:3,t:4,note:"Industrial energy; clean energy pivot"},
+    {name:"Cummins India",     g:3,m:4,d:5,v:3,t:4,note:"DG sets + clean power + exports"},
+    {name:"Voltas",            g:3,m:3,d:5,v:3,t:4,note:"AC + MEP projects; Tata group"},
+    {name:"Blue Star",         g:4,m:3,d:5,v:3,t:4,note:"Commercial AC; growing residential"},
+    {name:"Polycab India",     g:4,m:4,d:5,v:3,t:5,note:"Cables + FMEG; #1 market position"},
+    {name:"KEI Industries",    g:4,m:4,d:5,v:3,t:5,note:"EHV cables; data centre demand"},
+    {name:"Havells India",     g:4,m:4,d:5,v:3,t:5,note:"Consumer + industrial electrical"},
+    {name:"Finolex Cables",    g:3,m:3,d:5,v:3,t:4,note:"Copper cable; value play"},
+    {name:"RR Kabel",          g:4,m:3,d:5,v:3,t:4,note:"Listed recently; growing fast"},
+    {name:"Kalpataru Projects",g:4,m:3,d:3,v:3,t:4,note:"T&D + railways + pipeline EPC"},
+    {name:"RVNL",              g:4,m:3,d:4,v:3,t:5,note:"Rail infra PSU; massive order book"},
+    {name:"Bharat Electronics", g:4,m:4,d:5,v:3,t:5,note:"Listed separately; also in defence"},
+    {name:"Dixon Technologies",g:5,m:3,d:4,v:3,t:5,note:"Electronics EMS; PLI beneficiary"},
+    {name:"Kaynes Technology", g:5,m:3,d:4,v:2,t:5,note:"Defence + EV + medtech EMS"},
+    {name:"Hitachi Energy India",g:4,m:4,d:5,v:2,t:5,note:"Transformers + grid solutions"},
+    {name:"Jupiter Wagons",    g:4,m:3,d:4,v:3,t:4,note:"Rail wagons + containers"},
+    {name:"Suzlon Energy",     g:4,m:3,d:3,v:3,t:5,note:"Wind turbine OEM; debt reduced"}
+  ],
+  "Pharma":[
+    {name:"Sun Pharma",        g:4,m:4,d:5,v:3,t:4,note:"Specialty + GLP-1 + branded generics"},
+    {name:"Dr Reddy's",        g:3,m:4,d:5,v:3,t:4,note:"US generics + biosimilars"},
+    {name:"Cipla",             g:3,m:3,d:5,v:3,t:4,note:"Respiratory + branded generics"},
+    {name:"Divi's Laboratories",g:3,m:4,d:5,v:3,t:4,note:"Global API leader; GLP-1 supply"},
+    {name:"Mankind Pharma",    g:4,m:4,d:5,v:3,t:4,note:"Mass-market branded generics"},
+    {name:"Natco Pharma",      g:4,m:4,d:5,v:4,t:4,note:"Para-IV filer; GLP-1 play"},
+    {name:"Gland Pharma",      g:3,m:4,d:5,v:3,t:4,note:"Injectables; CDMO play"},
+    {name:"Laurus Labs",       g:3,m:3,d:4,v:3,t:4,note:"ARV + CDMO; margin recovery"},
+    {name:"Biocon",            g:4,m:2,d:3,v:3,t:4,note:"Biosimilars; Biologics sub scale"},
+    {name:"Ajanta Pharma",     g:3,m:4,d:5,v:3,t:4,note:"Ophthalmology + cardio niche"},
+    {name:"Torrent Pharma",    g:3,m:4,d:3,v:3,t:4,note:"Cardiac + CNS branded generics"},
+    {name:"Abbott India",      g:3,m:4,d:5,v:2,t:4,note:"MNC subsidiary; premium branded"},
+    {name:"Pfizer India",      g:2,m:4,d:5,v:3,t:3,note:"MNC subsidiary; mature portfolio"},
+    {name:"Sanofi India",      g:2,m:4,d:5,v:3,t:3,note:"MNC; diabetes + vaccines"},
+    {name:"Lupin",             g:3,m:3,d:4,v:3,t:4,note:"US + India branded generics"},
+    {name:"Alkem Laboratories",g:3,m:3,d:5,v:3,t:4,note:"Domestic branded; anti-infective"},
+    {name:"Hikal",             g:3,m:3,d:3,v:3,t:4,note:"Pharma + agro API crossover"},
+    {name:"Suven Pharmaceuticals",g:4,m:4,d:5,v:3,t:4,note:"CDMO; niche CNS APIs"},
+    {name:"Sequent Scientific",g:3,m:3,d:3,v:3,t:4,note:"Animal health API; global"},
+    {name:"Piramal Pharma",    g:3,m:3,d:3,v:3,t:4,note:"CDMO + India consumer health"}
+  ],
+  "Banking":[
+    {name:"HDFC Bank",         g:4,m:4,d:4,v:3,t:4,note:"#1 private bank; post-merger normalising"},
+    {name:"ICICI Bank",        g:4,m:4,d:4,v:3,t:4,note:"Best RoA trajectory in sector"},
+    {name:"Kotak Mahindra Bank",g:3,m:4,d:4,v:2,t:3,note:"Quality premium; digital strength"},
+    {name:"Axis Bank",         g:3,m:3,d:4,v:3,t:3,note:"Improving RoA; turnaround visible"},
+    {name:"Yes Bank",          g:3,m:2,d:3,v:4,t:2,note:"Recovery stage; governance risk"},
+    {name:"IndusInd Bank",     g:3,m:3,d:3,v:3,t:3,note:"Microfinance + vehicle loans"},
+    {name:"IDFC First Bank",   g:4,m:2,d:4,v:3,t:3,note:"Building retail franchise; thin margins"},
+    {name:"RBL Bank",          g:3,m:2,d:3,v:3,t:2,note:"Mid-size; credit card + MFI risk"},
+    {name:"Bandhan Bank",      g:3,m:3,d:3,v:3,t:3,note:"Microfinance heavy; Bengal-focused"},
+    {name:"AU Small Finance Bank",g:4,m:3,d:4,v:3,t:4,note:"Premium SFB; universal bank aspiration"},
+    {name:"SBI",               g:3,m:3,d:3,v:4,t:3,note:"Best PSU bank; cheap vs private"},
+    {name:"Bank of Baroda",    g:3,m:3,d:3,v:4,t:3,note:"2nd best PSU; improving RoA"},
+    {name:"Canara Bank",       g:3,m:3,d:3,v:4,t:3,note:"Large PSU; NPA improving"},
+    {name:"Punjab National Bank",g:2,m:2,d:3,v:4,t:2,note:"PSU; NPA still elevated"},
+    {name:"Bank of India",     g:2,m:3,d:3,v:4,t:3,note:"PSU; mid-size"},
+    {name:"Union Bank",        g:3,m:3,d:3,v:4,t:3,note:"PSU; merged entity"},
+    {name:"Indian Bank",       g:3,m:3,d:3,v:4,t:3,note:"South India PSU; decent quality"},
+    {name:"Federal Bank",      g:3,m:3,d:4,v:3,t:3,note:"South India; growing retail"},
+    {name:"South Indian Bank", g:2,m:2,d:3,v:3,t:2,note:"Kerala-base; niche franchise"},
+    {name:"City Union Bank",   g:3,m:3,d:4,v:3,t:3,note:"South India MSME focus"},
+    {name:"Karur Vysya Bank",  g:3,m:3,d:4,v:3,t:3,note:"Tamil Nadu base; recovery"},
+    {name:"DCB Bank",          g:3,m:3,d:3,v:3,t:3,note:"Small private; MSME + affordable housing"},
+    {name:"Jammu & Kashmir Bank",g:3,m:3,d:3,v:3,t:3,note:"J&K state bank; recovery"}
+  ],
+  "Infra/Cement":[
+    {name:"L&T (Infra)",       g:4,m:4,d:3,v:3,t:5,note:"Roads + metro + water EPC"},
+    {name:"IRB Infra",         g:4,m:3,d:2,v:4,t:4,note:"Road EPC + BOT; high debt"},
+    {name:"G R Infraprojects", g:4,m:4,d:4,v:3,t:4,note:"Road + railway EPC; lean balance sheet"},
+    {name:"PNC Infratech",     g:4,m:3,d:4,v:3,t:4,note:"Roads + water EPC"},
+    {name:"HG Infra Engineering",g:4,m:4,d:4,v:3,t:4,note:"Roads + railways EPC; fast growth"},
+    {name:"Ashoka Buildcon",   g:3,m:3,d:3,v:3,t:4,note:"BOT road portfolio + EPC"},
+    {name:"Dilip Buildcon",    g:3,m:3,d:2,v:3,t:4,note:"Roads EPC; debt concern"},
+    {name:"RITES",             g:3,m:4,d:5,v:3,t:4,note:"Rail PSU; consulting + export"},
+    {name:"IRCON International",g:3,m:3,d:5,v:3,t:4,note:"Rail + highway PSU EPC"},
+    {name:"UltraTech Cement",  g:3,m:4,d:4,v:3,t:4,note:"India's largest; consolidation"},
+    {name:"Shree Cement",      g:3,m:4,d:5,v:2,t:4,note:"Lowest cost producer"},
+    {name:"Ambuja Cements",    g:3,m:3,d:4,v:3,t:4,note:"Adani group; distribution push"},
+    {name:"ACC",               g:3,m:3,d:4,v:3,t:4,note:"Adani group; pan-India"},
+    {name:"Dalmia Bharat",     g:3,m:3,d:3,v:3,t:3,note:"East India; expanding South"},
+    {name:"JK Cement",         g:3,m:3,d:3,v:3,t:3,note:"White + grey cement"},
+    {name:"Orient Cement",     g:3,m:3,d:3,v:3,t:3,note:"South + West India"},
+    {name:"Ramco Cement",      g:3,m:3,d:3,v:3,t:3,note:"South India focused"}
+  ],
+  "Brokers/Wealth":[
+    {name:"360 One WAM",       g:5,m:5,d:5,v:3,t:5,note:"Ultra-HNI wealth management leader"},
+    {name:"Angel One",         g:4,m:4,d:5,v:3,t:5,note:"Discount broker pivoting to wealth + AMC"},
+    {name:"ICICI Securities",  g:3,m:4,d:5,v:3,t:4,note:"Full-service + digital platform"},
+    {name:"Nuvama Wealth",     g:4,m:4,d:5,v:3,t:5,note:"Edelweiss wealth arm"},
+    {name:"Anand Rathi Wealth",g:4,m:5,d:5,v:3,t:5,note:"Mass affluent + NRI focus"},
+    {name:"Motilal Oswal",     g:3,m:3,d:4,v:3,t:4,note:"Broking + AMC + housing finance"},
+    {name:"5Paisa Capital",    g:4,m:2,d:4,v:3,t:4,note:"Discount broker; loss-making"},
+    {name:"Geojit Financial",  g:2,m:3,d:5,v:3,t:3,note:"South India full-service broker"},
+    {name:"Edelweiss Financial",g:3,m:3,d:3,v:3,t:4,note:"Diversified fin services; ARC + AMC"},
+    {name:"IIFL Securities",   g:3,m:3,d:4,v:3,t:4,note:"Full-service + wealth arm"}
+  ],
+  "AMC":[
+    {name:"HDFC AMC",          g:4,m:5,d:5,v:2,t:5,note:"#1 AMC by AUM; dominant brand"},
+    {name:"Nippon India AMC",  g:4,m:5,d:5,v:3,t:5,note:"ETF + direct plan specialist"},
+    {name:"Aditya Birla AMC",  g:3,m:4,d:5,v:3,t:5,note:"Balanced fund house; passive push"},
+    {name:"UTI AMC",           g:3,m:3,d:5,v:3,t:4,note:"PSU AMC; re-rating potential"},
+    {name:"Mirae Asset AMC",   g:4,m:4,d:5,v:3,t:5,note:"Aggressive SIP growth"},
+    {name:"Sundaram AMC",      g:3,m:4,d:5,v:3,t:4,note:"South India base; quality funds"},
+    {name:"Quantum AMC",       g:2,m:3,d:5,v:4,t:3,note:"Small; value + passive focus"}
+  ],
+  "Insurance":[
+    {name:"HDFC Life",         g:4,m:3,d:5,v:3,t:5,note:"VNB margin leader; protection-first"},
+    {name:"SBI Life",          g:4,m:3,d:5,v:3,t:5,note:"Bancassurance moat via SBI network"},
+    {name:"ICICI Prudential Life",g:3,m:3,d:5,v:3,t:4,note:"ULIP to protection pivot"},
+    {name:"Max Life (Max Financial)",g:4,m:3,d:5,v:3,t:5,note:"Protection leader; private"},
+    {name:"Bajaj Allianz Life",g:3,m:3,d:5,v:3,t:4,note:"Bajaj group; diversified product"},
+    {name:"Tata AIA Life",     g:4,m:3,d:5,v:3,t:4,note:"Tata group; fast growing"},
+    {name:"LIC of India",      g:2,m:2,d:5,v:4,t:3,note:"PSU giant; low VNB margins"},
+    {name:"Star Health",       g:4,m:2,d:5,v:3,t:4,note:"Largest standalone health insurer"},
+    {name:"Niva Bupa",         g:4,m:2,d:5,v:3,t:4,note:"Growing retail health franchise"},
+    {name:"Care Health (Religare)",g:3,m:2,d:5,v:3,t:3,note:"Mid-size health insurer"},
+    {name:"New India Assurance",g:2,m:2,d:5,v:3,t:3,note:"PSU general insurance; weak margins"},
+    {name:"United India Insurance",g:2,m:1,d:4,v:3,t:2,note:"PSU GI; challenges remain"},
+    {name:"ICICI Lombard",     g:4,m:3,d:5,v:3,t:4,note:"Best private general insurer"},
+    {name:"HDFC Ergo",         g:4,m:3,d:5,v:3,t:4,note:"HDFC general insurance"},
+    {name:"Go Digit Insurance",g:4,m:2,d:5,v:3,t:4,note:"Insurtech; growing fast"},
+    {name:"PB Fintech (PolicyBazaar)",g:4,m:2,d:5,v:2,t:5,note:"Insurance + credit marketplace"}
+  ],
+  "NBFC":[
+    {name:"Bajaj Finance",     g:4,m:4,d:3,v:2,t:4,note:"Consumer credit; cross-sell moat"},
+    {name:"Bajaj Finserv",     g:4,m:4,d:3,v:2,t:4,note:"Holding co; Bajaj Finance + insurance"},
+    {name:"Chola Finance",     g:4,m:4,d:3,v:3,t:4,note:"Vehicle + home finance strength"},
+    {name:"Muthoot Finance",   g:3,m:4,d:4,v:3,t:4,note:"#1 gold loan; MSME + housing expand"},
+    {name:"Manappuram Finance",g:3,m:3,d:3,v:4,t:3,note:"Gold + MFI + housing diversification"},
+    {name:"Poonawalla Fincorp",g:4,m:3,d:4,v:3,t:4,note:"Clean book; Poonawalla backed"},
+    {name:"L&T Finance",       g:3,m:3,d:3,v:3,t:3,note:"Retail pivot; farm + home loans"},
+    {name:"Mahindra Finance",  g:3,m:3,d:3,v:3,t:3,note:"Rural vehicle + tractor finance"},
+    {name:"IIFL Finance",      g:4,m:4,d:3,v:3,t:4,note:"Gold + home + SME loans"},
+    {name:"Aditya Birla Capital",g:3,m:3,d:3,v:3,t:4,note:"Diversified fin services NBFC"},
+    {name:"HDB Financial Services",g:3,m:3,d:3,v:3,t:3,note:"HDFC Bank subsidiary; MSME"},
+    {name:"Shriram Finance",   g:3,m:4,d:3,v:3,t:4,note:"CV + used vehicle finance leader"},
+    {name:"Sundaram Finance",  g:3,m:4,d:4,v:3,t:3,note:"South India CV + auto finance"},
+    {name:"Five-Star Business Finance",g:4,m:4,d:4,v:3,t:4,note:"Small business loans; South India"},
+    {name:"Aptus Value Housing",g:4,m:4,d:4,v:3,t:4,note:"Affordable housing; South India"},
+    {name:"Home First Finance",g:4,m:4,d:4,v:3,t:4,note:"Affordable housing tier-2/3 cities"},
+    {name:"Repco Home Finance",g:3,m:3,d:4,v:3,t:3,note:"South India housing finance"},
+    {name:"Aavas Financiers",  g:4,m:4,d:4,v:3,t:4,note:"Affordable housing Rajasthan base"},
+    {name:"PNB Housing Finance",g:3,m:3,d:3,v:3,t:3,note:"PSU-backed; mid-tier housing"},
+    {name:"Can Fin Homes",     g:3,m:4,d:4,v:3,t:3,note:"Canara Bank subsidiary; housing"}
+  ],
+  "SFB/MicroFin":[
+    {name:"AU Small Finance Bank",g:4,m:3,d:4,v:3,t:4,note:"Premium SFB; universal bank aspirant"},
+    {name:"Equitas SFB",       g:3,m:3,d:4,v:3,t:3,note:"Micro + SME lending franchise"},
+    {name:"Ujjivan SFB",       g:3,m:2,d:4,v:3,t:3,note:"MFI-to-SFB; rural focus"},
+    {name:"ESAF SFB",          g:3,m:2,d:4,v:3,t:2,note:"Kerala MFI; stress elevated"},
+    {name:"Jana SFB",          g:3,m:2,d:3,v:3,t:2,note:"Mass market SFB"},
+    {name:"Suryoday SFB",      g:3,m:2,d:3,v:3,t:2,note:"Urban MFI focus"},
+    {name:"Utkarsh SFB",       g:3,m:2,d:4,v:3,t:3,note:"Varanasi base; rural UP"},
+    {name:"CreditAccess Grameen",g:3,m:3,d:3,v:3,t:3,note:"Karnataka MFI; expanding North"},
+    {name:"Spandana Sphoorty", g:2,m:2,d:3,v:4,t:2,note:"Andhra MFI; stress slowly easing"},
+    {name:"Fusion Finance",    g:3,m:2,d:3,v:3,t:2,note:"North India MFI"},
+    {name:"Asirvad Micro Finance",g:3,m:2,d:3,v:3,t:2,note:"South India MFI; Manappuram sub"},
+    {name:"Muthoot Microfin",  g:3,m:2,d:3,v:3,t:3,note:"Muthoot group MFI arm"}
+  ],
+  "New Age Tech":[
+    {name:"Zomato",            g:5,m:2,d:5,v:2,t:4,note:"Food delivery + Blinkit; profitable"},
+    {name:"Swiggy",            g:4,m:1,d:4,v:2,t:3,note:"Food delivery; profitability path long"},
+    {name:"Nykaa",             g:4,m:2,d:5,v:2,t:4,note:"Beauty ecommerce + omnichannel"},
+    {name:"Paytm",             g:2,m:1,d:4,v:3,t:3,note:"Fintech; recovering from RBI hit"},
+    {name:"PB Fintech",        g:4,m:2,d:5,v:2,t:5,note:"Insurance + credit marketplace"},
+    {name:"Delhivery",         g:3,m:1,d:4,v:3,t:3,note:"Logistics infrastructure"},
+    {name:"Nazara Technologies",g:4,m:2,d:4,v:3,t:4,note:"Mobile gaming; India + Africa"},
+    {name:"Info Edge (Naukri)",g:3,m:4,d:5,v:2,t:4,note:"Job portal; monopoly + Zomato stake"},
+    {name:"CarTrade Tech",     g:3,m:2,d:5,v:3,t:3,note:"Auto marketplace; profitability"},
+    {name:"EaseMyTrip",        g:3,m:2,d:5,v:3,t:4,note:"Online travel; growing fast"},
+    {name:"Indiamart Intermesh",g:3,m:4,d:5,v:3,t:4,note:"B2B marketplace; cash-rich"},
+    {name:"TradeIndia (Infibeam)",g:3,m:2,d:4,v:3,t:3,note:"B2B + payments platform"}
+  ],
+  "Retail":[
+    {name:"Avenue Supermarts", g:4,m:4,d:5,v:2,t:4,note:"EDLP grocery; 18% ROE consistently"},
+    {name:"Trent",             g:5,m:4,d:5,v:2,t:5,note:"Zudio mass fashion; fastest growing"},
+    {name:"Vedant Fashions",   g:3,m:4,d:5,v:3,t:4,note:"Manyavar ethnic wear monopoly"},
+    {name:"Aditya Birla Fashion",g:3,m:2,d:2,v:3,t:3,note:"Pantaloons + premium brands; debt"},
+    {name:"V-Mart",            g:2,m:2,d:4,v:4,t:3,note:"Value retail; recovery play"},
+    {name:"Shoppers Stop",     g:3,m:2,d:4,v:3,t:3,note:"Dept store; premiumisation"},
+    {name:"Cantabil Retail",   g:3,m:3,d:5,v:3,t:3,note:"Value fashion North India"},
+    {name:"Westside (Trent)",  g:5,m:4,d:5,v:2,t:5,note:"Premium fashion Tata group"},
+    {name:"Reliance Retail (unlisted)",g:4,m:3,d:3,v:3,t:5,note:"India's largest retailer"},
+    {name:"Spencer's Retail",  g:2,m:1,d:3,v:3,t:2,note:"Legacy format; limited growth"},
+    {name:"Future Retail (delisted)",g:1,m:1,d:1,v:1,t:1,note:"Bankrupt; avoid"},
+    {name:"Titan Company",     g:4,m:4,d:5,v:2,t:4,note:"Watches + jewellery + eyewear"}
+  ],
+  "FMCG":[
+    {name:"Hindustan Unilever",g:2,m:5,d:5,v:2,t:3,note:"#1 FMCG; expensive but best quality"},
+    {name:"ITC",               g:3,m:5,d:5,v:4,t:3,note:"Cigarettes + FMCG; re-rating play"},
+    {name:"Nestle India",      g:3,m:5,d:5,v:1,t:3,note:"Premium food; very expensive"},
+    {name:"Britannia",         g:2,m:4,d:5,v:3,t:3,note:"Bakery leader; margin expansion"},
+    {name:"Tata Consumer",     g:3,m:3,d:5,v:3,t:4,note:"Starbucks + Tata Salt + brands"},
+    {name:"Godrej Consumer",   g:3,m:3,d:5,v:3,t:3,note:"Household + personal care + Africa"},
+    {name:"Marico",            g:2,m:4,d:5,v:3,t:3,note:"Parachute + Saffola; rural"},
+    {name:"Dabur India",       g:2,m:3,d:5,v:3,t:3,note:"Ayurvedic + health + juices"},
+    {name:"Colgate-Palmolive", g:2,m:4,d:5,v:2,t:3,note:"Oral care monopoly; expensive"},
+    {name:"Jyothy Labs",       g:3,m:4,d:5,v:3,t:3,note:"Ujala + Margo; mid-cap FMCG"},
+    {name:"Emami",             g:2,m:4,d:5,v:3,t:3,note:"Male grooming + Zandu Balm"},
+    {name:"P&G India",         g:2,m:4,d:5,v:3,t:3,note:"MNC; personal care + healthcare"},
+    {name:"Himalaya Drug",     g:3,m:3,d:5,v:4,t:3,note:"Herbal personal care; unlisted"},
+    {name:"Patanjali (FMCG)",  g:3,m:3,d:4,v:4,t:3,note:"Ayurvedic; unlisted FMCG"},
+    {name:"Varun Beverages",   g:4,m:4,d:3,v:3,t:4,note:"PepsiCo bottler; India + Africa"},
+    {name:"Radico Khaitan",    g:3,m:3,d:4,v:3,t:3,note:"Indian spirits; premium pivot"},
+    {name:"United Breweries",  g:3,m:3,d:4,v:2,t:3,note:"Kingfisher beer; UB group"},
+    {name:"Varun Breweries (VBL)",g:4,m:4,d:3,v:3,t:4,note:"PepsiCo franchise; compounder"}
+  ],
+  "Cement":[
+    {name:"UltraTech Cement",  g:3,m:4,d:4,v:3,t:4,note:"India's largest; acquisition-led"},
+    {name:"Shree Cement",      g:3,m:4,d:5,v:2,t:4,note:"Lowest cost; premium valuation"},
+    {name:"Ambuja Cements",    g:3,m:3,d:4,v:3,t:4,note:"Adani group; distribution push"},
+    {name:"ACC",               g:3,m:3,d:4,v:3,t:4,note:"Adani group; pan-India network"},
+    {name:"Dalmia Bharat",     g:3,m:3,d:3,v:3,t:3,note:"East India; expanding South"},
+    {name:"JK Cement",         g:3,m:3,d:3,v:3,t:3,note:"White + grey cement; niche"},
+    {name:"Orient Cement",     g:3,m:3,d:3,v:3,t:3,note:"South + West India"},
+    {name:"Ramco Cement",      g:3,m:3,d:4,v:3,t:3,note:"South India focused"},
+    {name:"Heidelberg India",  g:2,m:3,d:4,v:3,t:3,note:"MNC subsidiary; Central India"},
+    {name:"India Cements",     g:2,m:2,d:2,v:3,t:3,note:"South India; UltraTech acquirer"},
+    {name:"Birla Corp",        g:3,m:3,d:3,v:3,t:3,note:"MP + East India base"},
+    {name:"NCL Industries",    g:3,m:3,d:4,v:3,t:3,note:"South India; small cap"}
+  ],
+  "Gold/Jewellery":[
+    {name:"Titan Company",     g:4,m:4,d:5,v:2,t:4,note:"Tanishq + watches + eyewear ecosystem"},
+    {name:"Kalyan Jewellers",  g:4,m:3,d:4,v:3,t:4,note:"Pan-India franchise model"},
+    {name:"Senco Gold",        g:4,m:3,d:4,v:3,t:4,note:"East India dominant; expanding"},
+    {name:"PC Jeweller",       g:2,m:2,d:2,v:4,t:3,note:"Turnaround; high debt risk"},
+    {name:"Rajesh Exports",    g:2,m:2,d:3,v:4,t:3,note:"Gold refining + jewellery export"},
+    {name:"Thangamayil Jewellery",g:3,m:3,d:4,v:3,t:4,note:"Tamil Nadu dominant"},
+    {name:"P N Gadgil & Sons", g:4,m:3,d:4,v:3,t:4,note:"Maharashtra; recently listed"},
+    {name:"Malabar Gold (unlisted)",g:4,m:3,d:4,v:3,t:4,note:"South India leader; IPO awaited"},
+    {name:"Tribhovandas Bhimji Zaveri",g:3,m:3,d:4,v:3,t:4,note:"Mumbai retail; premium segment"}
+  ],
+  "Hotels/Tourism":[
+    {name:"Indian Hotels (Taj)",g:4,m:4,d:4,v:2,t:5,note:"Taj + Vivanta + Ginger; largest chain"},
+    {name:"EIH (Oberoi)",      g:4,m:4,d:5,v:2,t:5,note:"Ultra-luxury; highest ARPOB India"},
+    {name:"Lemon Tree Hotels", g:4,m:3,d:3,v:3,t:5,note:"Mid-market; asset-light pivot"},
+    {name:"Chalet Hotels",     g:4,m:3,d:3,v:3,t:4,note:"Business hotels in metros"},
+    {name:"Mahindra Holidays", g:3,m:3,d:3,v:3,t:4,note:"Club Mahindra timeshare model"},
+    {name:"ITDC",              g:2,m:2,d:4,v:3,t:3,note:"PSU hotels; Ashok group"},
+    {name:"Royal Orchid Hotels",g:3,m:3,d:4,v:3,t:4,note:"Mid-market + leisure; South India"},
+    {name:"Kamat Hotels",      g:3,m:3,d:3,v:3,t:3,note:"West India; budget + mid-market"},
+    {name:"Sinclairs Hotels",  g:3,m:3,d:5,v:3,t:3,note:"East India; leisure + budget"},
+    {name:"Thomas Cook India", g:3,m:3,d:4,v:3,t:4,note:"Travel + forex + hotels"},
+    {name:"Cox & Kings",       g:2,m:1,d:2,v:2,t:3,note:"Debt restructuring; revival"},
+    {name:"IRCTC",             g:4,m:5,d:5,v:2,t:4,note:"Rail booking monopoly; high margin"}
+  ],
+  "Hospitals":[
+    {name:"Apollo Hospitals",  g:4,m:4,d:4,v:2,t:5,note:"Apollo 24/7 + pharmacy + hospitals"},
+    {name:"Max Healthcare",    g:4,m:4,d:5,v:2,t:5,note:"North India dominant; expanding"},
+    {name:"Narayana Hrudayalaya",g:4,m:4,d:5,v:3,t:5,note:"Cardiac specialist; global ops"},
+    {name:"Fortis Healthcare", g:3,m:3,d:4,v:3,t:4,note:"Pan-India; IHH backing"},
+    {name:"Global Health (Medanta)",g:4,m:3,d:4,v:3,t:4,note:"North India super-specialty"},
+    {name:"Aster DM Healthcare",g:4,m:3,d:3,v:3,t:4,note:"GCC + India; Middle East exits"},
+    {name:"Yatharth Hospital", g:4,m:4,d:4,v:3,t:4,note:"NCR focus; growing fast"},
+    {name:"Rainbow Children's",g:4,m:4,d:5,v:3,t:5,note:"Paediatrics niche; South India"},
+    {name:"Shalby Hospitals",  g:3,m:3,d:4,v:3,t:4,note:"Gujarat orthopaedic focus"},
+    {name:"Metropolis Healthcare",g:3,m:3,d:5,v:3,t:4,note:"Pathology; West + South India"},
+    {name:"Dr Lal PathLabs",   g:3,m:4,d:5,v:3,t:4,note:"Diagnostics North India leader"},
+    {name:"Thyrocare",         g:2,m:3,d:5,v:3,t:3,note:"Wellness + preventive testing"},
+    {name:"Krsnaa Diagnostics",g:3,m:3,d:4,v:3,t:4,note:"PPP diagnostics; Tier 2/3 cities"},
+    {name:"Health Total (Ananda)",g:2,m:2,d:4,v:3,t:3,note:"Weight management; niche"},
+    {name:"Healthium Medtech", g:3,m:3,d:4,v:3,t:4,note:"Surgical devices; exports"}
+  ],
+  "Paints":[
+    {name:"Asian Paints",      g:2,m:5,d:5,v:2,t:3,note:"#1 paint; 60yr distribution moat"},
+    {name:"Berger Paints",     g:2,m:4,d:5,v:2,t:3,note:"#2; competitive pressure rising"},
+    {name:"Kansai Nerolac",    g:2,m:3,d:5,v:3,t:3,note:"Industrial + auto OEM paints"},
+    {name:"Indigo Paints",     g:3,m:3,d:5,v:3,t:3,note:"Challenger brand; niche products"},
+    {name:"Grasim (Birla Opus)",g:3,m:3,d:3,v:3,t:3,note:"Disruptive new entrant; Rs.10,000Cr investment"},
+    {name:"Shalimar Paints",   g:2,m:2,d:3,v:3,t:2,note:"Heritage brand; turnaround"},
+    {name:"Akzo Nobel India",  g:2,m:3,d:5,v:3,t:3,note:"MNC subsidiary; Dulux brand"},
+    {name:"Nippon Paint India",g:3,m:3,d:5,v:3,t:3,note:"Japanese MNC; auto OEM focus"}
+  ],
+  "Textiles":[
+    {name:"Page Industries",   g:2,m:5,d:5,v:2,t:2,note:"Jockey licensee; premium innerwear moat"},
+    {name:"KPR Mill",          g:3,m:4,d:4,v:3,t:3,note:"Integrated textile; garment exports"},
+    {name:"Vardhman Textiles", g:2,m:3,d:3,v:3,t:2,note:"Yarn + fabric + garment; Punjab"},
+    {name:"Welspun Living",    g:2,m:3,d:3,v:3,t:2,note:"Home textiles exports USA/Europe"},
+    {name:"Himatsingka Seide", g:1,m:2,d:2,v:4,t:2,note:"Bed linen; stressed balance sheet"},
+    {name:"Trident",           g:2,m:3,d:3,v:3,t:3,note:"Terry towels + paper; exports"},
+    {name:"Filatex India",     g:3,m:3,d:3,v:3,t:3,note:"Polyester yarn; synthetic textiles"},
+    {name:"Indo Count Industries",g:3,m:3,d:4,v:3,t:3,note:"Bed linen exports; US market"},
+    {name:"Nitin Spinners",    g:3,m:3,d:3,v:3,t:3,note:"Cotton yarn; export + domestic"},
+    {name:"Gokaldas Exports",  g:3,m:3,d:4,v:3,t:3,note:"Garment export; global brands"},
+    {name:"Raymond",           g:3,m:3,d:3,v:3,t:3,note:"Suiting + real estate + tools"},
+    {name:"Arvind",            g:2,m:3,d:3,v:3,t:3,note:"Denim + brands + engineering"}
+  ],
+  "Recycling/ESG":[
+    {name:"Gravita India",     g:4,m:4,d:4,v:3,t:4,note:"Lead + aluminium recycling; 10+ countries"},
+    {name:"Eco Recycling",     g:3,m:3,d:4,v:3,t:4,note:"E-waste; compliance-driven model"},
+    {name:"Tata Cleantech",    g:3,m:3,d:3,v:3,t:4,note:"Green infra financing"},
+    {name:"Antique Finance",   g:3,m:3,d:4,v:3,t:3,note:"ESG-focused lending"},
+    {name:"Zinc India (Vedanta)",g:3,m:4,d:3,v:3,t:3,note:"Zinc + lead + silver recycling"},
+    {name:"Minda Corporation", g:3,m:3,d:4,v:3,t:4,note:"Auto components + EV parts recycle"}
+  ],
+  "Diversified":[
+    {name:"Varun Beverages",   g:4,m:4,d:3,v:3,t:4,note:"PepsiCo bottler; India + Africa"},
+    {name:"IEX",               g:3,m:5,d:5,v:2,t:5,note:"Power exchange; near-monopoly"},
+    {name:"Azad Engineering",  g:5,m:4,d:4,v:3,t:4,note:"Precision aerospace + energy parts"},
+    {name:"Westlife Foodworld",g:3,m:3,d:4,v:3,t:3,note:"McDonald's W+S India franchisee"},
+    {name:"G R Infraprojects", g:4,m:4,d:4,v:3,t:4,note:"Road + railway EPC"},
+    {name:"Devyani International",g:4,m:2,d:3,v:2,t:3,note:"KFC + Pizza Hut India franchise"},
+    {name:"Sapphire Foods",    g:4,m:2,d:3,v:3,t:3,note:"KFC + Pizza Hut South + West"},
+    {name:"Barbeque Nation",   g:3,m:2,d:3,v:3,t:3,note:"Casual dining; SaaS-like model"},
+    {name:"Jubilant Foodworks",g:3,m:3,d:4,v:3,t:3,note:"Domino's India; expanding brands"},
+    {name:"CAMS",              g:4,m:5,d:5,v:3,t:5,note:"MF transaction processor; monopoly-ish"}
+  ],
+  "IT Services":[
+    {name:"TCS",               g:2,m:5,d:5,v:3,t:2,note:"#1 IT; AI disruption headwind"},
+    {name:"Infosys",           g:2,m:4,d:5,v:3,t:2,note:"Large deal wins; guidance cautious"},
+    {name:"HCL Technologies",  g:2,m:4,d:5,v:3,t:2,note:"Products + services mix"},
+    {name:"Wipro",             g:1,m:3,d:5,v:4,t:2,note:"Structural issues; cheapest large IT"},
+    {name:"Tech Mahindra",     g:2,m:3,d:5,v:3,t:2,note:"Telecom IT; restructuring"},
+    {name:"LTIMindtree",       g:3,m:4,d:5,v:3,t:3,note:"L&T IT; mid-size quality"},
+    {name:"Mphasis",           g:3,m:4,d:5,v:3,t:3,note:"DXC + BFSI focus; US exposure"},
+    {name:"Persistent Systems",g:4,m:4,d:5,v:2,t:3,note:"Digital engineering; fast growth"},
+    {name:"Coforge",           g:4,m:3,d:5,v:3,t:3,note:"BFSI + travel IT; Noida base"},
+    {name:"Birlasoft",         g:3,m:3,d:5,v:3,t:3,note:"Mid-size; SAP + cloud services"},
+    {name:"Mastek",            g:3,m:3,d:5,v:3,t:3,note:"UK govt + BFSI IT"},
+    {name:"Hexaware (relisted)",g:3,m:4,d:5,v:3,t:3,note:"AI + automation; PE-backed"},
+    {name:"KPIT Technologies", g:4,m:4,d:5,v:2,t:4,note:"Auto software; EV + ADAS"},
+    {name:"Tata Elxsi",        g:3,m:5,d:5,v:2,t:4,note:"Embedded design; auto + media"},
+    {name:"Cyient",            g:3,m:3,d:5,v:3,t:3,note:"Engineering R&D + digital"},
+    {name:"Zensar Technologies",g:3,m:3,d:5,v:3,t:3,note:"RPG group; US BFSI"},
+    {name:"Intellect Design",  g:3,m:3,d:5,v:3,t:3,note:"Fintech product company; SaaS"},
+    {name:"Newgen Software",   g:4,m:4,d:5,v:3,t:4,note:"Document + process automation"},
+    {name:"Happiest Minds",    g:4,m:4,d:5,v:3,t:4,note:"Digital born; small cap quality"}
+  ]
 };
+
+// ══════════════════════════════════════════════════════════
+// SCORING ENGINE — Every score is derived from 5 real inputs
+// ══════════════════════════════════════════════════════════
+// Each company has 5 factors rated 1–5:
+//   g = Revenue Growth    (1=<5%,  2=5-10%, 3=10-15%, 4=15-25%, 5=>25%)
+//   m = Profit Margin     (1=<5%,  2=5-10%, 3=10-15%, 4=15-25%, 5=>25%)
+//   d = Debt Level        (1=very high debt → 5=debt-free)
+//   v = Valuation         (1=very expensive → 5=very cheap)
+//   t = Sector Tailwind   (1=headwind → 5=strong tailwind)
+//
+// CB Score = (g×0.25 + m×0.20 + d×0.20 + v×0.20 + t×0.15) × 20
+// Max = 5 × 20 = 100
+
+const FACTOR_WEIGHTS = { g:0.25, m:0.20, d:0.20, v:0.20, t:0.15 };
+const FACTOR_LABELS  = { g:'Revenue Growth', m:'Profit Margin', d:'Debt Level', v:'Valuation', t:'Sector Tailwind' };
+const FACTOR_SCALES  = {
+  g: ['—','<5% p.a.','5–10% p.a.','10–15% p.a.','15–25% p.a.','>25% p.a.'],
+  m: ['—','<5%','5–10%','10–15%','15–25%','>25%'],
+  d: ['—','Very High Debt','High Debt','Medium Debt','Low Debt','Debt-Free'],
+  v: ['—','Very Expensive (>50x PE)','Expensive (35–50x)','Fair (22–35x)','Reasonable (15–22x)','Cheap (<15x PE)'],
+  t: ['—','Strong Headwind','Headwind','Neutral','Tailwind','Strong Tailwind']
+};
+
+function calcScore(c) {
+  const s = (c.g*0.25 + c.m*0.20 + c.d*0.20 + c.v*0.20 + c.t*0.15) * 20;
+  return Math.round(s);
+}
+
+function scoreBreakdown(c) {
+  return Object.entries(FACTOR_WEIGHTS).map(([k,w]) =>
+    `${FACTOR_LABELS[k]}: ${FACTOR_SCALES[k][c[k]]} (${c[k]}/5, weight ${Math.round(w*100)}%)`
+  ).join(' | ');
+}
+
+// Inject calculated scores into COMPANIES (overrides any legacy score field)
+Object.values(COMPANIES).forEach(arr => arr.forEach(c => { c.score = calcScore(c); }));
+
+// Derive SECTOR scores = average of top-3 companies' scores (company-first!)
+function deriveSectorScore(sectorName) {
+  const cos = COMPANIES[sectorName] || [];
+  if (cos.length === 0) return 60;
+  const top3 = [...cos].sort((a,b) => b.score - a.score).slice(0, 3);
+  return Math.round(top3.reduce((s,c) => s+c.score, 0) / top3.length);
+}
+
+// Apply derived scores to SECTORS
+Object.keys(SECTORS).forEach(s => {
+  SECTORS[s].score = deriveSectorScore(s);
+  // Derive trend from score
+  SECTORS[s].tc = SECTORS[s].score>=75?'green':SECTORS[s].score>=55?'yellow':'red';
+});
+
+// Sector tailwind factor labels for display
+const TAILWIND_LABEL = ['—','Very Weak','Weak','Neutral','Good','Excellent'];
+// ══════════════════════════════════════════════════════════
+
 const THEMES={
   "GLP1":{name:"GLP-1 / Semaglutide",companies:[{name:"Sun Pharma",score:88,tailwind:"GLP-1 + Specialty",risk:"US Pricing Pressure"},{name:"Dr Reddy's",score:86,tailwind:"Generic Semaglutide",risk:"Competition"},{name:"Natco Pharma",score:81,tailwind:"Patent Expiry Play",risk:"Pricing Pressure"},{name:"Cipla",score:76,tailwind:"API Supply Chain",risk:"Regulatory Risk"}]},
   "Power":{name:"Power Transmission",companies:[{name:"NTPC",score:89,tailwind:"Power Demand Surge",risk:"Regulatory Lag"},{name:"Power Grid",score:86,tailwind:"Transmission Capex",risk:"Slow Tariff Growth"},{name:"ABB India",score:82,tailwind:"Grid Modernisation",risk:"Valuation Premium"},{name:"Hitachi Energy",score:80,tailwind:"Transformer Demand",risk:"Import Competition"},{name:"KEC Intl",score:76,tailwind:"T&D Order Book",risk:"Execution Delays"}]},
@@ -2121,27 +2561,27 @@ const SCREENER_DATA=[
   {name:"Insurance",macro:25,earn:25,struct:30,horizon:"3-5Y Selective",reason:"Extremely low penetration vs peers. IRDAI reforms driving distribution. Life + health both structural.",risks:"Mis-selling regulation, LIC competition",catalysts:"IRDAI bima reforms, Bima Sugam platform"},
   {name:"Infra / Cement",macro:28,earn:26,struct:27,horizon:"3-5Y Selective",reason:"Govt capex Rs.11L Cr/year. NHAI road awards, metro, rail. Cement volume 8-9% CAGR.",risks:"Commodity cost volatility, monsoon disruption",catalysts:"NHAI awards, state election spending"},
   {name:"Cement",macro:25,earn:24,struct:26,horizon:"3-5Y Selective",reason:"Infrastructure push driving volume. Consolidation underway with Adani-UltraTech competition. Capacity additions moderate.",risks:"Overcapacity, coal/pet-coke cost spikes, new entrants",catalysts:"Govt housing + infra spend, urban real estate"},
-  {name:"Gold/Jewellery",macro:24,earn:25,struct:26,horizon:"Watch",reason:"Gold at all-time highs raises jewellery demand. Organised retail (Tanishq, Kalyan) taking share from unorganised. Titan's omnichannel is best-in-class.",risks:"Gold price correction, GST complications, unorganised competition",catalysts:"Wedding season, gold price rally, BIS hallmarking enforcement"},
-  {name:"Retail",macro:23,earn:24,struct:25,horizon:"Watch",reason:"India's retail formalisation is real. Trent/Zudio disrupting value fashion. DMart's EDLP model prints ROE of 18%+. But valuations already price in a lot.",risks:"E-commerce encroachment, high real estate costs, consumer slowdown",catalysts:"Rural income recovery, premiumisation, physical + digital integration"},
-  {name:"NBFC",macro:23,earn:21,struct:22,horizon:"Watch",reason:"Rate cut cycle helps borrowing costs. MFI segment stress drag but vehicle + housing NBFCs solid.",risks:"MFI stress, asset quality deterioration",catalysts:"Rate cuts, rural credit demand"},
-  {name:"Chemicals (Specialty)",macro:23,earn:24,struct:28,horizon:"Watch",reason:"China+1 shift in specialty chemicals is structural 5Y story. Near-term China dumping still a headwind.",risks:"China dumping, global demand slowdown",catalysts:"Anti-dumping duties, new capacity utilisation"},
-  {name:"New Age Tech",macro:22,earn:18,struct:22,horizon:"Watch",reason:"Zomato profitable; quick commerce Blinkit growing at 80%+ YoY. India's digital consumer base 700M+. Long road to profitability for most but addressable markets are huge.",risks:"Cash burn, competitive intensity, regulatory risk for fintech",catalysts:"Profitability milestones, new market entry, IPO pipeline"},
-  {name:"Paints",macro:19,earn:20,struct:22,horizon:"Watch",reason:"Grasim entry creates competitive disruption but Asian Paints still has distribution moat. Premium segment growing. Construction cycle helps.",risks:"Grasim pricing war, crude/TiO2 cost spikes, slower real estate",catalysts:"Real estate cycle, infrastructure painting, rural demand"},
-  {name:"Real Estate",macro:24,earn:22,struct:25,horizon:"Watch",reason:"Rate cuts + premiumisation. DLF, Godrej, Prestige: strong launches but valuations pricing in perfection.",risks:"Rate reversal, regulatory delays",catalysts:"Rate cut cycle, urban housing demand"},
-  {name:"PSU Banks",macro:22,earn:20,struct:22,horizon:"Watch",reason:"NPA cycle cleaned. RoE improving from 4% to 12%+. SBI is only one worth owning. Structural ROE ceiling lower.",risks:"NPA resurgence, political lending pressure",catalysts:"GDP acceleration, asset quality hold"},
-  {name:"SFB/MicroFin",macro:18,earn:17,struct:19,horizon:"Watch",reason:"Small Finance Banks building deposit franchise. AU SFB best quality. MFI sector stressed due to overleveraging in rural areas but long-term penetration story intact.",risks:"Credit stress in MFI portfolios, over-indebtedness, RBI norms",catalysts:"Rural income recovery, NBFC-to-bank conversion, rate cuts"},
-  {name:"Diversified",macro:22,earn:21,struct:22,horizon:"Watch",reason:"Select picks: Varun Beverages (Pepsi franchise) steady compounder; IEX (power exchange monopoly) earnings visibility; Azad Engineering niche aerospace play.",risks:"Company-specific concentration risk; commodity exposure for some",catalysts:"Power market deregulation, new beverage launches, aerospace orders"},
-  {name:"Auto & EV",macro:22,earn:23,struct:24,horizon:"Watch",reason:"EV transition structural but competitive. ICE SUV cycle strong. 2W rural recovery underway.",risks:"EV subsidy cuts, raw material costs",catalysts:"EV PLI, rural demand revival"},
-  {name:"Consumer Durables",macro:20,earn:19,struct:21,horizon:"Watch",reason:"AC, refrigerator: premiumisation driving volume + value growth. PLI for white goods. But valuations rich.",risks:"Raw material cost spikes, rural slowdown",catalysts:"Summer cycle, premiumisation, PLI benefits"},
-  {name:"Recycling/ESG",macro:18,earn:18,struct:20,horizon:"Watch",reason:"Circular economy regulations tightening globally. Gravita India strong recycler. ESG-mandated procurement by large corporations driving demand for recycled materials.",risks:"Commodity price volatility, regulatory execution risk",catalysts:"EPR (Extended Producer Responsibility) mandates, battery recycling growth"},
-  {name:"IT Services",macro:14,earn:15,struct:16,horizon:"Skip",reason:"Global tech spending in pause mode. US recession risk, AI disruption threatening traditional outsourcing.",risks:"AI replacing headcount, client budget freeze",catalysts:"US economy re-acceleration, large deal wins"},
-  {name:"FMCG (Large Cap)",macro:13,earn:14,struct:17,horizon:"Skip",reason:"Volume growth under 4%, premium valuations (50-60x PE). Defensive but expensive — poor risk/reward.",risks:"Overvaluation, rural slowdown, private label",catalysts:"None near-term — purely defensive"},
-  {name:"Textiles",macro:15,earn:13,struct:16,horizon:"Skip",reason:"China+1 is real but India hasn't captured the shift. Labour/logistics issues. PLI impact slow. Only Page Industries and KPR Mill have structural moats.",risks:"Bangladesh competition, labour costs, forex",catalysts:"US-China trade war, PLI scale-up, brand building"},
-  {name:"Media / Entertainment",macro:12,earn:11,struct:13,horizon:"Skip",reason:"OTT disrupting linear TV; ad revenue lumpy. No structural compounding story for 3-5 years.",risks:"Cord-cutting, OTT losses, cyclical ad spend",catalysts:"IPL value, streaming profitability"},
-  {name:"Aviation",macro:14,earn:12,struct:15,horizon:"Skip",reason:"Structural demand growth but perpetually capital-destructive. High fuel dependency, thin margins.",risks:"Crude oil spike, airport capacity crunch",catalysts:"Open skies, fleet expansion profitability"},
-  {name:"Telecom",macro:16,earn:14,struct:18,horizon:"Skip",reason:"Duopoly with pricing power but capex intensity enormous. 5G monetisation unclear.",risks:"Spectrum costs, ARPU ceiling",catalysts:"ARPU hike cycle, enterprise 5G"},
-  {name:"Metals & Mining",macro:18,earn:16,struct:16,horizon:"Skip",reason:"Pure cyclical. China demand and global recession are primary drivers — too uncertain for 3-5Y thesis.",risks:"China slowdown, USD strength",catalysts:"Global infrastructure cycle"},
-  {name:"Commodities",macro:17,earn:15,struct:15,horizon:"Skip",reason:"Commodity prices volatile and China-driven. No structural compounding visible.",risks:"Global recession, demand destruction",catalysts:"Infra supercycle, supply disruptions"}
+  {name:"Gold/Jewellery",macro:24,earn:25,struct:26,horizon:"Score 50–69",reason:"Gold at all-time highs raises jewellery demand. Organised retail (Tanishq, Kalyan) taking share from unorganised. Titan's omnichannel is best-in-class.",risks:"Gold price correction, GST complications, unorganised competition",catalysts:"Wedding season, gold price rally, BIS hallmarking enforcement"},
+  {name:"Retail",macro:23,earn:24,struct:25,horizon:"Score 50–69",reason:"India's retail formalisation is real. Trent/Zudio disrupting value fashion. DMart's EDLP model prints ROE of 18%+. But valuations already price in a lot.",risks:"E-commerce encroachment, high real estate costs, consumer slowdown",catalysts:"Rural income recovery, premiumisation, physical + digital integration"},
+  {name:"NBFC",macro:23,earn:21,struct:22,horizon:"Score 50–69",reason:"Rate cut cycle helps borrowing costs. MFI segment stress drag but vehicle + housing NBFCs solid.",risks:"MFI stress, asset quality deterioration",catalysts:"Rate cuts, rural credit demand"},
+  {name:"Chemicals (Specialty)",macro:23,earn:24,struct:28,horizon:"Score 50–69",reason:"China+1 shift in specialty chemicals is structural 5Y story. Near-term China dumping still a headwind.",risks:"China dumping, global demand slowdown",catalysts:"Anti-dumping duties, new capacity utilisation"},
+  {name:"New Age Tech",macro:22,earn:18,struct:22,horizon:"Score 50–69",reason:"Zomato profitable; quick commerce Blinkit growing at 80%+ YoY. India's digital consumer base 700M+. Long road to profitability for most but addressable markets are huge.",risks:"Cash burn, competitive intensity, regulatory risk for fintech",catalysts:"Profitability milestones, new market entry, IPO pipeline"},
+  {name:"Paints",macro:19,earn:20,struct:22,horizon:"Score 50–69",reason:"Grasim entry creates competitive disruption but Asian Paints still has distribution moat. Premium segment growing. Construction cycle helps.",risks:"Grasim pricing war, crude/TiO2 cost spikes, slower real estate",catalysts:"Real estate cycle, infrastructure painting, rural demand"},
+  {name:"Real Estate",macro:24,earn:22,struct:25,horizon:"Score 50–69",reason:"Rate cuts + premiumisation. DLF, Godrej, Prestige: strong launches but valuations pricing in perfection.",risks:"Rate reversal, regulatory delays",catalysts:"Rate cut cycle, urban housing demand"},
+  {name:"PSU Banks",macro:22,earn:20,struct:22,horizon:"Score 50–69",reason:"NPA cycle cleaned. RoE improving from 4% to 12%+. SBI is only one worth owning. Structural ROE ceiling lower.",risks:"NPA resurgence, political lending pressure",catalysts:"GDP acceleration, asset quality hold"},
+  {name:"SFB/MicroFin",macro:18,earn:17,struct:19,horizon:"Score 50–69",reason:"Small Finance Banks building deposit franchise. AU SFB best quality. MFI sector stressed due to overleveraging in rural areas but long-term penetration story intact.",risks:"Credit stress in MFI portfolios, over-indebtedness, RBI norms",catalysts:"Rural income recovery, NBFC-to-bank conversion, rate cuts"},
+  {name:"Diversified",macro:22,earn:21,struct:22,horizon:"Score 50–69",reason:"Select picks: Varun Beverages (Pepsi franchise) steady compounder; IEX (power exchange monopoly) earnings visibility; Azad Engineering niche aerospace play.",risks:"Company-specific concentration risk; commodity exposure for some",catalysts:"Power market deregulation, new beverage launches, aerospace orders"},
+  {name:"Auto & EV",macro:22,earn:23,struct:24,horizon:"Score 50–69",reason:"EV transition structural but competitive. ICE SUV cycle strong. 2W rural recovery underway.",risks:"EV subsidy cuts, raw material costs",catalysts:"EV PLI, rural demand revival"},
+  {name:"Consumer Durables",macro:20,earn:19,struct:21,horizon:"Score 50–69",reason:"AC, refrigerator: premiumisation driving volume + value growth. PLI for white goods. But valuations rich.",risks:"Raw material cost spikes, rural slowdown",catalysts:"Summer cycle, premiumisation, PLI benefits"},
+  {name:"Recycling/ESG",macro:18,earn:18,struct:20,horizon:"Score 50–69",reason:"Circular economy regulations tightening globally. Gravita India strong recycler. ESG-mandated procurement by large corporations driving demand for recycled materials.",risks:"Commodity price volatility, regulatory execution risk",catalysts:"EPR (Extended Producer Responsibility) mandates, battery recycling growth"},
+  {name:"IT Services",macro:14,earn:15,struct:16,horizon:"Score < 50",reason:"Global tech spending in pause mode. US recession risk, AI disruption threatening traditional outsourcing.",risks:"AI replacing headcount, client budget freeze",catalysts:"US economy re-acceleration, large deal wins"},
+  {name:"FMCG (Large Cap)",macro:13,earn:14,struct:17,horizon:"Score < 50",reason:"Volume growth under 4%, premium valuations (50-60x PE). Defensive but expensive — poor risk/reward.",risks:"Overvaluation, rural slowdown, private label",catalysts:"None near-term — purely defensive"},
+  {name:"Textiles",macro:15,earn:13,struct:16,horizon:"Score < 50",reason:"China+1 is real but India hasn't captured the shift. Labour/logistics issues. PLI impact slow. Only Page Industries and KPR Mill have structural moats.",risks:"Bangladesh competition, labour costs, forex",catalysts:"US-China trade war, PLI scale-up, brand building"},
+  {name:"Media / Entertainment",macro:12,earn:11,struct:13,horizon:"Score < 50",reason:"OTT disrupting linear TV; ad revenue lumpy. No structural compounding story for 3-5 years.",risks:"Cord-cutting, OTT losses, cyclical ad spend",catalysts:"IPL value, streaming profitability"},
+  {name:"Aviation",macro:14,earn:12,struct:15,horizon:"Score < 50",reason:"Structural demand growth but perpetually capital-destructive. High fuel dependency, thin margins.",risks:"Crude oil spike, airport capacity crunch",catalysts:"Open skies, fleet expansion profitability"},
+  {name:"Telecom",macro:16,earn:14,struct:18,horizon:"Score < 50",reason:"Duopoly with pricing power but capex intensity enormous. 5G monetisation unclear.",risks:"Spectrum costs, ARPU ceiling",catalysts:"ARPU hike cycle, enterprise 5G"},
+  {name:"Metals & Mining",macro:18,earn:16,struct:16,horizon:"Score < 50",reason:"Pure cyclical. China demand and global recession are primary drivers — too uncertain for 3-5Y thesis.",risks:"China slowdown, USD strength",catalysts:"Global infrastructure cycle"},
+  {name:"Commodities",macro:17,earn:15,struct:15,horizon:"Score < 50",reason:"Commodity prices volatile and China-driven. No structural compounding visible.",risks:"Global recession, demand destruction",catalysts:"Infra supercycle, supply disruptions"}
 ];
 
 // ── STATE ───────────────────────────────────────────────────────────────
@@ -2266,9 +2706,8 @@ function updateAll(){
   // Main board top sectors
   const mbTS=document.getElementById("mb-topSectors");
   if(mbTS) mbTS.innerHTML=Object.entries(SECTORS).sort((a,b)=>b[1].score-a[1].score).slice(0,6).map(([nm,s])=>{
-    const verdict = s.score>=75?'&#9989; Buy':'&#9203; Watch';
-    const verdictCol = s.score>=75?'#006b30':'#b35c00';
-    const verdictBg = s.score>=75?'#e6f4ef':'#fff3e0';
+    const verdictBg = s.score>=75?'#e6f4ef':s.score>=55?'#fff3e0':'#fce8e8';
+    const verdictCol = s.score>=75?'#006b30':s.score>=55?'#b35c00':'#b71c1c';
     return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f0f2f8;cursor:pointer;" onclick="switchPage('drilldown')">
       <div style="flex:1;">
         <div style="font-size:13px;font-weight:800;color:#1a1e2e;">${nm}</div>
@@ -2276,7 +2715,7 @@ function updateAll(){
       </div>
       <div style="height:5px;width:60px;background:#e8ecf5;border-radius:4px;overflow:hidden;"><div style="width:${s.score}%;height:100%;background:${s.score>=75?'#00a854':s.score>=55?'#ff7c00':'#e53935'};border-radius:4px;"></div></div>
       <span style="font-size:11px;font-weight:900;color:#1a1e2e;min-width:24px;">${s.score}</span>
-      <span style="font-size:10px;font-weight:800;padding:3px 8px;border-radius:8px;background:${verdictBg};color:${verdictCol};">${verdict}</span>
+      <span style="font-size:11px;font-weight:900;color:${verdictCol};min-width:24px;">${s.score}</span>
     </div>`;
   }).join('');
 
@@ -2350,7 +2789,7 @@ function renderScreener(filter){
   data.sort((a,b)=>sk==="macro"?b.macro-a.macro:sk==="earnings"?b.earn-a.earn:sk==="structural"?b.struct-a.struct:b.composite-a.composite);
   const all=SCREENER_DATA.map(s=>({...s,composite:sComposite(s),verdict:sVerdict(sComposite(s))}));
   const nS=all.filter(s=>s.verdict==="strong").length, nW=all.filter(s=>s.verdict==="watch").length, nSk=all.filter(s=>s.verdict==="skip").length;
-  document.getElementById("screenerSummary").innerHTML=`<span class="sc-pill sc-pill-green">Strong Buy: ${nS}</span><span class="sc-pill sc-pill-yellow">Watch: ${nW}</span><span class="sc-pill sc-pill-red">Skip: ${nSk}</span>`;
+  document.getElementById("screenerSummary").innerHTML=`<span class="sc-pill sc-pill-green">Score ≥70: ${nS}</span><span class="sc-pill sc-pill-yellow">Watch: ${nW}</span><span class="sc-pill sc-pill-red">Skip: ${nSk}</span>`;
   document.getElementById("screenerInsight").innerHTML=`<strong>Screener Summary (3-5Y):</strong> Out of ${SCREENER_DATA.length} sectors, <strong style="color:var(--green)">${nS} pass</strong> composite threshold, <strong style="color:var(--yellow)">${nW}</strong> on watch, <strong style="color:var(--red)">${nSk}</strong> avoided. Top 3: <strong style="color:var(--orange)">${all.filter(s=>s.verdict==="strong").sort((a,b)=>b.composite-a.composite).slice(0,3).map(s=>s.name).join(", ")}</strong>.`;
   window._screenerData=data; renderScreenerContent();
 }
@@ -2363,14 +2802,14 @@ function renderScreenerContent(){
         const sc=s.composite,cl=sCls(sc);
         const bar=(v)=>`<div class="pillar-bar"><div class="bar"><div class="bar-fill" style="width:${Math.round(v/35*100)}%;background:${v>=28?"var(--green)":v>=20?"var(--yellow)":"var(--red)"}"></div></div><span class="${sCls(Math.round(v/35*100))}" style="font-size:10px;font-weight:800;">${v}</span></div>`;
         const vbcls=s.verdict==="strong"?"vb-strong":s.verdict==="watch"?"vb-watch":"vb-skip";
-        return `<tr><td style="color:var(--text-muted);font-weight:700;">${i+1}</td><td style="font-weight:800;">${s.name}</td><td>${bar(s.macro)}</td><td>${bar(s.earn)}</td><td>${bar(s.struct)}</td><td><span class="${cl}" style="font-size:15px;font-weight:900;">${sc}</span></td><td style="font-size:10px;font-weight:700;color:var(--blue);">${s.horizon}</td><td><span class="verdict-badge ${vbcls}">${s.verdict==="strong"?"Strong Buy":s.verdict==="watch"?"Watch":"Skip"}</span></td></tr>`;
+        return `<tr><td style="color:var(--text-muted);font-weight:700;">${i+1}</td><td style="font-weight:800;">${s.name}</td><td>${bar(s.macro)}</td><td>${bar(s.earn)}</td><td>${bar(s.struct)}</td><td><span class="${cl}" style="font-size:15px;font-weight:900;">${sc}</span></td><td style="font-size:10px;font-weight:700;color:var(--blue);">${s.horizon}</td><td><span class="verdict-badge ${vbcls}">${s.verdict==="strong"?"Score ≥ 70":s.verdict==="watch"?"Score 50–69":"Score < 50"}</span></td></tr>`;
       }).join("")}</table>`;
   } else if(screenerTab==="rationale"){
     document.getElementById("screenerRationaleDiv").innerHTML=data.filter(s=>s.verdict!=="skip").map(s=>`
       <div style="padding:11px 0;border-bottom:1px solid #dde1ec;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
           <span style="font-size:13px;font-weight:900;">${s.name}</span>
-          <span class="verdict-badge ${s.verdict==="strong"?"vb-strong":"vb-watch"}">${s.verdict==="strong"?"Strong Buy":"Watch"}</span>
+          <span class="verdict-badge ${s.verdict==="strong"?"vb-strong":"vb-watch"}">${s.verdict==="strong"?"Score ≥ 70":"Score 50–69"}</span>
           <span class="${sCls(s.composite)}" style="font-weight:900;">Score: ${s.composite}</span>
           <span style="font-size:10px;color:var(--blue);font-weight:700;margin-left:auto;">${s.horizon}</span>
         </div>
@@ -2386,7 +2825,7 @@ function renderScreenerContent(){
       ${data.map(s=>{
         const vbcls=s.verdict==="strong"?"vb-strong":s.verdict==="watch"?"vb-watch":"vb-skip";
         const cell=(v,max)=>{const pct=v/max*100;const c=pct>=80?"var(--green)":pct>=57?"var(--yellow)":"var(--red)";return `<td style="font-weight:900;color:${c};font-size:13px;">${v}<span style="font-size:9px;color:var(--text-muted);">/${max}</span></td>`;};
-        return `<tr><td style="font-weight:800;">${s.name}</td>${cell(s.macro,35)}${cell(s.earn,35)}${cell(s.struct,35)}${cell(s.composite,100)}<td style="font-size:10px;font-weight:700;color:var(--blue);">${s.horizon}</td><td><span class="verdict-badge ${vbcls}">${s.verdict==="strong"?"Strong Buy":s.verdict==="watch"?"Watch":"Skip"}</span></td></tr>`;
+        return `<tr><td style="font-weight:800;">${s.name}</td>${cell(s.macro,35)}${cell(s.earn,35)}${cell(s.struct,35)}${cell(s.composite,100)}<td style="font-size:10px;font-weight:700;color:var(--blue);">${s.horizon}</td><td><span class="verdict-badge ${vbcls}">${s.verdict==="strong"?"Score ≥ 70":s.verdict==="watch"?"Score 50–69":"Score < 50"}</span></td></tr>`;
       }).join("")}</table>`;
   }
 }
@@ -2554,7 +2993,7 @@ const DRILL=[
         {name:"Metropolis Healthcare",score:78,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"14%",note:"Pathology leader West + South India"},
         {name:"Dr Lal PathLabs",score:80,roce:"High",debt:"Low",val:"Reasonable",growth:"16%",note:"North India leader; tech-enabled"},
         {name:"Thyrocare",score:70,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"12%",note:"Wellness + preventive diagnostics"}]}]}]},
-  {id:"chemicals",name:"Chemicals",score:70,verdict:"watch",horizon:"Watch",macro:23,earn:24,struct:28,
+  {id:"chemicals",name:"Chemicals",score:70,verdict:"watch",horizon:"Score 50–69",macro:23,earn:24,struct:28,
    thesis:"China+1 shift in specialty chemicals is structural 5Y story. Near-term China dumping still a headwind.",
    risks:"China dumping; global demand slowdown; margin compression",catalysts:"Anti-dumping duties, new capacity utilisation",
    subsectors:[
@@ -2569,7 +3008,7 @@ const DRILL=[
         {name:"Vinati Organics",score:74,roce:"High",debt:"Low",val:"Reasonable",growth:"16%",note:"ATBS monopoly + IBB leader"},
         {name:"Navin Fluorine",score:68,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"14%",note:"Fluorochemical + CDMO"},
         {name:"Deepak Nitrite",score:70,roce:"High",debt:"Low",val:"Reasonable",growth:"16%",note:"Phenol downstream value chain"}]}]}]},
-  {id:"auto",name:"Auto & EV",score:68,verdict:"watch",horizon:"Watch",macro:22,earn:23,struct:24,
+  {id:"auto",name:"Auto & EV",score:68,verdict:"watch",horizon:"Score 50–69",macro:22,earn:23,struct:24,
    thesis:"EV transition structural but competitive. ICE SUV cycle strong. 2W recovery underway.",
    risks:"EV subsidy cuts; raw material costs; high valuations",catalysts:"EV PLI, rural demand revival",
    subsectors:[
@@ -2623,7 +3062,7 @@ const DRILL=[
         {name:"Star Health",score:68,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"22%",note:"Largest standalone health insurer"},
         {name:"Niva Bupa",score:65,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"25%",note:"Growing retail health; recently listed FY25"},
         {name:"Care Health (Religare)",score:60,roce:"Low",debt:"Low",val:"Reasonable",growth:"18%",note:"Mid-size; expanding distribution network"}]}]}]},
-  {id:"nbfc2",name:"NBFC",score:68,verdict:"watch",horizon:"Watch",macro:23,earn:21,struct:22,
+  {id:"nbfc2",name:"NBFC",score:68,verdict:"watch",horizon:"Score 50–69",macro:23,earn:21,struct:22,
    thesis:"Rate cut cycle helps cost of funds. Vehicle + housing NBFCs solid. MFI segment stress remains drag through FY26.",
    risks:"MFI stress, asset quality deterioration, RBI regulatory actions",catalysts:"Rate cuts, rural credit demand revival, vehicle cycle",
    subsectors:[
@@ -2636,7 +3075,7 @@ const DRILL=[
       {id:"gold-cos",name:"Gold Loan Companies",score:70,verdict:"watch",thesis:"Gold price Rs.75,000+/10g = larger loan books. High ROA model with proven track record.",companies:[
         {name:"Muthoot Finance",score:74,roce:"High",debt:"Low",val:"Reasonable",growth:"16%",note:"#1 gold loan; expanding MSME + housing"},
         {name:"Manappuram Finance",score:65,roce:"Moderate",debt:"Medium",val:"Cheap",growth:"14%",note:"Gold + MFI + housing diversification"}]}]}]},
-  {id:"sfb2",name:"SFB/MicroFin",score:60,verdict:"watch",horizon:"Watch",macro:18,earn:17,struct:19,
+  {id:"sfb2",name:"SFB/MicroFin",score:60,verdict:"watch",horizon:"Score 50–69",macro:18,earn:17,struct:19,
    thesis:"Small Finance Banks building deposit franchise from strong MFI roots. MFI sector stressed due to over-leveraging in rural areas but long-term penetration story intact.",
    risks:"Credit stress in MFI portfolios; over-indebtedness; RBI licensing norms",catalysts:"Rural income recovery, universal bank conversion, rate cuts",
    subsectors:[
@@ -2650,7 +3089,7 @@ const DRILL=[
       {id:"mfi-list",name:"Listed MFIs",score:58,verdict:"watch",thesis:"CreditAccess Grameen best quality. Spandana and Asirvad recovering slowly.",companies:[
         {name:"CreditAccess Grameen",score:62,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"18%",note:"Karnataka-base; expanding North India"},
         {name:"Spandana Sphoorty",score:55,roce:"Moderate",debt:"Medium",val:"Cheap",growth:"12%",note:"Andhra rural focus; stress slowly easing"}]}]}]},
-  {id:"newagetech",name:"New Age Tech",score:62,verdict:"watch",horizon:"Watch",macro:22,earn:18,struct:22,
+  {id:"newagetech",name:"New Age Tech",score:62,verdict:"watch",horizon:"Score 50–69",macro:22,earn:18,struct:22,
    thesis:"Zomato now profitable; Blinkit quick commerce growing 80%+ YoY. India digital consumer base 700M+. Profitability path improving but patience required.",
    risks:"Cash burn; competitive intensity; regulatory risk for fintech",catalysts:"Profitability milestones, new market entry, IPO pipeline",
    subsectors:[
@@ -2664,7 +3103,7 @@ const DRILL=[
         {name:"Nykaa",score:62,roce:"Moderate",debt:"Low",val:"Expensive",growth:"22%",note:"Beauty e-commerce + 200+ stores omnichannel"},
         {name:"Paytm",score:48,roce:"Negative",debt:"Low",val:"Reasonable",growth:"15%",note:"Fintech; recovery post-RBI Paytm Bank hit"},
         {name:"Policy Bazaar (PB Fintech)",score:65,roce:"Improving",debt:"Low",val:"Expensive",growth:"28%",note:"Insurance + credit marketplace; improving unit econ"}]}]}]},
-  {id:"retail2",name:"Retail",score:67,verdict:"watch",horizon:"Watch",macro:23,earn:24,struct:25,
+  {id:"retail2",name:"Retail",score:67,verdict:"watch",horizon:"Score 50–69",macro:23,earn:24,struct:25,
    thesis:"India retail formalisation ongoing. Trent (Zudio) disrupting value fashion fastest. DMart EDLP irreplaceable. Ethnic wear (Manyavar) is a niche monopoly.",
    risks:"E-commerce encroachment, real estate costs, consumer slowdown",catalysts:"Rural income recovery, premiumisation, omnichannel integration",
    subsectors:[
@@ -2678,7 +3117,7 @@ const DRILL=[
       {id:"retail-groc-cos",name:"Grocery Retailers",score:76,verdict:"watch",thesis:"DMart has irreplaceable physical model; Quick commerce threat for top-up but not bulk shopping.",companies:[
         {name:"Avenue Supermarts (DMart)",score:82,roce:"Strong",debt:"Low",val:"Expensive",growth:"18%",note:"EDLP grocery; 18% ROE consistently"},
         {name:"Spencer's Retail",score:45,roce:"Low",debt:"High",val:"Cheap",growth:"5%",note:"Legacy format; limited expansion capacity"}]}]}]},
-  {id:"fmcg2",name:"FMCG",score:60,verdict:"watch",horizon:"Skip",macro:13,earn:14,struct:17,
+  {id:"fmcg2",name:"FMCG",score:60,verdict:"watch",horizon:"Score < 50",macro:13,earn:14,struct:17,
    thesis:"Defensive sector. Volume growth recovering post rural slowdown. ITC re-rating from cigarette to FMCG valuation is key thesis. FMCG 2.0 via Tata Consumer + Godrej Consumer.",
    risks:"Overvaluation at 50-60x PE, rural slowdown, private label disruption",catalysts:"Rural income growth, new category launches, premiumisation",
    subsectors:[
@@ -2691,7 +3130,7 @@ const DRILL=[
         {name:"Tata Consumer",score:73,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"14%",note:"Starbucks JV + Tata Salt + brand portfolio"},
         {name:"Marico",score:70,roce:"High",debt:"Low",val:"Reasonable",growth:"8%",note:"Parachute hair oil + Saffola; rural-facing"},
         {name:"Jyothy Labs",score:65,roce:"High",debt:"Low",val:"Reasonable",growth:"10%",note:"Ujala + Margo + Exo mid-cap FMCG"}]}]}]},
-  {id:"cement2",name:"Cement",score:68,verdict:"watch",horizon:"Watch",macro:25,earn:24,struct:26,
+  {id:"cement2",name:"Cement",score:68,verdict:"watch",horizon:"Score 50–69",macro:25,earn:24,struct:26,
    thesis:"Infrastructure + housing driving volume. Consolidation underway. Adani entry creates competitive dynamics but may also bring pricing discipline.",
    risks:"Overcapacity risk, pet-coke/coal cost spikes, pricing wars from Adani",catalysts:"Govt housing + infra spend, urban real estate cycle, consolidation",
    subsectors:[
@@ -2702,7 +3141,7 @@ const DRILL=[
         {name:"Ambuja Cements",score:72,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"15%",note:"Adani group; aggressive distribution push"},
         {name:"Dalmia Bharat",score:68,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"14%",note:"East India focus; expanding South India"},
         {name:"JK Cement",score:65,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"12%",note:"White + grey cement; niche positioning"}]}]}]},
-  {id:"goldjwl",name:"Gold/Jewellery",score:68,verdict:"watch",horizon:"Watch",macro:24,earn:25,struct:26,
+  {id:"goldjwl",name:"Gold/Jewellery",score:68,verdict:"watch",horizon:"Score 50–69",macro:24,earn:25,struct:26,
    thesis:"Gold at all-time highs (Rs.75,000+/10g). Organised jewellery gaining share from unorganised. Titan/Tanishq building irreplaceable premium franchise.",
    risks:"Gold price correction, GST input credit complications, unorganised competition",catalysts:"Wedding season, BIS hallmarking enforcement, digital gold growth",
    subsectors:[
@@ -2723,7 +3162,7 @@ const DRILL=[
         {name:"Lemon Tree Hotels",score:70,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"20%",note:"Mid-market; asset-light management pivot"},
         {name:"Chalet Hotels",score:68,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"18%",note:"Business hotels in Mumbai + metro cities"},
         {name:"Mahindra Holidays",score:62,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"14%",note:"Club Mahindra timeshare; sticky revenue model"}]}]}]},
-  {id:"paints2",name:"Paints",score:63,verdict:"watch",horizon:"Watch",macro:19,earn:20,struct:22,
+  {id:"paints2",name:"Paints",score:63,verdict:"watch",horizon:"Score 50–69",macro:19,earn:20,struct:22,
    thesis:"Real estate + infra driving decorative paint demand. Asian Paints moat under pressure from Grasim Rs.10,000Cr Birla Opus entry. Near-term margin pressure.",
    risks:"Grasim pricing war, TiO2/crude cost spikes, slower real estate cycle",catalysts:"Real estate cycle, infrastructure painting, rural demand recovery",
    subsectors:[
@@ -2734,7 +3173,7 @@ const DRILL=[
         {name:"Kansai Nerolac",score:62,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"8%",note:"Industrial + auto OEM specialty paints"},
         {name:"Indigo Paints",score:58,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"12%",note:"Challenger brand; niche specialty products"},
         {name:"Grasim (Birla Opus)",score:60,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"15%",note:"Disruptive new entrant; scale-building aggressively"}]}]}]},
-  {id:"textiles2",name:"Textiles",score:52,verdict:"watch",horizon:"Skip",macro:15,earn:13,struct:16,
+  {id:"textiles2",name:"Textiles",score:52,verdict:"watch",horizon:"Score < 50",macro:15,earn:13,struct:16,
    thesis:"China+1 is real but India hasn't captured the shift. Labour, logistics, and power costs remain challenges. Page Industries and KPR Mill have real structural moats.",
    risks:"Bangladesh competition, labour cost, forex volatility, Bangladesh normalisation",catalysts:"US-China trade war escalation, PLI scale-up, brand building",
    subsectors:[
@@ -2745,7 +3184,7 @@ const DRILL=[
         {name:"Vardhman Textiles",score:60,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"10%",note:"Yarn + fabric + garment; Ludhiana-base"},
         {name:"Welspun Living",score:55,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"12%",note:"Home textiles export leader to US/Europe"},
         {name:"Himatsingka Seide",score:48,roce:"Low",debt:"High",val:"Cheap",growth:"8%",note:"Bed linen + design brand; stressed balance sheet"}]}]}]},
-  {id:"recycling2",name:"Recycling/ESG",score:64,verdict:"watch",horizon:"Watch",macro:18,earn:18,struct:20,
+  {id:"recycling2",name:"Recycling/ESG",score:64,verdict:"watch",horizon:"Score 50–69",macro:18,earn:18,struct:20,
    thesis:"Circular economy regulations tightening globally. EPR mandates drive recycled material demand. Battery recycling for EV sector is next structural wave.",
    risks:"Commodity price volatility, regulatory execution risk, limited listed universe",catalysts:"EPR mandates, battery recycling growth, ESG procurement by large cos",
    subsectors:[
@@ -2754,7 +3193,7 @@ const DRILL=[
         {name:"Gravita India",score:70,roce:"High",debt:"Low",val:"Reasonable",growth:"22%",note:"Lead + aluminium recycling; operations in 10+ countries"},
         {name:"Eco Recycling (Ecoreco)",score:55,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"18%",note:"E-waste recycling; compliance-driven model"},
         {name:"Tata Cleantech Capital",score:60,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"15%",note:"Green infrastructure financing; ESG-focused"}]}]}]},
-  {id:"diversified2",name:"Diversified",score:64,verdict:"watch",horizon:"Watch",macro:22,earn:21,struct:22,
+  {id:"diversified2",name:"Diversified",score:64,verdict:"watch",horizon:"Score 50–69",macro:22,earn:21,struct:22,
    thesis:"Select picks with unique thesis: Varun Beverages (Pepsi franchise compounder), IEX (power exchange near-monopoly), Azad Engineering (precision aerospace niche).",
    risks:"Company-specific concentration risk; commodity exposure for some picks",catalysts:"Power market deregulation, new beverage territories, aerospace order flow",
    subsectors:[
@@ -2772,7 +3211,7 @@ let ddState={level:"top",sectorId:null,subsectorId:null,filterSS:null};
 const ddSc=v=>v>=80?"green":v>=65?"yellow":"red";
 const ddFillCls=v=>v>=80?"fill-green":v>=65?"fill-yellow":"fill-red";
 const ddVerdictCls=v=>v==="strong"?"vb-strong":v==="watch"?"vb-watch":"vb-skip";
-const ddVerdictLabel=v=>v==="strong"?"Strong Buy":v==="watch"?"Watch":"Skip";
+const ddVerdictLabel=v=>v==="strong"?"Score ≥ 70":v==="watch"?"Score 50–69":"Score < 50";
 const ddTagCls=v=>v==="strong"?"tag-strong":v==="watch"?"tag-watch":"tag-skip";
 const ddGetSector=id=>DRILL.find(s=>s.id===id);
 const ddGetSub=(sId,ssId)=>{const s=ddGetSector(sId);return s?.subsectors?.find(ss=>ss.id===ssId);};
@@ -3789,13 +4228,14 @@ function buildCompanyMaster() {
   Object.entries(COMPANIES).forEach(([sector, cos]) => {
     cos.forEach(c => {
       COMPANY_MASTER.push({
-        name: c.name, sector, score: c.score,
-        roce: c.roce||'Moderate', debt: c.debt||'Low',
-        val: c.val||'Reasonable', growth: c.growth||'—',
+        name: c.name, sector,
+        g: c.g||3, m: c.m||3, d: c.d||3, v: c.v||3, t: c.t||3,
         note: c.note||''
       });
     });
   });
+  // Recalc scores
+  COMPANY_MASTER.forEach(c => { c.score = calcScore(c); });
 }
 
 function populateSectorFilter() {
@@ -3808,7 +4248,9 @@ function populateSectorFilter() {
 }
 
 function addCompanyRow() {
-  COMPANY_MASTER.push({ name:'New Company', sector:'Power', score:70, roce:'Moderate', debt:'Low', val:'Reasonable', growth:'15%', note:'' });
+  const c = { name:'New Company', sector:'Power', g:3, m:3, d:3, v:3, t:3, note:'Add your notes here' };
+  c.score = calcScore(c);
+  COMPANY_MASTER.push(c);
   renderCompanyMaster();
 }
 
@@ -3843,94 +4285,147 @@ function renderCompanyMaster() {
 
   if (sortBy === 'score') data.sort((a,b) => b.score - a.score);
   else if (sortBy === 'sector') data.sort((a,b) => a.sector.localeCompare(b.sector) || b.score - a.score);
-  else if (sortBy === 'growth') data.sort((a,b) => (parseFloat(b.growth)||0) - (parseFloat(a.growth)||0));
+  else if (sortBy === 'growth') data.sort((a,b) => (b.g||0) - (a.g||0));
 
-  // Estimated allocation from portfolio size
   const total = port();
   const A = alloc(mscore());
   const eqL = total * A.eq / 100;
   const tw = Object.values(SECTORS).reduce((s,v) => s+v.weight, 0);
 
-  const roceColor = r => r==='Strong'||r==='Very High'||r==='High' ? '#006b30' : r==='Moderate' ? '#b35c00' : '#b71c1c';
-  const debtColor = d => d==='Low' ? '#006b30' : d==='Medium' ? '#b35c00' : '#b71c1c';
-  const valColor  = v => v==='Cheap' ? '#006b30' : v==='Reasonable'||v==='Fair' ? '#b35c00' : '#b71c1c';
-  const scColor   = s => s>=75 ? '#006b30' : s>=55 ? '#b35c00' : '#b71c1c';
+  const scColor = s => s>=75?'#006b30':s>=55?'#b35c00':'#b71c1c';
+  const scBg    = s => s>=75?'#e6f4ef':s>=55?'#fff3e0':'#fce8e8';
 
-  const rocOpts = ['Very High','High','Strong','Moderate','Low'].map(o => `<option>${o}</option>`).join('');
-  const dbtOpts = ['Low','Medium','High'].map(o => `<option>${o}</option>`).join('');
-  const valOpts = ['Cheap','Reasonable','Fair','Expensive'].map(o => `<option>${o}</option>`).join('');
+  // Factor dropdown helper
+  const factorSel = (origIdx, factor, val, opts) =>
+    `<select onchange="updateCompanyFactor(${origIdx},'${factor}',this.value)"
+      style="width:100%;border:1px solid #e0e4f0;border-radius:5px;padding:3px 4px;font-size:10px;font-family:'Poppins',sans-serif;outline:none;background:#fff;">
+      ${opts.slice(1).map((o,i)=>`<option value="${i+1}"${(i+1)===val?' selected':''}>${i+1}. ${o}</option>`).join('')}
+    </select>`;
 
-  tbody.innerHTML = data.map((c, displayIdx) => {
-    // Find original index in COMPANY_MASTER
+  tbody.innerHTML = data.map((c, di) => {
     const origIdx = COMPANY_MASTER.indexOf(c);
+    const sc = c.score;
     const sData = SECTORS[c.sector];
     const sW = sData ? sData.weight : 5;
     const sAmt = eqL * sW / tw;
-    // Rank within sector
     const sectorCos = COMPANY_MASTER.filter(x => x.sector === c.sector).sort((a,b) => b.score - a.score);
-    const rank = sectorCos.indexOf(c);
+    const rank = sectorCos.findIndex(x => x === c);
     const wts = [0.35,0.30,0.20,0.10,0.05];
-    const coAlloc = sAmt * (wts[rank] || 0.03);
+    const coAlloc = sAmt * (wts[rank] !== undefined ? wts[rank] : 0.03);
 
-    const secBg = sData ? (sData.score>=75?'#e6f4ef':sData.score>=55?'#fff3e0':'#fce8e8') : '#f5f6fa';
-    const secColor = sData ? (sData.score>=75?'#006b30':sData.score>=55?'#b35c00':'#b71c1c') : '#6b7498';
+    const verdictBg = sc>=75?'#e6f4ef':sc>=55?'#fff3e0':'#fce8e8';
+    const verdictCol = sc>=75?'#006b30':sc>=55?'#b35c00':'#b71c1c';
 
-    return `<tr style="border-left:3px solid ${scColor(c.score)}22;">
-      <td style="color:#6b7498;font-weight:700;font-size:11px;">${displayIdx+1}</td>
-      <td><input value="${c.name}" oninput="updateCompanyField(${origIdx},'name',this.value)"
-        style="width:140px;border:1px solid #e0e4f0;border-radius:6px;padding:4px 8px;font-size:12px;font-weight:700;font-family:'Poppins',sans-serif;outline:none;color:#1a1e2e;"></td>
-      <td><select onchange="updateCompanyField(${origIdx},'sector',this.value)"
-        style="border:1px solid #e0e4f0;border-radius:6px;padding:4px 7px;font-size:11px;font-family:'Poppins',sans-serif;outline:none;background:${secBg};color:${secColor};font-weight:700;">
-        ${ALL_SECTORS.map(s=>`<option${s===c.sector?' selected':''}>${s}</option>`).join('')}
-      </select></td>
-      <td><div style="display:flex;align-items:center;gap:5px;">
-        <input type="number" value="${c.score}" min="0" max="100"
-          oninput="updateCompanyField(${origIdx},'score',this.value)"
-          style="width:52px;border:1px solid #e0e4f0;border-radius:6px;padding:4px 6px;font-size:13px;font-weight:900;text-align:center;font-family:'Poppins',sans-serif;outline:none;color:${scColor(c.score)};">
-        <div style="flex:1;height:5px;background:#e8ecf5;border-radius:3px;overflow:hidden;min-width:40px;"><div style="width:${c.score}%;height:100%;background:${scColor(c.score)};border-radius:3px;"></div></div>
-      </div></td>
-      <td><select onchange="updateCompanyField(${origIdx},'roce',this.value)"
-        style="border:1px solid #e0e4f0;border-radius:6px;padding:4px 6px;font-size:11px;font-family:'Poppins',sans-serif;outline:none;color:${roceColor(c.roce)};font-weight:700;background:#fff;">
-        ${['Very High','High','Strong','Moderate','Low'].map(o=>`<option${o===c.roce?' selected':''}>${o}</option>`).join('')}
-      </select></td>
-      <td><select onchange="updateCompanyField(${origIdx},'debt',this.value)"
-        style="border:1px solid #e0e4f0;border-radius:6px;padding:4px 6px;font-size:11px;font-family:'Poppins',sans-serif;outline:none;color:${debtColor(c.debt)};font-weight:700;background:#fff;">
-        ${['Low','Medium','High'].map(o=>`<option${o===c.debt?' selected':''}>${o}</option>`).join('')}
-      </select></td>
-      <td><select onchange="updateCompanyField(${origIdx},'val',this.value)"
-        style="border:1px solid #e0e4f0;border-radius:6px;padding:4px 6px;font-size:11px;font-family:'Poppins',sans-serif;outline:none;color:${valColor(c.val)};font-weight:700;background:#fff;">
-        ${['Cheap','Reasonable','Fair','Expensive'].map(o=>`<option${o===c.val?' selected':''}>${o}</option>`).join('')}
-      </select></td>
-      <td><input value="${c.growth}" oninput="updateCompanyField(${origIdx},'growth',this.value)"
-        style="width:58px;border:1px solid #e0e4f0;border-radius:6px;padding:4px 6px;font-size:12px;font-weight:800;text-align:center;font-family:'Poppins',sans-serif;outline:none;color:#1976d2;"></td>
-      <td style="font-weight:900;color:var(--amber);font-size:12px;">Rs.${coAlloc.toFixed(1)}L</td>
-      <td><input value="${c.note}" oninput="updateCompanyField(${origIdx},'note',this.value)" placeholder="Add notes..."
-        style="width:160px;border:1px solid #e0e4f0;border-radius:6px;padding:4px 8px;font-size:11px;font-family:'Poppins',sans-serif;outline:none;color:#6b7498;"></td>
-      <td><button onclick="deleteCompanyRow(${origIdx})"
-        style="background:#fce8e8;color:#b71c1c;border:1px solid #ffcdd2;padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">✕</button></td>
+    // Score bar breakdown
+    const barW = (factor, wt) => {
+      const pct = (c[factor]/5) * 100;
+      const col = pct>=80?'#00a854':pct>=60?'#ff9800':'#e53935';
+      return `<div title="${FACTOR_LABELS[factor]}: ${FACTOR_SCALES[factor][c[factor]]}" style="display:inline-block;width:${Math.round(wt*60)}px;height:8px;background:#e8ecf5;border-radius:3px;overflow:hidden;margin-right:2px;vertical-align:middle;">
+        <div style="width:${pct}%;height:100%;background:${col};border-radius:3px;"></div></div>`;
+    };
+
+    return `<tr style="border-left:3px solid ${scColor(sc)}44;">
+      <td style="color:#6b7498;font-size:11px;font-weight:700;text-align:center;">${di+1}</td>
+      <td style="min-width:130px;">
+        <input value="${c.name}" oninput="updateCompanyField(${origIdx},'name',this.value)"
+          style="width:130px;border:1px solid #e0e4f0;border-radius:6px;padding:4px 7px;font-size:12px;font-weight:700;font-family:'Poppins',sans-serif;outline:none;color:#1a1e2e;">
+        <div style="font-size:9px;color:#6b7498;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px;">${c.note||''}</div>
+      </td>
+      <td>
+        <select onchange="updateCompanyField(${origIdx},'sector',this.value)"
+          style="border:1px solid #e0e4f0;border-radius:6px;padding:3px 6px;font-size:11px;font-family:'Poppins',sans-serif;outline:none;color:#1565c0;font-weight:700;background:#e3f2fd;">
+          ${ALL_SECTORS.filter(s=>COMPANIES[s]).map(s=>`<option${s===c.sector?' selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <!-- SCORE -->
+      <td style="text-align:center;">
+        <div style="font-size:22px;font-weight:900;color:${scColor(sc)};line-height:1;">${sc}</div>
+        <div style="height:4px;background:${scColor(sc)};border-radius:3px;margin:3px auto;width:36px;"></div>
+        <div style="margin-top:4px;">
+          ${Object.keys(FACTOR_WEIGHTS).map(f=>barW(f,FACTOR_WEIGHTS[f])).join('')}
+        </div>
+      </td>
+      <!-- GROWTH -->
+      <td style="min-width:140px;">
+        <div style="font-size:9px;font-weight:700;color:#6b7498;margin-bottom:2px;">Revenue Growth (25%)</div>
+        ${factorSel(origIdx,'g',c.g,FACTOR_SCALES.g)}
+      </td>
+      <!-- MARGIN -->
+      <td style="min-width:140px;">
+        <div style="font-size:9px;font-weight:700;color:#6b7498;margin-bottom:2px;">Profit Margin (20%)</div>
+        ${factorSel(origIdx,'m',c.m,FACTOR_SCALES.m)}
+      </td>
+      <!-- DEBT -->
+      <td style="min-width:130px;">
+        <div style="font-size:9px;font-weight:700;color:#6b7498;margin-bottom:2px;">Debt Level (20%)</div>
+        ${factorSel(origIdx,'d',c.d,FACTOR_SCALES.d)}
+      </td>
+      <!-- VALUATION -->
+      <td style="min-width:155px;">
+        <div style="font-size:9px;font-weight:700;color:#6b7498;margin-bottom:2px;">Valuation / PE (20%)</div>
+        ${factorSel(origIdx,'v',c.v,FACTOR_SCALES.v)}
+      </td>
+      <!-- TAILWIND -->
+      <td style="min-width:130px;">
+        <div style="font-size:9px;font-weight:700;color:#6b7498;margin-bottom:2px;">Sector Tailwind (15%)</div>
+        ${factorSel(origIdx,'t',c.t,FACTOR_SCALES.t)}
+      </td>
+      <!-- ALLOC -->
+      <td style="text-align:center;white-space:nowrap;">
+        <div style="font-size:13px;font-weight:900;color:#ff7c00;">${fmt(coAlloc)}</div>
+        <div style="font-size:9px;color:#6b7498;">Rank #${rank+1} in ${c.sector}</div>
+      </td>
+      <td>
+        <button onclick="deleteCompanyRow(${origIdx})"
+          style="background:#fce8e8;color:#b71c1c;border:1px solid #ffcdd2;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">✕</button>
+      </td>
     </tr>`;
   }).join('');
 
-  // Update the sector filter mini view in companyTableWrap
+  // Update compact sector panel
   const wrap = document.getElementById('companyTableWrap');
   if (wrap) {
     const grouped = {};
     data.forEach(c => { (grouped[c.sector] = grouped[c.sector]||[]).push(c); });
-    wrap.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;">` +
-      Object.entries(grouped).sort((a,b)=>b[1][0].score-a[1][0].score).map(([sec,cos])=>`
-        <div style="background:#f8f9fe;border:1px solid #dde1ec;border-radius:10px;padding:12px;">
-          <div style="font-size:12px;font-weight:800;color:#1a1e2e;margin-bottom:7px;">${sec}
-            <span style="float:right;font-size:10px;font-weight:700;color:${(SECTORS[sec]?.score||60)>=75?'#006b30':(SECTORS[sec]?.score||60)>=55?'#b35c00':'#b71c1c'};">Score ${SECTORS[sec]?.score||'—'}</span>
+    wrap.innerHTML = `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;">` +
+      Object.entries(grouped).sort((a,b)=>b[1][0].score-a[1][0].score).map(([sec,cos])=>{
+        const secScore = deriveSectorScore(sec);
+        const sc = scColor(secScore);
+        return `<div style="background:#f8f9fe;border:1px solid #dde1ec;border-radius:10px;padding:12px;border-top:3px solid ${sc};">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:12px;font-weight:800;color:#1a1e2e;">${sec}</span>
+            <span style="font-size:11px;font-weight:900;color:${sc};">${secScore} <span style="font-size:9px;color:#6b7498;font-weight:600;">sector avg</span></span>
           </div>
           ${cos.sort((a,b)=>b.score-a.score).map((c,i)=>`
-            <div style="display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid #eee;">
-              <span style="font-size:10px;font-weight:700;color:#6b7498;min-width:16px;">${i+1}.</span>
-              <span style="font-size:12px;font-weight:700;color:#1a1e2e;flex:1;">${c.name}</span>
-              <span style="font-size:12px;font-weight:900;color:${c.score>=75?'#006b30':c.score>=55?'#b35c00':'#b71c1c'};">${c.score}</span>
+            <div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #f0f2f8;">
+              <span style="font-size:10px;color:#6b7498;min-width:14px;">${i+1}.</span>
+              <span style="font-size:11px;font-weight:700;color:#1a1e2e;flex:1;">${c.name}</span>
+              <div title="${scoreBreakdown(c)}" style="display:flex;gap:1px;">
+                ${['g','m','d','v','t'].map(f=>`<div style="width:6px;height:14px;background:${c[f]>=4?'#00a854':c[f]>=3?'#ff9800':'#e53935'};border-radius:2px;" title="${FACTOR_LABELS[f]}: ${c[f]}/5"></div>`).join('')}
+              </div>
+              <span style="font-size:12px;font-weight:900;color:${scColor(c.score)};min-width:22px;text-align:right;">${c.score}</span>
             </div>`).join('')}
-        </div>`).join('') + '</div>';
+          <div style="margin-top:6px;font-size:9px;color:#6b7498;display:flex;gap:6px;">
+            ${['g','m','d','v','t'].map(f=>`<span>${FACTOR_LABELS[f].split(' ')[0][0]}:wt${Math.round(FACTOR_WEIGHTS[f]*100)}%</span>`).join('')}
+          </div>
+        </div>`;
+      }).join('') + '</div>';
   }
+
+  updateSectorScoresFromCompanies();
 }
+
+function updateSectorScoresFromCompanies() {
+  // Re-derive sector scores after any company change
+  Object.keys(SECTORS).forEach(s => {
+    SECTORS[s].score = deriveSectorScore(s);
+    SECTORS[s].tc = SECTORS[s].score>=75?'green':SECTORS[s].score>=55?'yellow':'red';
+  });
+  // Re-render sector heatmap if on model page
+  const stb = document.getElementById('sectorTableBody');
+  if (stb) updateAll();
+}
+
 
 // ── FOREIGN PORTFOLIO ─────────────────────────────────────────────────────
 let foreignPortfolio = [];
