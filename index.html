@@ -360,7 +360,7 @@ body{padding-bottom:52px;}
     </div>
     <div class="hm-item" onclick="switchPage('screener');closeHamburger()">
       <div class="hm-item-icon" style="background:#e6f4ef;">&#127919;</div>
-      <div><div class="hm-item-text">Sector Screener</div><div class="hm-item-sub">22 sectors scored — Strong Buy / Watch / Skip</div></div>
+      <div><div class="hm-item-text">Sector Screener</div><div class="hm-item-sub">23 sectors scored with CB Score</div></div>
     </div>
     <div class="hm-item" onclick="switchPage('model');closeHamburger()">
       <div class="hm-item-icon" style="background:#e3f2fd;">&#128200;</div>
@@ -776,7 +776,7 @@ body{padding-bottom:52px;}
 <div class="page" id="page-import">
   <div class="header">
     <h1>&#128229; Upload My Portfolio</h1>
-    <p>Upload your holdings from Zerodha, Groww, CDSL CAS or any broker CSV &rarr; get your real allocation ratio &rarr; compare vs CB Finance26 recommended</p>
+    <p>Upload your holdings from Zerodha, Groww, CDSL CAS or any broker CSV &rarr; get your real allocation ratio &rarr; compare vs CB Finance26 model allocation</p>
     <div class="header-meta">
       <span class="badge">Privacy: <span>File stays on your device</span></span>
       <span class="badge">Works with: <span>Zerodha, Groww, CDSL CAS, Manual CSV</span></span>
@@ -959,7 +959,7 @@ body{padding-bottom:52px;}
 
     <div class="grid-3" style="margin-bottom:18px;">
       <div class="card"><h2><span class="icon">&#128200;</span>Your Current Allocation</h2><div class="section-title">Based on imported holdings</div><div id="zh-currentAlloc"></div></div>
-      <div class="card"><h2><span class="icon">&#127919;</span>CB Finance26 Recommended</h2><div class="section-title">Based on current macro score</div><div id="zh-recommendedAlloc"></div></div>
+      <div class="card"><h2><span class="icon">&#127919;</span>CB Finance26 Model Allocation</h2><div class="section-title">Based on current macro score</div><div id="zh-recommendedAlloc"></div></div>
       <div class="card"><h2><span class="icon">&#128269;</span>Gap Analysis — Action Items</h2><div class="section-title">What to add / reduce / rebalance</div><div id="zh-gapAnalysis"></div></div>
     </div>
 
@@ -976,7 +976,7 @@ body{padding-bottom:52px;}
     </div>
 
     <div class="card full" style="margin-top:18px;">
-      <h2><span class="icon">&#128293;</span>Your Sector Concentration vs Recommended</h2>
+      <h2><span class="icon">&#128293;</span>Your Sector Concentration vs Model Allocation</h2>
       <div class="section-title">Red = over 25% limit &nbsp;|&nbsp; Orange = approaching limit &nbsp;|&nbsp; Green = within limits</div>
       <div id="zh-sectorBreakdown"></div>
     </div>
@@ -1010,7 +1010,7 @@ body{padding-bottom:52px;}
       </div>
       <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px 20px;text-align:center;min-width:90px;">
         <div style="font-size:24px;font-weight:900;color:#00e676;" id="kpi-strong">—</div>
-        <div style="font-size:10px;font-weight:700;color:#c8d0e8;margin-top:3px;">Buy Sectors</div>
+        <div style="font-size:10px;font-weight:700;color:#c8d0e8;margin-top:3px;">Scored Sectors</div>
         <div style="font-size:9px;color:#6b7498;margin-top:2px;">of 23 tracked</div>
       </div>
       <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:14px 20px;text-align:center;min-width:90px;">
@@ -1052,7 +1052,7 @@ body{padding-bottom:52px;}
     <div onclick="switchPage('model')" style="background:#fff;border:1px solid #dde1ec;border-radius:12px;padding:16px;cursor:pointer;transition:all 0.2s;border-top:4px solid #00a854;" onmouseover="this.style.boxShadow='0 4px 20px #00a85425'" onmouseout="this.style.boxShadow='none'">
       <div style="font-size:22px;margin-bottom:8px;">2️⃣</div>
       <div style="font-size:14px;font-weight:800;color:#006b30;margin-bottom:4px;">Pick Your Sectors</div>
-      <div style="font-size:12px;font-weight:600;color:#6b7498;line-height:1.6;">See which of 23 sectors to buy now, which to watch, and which to completely avoid — with the reason why.</div>
+      <div style="font-size:12px;font-weight:600;color:#6b7498;line-height:1.6;">See which of 23 sectors score high, which are medium, and which score low — with the reasoning.</div>
       <div style="margin-top:10px;font-size:11px;font-weight:800;color:#00a854;">See Sector Scores →</div>
     </div>
     <div onclick="switchPage('model')" style="background:#fff;border:1px solid #dde1ec;border-radius:12px;padding:16px;cursor:pointer;transition:all 0.2s;border-top:4px solid #1976d2;" onmouseover="this.style.boxShadow='0 4px 20px #1976d225'" onmouseout="this.style.boxShadow='none'">
@@ -1064,7 +1064,7 @@ body{padding-bottom:52px;}
     <div onclick="switchPage('import')" style="background:#fff;border:1px solid #dde1ec;border-radius:12px;padding:16px;cursor:pointer;transition:all 0.2s;border-top:4px solid #8e24aa;" onmouseover="this.style.boxShadow='0 4px 20px #8e24aa25'" onmouseout="this.style.boxShadow='none'">
       <div style="font-size:22px;margin-bottom:8px;">4️⃣</div>
       <div style="font-size:14px;font-weight:800;color:#7b1fa2;margin-bottom:4px;">Check Your Portfolio</div>
-      <div style="font-size:12px;font-weight:600;color:#6b7498;line-height:1.6;">Enter your current stocks. See exactly where you're over- or under-invested and what to buy or sell.</div>
+      <div style="font-size:12px;font-weight:600;color:#6b7498;line-height:1.6;">Enter your current stocks. See exactly where you're over- or under-invested compared to the allocation model.</div>
       <div style="margin-top:10px;font-size:11px;font-weight:800;color:#8e24aa;">Enter My Stocks →</div>
     </div>
   </div>
@@ -1076,7 +1076,7 @@ body{padding-bottom:52px;}
   <!-- TOP BUY SECTORS -->
   <div style="background:#fff;border:1px solid #dde1ec;border-radius:14px;padding:20px;">
     <div style="font-size:13px;font-weight:800;color:#006b30;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
-      <span style="background:#e6f4ef;padding:5px 8px;border-radius:8px;">✅</span> Best Sectors to Buy Now
+      <span style="background:#e6f4ef;padding:5px 8px;border-radius:8px;">📊</span> Highest Scoring Sectors
     </div>
     <div id="mb-topSectors"></div>
     <button onclick="switchPage('model')" style="margin-top:12px;background:#e6f4ef;color:#006b30;border:1px solid #00a854;padding:8px 16px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;width:100%;">See Green & Red Sectors →</button>
@@ -1136,7 +1136,7 @@ body{padding-bottom:52px;}
       <div id="myAlloc"></div>
     </div>
     <div style="background:#fff;border:1px solid #dde1ec;border-radius:14px;padding:18px;">
-      <div style="font-size:13px;font-weight:800;color:#1a1e2e;margin-bottom:12px;">🎯 Recommended Split</div>
+      <div style="font-size:13px;font-weight:800;color:#1a1e2e;margin-bottom:12px;">📊 Model Allocation Split</div>
       <div id="myRecommended"></div>
     </div>
     <div style="background:#fff;border:1px solid #dde1ec;border-radius:14px;padding:18px;">
@@ -1301,7 +1301,7 @@ body{padding-bottom:52px;}
 <div class="page" id="page-screener">
   <div class="header">
     <h1>&#127919; Which Sectors are Green? 🟢</h1>
-    <p>23 sectors scored — Green = Buy Now &nbsp;|&nbsp; Yellow = Wait &nbsp;|&nbsp; Red = Avoid for 3–5 years</p>
+    <p>23 sectors scored — 🟢 Green = High Score &nbsp;|&nbsp; 🟡 Yellow = Medium Score &nbsp;|&nbsp; 🔴 Red = Low Score</p>
     <div class="header-meta">
       <span class="badge">🟢 Green: <span id="sc-nStrong">—</span></span>
       <span class="badge">🟡 Caution: <span id="sc-nWatch">—</span></span>
@@ -1314,7 +1314,7 @@ body{padding-bottom:52px;}
         <label>Show:</label>
         <select onchange="renderScreener(this.value)" id="screenerFilter">
           <option value="all">All Sectors</option>
-          <option value="strong">Strong Buy Only</option>
+          <option value="strong">High Score (Green) Only</option>
           <option value="watch">Watch List</option>
           <option value="skip">Skip / Avoid</option>
         </select>
@@ -1337,14 +1337,14 @@ body{padding-bottom:52px;}
       <span><span class="leg-dot" style="background:var(--green)"></span>🟢 Green — Score ≥70</span>
       <span><span class="leg-dot" style="background:var(--yellow)"></span>Watch (score 50–69)</span>
       <span><span class="leg-dot" style="background:var(--red)"></span>Skip (&lt;50)</span>
-      <span style="color:var(--text-muted);margin-left:6px;">Each sector scored out of 100 — above 70 is buyable</span>
+      <span style="color:var(--text-muted);margin-left:6px;">Each sector scored out of 100 — higher score = stronger fundamentals</span>
     </div>
     <div id="screenerTableDiv" class="table-scroll"></div>
     <div id="screenerRationaleDiv" style="display:none;"></div>
     <div id="screenerMatrixDiv" style="display:none;"></div>
     <div class="screener-insight" id="screenerInsight"></div>
     <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-      <button class="push-to-btn" onclick="pushStrongToHeatmap()">Push Strong Buy Sectors &rarr; Heatmap</button>
+      <button class="push-to-btn" onclick="pushStrongToHeatmap()">Push Strong Scored Sectors &rarr; Heatmap</button>
       <span style="font-size:11px;color:var(--text-muted);font-weight:600;">Updates Allocation Model with screened selections</span>
     </div>
   </div>
@@ -1378,10 +1378,10 @@ body{padding-bottom:52px;}
       </div>
       <h3>Market Cycle Indicator</h3>
       <div class="cycle-grid">
-        <div class="cycle-card" id="cycle-earlyBull"><div class="cycle-name" style="color:var(--green);">Early Bull — Best time to invest</div><div class="cycle-action">Deploy capital aggressively</div></div>
+        <div class="cycle-card" id="cycle-earlyBull"><div class="cycle-name" style="color:var(--green);">Early Bull</div><div class="cycle-action">Deploy capital aggressively</div></div>
         <div class="cycle-card active" id="cycle-midBull"><div class="cycle-name" style="color:var(--orange);">Mid Bull ✓ — We are here</div><div class="cycle-action">Focus on quality companies</div></div>
-        <div class="cycle-card" id="cycle-lateBull"><div class="cycle-name" style="color:var(--yellow);">Late Bull — Take profits</div><div class="cycle-action">Be selective, take some profits</div></div>
-        <div class="cycle-card" id="cycle-bear"><div class="cycle-name" style="color:var(--red);">Bear Market — Hold cash</div><div class="cycle-action">Hold cash, buy safe assets</div></div>
+        <div class="cycle-card" id="cycle-lateBull"><div class="cycle-name" style="color:var(--yellow);">Late Bull</div><div class="cycle-action">Be selective, take some profits</div></div>
+        <div class="cycle-card" id="cycle-bear"><div class="cycle-name" style="color:var(--red);">Bear Market</div><div class="cycle-action">Hold cash, buy safe assets</div></div>
       </div>
     </div>
     <div class="card">
@@ -1519,7 +1519,7 @@ body{padding-bottom:52px;}
       <div style="background:#e6f4ef;border:1px solid #00a85444;border-radius:10px;padding:14px;cursor:help;" title="Corporate earnings are the ultimate driver of stock prices over 3-5 years. When 60%+ of Nifty companies beat estimates for 2+ quarters, it signals a genuine earnings upgrade cycle — the best time to be invested. Sector note: Watch banking NPA cycle, IT large deal wins, FMCG volume recovery.">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><span style="font-size:20px;">💰</span><span style="font-size:12px;font-weight:800;color:#1a1e2e;flex:1;">Earnings Cycle</span><span id="ri-earn">🟢</span></div>
         <div style="font-size:14px;font-weight:900;color:#006b30;margin-bottom:5px;" id="ri-earn-label">Stable Growth</div>
-        <div style="font-size:10px;color:#4a5070;line-height:1.6;">Nifty EPS growth is the biggest driver of stock returns. Upgrades = buy. Downgrades = caution. <em>(hover)</em></div>
+        <div style="font-size:10px;color:#4a5070;line-height:1.6;">Nifty EPS growth is the biggest driver of stock returns. Upgrades = good signal. Downgrades = caution. <em>(hover)</em></div>
         <div style="margin-top:6px;font-size:9px;font-weight:700;color:#006b30;background:#f0fff8;padding:3px 7px;border-radius:5px;">Banking NPA · IT deal wins · FMCG volume key indicators</div>
       </div>
 
@@ -1562,7 +1562,7 @@ body{padding-bottom:52px;}
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
       <div>
         <h2 style="margin-bottom:4px;"><span class="icon">&#127970;</span>Step 4 — Company Rankings (Start Here)</h2>
-        <div class="section-title" style="margin-bottom:0;">Ranked by quality score (0–100). Green ≥75 = Strong Buy. Edit any company, change scores, add your own picks.</div>
+        <div class="section-title" style="margin-bottom:0;">Ranked by quality score (0–100). Green ≥75 = High Score. Edit any company, change scores, add your own picks.</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
         <select id="coFilterSector" onchange="renderCompanyMaster()" style="border:1px solid #dde1ec;border-radius:7px;padding:7px 11px;font-size:12px;font-weight:600;font-family:'Poppins',sans-serif;outline:none;color:#1a1e2e;background:#f8f9fe;">
@@ -1591,7 +1591,7 @@ body{padding-bottom:52px;}
       </table>
     </div>
     <div style="margin-top:10px;padding:10px 12px;background:#fff8f0;border-left:3px solid #ff7c00;border-radius:8px;font-size:11px;font-weight:600;color:#5a3a00;">
-      &#128161; <strong>Tip:</strong> CB Score ≥75 = Strong Buy, 55–74 = Watch, &lt;55 = Skip. Edit any field directly. Add your own companies. Changes update the allocation breakdown instantly.
+      &#128161; <strong>Tip:</strong> CB Score ≥75 = High • 55–74 = Medium • &lt;55 = Low • Edit any field or add your own companies
     </div>
   </div>
 
@@ -1642,14 +1642,14 @@ body{padding-bottom:52px;}
       <h3 style="margin-top:14px;">P/E Guardrails</h3>
       <table>
         <tr><th>P/E</th><th>Action</th></tr>
-        <tr><td class="green">Below 18x</td><td style="font-weight:700;">Buy aggressively</td></tr>
-        <tr><td class="yellow">18x–22x</td><td style="font-weight:700;">Selective buying</td></tr>
-        <tr><td class="orange">22x–25x</td><td style="font-weight:700;">Hold, reduce adds</td></tr>
+        <tr><td class="green">Below 18x</td><td style="font-weight:700;">Deploy capital (aggressive)</td></tr>
+        <tr><td class="yellow">18x–22x</td><td style="font-weight:700;">Selective deployment</td></tr>
+        <tr><td class="orange">22x–25x</td><td style="font-weight:700;">Reduce new additions</td></tr>
         <tr><td class="red">Above 25x</td><td style="font-weight:700;">Book profits</td></tr>
       </table>
     </div>
     <div class="card">
-      <h2><span class="icon">&#127881;</span>What to Buy / Avoid Right Now 🎯</h2>
+      <h2><span class="icon">&#127881;</span>Sector Signals — Current Assessment 🎯</h2>
       <div class="section-title">Our current views on the market</div>
       <div style="margin-bottom:8px;font-size:11px;font-weight:800;color:var(--green);">&#9650; STRONG</div>
       <div class="opp-item"><div class="opp-dot" style="background:var(--green)"></div><div class="opp-name">Power &amp; Transmission</div><div class="opp-strength" style="background:#e6f4ef;color:#006b30;border:1px solid #00a854;">Very High</div></div>
@@ -1679,7 +1679,7 @@ body{padding-bottom:52px;}
         <tr><th>Phase</th><th>Outperformers</th></tr>
         <tr><td class="green">Early Recovery</td><td style="font-size:10px;font-weight:600;">Banks, Autos, Real Estate</td></tr>
         <tr><td class="blue">Expansion</td><td style="font-size:10px;font-weight:600;">Capital Goods, Power, Infra</td></tr>
-        <tr><td class="yellow">Late Bull — Take profits</td><td style="font-size:10px;font-weight:600;">Consumption, FMCG</td></tr>
+        <tr><td class="yellow">Late Bull</td><td style="font-size:10px;font-weight:600;">Consumption, FMCG</td></tr>
         <tr><td class="red">Slowdown</td><td style="font-size:10px;font-weight:600;">Pharma, FMCG, Utilities</td></tr>
       </table>
     </div>
@@ -1746,7 +1746,7 @@ body{padding-bottom:52px;}
       <div class="section-title">How to distribute your debt bucket across categories based on the macro environment</div>
       <div class="table-scroll">
         <table>
-          <tr><th>Category</th><th>Early Bull — Best time to invest</th><th>Mid Bull</th><th>Late Bull — Take profits</th><th>Transition</th><th>Bear Market — Hold cash</th><th>Why</th></tr>
+          <tr><th>Category</th><th>Early Bull</th><th>Mid Bull</th><th>Late Bull</th><th>Transition</th><th>Bear Market</th><th>Why</th></tr>
           <tr><td style="font-weight:800;">Liquid / Overnight Funds</td><td>10%</td><td>15%</td><td>20%</td><td>25%</td><td>30%</td><td style="font-size:10px;color:#4a5070;">Parking capital; instant liquidity</td></tr>
           <tr><td style="font-weight:800;">Arbitrage Funds</td><td>15%</td><td>20%</td><td>20%</td><td>15%</td><td>10%</td><td style="font-size:10px;color:#4a5070;">Equity taxation + near-debt returns; best in volatile markets</td></tr>
           <tr><td style="font-weight:800;">Short Duration / Ultra Short</td><td>20%</td><td>20%</td><td>15%</td><td>15%</td><td>10%</td><td style="font-size:10px;color:#4a5070;">Low duration risk; 6–18 month deployment</td></tr>
@@ -1842,9 +1842,9 @@ body{padding-bottom:52px;}
       <div class="table-scroll">
         <table>
           <tr><th>Instrument</th><th>Metal/Asset</th><th>Type</th><th>Exchange</th><th>Tax Treatment</th><th>Liquidity</th><th>Best For</th></tr>
-          <tr><td style="font-weight:800;">Nippon India Gold ETF</td><td style="color:#b35c00;font-weight:700;">Gold</td><td>ETF</td><td>NSE/BSE</td><td>LTCG 20% (24m+)</td><td class="green">High</td><td style="font-size:10px;">Core gold holding</td></tr>
-          <tr><td style="font-weight:800;">SBI Gold ETF</td><td style="color:#b35c00;font-weight:700;">Gold</td><td>ETF</td><td>NSE/BSE</td><td>LTCG 20% (24m+)</td><td class="green">High</td><td style="font-size:10px;">Core gold holding</td></tr>
-          <tr><td style="font-weight:800;">Sovereign Gold Bond</td><td style="color:#b35c00;font-weight:700;">Gold</td><td>Govt Bond</td><td>RBI/Exchange</td><td>Tax-free on maturity</td><td style="color:#b35c00;font-weight:700;">Medium</td><td style="font-size:10px;">Long-term hold (8Y)</td></tr>
+          <tr><td style="font-weight:800;">Nippon India Gold ETF</td><td style="color:#b35c00;font-weight:700;">Gold</td><td>ETF</td><td>NSE/BSE</td><td>LTCG 20% (24m+)</td><td class="green">High</td><td style="font-size:10px;">Gold allocation</td></tr>
+          <tr><td style="font-weight:800;">SBI Gold ETF</td><td style="color:#b35c00;font-weight:700;">Gold</td><td>ETF</td><td>NSE/BSE</td><td>LTCG 20% (24m+)</td><td class="green">High</td><td style="font-size:10px;">Gold allocation</td></tr>
+          <tr><td style="font-weight:800;">Sovereign Gold Bond</td><td style="color:#b35c00;font-weight:700;">Gold</td><td>Govt Bond</td><td>RBI/Exchange</td><td>Tax-free on maturity</td><td style="color:#b35c00;font-weight:700;">Medium</td><td style="font-size:10px;">Long-term (8Y maturity)</td></tr>
           <tr><td style="font-weight:800;">Mirae Asset Silver ETF</td><td style="color:#5a6080;font-weight:700;">Silver</td><td>ETF</td><td>NSE</td><td>LTCG 20% (24m+)</td><td style="color:#b35c00;font-weight:700;">Medium</td><td style="font-size:10px;">Industrial + monetary</td></tr>
           <tr><td style="font-weight:800;">ICICI Pru Silver ETF</td><td style="color:#5a6080;font-weight:700;">Silver</td><td>ETF</td><td>NSE/BSE</td><td>LTCG 20% (24m+)</td><td style="color:#b35c00;font-weight:700;">Medium</td><td style="font-size:10px;">EV/Solar theme play</td></tr>
           <tr><td style="font-weight:800;">Nippon India Copper ETF</td><td style="color:#7a4200;font-weight:700;">Copper</td><td>ETF</td><td>NSE</td><td>LTCG 20% (24m+)</td><td style="color:#e53935;font-weight:700;">Low-Med</td><td style="font-size:10px;">Industrial cycle play</td></tr>
@@ -1943,7 +1943,7 @@ body{padding-bottom:52px;}
 
     <!-- REIT vs InvIT comparison + buy guide -->
     <div class="card full" style="margin-top:0;">
-      <h2><span class="icon">&#128200;</span>REITs &amp; InvITs — Full Comparison &amp; Buying Guide</h2>
+      <h2><span class="icon">&#128200;</span>REITs &amp; InvITs — Full Comparison</h2>
       <div class="section-title">All listed instruments with key metrics, platforms, and entry strategy</div>
       <div class="table-scroll">
         <table>
@@ -1956,7 +1956,7 @@ body{padding-bottom:52px;}
             <td style="font-weight:700;">~Rs.350</td>
             <td style="font-size:11px;">~Rs.34,000 Cr</td>
             <td style="font-size:11px;">NSE / BSE</td>
-            <td><span style="background:#e6f4ef;color:#006b30;border:1px solid #00a854;padding:2px 7px;border-radius:7px;font-size:10px;font-weight:700;">Strong Buy</span></td>
+            <td><span style="background:#e6f4ef;color:#006b30;border:1px solid #00a854;padding:2px 7px;border-radius:7px;font-size:10px;font-weight:700;">High Score</span></td>
             <td style="font-size:10px;color:#6b7498;">Tech sector slowdown hits occupancy</td>
           </tr>
           <tr>
@@ -1967,7 +1967,7 @@ body{padding-bottom:52px;}
             <td style="font-weight:700;">~Rs.310</td>
             <td style="font-size:11px;">~Rs.20,000 Cr</td>
             <td style="font-size:11px;">NSE / BSE</td>
-            <td><span style="background:#e6f4ef;color:#006b30;border:1px solid #00a854;padding:2px 7px;border-radius:7px;font-size:10px;font-weight:700;">Strong Buy</span></td>
+            <td><span style="background:#e6f4ef;color:#006b30;border:1px solid #00a854;padding:2px 7px;border-radius:7px;font-size:10px;font-weight:700;">High Score</span></td>
             <td style="font-size:10px;color:#6b7498;">WFH trend; IT hiring slowdown</td>
           </tr>
           <tr>
@@ -2000,7 +2000,7 @@ body{padding-bottom:52px;}
             <td style="font-weight:700;">~Rs.70</td>
             <td style="font-size:11px;">~Rs.7,000 Cr</td>
             <td style="font-size:11px;">NSE / BSE</td>
-            <td><span style="background:#e6f4ef;color:#006b30;border:1px solid #00a854;padding:2px 7px;border-radius:7px;font-size:10px;font-weight:700;">Strong Buy</span></td>
+            <td><span style="background:#e6f4ef;color:#006b30;border:1px solid #00a854;padding:2px 7px;border-radius:7px;font-size:10px;font-weight:700;">High Score</span></td>
             <td style="font-size:10px;color:#6b7498;">Traffic volume; debt at project level</td>
           </tr>
           <tr style="background:#f5f7ff;">
@@ -2011,7 +2011,7 @@ body{padding-bottom:52px;}
             <td style="font-weight:700;">~Rs.135</td>
             <td style="font-size:11px;">~Rs.11,000 Cr</td>
             <td style="font-size:11px;">NSE / BSE</td>
-            <td><span style="background:#e6f4ef;color:#006b30;border:1px solid #00a854;padding:2px 7px;border-radius:7px;font-size:10px;font-weight:700;">Strong Buy</span></td>
+            <td><span style="background:#e6f4ef;color:#006b30;border:1px solid #00a854;padding:2px 7px;border-radius:7px;font-size:10px;font-weight:700;">High Score</span></td>
             <td style="font-size:10px;color:#6b7498;">Regulated returns; interest rate sensitive</td>
           </tr>
           <tr style="background:#f5f7ff;">
@@ -2044,7 +2044,7 @@ body{padding-bottom:52px;}
             <td style="font-weight:700;">~Rs.90</td>
             <td style="font-size:11px;">~Rs.5,000 Cr</td>
             <td style="font-size:11px;">NSE / BSE</td>
-            <td><span style="background:#e6f4ef;color:#006b30;border:1px solid #00a854;padding:2px 7px;border-radius:7px;font-size:10px;font-weight:700;">Strong Buy</span></td>
+            <td><span style="background:#e6f4ef;color:#006b30;border:1px solid #00a854;padding:2px 7px;border-radius:7px;font-size:10px;font-weight:700;">High Score</span></td>
             <td style="font-size:10px;color:#6b7498;">Private sector concentration; grid delay risk</td>
           </tr>
         </table>
@@ -2057,7 +2057,7 @@ body{padding-bottom:52px;}
             2. Search the name on NSE/BSE like a stock<br>
             3. Minimum 1 unit (post SEBI rule change)<br>
             4. Distributions credited directly to bank account quarterly<br>
-            5. Buy in tranches — don't lump-sum, use dips in rate cycles
+            5. Consider tranches — use dips in rate cycles for entry
           </div>
         </div>
         <div style="background:#e6f4ef;border-left:3px solid #00a854;padding:12px 14px;border-radius:8px;">
@@ -2156,7 +2156,7 @@ body{padding-bottom:52px;}
   </div>
   <div class="breadcrumb" id="dd-breadcrumb"><span class="crumb bc-active" onclick="ddGoLevel('top')">All Sectors</span></div>
   <div class="drill-legend">
-    <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Strong Buy</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>High Score</div>
     <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div>Watch</div>
     <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>Skip</div>
   </div>
@@ -2816,15 +2816,15 @@ let THEMES={
   ]}
 };
 const SCREENER_DATA=[
-  {name:"Power",macro:34,earn:32,struct:34,horizon:"3-5Y Core Hold",reason:"Secular demand surge from AI data centres, EV, urbanisation. Grid modernisation Rs.2.5L Cr capex. Solar + thermal + transmission all firing.",risks:"Regulatory tariff lag, execution risk at scale",catalysts:"Budget allocation, rate cut, AI data-centre build"},
-  {name:"Defence",macro:33,earn:30,struct:34,horizon:"3-5Y Core Hold",reason:"Atmanirbhar Bharat, export push to 85+ countries, multi-year order books. HAL, BEL, MDL at record backlogs.",risks:"Execution timelines, election-year policy continuity",catalysts:"HAL orders, BEL export, budget hike"},
-  {name:"Capital Goods",macro:31,earn:30,struct:30,horizon:"3-5Y Core Hold",reason:"Govt PLI + capex supercycle. L&T, ABB, Siemens order books at record highs. Private capex beginning to revive.",risks:"Private capex still weak; execution risk",catalysts:"PLI disbursements, rate cuts, infra awards"},
-  {name:"AMC",macro:29,earn:31,struct:32,horizon:"3-5Y Core Hold",reason:"SIP flows at all-time highs (Rs.20,000Cr/month). AUM doubling every 4-5Y. Asset-light, high ROE business. India MF penetration at 16% vs 50%+ in developed markets.",risks:"Market crash reduces AUM and fees; entry of new competitors",catalysts:"Rising financial literacy, mandatory pension via MF, SEBI reforms"},
-  {name:"Pharma",macro:28,earn:29,struct:32,horizon:"3-5Y Core Hold",reason:"US generic ramp, GLP-1 wave, China+1 API shift. Domestic branded generics 12%+ CAGR.",risks:"US FDA risk, generic pricing pressure",catalysts:"Semaglutide approvals, biosimilar launches"},
-  {name:"Hospitals",macro:27,earn:28,struct:31,horizon:"3-5Y Core Hold",reason:"Low bed density, rising insurance, medical tourism. ARPOB expanding 12-15%/yr. Apollo, Max, Fortis executing.",risks:"Regulatory fee caps, talent shortage",catalysts:"Health insurance growth, Ayushman expansion"},
-  {name:"Brokers/Wealth",macro:28,earn:27,struct:29,horizon:"3-5Y Core Hold",reason:"Demat accounts crossing 16Cr. SIP + F&O volumes structurally rising. Wealth management for India's expanding HNI base is a decade-long story.",risks:"Market downturn reduces volumes and AUM fees; SEBI regulation on F&O",catalysts:"Market rally, new product launches, rising HNI population"},
+  {name:"Power",macro:34,earn:32,struct:34,horizon:"3-5Y Focus",reason:"Secular demand surge from AI data centres, EV, urbanisation. Grid modernisation Rs.2.5L Cr capex. Solar + thermal + transmission all firing.",risks:"Regulatory tariff lag, execution risk at scale",catalysts:"Budget allocation, rate cut, AI data-centre build"},
+  {name:"Defence",macro:33,earn:30,struct:34,horizon:"3-5Y Focus",reason:"Atmanirbhar Bharat, export push to 85+ countries, multi-year order books. HAL, BEL, MDL at record backlogs.",risks:"Execution timelines, election-year policy continuity",catalysts:"HAL orders, BEL export, budget hike"},
+  {name:"Capital Goods",macro:31,earn:30,struct:30,horizon:"3-5Y Focus",reason:"Govt PLI + capex supercycle. L&T, ABB, Siemens order books at record highs. Private capex beginning to revive.",risks:"Private capex still weak; execution risk",catalysts:"PLI disbursements, rate cuts, infra awards"},
+  {name:"AMC",macro:29,earn:31,struct:32,horizon:"3-5Y Focus",reason:"SIP flows at all-time highs (Rs.20,000Cr/month). AUM doubling every 4-5Y. Asset-light, high ROE business. India MF penetration at 16% vs 50%+ in developed markets.",risks:"Market crash reduces AUM and fees; entry of new competitors",catalysts:"Rising financial literacy, mandatory pension via MF, SEBI reforms"},
+  {name:"Pharma",macro:28,earn:29,struct:32,horizon:"3-5Y Focus",reason:"US generic ramp, GLP-1 wave, China+1 API shift. Domestic branded generics 12%+ CAGR.",risks:"US FDA risk, generic pricing pressure",catalysts:"Semaglutide approvals, biosimilar launches"},
+  {name:"Hospitals",macro:27,earn:28,struct:31,horizon:"3-5Y Focus",reason:"Low bed density, rising insurance, medical tourism. ARPOB expanding 12-15%/yr. Apollo, Max, Fortis executing.",risks:"Regulatory fee caps, talent shortage",catalysts:"Health insurance growth, Ayushman expansion"},
+  {name:"Brokers/Wealth",macro:28,earn:27,struct:29,horizon:"3-5Y Focus",reason:"Demat accounts crossing 16Cr. SIP + F&O volumes structurally rising. Wealth management for India's expanding HNI base is a decade-long story.",risks:"Market downturn reduces volumes and AUM fees; SEBI regulation on F&O",catalysts:"Market rally, new product launches, rising HNI population"},
   {name:"Banking (Pvt)",macro:26,earn:27,struct:26,horizon:"3-5Y Selective",reason:"Rate cut cycle benefits NIMs. Credit growth 14-16%. HDFC, ICICI at best-in-class RoA trajectory.",risks:"NIM compression near-term, MFI book stress",catalysts:"RBI rate cuts, GDP acceleration"},
-  {name:"Hotels/Tourism",macro:26,earn:26,struct:28,horizon:"3-5Y Core Hold",reason:"India's hotel supply gap is structural. Post-COVID revenge travel secular. Foreign tourist arrivals recovering. RevPAR expansion 15-20% YoY.",risks:"Crude oil shock, geopolitical event, oversupply in leisure",catalysts:"Air connectivity growth, visa liberalisation, G20 push"},
+  {name:"Hotels/Tourism",macro:26,earn:26,struct:28,horizon:"3-5Y Focus",reason:"India's hotel supply gap is structural. Post-COVID revenge travel secular. Foreign tourist arrivals recovering. RevPAR expansion 15-20% YoY.",risks:"Crude oil shock, geopolitical event, oversupply in leisure",catalysts:"Air connectivity growth, visa liberalisation, G20 push"},
   {name:"Insurance",macro:25,earn:25,struct:30,horizon:"3-5Y Selective",reason:"Extremely low penetration vs peers. IRDAI reforms driving distribution. Life + health both structural.",risks:"Mis-selling regulation, LIC competition",catalysts:"IRDAI bima reforms, Bima Sugam platform"},
   {name:"Infra / Cement",macro:28,earn:26,struct:27,horizon:"3-5Y Selective",reason:"Govt capex Rs.11L Cr/year. NHAI road awards, metro, rail. Cement volume 8-9% CAGR.",risks:"Commodity cost volatility, monsoon disruption",catalysts:"NHAI awards, state election spending"},
   {name:"Cement",macro:25,earn:24,struct:26,horizon:"3-5Y Selective",reason:"Infrastructure push driving volume. Consolidation underway with Adani-UltraTech competition. Capacity additions moderate.",risks:"Overcapacity, coal/pet-coke cost spikes, new entrants",catalysts:"Govt housing + infra spend, urban real estate"},
@@ -3088,7 +3088,7 @@ function updateAll(){
   // Main board top sectors
   const mbTS=document.getElementById("mb-topSectors");
   if(mbTS) mbTS.innerHTML=Object.entries(SECTORS).sort((a,b)=>b[1].score-a[1].score).slice(0,6).map(([nm,s])=>{
-    const verdict = s.score>=75?'&#9989; Buy':'&#9203; Watch';
+    const verdict = s.score>=75?'🟢 High':'🟡 Medium';
     const verdictCol = s.score>=75?'#006b30':'#b35c00';
     const verdictBg = s.score>=75?'#e6f4ef':'#fff3e0';
     return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f0f2f8;cursor:pointer;" onclick="switchPage('drilldown')">
@@ -3234,8 +3234,8 @@ function renderScreener(filter){
   data.sort((a,b)=>sk==="macro"?b.macro-a.macro:sk==="earnings"?b.earn-a.earn:sk==="structural"?b.struct-a.struct:b.composite-a.composite);
   const all=SCREENER_DATA.map(s=>({...s,composite:sComposite(s),verdict:sVerdict(sComposite(s))}));
   const nS=all.filter(s=>s.verdict==="strong").length, nW=all.filter(s=>s.verdict==="watch").length, nSk=all.filter(s=>s.verdict==="skip").length;
-  document.getElementById("screenerSummary").innerHTML=`<span class="sc-pill sc-pill-green">Strong Buy: ${nS}</span><span class="sc-pill sc-pill-yellow">Watch: ${nW}</span><span class="sc-pill sc-pill-red">Skip: ${nSk}</span>`;
-  document.getElementById("screenerInsight").innerHTML=`<strong>Screener Summary (3-5Y):</strong> Out of ${SCREENER_DATA.length} sectors, <strong style="color:var(--green)">${nS} pass</strong> composite threshold, <strong style="color:var(--yellow)">${nW}</strong> on watch, <strong style="color:var(--red)">${nSk}</strong> avoided. Top 3: <strong style="color:var(--orange)">${all.filter(s=>s.verdict==="strong").sort((a,b)=>b.composite-a.composite).slice(0,3).map(s=>s.name).join(", ")}</strong>.`;
+  document.getElementById("screenerSummary").innerHTML=`<span class="sc-pill sc-pill-green">High Score: ${nS}</span><span class="sc-pill sc-pill-yellow">Medium: ${nW}</span><span class="sc-pill sc-pill-red">Low Score: ${nSk}</span>`;
+  document.getElementById("screenerInsight").innerHTML=`<strong>Screener Summary (3-5Y):</strong> Out of ${SCREENER_DATA.length} sectors, <strong style="color:var(--green)">${nS} score high</strong>, <strong style="color:var(--yellow)">${nW}</strong> score medium, <strong style="color:var(--red)">${nSk}</strong> score low. Top 3: <strong style="color:var(--orange)">${all.filter(s=>s.verdict==="strong").sort((a,b)=>b.composite-a.composite).slice(0,3).map(s=>s.name).join(", ")}</strong>.`;
   window._screenerData=data; renderScreenerContent();
 }
 function renderScreenerContent(){
@@ -3247,14 +3247,14 @@ function renderScreenerContent(){
         const sc=s.composite,cl=sCls(sc);
         const bar=(v)=>`<div class="pillar-bar"><div class="bar"><div class="bar-fill" style="width:${Math.round(v/35*100)}%;background:${v>=28?"var(--green)":v>=20?"var(--yellow)":"var(--red)"}"></div></div><span class="${sCls(Math.round(v/35*100))}" style="font-size:10px;font-weight:800;">${v}</span></div>`;
         const vbcls=s.verdict==="strong"?"vb-strong":s.verdict==="watch"?"vb-watch":"vb-skip";
-        return `<tr><td style="color:var(--text-muted);font-weight:700;">${i+1}</td><td style="font-weight:800;">${s.name}</td><td>${bar(s.macro)}</td><td>${bar(s.earn)}</td><td>${bar(s.struct)}</td><td><span class="${cl}" style="font-size:15px;font-weight:900;">${sc}</span></td><td style="font-size:10px;font-weight:700;color:var(--blue);">${s.horizon}</td><td><span class="verdict-badge ${vbcls}">${s.verdict==="strong"?"Strong Buy":s.verdict==="watch"?"Watch":"Skip"}</span></td></tr>`;
+        return `<tr><td style="color:var(--text-muted);font-weight:700;">${i+1}</td><td style="font-weight:800;">${s.name}</td><td>${bar(s.macro)}</td><td>${bar(s.earn)}</td><td>${bar(s.struct)}</td><td><span class="${cl}" style="font-size:15px;font-weight:900;">${sc}</span></td><td style="font-size:10px;font-weight:700;color:var(--blue);">${s.horizon}</td><td><span class="verdict-badge ${vbcls}">${s.verdict==="strong"?"High Score":s.verdict==="watch"?"Medium":"Low Score"}</span></td></tr>`;
       }).join("")}</table>`;
   } else if(screenerTab==="rationale"){
     document.getElementById("screenerRationaleDiv").innerHTML=data.filter(s=>s.verdict!=="skip").map(s=>`
       <div style="padding:11px 0;border-bottom:1px solid #dde1ec;">
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap;">
           <span style="font-size:13px;font-weight:900;">${s.name}</span>
-          <span class="verdict-badge ${s.verdict==="strong"?"vb-strong":"vb-watch"}">${s.verdict==="strong"?"Strong Buy":"Watch"}</span>
+          <span class="verdict-badge ${s.verdict==="strong"?"vb-strong":"vb-watch"}">${s.verdict==="strong"?"High Score":"Medium"}</span>
           <span class="${sCls(s.composite)}" style="font-weight:900;">Score: ${s.composite}</span>
           <span style="font-size:10px;color:var(--blue);font-weight:700;margin-left:auto;">${s.horizon}</span>
         </div>
@@ -3270,7 +3270,7 @@ function renderScreenerContent(){
       ${data.map(s=>{
         const vbcls=s.verdict==="strong"?"vb-strong":s.verdict==="watch"?"vb-watch":"vb-skip";
         const cell=(v,max)=>{const pct=v/max*100;const c=pct>=80?"var(--green)":pct>=57?"var(--yellow)":"var(--red)";return `<td style="font-weight:900;color:${c};font-size:13px;">${v}<span style="font-size:9px;color:var(--text-muted);">/${max}</span></td>`;};
-        return `<tr><td style="font-weight:800;">${s.name}</td>${cell(s.macro,35)}${cell(s.earn,35)}${cell(s.struct,35)}${cell(s.composite,100)}<td style="font-size:10px;font-weight:700;color:var(--blue);">${s.horizon}</td><td><span class="verdict-badge ${vbcls}">${s.verdict==="strong"?"Strong Buy":s.verdict==="watch"?"Watch":"Skip"}</span></td></tr>`;
+        return `<tr><td style="font-weight:800;">${s.name}</td>${cell(s.macro,35)}${cell(s.earn,35)}${cell(s.struct,35)}${cell(s.composite,100)}<td style="font-size:10px;font-weight:700;color:var(--blue);">${s.horizon}</td><td><span class="verdict-badge ${vbcls}">${s.verdict==="strong"?"High Score":s.verdict==="watch"?"Medium":"Low Score"}</span></td></tr>`;
       }).join("")}</table>`;
   }
 }
@@ -3279,7 +3279,7 @@ function pushStrongToHeatmap(){
   const nm={"Power":"Power","Defence":"Defence","Capital Goods":"Capital Goods","Pharma":"Pharma","Banking (Pvt)":"Banking","Banking":"Banking","Infra / Cement":"Infra/Cement","Hospitals":"Hospitals","Hospitals/Healthcare":"Hospitals","AMC":"AMC","Brokers/Wealth":"Brokers/Wealth","Hotels/Tourism":"Hotels/Tourism","Insurance":"Insurance","NBFC":"NBFC","New Age Tech":"New Age Tech","Retail":"Retail","Cement":"Cement","Gold/Jewellery":"Gold/Jewellery","Diversified":"Diversified"};
   strong.forEach((s,i)=>{const e=nm[s.name]||s.name;if(SECTORS[e]){SECTORS[e].score=Math.min(95,Math.round(s.composite*0.95));SECTORS[e].weight=Math.max(5,Math.round(20-i*2));}});
   updateAll();
-  const n=document.createElement("div");n.className="notify-flash";n.textContent="Heatmap updated with "+strong.length+" Strong Buy sectors";document.body.appendChild(n);setTimeout(()=>n.remove(),3000);
+  const n=document.createElement("div");n.className="notify-flash";n.textContent="Heatmap updated with "+strong.length+" high-score sectors";document.body.appendChild(n);setTimeout(()=>n.remove(),3000);
 }
 // ── DRILL-DOWN DATA ──────────────────────────────────────────────────────
 const DRILL=[
@@ -3656,7 +3656,7 @@ let ddState={level:"top",sectorId:null,subsectorId:null,filterSS:null};
 const ddSc=v=>v>=80?"green":v>=65?"yellow":"red";
 const ddFillCls=v=>v>=80?"fill-green":v>=65?"fill-yellow":"fill-red";
 const ddVerdictCls=v=>v==="strong"?"vb-strong":v==="watch"?"vb-watch":"vb-skip";
-const ddVerdictLabel=v=>v==="strong"?"Strong Buy":v==="watch"?"Watch":"Skip";
+const ddVerdictLabel=v=>v==="strong"?"High Score":v==="watch"?"Medium":"Low Score";
 const ddTagCls=v=>v==="strong"?"tag-strong":v==="watch"?"tag-watch":"tag-skip";
 const ddGetSector=id=>DRILL.find(s=>s.id===id);
 const ddGetSub=(sId,ssId)=>{const s=ddGetSector(sId);return s?.subsectors?.find(ss=>ss.id===ssId);};
@@ -3819,7 +3819,7 @@ const DEBT_FUNDS = [
   {name:"Gilt Fund", risk:"High (duration)", horizon:"3–5 years", returns:"7–10% (mark to market)", taxNote:"Slab rate (debt)", verdict:"watch",
    desc:"100% Govt securities. Zero credit risk but HIGH duration risk. Prices rise sharply when rates fall. Duration 7–10 years typical.",
    funds:"SBI Magnum Gilt, ICICI Pru Gilt, DSP Gilt Fund",
-   when:"When RBI is about to cut rates. Buy at rate peak; sell after 200–300bps cut. NOT for short term."},
+   when:"When RBI is about to cut rates. Suitable for rate-sensitive allocation. NOT for short term."},
   {name:"Dynamic Bond Fund", risk:"Medium-High", horizon:"3+ years", returns:"7–9%", taxNote:"Slab rate (debt)", verdict:"watch",
    desc:"Fund manager actively manages duration based on rate outlook. Can go from 1Y to 15Y duration. Returns very cycle dependent.",
    funds:"ICICI Pru Dynamic Bond, Kotak Dynamic Bond, HDFC Dynamic Debt",
@@ -4314,7 +4314,7 @@ function renderZerodhaResults() {
         </div>
         <span style="font-size:12px;font-weight:900;color:${color};min-width:38px;">${actual.toFixed(1)}%</span>
       </div>
-      <div style="font-size:10px;color:#6b7498;margin-top:2px;">Target: ${recommended}%</div>
+      <div style="font-size:10px;color:#6b7498;margin-top:2px;">Model: ${recommended}%</div>
     </div>`;
   };
 
@@ -4988,7 +4988,7 @@ function renderRiskIndicators(){
     {dot:'ri-val', label:'ri-val-label',
      level: score>8?{d:'🟢',l:'Low Risk',c:'#006b30',bg:'#e6f4ef'} : score>2?{d:'🟡',l:'Medium',c:'#b35c00',bg:'#fff3e0'} : {d:'🔴',l:'High — Expensive',c:'#b71c1c',bg:'#fce8e8'}},
     {dot:'ri-fii', label:'ri-fii-label',
-     level: score>6?{d:'🟢',l:'Buying',c:'#006b30',bg:'#e6f4ef'} : score>1?{d:'🟡',l:'Neutral',c:'#b35c00',bg:'#fff3e0'} : {d:'🔴',l:'Selling',c:'#b71c1c',bg:'#fce8e8'}},
+     level: score>6?{d:'🟢',l:'FII Inflow',c:'#006b30',bg:'#e6f4ef'} : score>1?{d:'🟡',l:'Neutral',c:'#b35c00',bg:'#fff3e0'} : {d:'🔴',l:'FII Outflow',c:'#b71c1c',bg:'#fce8e8'}},
     {dot:'ri-earn', label:'ri-earn-label',
      level: score>5?{d:'🟢',l:'Upgrades',c:'#006b30',bg:'#e6f4ef'} : score>0?{d:'🟢',l:'Stable Growth',c:'#006b30',bg:'#e6f4ef'} : {d:'🔴',l:'Downgrades Risk',c:'#b71c1c',bg:'#fce8e8'}},
     {dot:'ri-sent', label:'ri-sent-label',
@@ -5028,7 +5028,7 @@ function showScenario(i){
     <div style="font-size:12px;color:#4a5070;margin-bottom:14px;line-height:1.6;">${sc.desc}</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:14px;">
       <div>
-        <div style="font-size:11px;font-weight:800;color:#006b30;margin-bottom:6px;">🟢 Sectors that hold up / outperform:</div>
+        <div style="font-size:11px;font-weight:800;color:#006b30;margin-bottom:6px;">🟢 Sectors with stronger fundamentals in this scenario:</div>
         <div>${greenList}</div>
       </div>
       <div>
@@ -5505,7 +5505,7 @@ function calculateMyPortfolio() {
         </div>
         <span style="font-size:12px;font-weight:900;color:${color};min-width:38px;">${actual.toFixed(1)}%</span>
       </div>
-      <div style="font-size:10px;color:#6b7498;margin-top:2px;">Target: ${recommended}%</div>
+      <div style="font-size:10px;color:#6b7498;margin-top:2px;">Model: ${recommended}%</div>
     </div>`;
   };
 
