@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26 — Capital Allocation Intelligence System</title>
+<title>CB Finance26™ — Capital Allocation Intelligence System</title>
+<meta name="description" content="CB Finance26 — Proprietary capital allocation research framework. For authorised members only.">
+<meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
+<meta name="author" content="CB Finance26 Research">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -325,9 +329,104 @@ body{padding-bottom:52px;}
 </head>
 <body>
 <!-- NAV -->
+
+<!-- ═══ ACCESS GATE ═══ -->
+<div id="accessGate" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;background:linear-gradient(135deg,#1a1e2e 0%,#0d1117 100%);display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;">
+  <div style="background:#fff;border-radius:20px;padding:40px 48px;max-width:480px;width:90%;text-align:center;box-shadow:0 24px 80px #00000060;">
+    <!-- Logo -->
+    <div style="font-size:32px;font-weight:900;color:#c45000;margin-bottom:4px;">&#9733; CB <span style="color:#ff7c00;">Finance26</span>™</div>
+    <div style="font-size:11px;font-weight:700;color:#6b7498;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;">Capital Allocation Intelligence System</div>
+    <div style="width:48px;height:3px;background:linear-gradient(90deg,#ff7c00,#ffc107);border-radius:3px;margin:0 auto 24px;"></div>
+
+    <!-- Lock icon -->
+    <div style="font-size:36px;margin-bottom:16px;">🔐</div>
+    <div style="font-size:16px;font-weight:800;color:#1a1e2e;margin-bottom:8px;">Authorised Access Only</div>
+    <div style="font-size:12px;font-weight:600;color:#6b7498;margin-bottom:24px;line-height:1.7;">This tool is for authorised CB Finance26 members only.<br>Enter your access code to continue.</div>
+
+    <!-- Access code input -->
+    <input type="password" id="accessCodeInput" placeholder="Enter access code"
+      style="width:100%;border:2px solid #dde1ec;border-radius:10px;padding:13px 16px;font-size:15px;font-weight:700;text-align:center;font-family:'Poppins',sans-serif;outline:none;margin-bottom:12px;color:#1a1e2e;letter-spacing:3px;"
+      onkeydown="if(event.key==='Enter') checkAccessCode()">
+    <div id="accessError" style="font-size:11px;font-weight:700;color:#b71c1c;margin-bottom:10px;min-height:16px;"></div>
+    <button onclick="checkAccessCode()" style="width:100%;background:linear-gradient(135deg,#ff7c00,#ff9a00);color:#fff;border:none;padding:14px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;margin-bottom:20px;">
+      Enter →
+    </button>
+
+    <!-- Legal notice -->
+    <div style="background:#f8f9fe;border-radius:10px;padding:12px 14px;text-align:left;border:1px solid #dde1ec;">
+      <div style="font-size:10px;font-weight:700;color:#1a1e2e;margin-bottom:5px;">⚖️ Legal Notice</div>
+      <div style="font-size:10px;color:#6b7498;line-height:1.7;">By entering, you agree that this tool is for <strong>personal research and educational purposes only</strong>. This is <strong>NOT financial advice</strong>. CB Finance26™ is proprietary intellectual property. Redistribution, copying, or sharing without written consent is strictly prohibited. All scores are analytical frameworks, not investment recommendations.</div>
+    </div>
+
+    <!-- Copyright -->
+    <div style="margin-top:16px;font-size:10px;color:#b0bcd8;font-weight:600;">
+      © 2025 CB Finance26™. All Rights Reserved. Proprietary &amp; Confidential.
+    </div>
+  </div>
+</div>
+
+<!-- ═══ WATERMARK (visible on all pages) ═══ -->
+<div id="watermarkOverlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9998;overflow:hidden;opacity:0.04;">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:48px;font-weight:900;color:#1a1e2e;white-space:nowrap;letter-spacing:6px;user-select:none;">CB FINANCE26™ · CONFIDENTIAL</div>
+</div>
+
+<script>
+// Access gate logic
+(function(){
+  // Check if already unlocked in this session
+  if(sessionStorage.getItem('cbf26_auth')==='granted'){
+    document.getElementById('accessGate').style.display='none';
+    return;
+  }
+  // Auto-focus input
+  setTimeout(()=>document.getElementById('accessCodeInput')?.focus(),300);
+})();
+
+function checkAccessCode(){
+  const input=document.getElementById('accessCodeInput');
+  const err=document.getElementById('accessError');
+  const val=(input?.value||'').trim().toUpperCase();
+  // Codes: multiple valid codes for different members
+  // Change these to your actual codes before distributing
+  const VALID_CODES=['CBF26','MEMBER2025','RESEARCH26','CBFINANCE','ALPHA2025'];
+  if(VALID_CODES.includes(val)){
+    sessionStorage.setItem('cbf26_auth','granted');
+    const gate=document.getElementById('accessGate');
+    gate.style.transition='opacity 0.5s';
+    gate.style.opacity='0';
+    setTimeout(()=>gate.style.display='none',500);
+    err.textContent='';
+  } else {
+    err.textContent='Incorrect code. Please contact CB Finance26 for access.';
+    input.value='';
+    input.style.borderColor='#e53935';
+    setTimeout(()=>input.style.borderColor='#dde1ec',2000);
+  }
+}
+
+// Basic copy protection
+document.addEventListener('contextmenu', e=>{
+  e.preventDefault();
+  return false;
+});
+document.addEventListener('keydown', e=>{
+  // Block Ctrl+S, Ctrl+P, Ctrl+U, F12
+  if((e.ctrlKey||e.metaKey) && ['s','p','u'].includes(e.key.toLowerCase())){
+    e.preventDefault(); return false;
+  }
+});
+document.addEventListener('copy', e=>{
+  const sel=window.getSelection()?.toString()||'';
+  if(sel.length>200){
+    e.clipboardData.setData('text/plain', sel.substring(0,200)+'\n\n[CB Finance26™ Proprietary Content — © 2025 CB Finance26. Redistribution Prohibited.]');
+    e.preventDefault();
+  }
+});
+</script>
+
 <div class="nav-shell">
   <div class="nav-header">
-    <div class="nav-logo">&#9733; CB <span>Finance26</span></div>
+    <div class="nav-logo">&#9733; CB <span>Finance26</span><sup style="font-size:8px;color:#ff7c00;margin-left:1px;">™</sup></div>
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="switchPage('main',this)" id="navBtn-main">&#127968; Dashboard</button>
       <button class="nav-tab" onclick="switchPage('model',this)" id="navBtn-model">&#128200; My Plan</button>
@@ -348,7 +447,7 @@ body{padding-bottom:52px;}
 <!-- HAMBURGER MENU -->
 <div class="hamburger-menu" id="hmMenu">
   <div class="hm-header">
-    <div class="hm-title">&#9733; CB Finance26</div>
+    <div class="hm-title">&#9733; CB Finance26™ <span style="font-size:9px;font-weight:600;color:#ffab40;">Proprietary</span></div>
     <button class="hm-close" onclick="closeHamburger()">&#10005;</button>
   </div>
 
@@ -421,7 +520,7 @@ body{padding-bottom:52px;}
   </div>
 
   <div class="hm-divider"></div>
-  <div style="padding:14px 20px;font-size:10px;color:#b0bcd8;font-weight:600;">CB Finance26 v6 &nbsp;|&nbsp; 23 Sectors &nbsp;|&nbsp; Educational use only</div>
+  <div style="padding:14px 20px;font-size:10px;color:#b0bcd8;font-weight:600;">© 2025 CB Finance26™ · Proprietary &amp; Confidential · Not Financial Advice · Authorised Members Only</div>
 </div>
 
 
@@ -769,7 +868,7 @@ body{padding-bottom:52px;}
       </div>
     </div>
 
-  <div class="footer">CB Finance26 v5 &nbsp;|&nbsp; All links open official portals in a new tab. Not financial advice.</div>
+  <div class="footer">© 2025 CB Finance26™ · Not Financial Advice · For Research Purposes Only</div>
 </div>
 
 <!-- PAGE: IMPORT -->
@@ -982,10 +1081,18 @@ body{padding-bottom:52px;}
     </div>
   </div>
 
-  <div class="footer">CB Finance26 v5 &nbsp;|&nbsp; Your data never leaves your device. Not financial advice.</div>
+  <div class="footer">© 2025 CB Finance26™ · All data processed locally · Not Financial Advice</div>
 </div>
 
 <!-- PAGE 1: MAIN BOARD -->
+<!-- DISCLAIMER BANNER -->
+<div style="background:#1a1e2e;padding:8px 20px;text-align:center;font-size:10px;font-weight:600;color:#b0bcd8;border-bottom:1px solid #2a3050;position:sticky;top:50px;z-index:99;letter-spacing:0.3px;">
+  ⚖️ <strong style="color:#ffab40;">CB Finance26™ Proprietary System</strong> — For Authorised Members Only &nbsp;|&nbsp; 
+  <strong style="color:#ffd0b0;">NOT Financial Advice</strong> &nbsp;|&nbsp; All scores are analytical frameworks only &nbsp;|&nbsp;
+  © 2025 CB Finance26™ · Confidential &amp; Proprietary &nbsp;|&nbsp;
+  <span style="color:#ff7c00;">Redistribution Prohibited</span>
+</div>
+
 <div class="page active" id="page-main">
 
 <!-- ═══ HERO BANNER ═══ -->
@@ -994,7 +1101,7 @@ body{padding-bottom:52px;}
   <div style="position:absolute;bottom:-40px;left:30%;width:120px;height:120px;background:rgba(255,193,7,0.05);border-radius:50%;"></div>
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
     <div>
-      <div style="font-size:11px;font-weight:700;color:#ffab40;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;">CB Finance26 · Your Personal Investment Advisor</div>
+      <div style="font-size:11px;font-weight:700;color:#ffab40;text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;">CB Finance26™ · Proprietary Capital Allocation System</div>
       <h1 style="font-size:26px;font-weight:900;color:#fff;margin-bottom:8px;line-height:1.2;">Where should my money go?</h1>
       <p style="color:#c8d0e8;font-size:13px;font-weight:500;margin-bottom:16px;">Answer 3 questions → get your complete investment plan with sector picks, company rankings and allocation targets.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -1348,7 +1455,7 @@ body{padding-bottom:52px;}
       <span style="font-size:11px;color:var(--text-muted);font-weight:600;">Updates Allocation Model with screened selections</span>
     </div>
   </div>
-  <div class="footer">CB Finance26 v10.0 &nbsp;|&nbsp; 23 Sectors &nbsp;|&nbsp; For educational and research purposes only.</div>
+  <div class="footer">© 2025 CB Finance26™ v10.0 · 23 Sectors · Proprietary System · Not Financial Advice · Authorised Members Only</div>
 </div>
 <!-- END page-screener -->
 
@@ -1684,7 +1791,7 @@ body{padding-bottom:52px;}
       </table>
     </div>
   </div>
-  <div class="footer">CB Finance26 v4.0 &nbsp;|&nbsp; For educational and research purposes only. Not financial advice.</div>
+  <div class="footer">© 2025 CB Finance26™ · Proprietary Research Framework · Not Financial Advice</div>
 </div>
 
 
@@ -2145,7 +2252,7 @@ body{padding-bottom:52px;}
     </div>
   </div>
 
-  <div class="footer">CB Finance26 v4.0 &nbsp;|&nbsp; For educational and research purposes only. Not financial advice.</div>
+  <div class="footer">© 2025 CB Finance26™ · Proprietary Research Framework · Not Financial Advice</div>
 </div>
 
 <!-- PAGE 4: DRILL-DOWN -->
@@ -2161,7 +2268,7 @@ body{padding-bottom:52px;}
     <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>Skip</div>
   </div>
   <div id="ddContent"></div>
-  <div class="footer">CB Finance26 v4.0 &nbsp;|&nbsp; For educational and research purposes only. Not financial advice.</div>
+  <div class="footer">© 2025 CB Finance26™ · Proprietary Research Framework · Not Financial Advice</div>
 </div>
 <script>
 
@@ -5608,6 +5715,32 @@ document.addEventListener("DOMContentLoaded",()=>{
   <button class="bb-btn" style="background:#f0f4ff;color:#1976d2;border:1px solid #b0bcd8;" onclick="switchPage('import')">&#128229; Import Holdings</button>
   <button class="bb-btn" style="background:#f0f4ff;color:#1976d2;border:1px solid #b0bcd8;" onclick="switchPage('statements')">&#128196; Statements</button>
   <button class="bb-btn" style="background:#f8f9fe;color:#6b7498;border:1px solid #dde1ec;" onclick="toggleHamburger()">&#9776; Menu</button>
+</div>
+
+
+<!-- LEGAL FOOTER -->
+<div style="background:#1a1e2e;padding:20px;text-align:center;margin-top:40px;border-top:2px solid #2a3050;">
+  <div style="font-size:15px;font-weight:900;color:#ff7c00;margin-bottom:4px;">&#9733; CB Finance26™</div>
+  <div style="font-size:10px;font-weight:700;color:#6b7498;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px;">Capital Allocation Intelligence System</div>
+  <div style="max-width:700px;margin:0 auto;font-size:10px;color:#8a9bbf;line-height:1.8;margin-bottom:16px;">
+    <strong style="color:#ffab40;">Important Legal Notice:</strong> CB Finance26™ is a proprietary analytical framework developed for educational and research purposes. All content, scores, frameworks, methodologies, and data compilations are the intellectual property of CB Finance26. This system does <strong>NOT</strong> constitute financial advice, investment recommendations, or securities research. Past performance of sectors or companies mentioned is not indicative of future results. Users must consult a SEBI-registered investment advisor before making any investment decisions.
+  </div>
+  <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;font-size:10px;color:#6b7498;font-weight:600;margin-bottom:12px;">
+    <span>© 2025 CB Finance26™</span>
+    <span>·</span>
+    <span>All Rights Reserved</span>
+    <span>·</span>
+    <span>Proprietary &amp; Confidential</span>
+    <span>·</span>
+    <span>Unauthorised Redistribution Prohibited</span>
+    <span>·</span>
+    <span>Not SEBI Registered Research</span>
+    <span>·</span>
+    <span>Not Financial Advice</span>
+  </div>
+  <div style="font-size:10px;color:#4a5070;font-weight:600;">
+    Version 10.0 · For Authorised Members Only · All data processed locally on your device
+  </div>
 </div>
 
 </body>
