@@ -1828,6 +1828,22 @@ document.addEventListener('copy', e=>{
     </div>
   </div>
 
+  <!-- VOLUME & SENTIMENT PANEL -->
+  <div class="card full" id="vsPanelCard">
+    <h2><span class="icon">&#128202;</span>Market Volume &amp; Sentiment — Sector Override</h2>
+    <div style="font-size:11px;font-weight:600;color:#5a6080;margin-bottom:14px;line-height:1.7;background:#f8f9fe;padding:10px 14px;border-radius:8px;border-left:3px solid #ff7c00;">
+      <strong>Volume (8% of CB Score)</strong> — Trading liquidity: high volume = institutional interest, easy entry/exit, price discovery. &nbsp;|&nbsp;
+      <strong>Sentiment (7% of CB Score)</strong> — Market mood: FII buying, earnings upgrades, sector re-ratings. &nbsp;|&nbsp;
+      Together they move any stock's CB Score by <strong>up to ±8 points</strong>. Defaults are set by sector — override below to reflect current market conditions.
+    </div>
+    <div id="vsSectorGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px;margin-bottom:14px;"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <button onclick="resetVolumeSentiment()" style="background:#f5f6fa;color:#6b7498;border:1px solid #dde1ec;padding:7px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">↺ Reset Defaults</button>
+      <button onclick="applyVolumeSentiment()" style="background:linear-gradient(135deg,#ff7c00,#ff9a00);color:#fff;border:none;padding:7px 16px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;">▶ Apply &amp; Recalculate</button>
+      <span style="font-size:10px;font-weight:600;color:#6b7498;">Changes rebuild all company scores instantly</span>
+    </div>
+  </div>
+
   <!-- COMPANY-FIRST MASTER TABLE -->
   <div class="card full" style="border-top:3px solid #ff7c00;">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
@@ -1840,9 +1856,12 @@ document.addEventListener('copy', e=>{
           <option value="all">All Sectors</option>
         </select>
         <select id="coSortBy" onchange="renderCompanyMaster()" style="border:1px solid #dde1ec;border-radius:7px;padding:7px 11px;font-size:12px;font-weight:600;font-family:'Poppins',sans-serif;outline:none;color:#1a1e2e;background:#f8f9fe;">
-          <option value="score">Sort: CB Score</option>
-          <option value="sector">Sort: Sector</option>
-          <option value="growth">Sort: Growth</option>
+          <option value="score">Sort: CB Score ↓</option>
+          <option value="rank">Sort: Mkt Cap (NSE Rank ↑)</option>
+          <option value="valuation">Sort: Valuation (Cheapest first)</option>
+          <option value="vs_score">Sort: Volume+Sentiment ↓</option>
+          <option value="sector">Sort: Sector A→Z</option>
+          <option value="growth">Sort: Growth ↓</option>
         </select>
         <button onclick="addCompanyRow()" style="background:#006b30;color:#fff;border:none;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;">+ Add Company</button>
         <button onclick="resetCompanies()" style="background:#f8f9fe;color:#6b7498;border:1px solid #dde1ec;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">&#8635; Reset</button>
@@ -2731,6 +2750,7 @@ function switchPage(id,btn){
   window.scrollTo({top:0,behavior:'smooth'});
   if(id==='drilldown') ddRender();
   if(id==='credibility') renderCredibilityPage();
+  if(id==='model') setTimeout(renderVSPanel, 100);
 }
 
 
@@ -2908,6 +2928,7 @@ const SECTORS={
   "Recycling/ESG":  {score:64,trend:"↑ Emerging", tc:"yellow", weight:1, phase:"Recovery",  phaseCls:"phase-recovery"},
   "Diversified":    {score:64,trend:"↔ Mixed",    tc:"yellow", weight:2, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
   "IT Services":    {score:48,trend:"↓ Weak",     tc:"red",    weight:3, phase:"Slowdown",  phaseCls:"phase-slowdown"},
+  "Sugar":          {score:68,trend:"↑ Ethanol",  tc:"yellow", weight:1, phase:"Recovery",  phaseCls:"phase-recovery"},
   "Telecom":        {score:60,trend:"↔ Mixed",    tc:"yellow", weight:2, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
   "Auto":           {score:72,trend:"↑ Strong",   tc:"green",  weight:3, phase:"Expansion", phaseCls:"phase-expansion"},
   "Metals":         {score:52,trend:"↔ Cyclical", tc:"yellow", weight:2, phase:"Slowdown",  phaseCls:"phase-slowdown"},
@@ -3040,7 +3061,25 @@ const COMPANY_RANKS = {
   "Eris Lifesciences":350,
   "Sequent Scientific":420,
   "Solara Active Pharma":430,
-  "Cohance Lifesciences (ex-Suven)":295
+  "Cohance Lifesciences (ex-Suven)":295,
+  "CG Power":185,
+  "VA Tech Wabag":380,
+  "Bajel Projects":460,
+  "Cholamandalam Investment":82,
+  "L&T Finance":310,
+  "LIC Housing Finance":135,
+  "PNB Housing Finance":240,
+  "Aavas Financiers":280,
+  "Home First Finance":330,
+  "Aptus Value Housing":360,
+  "Can Fin Homes":370,
+  "Balrampur Chini":290,
+  "EID Parry":300,
+  "Triveni Engineering":350,
+  "Shree Renuka Sugars":400,
+  "Dalmia Bharat Sugar":410,
+  "SP Apparels":480,
+  "Tata Capital":200
 };
 
 const COMPANIES={
@@ -3140,7 +3179,12 @@ const COMPANIES={
     {name:"Dixon Technologies",g:5,m:3,d:4,v:3,t:5,r:4,note:"Electronics EMS; PLI beneficiary"},
     {name:"Kaynes Technology",g:5,m:3,d:4,v:2,t:5,r:4,note:"Defence + EV + medtech EMS"},
     {name:"Jupiter Wagons",g:4,m:3,d:4,v:3,t:4,r:3,note:"Rail wagons + containers"},
-    {name:"Suzlon Energy",g:4,m:3,d:3,v:3,t:5,r:3,note:"Wind turbine OEM; debt reduced"}
+    {name:"Suzlon Energy",g:4,m:3,d:3,v:3,t:5,r:3,note:"Wind turbine OEM; debt reduced"},
+    {name:"CG Power",g:5,m:4,d:5,v:3,t:5,r:4,note:"Motors+switchgear+railways; Muthoot-Murugappa re-rated"},
+    {name:"Hitachi Energy India",g:4,m:3,d:4,v:2,t:5,r:4,note:"Grid automation+HVDC; MNC premium; power infra"},
+    {name:"Siemens India",g:4,m:4,d:5,v:2,t:4,r:4,note:"Industrial automation+energy; MNC; 40% ROCE"},
+    {name:"VA Tech Wabag",g:4,m:3,d:4,v:3,t:5,r:3,note:"Water treatment EPC; global+domestic; strong order book"},
+    {name:"Bajel Projects",g:4,m:3,d:4,v:3,t:4,r:3,note:"Bajaj Electricals infra spin-off; transmission line EPC"}
   ],
   "Pharma":[
     {name:"Sun Pharma",g:5,m:4,d:5,v:3,t:5,r:4,note:"Specialty + GLP-1 + branded; acquired Concert Pharma (derma); Taro rationalized; US specialty grew 18% FY25; Ilumya + Cequa blockbuster pipeline"},
@@ -3244,7 +3288,15 @@ const COMPANIES={
     {name:"Repco Home Finance",g:3,m:4,d:4,v:3,t:3,r:3,q:3,note:"South India housing; NPA 4%"},
     {name:"Aavas Financiers",g:4,m:4,d:5,v:3,t:4,r:4,q:4,note:"Affordable housing; Rajasthan"},
     {name:"PNB Housing Finance",g:3,m:3,d:3,v:3,t:3,r:3,q:3,note:"PSU-backed; NPA 1.5%"},
-    {name:"Can Fin Homes",g:3,m:4,d:4,v:3,t:3,r:4,q:3,note:"Canara Bank sub; housing"}
+    {name:"Can Fin Homes",g:3,m:4,d:4,v:3,t:3,r:4,q:3,note:"Canara Bank sub; housing"},
+    {name:"Cholamandalam Investment",g:5,m:4,d:3,v:3,t:5,r:4,q:4,note:"Murugappa; vehicle+home+LAP; 20%+ growth; top-tier NBFC"},
+    {name:"L&T Finance",g:4,m:3,d:3,v:3,t:4,r:3,q:3,note:"Retailisation strategy; rural+2W+agri; turnaround underway"},
+    {name:"Tata Capital",g:4,m:3,d:3,v:3,t:4,r:3,q:3,note:"Tata group NBFC; diversified lending; pre-IPO watch"},
+    {name:"LIC Housing Finance",g:3,m:4,d:3,v:3,t:3,r:3,q:3,note:"Largest HFC by book; PSU parentage; stable"},
+    {name:"PNB Housing Finance",g:4,m:3,d:3,v:3,t:4,r:3,q:3,note:"Retail housing focus; turnaround; Carlyle backed"},
+    {name:"Aavas Financiers",g:4,m:4,d:4,v:3,t:4,r:4,q:4,note:"Affordable housing; rural salaried; strong asset quality"},
+    {name:"Home First Finance",g:5,m:4,d:4,v:3,t:5,r:4,q:4,note:"Tech-driven affordable HFC; 30%+ growth"},
+    {name:"Aptus Value Housing",g:5,m:4,d:5,v:3,t:5,r:4,q:5,note:"South India affordable housing; near-zero NPA"}
   ],
   "SFB/MicroFin":[
     {name:"AU Small Finance Bank",g:4,m:4,d:4,v:3,t:4,r:3,q:4,note:"Universal bank path; RoA 1.6%"},
@@ -3416,7 +3468,10 @@ const COMPANIES={
     {name:"Indo Count Industries",g:3,m:3,d:4,v:3,t:3,r:3,note:"Bed linen exports; US"},
     {name:"Gokaldas Exports",g:3,m:3,d:4,v:3,t:3,r:3,note:"Garment export; global brands"},
     {name:"Raymond",g:3,m:3,d:3,v:3,t:3,r:3,note:"Suiting + real estate + tools"},
-    {name:"Arvind",g:2,m:3,d:3,v:3,t:3,r:3,note:"Denim + brands + engineering"}
+    {name:"Arvind",g:2,m:3,d:3,v:3,t:3,r:3,note:"Denim + brands + engineering"},
+    {name:"SP Apparels",g:4,m:4,d:4,v:3,t:4,r:4,note:"Children's knitwear export; UK/EU focused; margin expansion"},
+    {name:"Trident",g:3,m:4,d:3,v:3,t:3,r:4,note:"Terry towel + paper + yarn; US export dominant"},
+    {name:"Raymond",g:3,m:3,d:3,v:3,t:3,r:3,note:"Branded suiting + realty; demerger value unlock"}
   ],
   "Recycling/ESG":[
     {name:"Gravita India",g:4,m:4,d:4,v:3,t:4,r:4,note:"Lead + aluminium recycling; global"},
@@ -3440,6 +3495,14 @@ const COMPANIES={
     {name:"HFCL",g:4,m:3,d:3,v:3,t:4,r:3,note:"Optical fibre + defence comms"},
     {name:"Route Mobile",g:4,m:4,d:5,v:3,t:4,r:4,note:"Cloud communication platform"},
     {name:"Tanla Platforms",g:3,m:4,d:5,v:3,t:4,r:4,note:"CPaaS + messaging platform"}
+  ],
+  "Sugar":[
+    {name:"Balrampur Chini",g:4,m:4,d:5,v:3,t:4,r:4,note:"India #2 sugar; ethanol play; integrated"},
+    {name:"EID Parry",g:4,m:4,d:4,v:3,t:4,r:3,note:"Murugappa; sugar+nutraceuticals+ethanol"},
+    {name:"Triveni Engineering",g:4,m:4,d:4,v:3,t:4,r:4,note:"UP sugar+engineering; ethanol capex strong"},
+    {name:"Shree Renuka Sugars",g:3,m:3,d:3,v:3,t:4,r:3,note:"Wilmar JV; large capacity; turnaround"},
+    {name:"Dalmia Bharat Sugar",g:4,m:4,d:4,v:3,t:4,r:4,note:"Mid-size; ethanol+power co-gen; clean B/S"},
+    {name:"Dwarikesh Sugar",g:3,m:3,d:4,v:3,t:3,r:3,note:"UP sugar; consistent dividend; small cap"}
   ],
   "IT Services":[
     {name:"TCS",g:2,m:5,d:5,v:3,t:2,r:3,q:4,note:"EBIT 25%; AI disruption headwind"},
@@ -3656,6 +3719,7 @@ const SCREENER_DATA=[
   {name:"Auto 2W",macro:30,earn:29,struct:30,horizon:"3-5Y Core",reason:"Royal Enfield (Eicher) premium motorcycle niche scaling globally. Bajaj Auto: strong Nigeria/Africa/LATAM exports — rupee depreciation = export bonus. TVS EV leadership + premium Jupiter/Apache mix. Hero recovering rural. India 2W market 20M+/year, export growth 30%+. EV 2W: 10% penetration and rising fast with Ola, Ather, TVS.",risks:"EV disruption timeline; fuel price shocks; monsoon rural income dependency",catalysts:"Rural recovery, export market expansion, premiumisation, EV penetration 15%+"},
   {name:"Auto Spares",macro:30,earn:28,struct:30,horizon:"3Y Focus",reason:"Rising auto content per vehicle. EV creates new component opportunities. India suppliers gaining global wallet share.",risks:"EV disruption of legacy ICE parts, customer concentration",catalysts:"EV content growth, PLI for auto components, China+1 supply shift"},
   {name:"Reliance Group",macro:26,earn:25,struct:28,horizon:"3-5Y Core",reason:"RIL: diversified moat across energy, retail, and telecom. Jio Financial emerging NBFC + insurance. Green energy.",risks:"Execution delays, 5G ROI timeline, regulatory changes",catalysts:"Jio Financial scale-up, green hydrogen milestones, retail monetisation"},
+  {name:"Sugar",macro:22,earn:22,struct:24,horizon:"Selective",reason:"Ethanol blending mandate driving structural rerating. E20 target by 2025. Sugar companies = de facto energy companies. Balrampur, EID Parry, Triveni all integrating ethanol+power co-gen.",risks:"Sugar price controls; monsoon dependent cane supply; ethanol price policy",catalysts:"Ethanol blending 20%+ target, sugar export policy, Brazil supply disruption"},
   {name:"Adani Group",macro:24,earn:22,struct:26,horizon:"Selective",reason:"Ports + airports + green energy portfolio strong. Governance premium demanded post-Hindenburg.",risks:"High group debt, corporate governance concerns, regulatory scrutiny",catalysts:"Green energy delivery, airport profitability, credit rating improvements"}
 ];
 
@@ -3703,7 +3767,45 @@ function getRiskLevel(){
 // These are extra user-adjustable factors for company scoring
 // s = volume/trade activity rating (1-5), n = sentiment rating (1-5)
 // Added to COMPANY_MASTER at build time, default 3
+const SECTOR_VOLUME_SENTIMENT = {
+  "Power": {s:5,n:5},
+  "Pharma": {s:5,n:5},
+  "AMC": {s:4,n:5},
+  "Defence": {s:5,n:5},
+  "Auto 2W": {s:4,n:4},
+  "Brokers/Wealth": {s:4,n:5},
+  "Capital Goods": {s:5,n:4},
+  "Banking": {s:5,n:3},
+  "Hospitals": {s:4,n:4},
+  "Auto Spares": {s:4,n:4},
+  "Insurance": {s:3,n:4},
+  "Hotels/Tourism": {s:3,n:4},
+  "Auto 4W": {s:4,n:3},
+  "Infra/Cement": {s:4,n:3},
+  "Reliance Group": {s:5,n:4},
+  "Chemicals": {s:3,n:3},
+  "NBFC": {s:3,n:3},
+  "Cement": {s:3,n:3},
+  "Gold/Jewellery": {s:3,n:3},
+  "Retail": {s:3,n:3},
+  "New Age Tech": {s:3,n:3},
+  "Adani Group": {s:4,n:3},
+  "Diversified": {s:3,n:3},
+  "Recycling/ESG": {s:2,n:3},
+  "Paints": {s:3,n:2},
+  "Real Estate": {s:3,n:3},
+  "SFB/MicroFin": {s:2,n:2},
+  "FMCG": {s:3,n:2},
+  "Telecom": {s:3,n:3},
+  "Auto": {s:4,n:3},
+  "Metals": {s:4,n:2},
+  "Textiles": {s:2,n:2},
+  "IT Services": {s:4,n:2},
+  "Sugar":       {s:3,n:3}
+};
+
 const EXTRA_FACTOR_WEIGHTS = { s: 0.08, n: 0.07 }; // 15% combined weight
+const VS_SCALE = 8 / ((2*0.08)+(2*0.07)); // Calibrated so max V&S adj = ±8 points
 const EXTRA_FACTOR_LABELS  = { s: "Trading Volume / Liquidity", n: "Market Sentiment" };
 const EXTRA_FACTOR_SCALES  = {
   s: ["—","Very Low (illiquid; <Rs.5Cr/day avg)","Low (Rs.5–25Cr/day)","Moderate (Rs.25–100Cr/day)","High (Rs.100–500Cr/day)","Very High (>Rs.500Cr/day; highly liquid)"],
@@ -3714,10 +3816,9 @@ const EXTRA_FACTOR_SCALES  = {
 const _calcScoreBase = calcScore;
 function calcScore(c){
   const base = _calcScoreBase(c);
-  const sv = (c.s||3)*EXTRA_FACTOR_WEIGHTS.s + (c.n||3)*EXTRA_FACTOR_WEIGHTS.n;
-  // Adjust: extra factors can move score by ±8 points
-  const adj = Math.round((sv - (3*(EXTRA_FACTOR_WEIGHTS.s+EXTRA_FACTOR_WEIGHTS.n))) * 20 / (EXTRA_FACTOR_WEIGHTS.s+EXTRA_FACTOR_WEIGHTS.n));
-  return Math.min(100, Math.max(0, base + adj));
+  // V&S adjustment: max ±8 points using calibrated VS_SCALE
+  const adj = Math.round(((( c.s||3)-3)*EXTRA_FACTOR_WEIGHTS.s + ((c.n||3)-3)*EXTRA_FACTOR_WEIGHTS.n) * VS_SCALE);
+  return Math.min(99, Math.max(20, base + adj));
 }
 
 // ── EDITABLE STORAGE (localStorage with fallback) ─────────────────────────
@@ -4074,11 +4175,16 @@ function renderScreenerContent(){
       </div>`).join("")+`<div style="margin-top:10px;font-size:11px;color:var(--text-muted);">Skip sectors suppressed. Use Screener Table to see all 22.</div>`;
   } else {
     document.getElementById("screenerMatrixDiv").innerHTML=`<table class="screener-table">
-      <tr><th>Sector</th><th>Macro/35</th><th>Earnings/35</th><th>Structural/35</th><th>Composite/100</th><th>Horizon</th><th>Status</th></tr>
+      <tr><th>Sector</th><th>Macro/35</th><th>Earnings/35</th><th>Structural/35</th><th>Composite/100</th><th title="Trading Volume &amp; Liquidity (8%)">Volume</th><th title="Market Sentiment: FII/DII/Upgrades (7%)">Sentiment</th><th>Horizon</th><th>Status</th></tr>
       ${data.map(s=>{
         const vbcls=s.verdict==="strong"?"vb-strong":s.verdict==="watch"?"vb-watch":"vb-skip";
         const cell=(v,max)=>{const pct=v/max*100;const c=pct>=80?"var(--green)":pct>=57?"var(--yellow)":"var(--red)";return `<td style="font-weight:900;color:${c};font-size:13px;">${v}<span style="font-size:9px;color:var(--text-muted);">/${max}</span></td>`;};
-        return `<tr><td style="font-weight:800;">${s.name}</td>${cell(s.macro,35)}${cell(s.earn,35)}${cell(s.struct,35)}${cell(s.composite,100)}<td style="font-size:10px;font-weight:700;color:var(--blue);">${s.horizon}</td><td><span class="verdict-badge ${vbcls}">${s.verdict==="strong"?"High Score":s.verdict==="watch"?"Medium":"Low Score"}</span></td></tr>`;
+        const vs = SECTOR_VOLUME_SENTIMENT[s.name] || {s:3,n:3};
+        const vsVolColor = vs.s>=4?'var(--green)':vs.s>=3?'var(--yellow)':'var(--red)';
+        const vsSenColor = vs.n>=4?'var(--green)':vs.n>=3?'var(--yellow)':'var(--red)';
+        const volBar = `<div style="display:flex;align-items:center;gap:4px;"><div style="flex:1;height:5px;background:#e8ecf5;border-radius:3px;overflow:hidden;min-width:40px;"><div style="width:${vs.s*20}%;height:100%;background:${vsVolColor};border-radius:3px;"></div></div><span style="font-size:10px;font-weight:800;color:${vsVolColor};">${vs.s}/5</span></div>`;
+        const senBar = `<div style="display:flex;align-items:center;gap:4px;"><div style="flex:1;height:5px;background:#e8ecf5;border-radius:3px;overflow:hidden;min-width:40px;"><div style="width:${vs.n*20}%;height:100%;background:${vsSenColor};border-radius:3px;"></div></div><span style="font-size:10px;font-weight:800;color:${vsSenColor};">${vs.n}/5</span></div>`;
+        return `<tr><td style="font-weight:800;">${s.name}</td>${cell(s.macro,35)}${cell(s.earn,35)}${cell(s.struct,35)}${cell(s.composite,100)}<td style="min-width:70px;">${volBar}</td><td style="min-width:70px;">${senBar}</td><td style="font-size:10px;font-weight:700;color:var(--blue);">${s.horizon}</td><td><span class="verdict-badge ${vbcls}">${s.verdict==="strong"?"High Score":s.verdict==="watch"?"Medium":"Low Score"}</span></td></tr>`;
       }).join("")}</table>`;
   }
 }
@@ -4481,8 +4587,7 @@ const DRILL=[
         {name:"Ather Energy",score:80,roce:"Low",debt:"Low",val:"Reasonable",growth:"30%",note:"Premium EV scooter; tech-first; HERO backed"},
         {name:"TVS Motor (iQube)",score:82,roce:"High",debt:"Low",val:"Reasonable",growth:"28%",note:"TVS EV leadership + ICE premium mix"}]},
       {id:"2w-mass",name:"Mass Market 2W",score:76,verdict:"watch",thesis:"Hero MotoCorp rural recovery. Bajaj Platina/CT mass segment stable.",companies:[
-        {name:"Hero MotoCorp",score:76,roce:"High",debt:"Low",val:"Reasonable",growth:"10%",note:"Mass 2W market leader; rural dependent; EV pivot slow"},
-        {name:"Bajaj Auto (Mass)",score:80,roce:"High",debt:"Low",val:"Reasonable",growth:"12%",note:"Platina/CT + Pulsar; export engine"}]}]}]},
+        {name:"Hero MotoCorp",score:76,roce:"High",debt:"Low",val:"Reasonable",growth:"10%",note:"Mass 2W market leader; rural dependent; EV pivot slow"}]}]}]},
   {id:"telecom",name:"Telecom",score:60,verdict:"watch",horizon:"Selective",macro:22,earn:20,struct:22,
    thesis:"Airtel ARPU rising; Africa ops strong; 5G monetisation beginning. Jio dominance in data. Avoid Vi entirely. Tower infra (Indus) beneficiary.",
    risks:"AGR dues; Vi survival risk; 5G capex heavy",catalysts:"5G ARPU premium, Jio JioFinancial, Airtel Africa listing",
@@ -4625,7 +4730,8 @@ const SECTOR_TO_DRILL = {
   'Metals':         null,
   'Real Estate':    null,
   'Reliance Group': null,
-  'Adani Group':    null
+  'Adani Group':    null,
+  'Sugar':         null
 };
 
 // Navigate to Research tab at the right sector for a given company
@@ -5270,7 +5376,7 @@ const STOCK_SECTOR_MAP = {
   // ETFs / INDEX
   'NIFTYBEES':'Index ETF','JUNIORBEES':'Index ETF','SETFNIF50':'Index ETF',
   'GOLDBEES':'Gold','SGBBSES':'Gold','SILVBEES':'Silver',
-  'LIQUIDBEES':'Liquid/Cash','LIQUIDCASE':'Liquid/Cash',
+  'LIQUIDBEES':'Liquid/Cash','LIQUIDCASE':'Liquid/Cash'
 };
 
 // Sector → asset class mapping
@@ -5288,7 +5394,8 @@ const SECTOR_ASSET = {
   'Liquid/Cash':'Cash',
   'Auto 4W':'Equity','Auto 2W':'Equity','Auto Spares':'Equity',
   'Reliance Group':'Equity','Adani Group':'Equity',
-  'Auto 4W':'Equity','Auto 2W':'Equity','Auto Spares':'Equity'
+  'Auto 4W':'Equity','Auto 2W':'Equity','Auto Spares':'Equity',
+  'Sugar':'Equity'
 };
 // Legacy company data (also referenced in COMPANIES obj above)
 
@@ -5877,7 +5984,8 @@ const SECTOR_TYPE = {
   "Chemicals":      "mfg",
   "Real Estate":    "mfg",
   "Adani Group":    "mfg",
-  "Reliance Group": "mfg"
+  "Reliance Group": "mfg",
+  "Sugar": "mfg"
 };
 
 const SECTOR_FACTORS = {
@@ -6277,13 +6385,22 @@ function updateSectorScoresFromCompanies(){
 function buildCompanyMaster() {
   COMPANY_MASTER = [];
   Object.entries(COMPANIES).forEach(([sector, cos]) => {
+    // Get sector-level volume & sentiment baseline
+    const sectorVS = SECTOR_VOLUME_SENTIMENT[sector] || {s:3, n:3};
     cos.forEach(c => {
       // Compute CB score if not explicitly set (for g,m,d,v,t,r notation)
-      let score = c.score;
-      if (score === undefined) {
-        score = Math.round(((c.g||3)+(c.m||3)+(c.d||3)+(c.v||3)+(c.t||3)+(c.r||3))*100/30);
-        score = Math.min(99, Math.max(20, score));
+      // Inject volume (s) and sentiment (n) — company overrides sector default
+      const vol  = c.s !== undefined ? c.s : sectorVS.s;
+      const sent = c.n !== undefined ? c.n : sectorVS.n;
+      // Compute V&S adjustment: max ±8 points, calibrated
+      const vsAdj = Math.round(((vol-3)*EXTRA_FACTOR_WEIGHTS.s + (sent-3)*EXTRA_FACTOR_WEIGHTS.n) * VS_SCALE);
+      // Base score: from explicit value OR computed from g,m,d,v,t,r factors
+      let baseScore = c.score;
+      if (baseScore === undefined) {
+        baseScore = Math.round(((c.g||3)+(c.m||3)+(c.d||3)+(c.v||3)+(c.t||3)+(c.r||3))*100/30);
       }
+      // Final score = base + V&S adjustment (always live)
+      const score = Math.min(99, Math.max(20, baseScore + vsAdj));
       // Map debt notation
       const debtMap = {5:'Low',4:'Low',3:'Moderate',2:'High',1:'Very High'};
       const valMap = {5:'Very Cheap',4:'Cheap',3:'Reasonable',2:'Expensive',1:'Very Expensive'};
@@ -6291,6 +6408,7 @@ function buildCompanyMaster() {
       const rank = COMPANY_RANKS[c.name] || null;
       COMPANY_MASTER.push({
         name: c.name, sector, score, rank,
+        s: vol, n: sent,
         roce: c.roce||(c.r>=4?'High':c.r>=3?'Moderate':'Low'),
         debt: c.debt||debtMap[c.d]||'Moderate',
         val: c.val||valMap[c.v]||'Reasonable',
@@ -6304,10 +6422,24 @@ function buildCompanyMaster() {
 function populateSectorFilter() {
   const sel = document.getElementById('coFilterSector');
   if (!sel) return;
-  const sectors = ['all', ...Object.keys(SECTORS).sort()];
-  sel.innerHTML = sectors.map(s =>
-    `<option value="${s}">${s === 'all' ? 'All Sectors' : s}</option>`
-  ).join('');
+  // Sort sectors by CB Score descending for the dropdown order
+  const sectorsByScore = Object.keys(SECTORS)
+    .filter(s => COMPANIES[s] && COMPANIES[s].length > 0)
+    .sort((a,b) => (SECTORS[b]?.score||0) - (SECTORS[a]?.score||0));
+  sel.innerHTML =
+    `<option value="all">── All Sectors (by CB Score) ──</option>` +
+    `<optgroup label="🟢 High Score (≥80)">` +
+    sectorsByScore.filter(s=>(SECTORS[s]?.score||0)>=80)
+      .map(s=>`<option value="${s}">${s}</option>`).join('') +
+    `</optgroup>` +
+    `<optgroup label="🟡 Watch (65–79)">` +
+    sectorsByScore.filter(s=>{const sc=SECTORS[s]?.score||0;return sc>=65&&sc<80;})
+      .map(s=>`<option value="${s}">${s}</option>`).join('') +
+    `</optgroup>` +
+    `<optgroup label="🔴 Lower Score (<65)">` +
+    sectorsByScore.filter(s=>(SECTORS[s]?.score||0)<65)
+      .map(s=>`<option value="${s}">${s}</option>`).join('') +
+    `</optgroup>`;
 }
 
 function addCompanyRow() {
@@ -6325,10 +6457,33 @@ function deleteCompanyRow(idx) {
 function updateCompanyField(idx, field, value) {
   if (!COMPANY_MASTER[idx]) return;
   COMPANY_MASTER[idx][field] = field === 'score' ? (parseInt(value)||0) : value;
-  if (field === 'score') {
-    // Re-render just the score cell color
-    renderCompanyMaster();
-  }
+  if (field === 'score') renderCompanyMaster();
+}
+
+// Called by sector-aware factor dropdowns in the company table
+function updateCompanyFactor(idx, factor, value) {
+  if (!COMPANY_MASTER[idx]) return;
+  const val = parseInt(value) || 3;
+  COMPANY_MASTER[idx][factor] = val;
+  // Recalculate score from all factor values
+  const c = COMPANY_MASTER[idx];
+  const sf = getSectorFactors(c.sector || '');
+  let weightedSum = 0, totalWeight = 0;
+  Object.entries(sf.weights).forEach(([k, w]) => {
+    weightedSum += (c[k] || 3) * w;
+    totalWeight += w;
+  });
+  // Add volume & sentiment (always live)
+  const vs = SECTOR_VOLUME_SENTIMENT[c.sector] || {s:3, n:3};
+  const vsVol  = c.s !== undefined ? c.s : vs.s;
+  const vsSent = c.n !== undefined ? c.n : vs.n;
+  const vsAdj2 = Math.round(((vsVol-3)*EXTRA_FACTOR_WEIGHTS.s + (vsSent-3)*EXTRA_FACTOR_WEIGHTS.n) * VS_SCALE);
+  const baseFromFactors = Math.round(weightedSum / totalWeight * 20);
+  const newScore = Math.min(99, Math.max(20, baseFromFactors + vsAdj2));
+  COMPANY_MASTER[idx].score = newScore;
+  // Save and re-render
+  try { saveEditable('company_overrides_' + idx, {factor, val, score: newScore}); } catch(e) {}
+  renderCompanyMaster();
 }
 
 function resetCompanies() {
@@ -6345,9 +6500,33 @@ function renderCompanyMaster() {
 
   let data = [...COMPANY_MASTER];
   if (filterSector!=='all') data = data.filter(c=>c.sector===filterSector);
-  if (sortBy==='score')  data.sort((a,b)=>b.score-a.score);
-  else if (sortBy==='sector') data.sort((a,b)=>a.sector.localeCompare(b.sector)||b.score-a.score);
-  else if (sortBy==='growth') data.sort((a,b)=>(b.g||0)-(a.g||0));
+  // Valuation string rank for sorting
+  const VAL_ORDER={'Very Cheap':1,'Cheap':2,'Reasonable':3,'Expensive':4,'Very Expensive':5};
+  if (sortBy==='score')
+    data.sort((a,b)=>b.score-a.score);
+  else if (sortBy==='rank')
+    // NSE rank ascending (rank 1 = largest cap first); unranked go to end
+    data.sort((a,b)=>{
+      const ar=a.rank||9999, br=b.rank||9999;
+      return ar!==br ? ar-br : b.score-a.score;
+    });
+  else if (sortBy==='valuation')
+    // Cheapest first (lowest VAL_ORDER number = cheapest)
+    data.sort((a,b)=>{
+      const av=VAL_ORDER[a.val]||3, bv=VAL_ORDER[b.val]||3;
+      return av!==bv ? av-bv : b.score-a.score;
+    });
+  else if (sortBy==='vs_score')
+    // Volume+Sentiment combined score descending
+    data.sort((a,b)=>{
+      const as=(a.s||3)*EXTRA_FACTOR_WEIGHTS.s+(a.n||3)*EXTRA_FACTOR_WEIGHTS.n;
+      const bs=(b.s||3)*EXTRA_FACTOR_WEIGHTS.s+(b.n||3)*EXTRA_FACTOR_WEIGHTS.n;
+      return bs!==as ? bs-as : b.score-a.score;
+    });
+  else if (sortBy==='sector')
+    data.sort((a,b)=>a.sector.localeCompare(b.sector)||b.score-a.score);
+  else if (sortBy==='growth')
+    data.sort((a,b)=>(b.g||0)-(a.g||0));
 
   const total=port(), A=alloc(mscore()), eqL=total*A.eq/100;
   const tw=Object.values(SECTORS).reduce((s,v)=>s+v.weight,0);
@@ -6422,6 +6601,10 @@ function renderCompanyMaster() {
         <div style="font-size:22px;font-weight:900;color:${scColor(sc)};line-height:1.1;">${sc}</div>
         <div style="height:3px;background:${scColor(sc)};border-radius:2px;margin:3px auto;width:32px;"></div>
         <div style="margin-top:3px;">${bars}</div>
+        <div style="display:flex;gap:2px;margin-top:3px;justify-content:center;">
+          <span title="Volume/Liquidity: ${EXTRA_FACTOR_SCALES.s[c.s||3]}" style="font-size:8px;font-weight:800;padding:1px 4px;border-radius:3px;background:${(c.s||3)>=4?'#e6f4ef':(c.s||3)>=3?'#fff3e0':'#fce8e8'};color:${(c.s||3)>=4?'#006b30':(c.s||3)>=3?'#b35c00':'#b71c1c'};">V${c.s||3}</span>
+          <span title="Sentiment: ${EXTRA_FACTOR_SCALES.n[c.n||3]}" style="font-size:8px;font-weight:800;padding:1px 4px;border-radius:3px;background:${(c.n||3)>=4?'#e3f2fd':(c.n||3)>=3?'#fff3e0':'#fce8e8'};color:${(c.n||3)>=4?'#1565c0':(c.n||3)>=3?'#b35c00':'#b71c1c'};">S${c.n||3}</span>
+        </div>
       </td>
       ${factorCells}
       <td style="text-align:center;padding:4px 6px;white-space:nowrap;">
@@ -6436,16 +6619,34 @@ function renderCompanyMaster() {
     </tr>`;
   }).join('');
 
-  // Update header row dynamically based on filter
+  // Update header row — fixed universal headers when showing All Sectors
   const thead = document.querySelector('#companyMasterTable thead tr');
   if (thead) {
-    const activeSector = filterSector!=='all' ? filterSector : (data[0]?.sector||'Power');
-    const sf = getSectorFactors(activeSector);
-    const factorHeaders = [...Object.entries(sf.labels),...Object.entries(EXTRA_FACTOR_LABELS)].map(([k,label])=>{
-      const short = label.split('(')[0].trim().split('/')[0].trim();
-      return `<th title="${label}" style="white-space:nowrap;font-size:10px;">${short}</th>`;
-    }).join('');
-    thead.innerHTML = `<th style="width:32px;">#</th><th>Company</th><th>Sector</th><th style="text-align:center;">Score</th>${factorHeaders}<th>Alloc</th><th></th>`;
+    if (filterSector === 'all') {
+      // Universal fixed headers for mixed-sector view
+      thead.innerHTML = `<th style="width:28px;">#</th>
+        <th title="Market Cap Rank">Mkt Cap Rank</th>
+        <th>Company</th>
+        <th>Sector</th>
+        <th style="text-align:center;">CB Score</th>
+        <th title="Revenue/Loan Growth">Growth</th>
+        <th title="Operating Margin / NIM">Margin</th>
+        <th title="Debt or NPA Quality">Debt/NPA</th>
+        <th title="Valuation">Valuation</th>
+        <th title="Sector Tailwind">Tailwind</th>
+        <th title="ROCE / RoA / Key Quality">Quality</th>
+        <th title="Trading Volume / Liquidity (8%)">Volume</th>
+        <th title="Market Sentiment (7%)">Sentiment</th>
+        <th>Alloc</th><th></th>`;
+    } else {
+      // Sector-specific headers
+      const sf = getSectorFactors(filterSector);
+      const factorHeaders = [...Object.entries(sf.labels),...Object.entries(EXTRA_FACTOR_LABELS)].map(([k,label])=>{
+        const short = label.split('(')[0].trim().split('/')[0].trim();
+        return `<th title="${label}" style="white-space:nowrap;font-size:10px;">${short}</th>`;
+      }).join('');
+      thead.innerHTML = `<th style="width:28px;">#</th><th title="Market Cap Rank">Rank</th><th>Company</th><th>Sector</th><th style="text-align:center;">Score</th>${factorHeaders}<th>Alloc</th><th></th>`;
+    }
   }
 
   // Compact sector panel
@@ -7207,6 +7408,7 @@ function addDays(dateStr, days) {
 document.addEventListener('DOMContentLoaded', () => {
   loadCredState();
   startLiveDataRefresh();  // Start GitHub live data if configured
+  renderVSPanel();  // Init volume/sentiment panel
 
   // Delegated click handler — handles both My Plan links and Research search results
   document.addEventListener('click', function(e) {
@@ -7374,6 +7576,136 @@ window.enableGithubLiveData = function(baseUrl, token) {
       GITHUB_CONFIG.enabled = true;
       GITHUB_CONFIG.baseUrl = saved.baseUrl;
     }
+  } catch(e) {}
+})();
+
+
+// ══════════════════════════════════════════════════════════════
+// VOLUME & SENTIMENT ENGINE
+// ══════════════════════════════════════════════════════════════
+
+// Current overrides (sector → {s, n})
+let VS_OVERRIDES = {};
+
+const VS_LABELS = {
+  s: ['—','Very Low','Low (thin)','Moderate','High','Very High'],
+  n: ['—','Very Negative','Negative','Neutral','Positive','Very Positive']
+};
+
+const VS_COLORS = {
+  1:'#fce8e8', 2:'#fff3e0', 3:'#f8f9fe', 4:'#e6f4ef', 5:'#e3f2fd'
+};
+const VS_TEXT = {
+  1:'#b71c1c', 2:'#b35c00', 3:'#5a6080', 4:'#006b30', 5:'#1565c0'
+};
+
+function renderVSPanel() {
+  const grid = document.getElementById('vsSectorGrid');
+  if (!grid) return;
+
+  // Get all sectors that have companies
+  const sectors = Object.keys(SECTORS).filter(s => COMPANIES[s] && COMPANIES[s].length > 0);
+
+  grid.innerHTML = sectors.map(sector => {
+    const base = SECTOR_VOLUME_SENTIMENT[sector] || {s:3, n:3};
+    const ovr  = VS_OVERRIDES[sector] || base;
+    const s = ovr.s, n = ovr.n;
+
+    return `<div style="background:#fff;border:1px solid #dde1ec;border-radius:10px;padding:12px 14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div style="font-size:12px;font-weight:800;color:#1a1e2e;">${sector}</div>
+        <div style="display:flex;gap:4px;">
+          <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;background:${VS_COLORS[s]};color:${VS_TEXT[s]};">Vol:${s}</span>
+          <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;background:${VS_COLORS[n]};color:${VS_TEXT[n]};">Sent:${n}</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <div>
+          <div style="font-size:9px;font-weight:700;color:#6b7498;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">&#128202; Volume / Liquidity</div>
+          <select onchange="updateVS('${sector}','s',this.value)"
+            style="width:100%;border:1px solid #dde1ec;border-radius:6px;padding:5px 7px;font-size:10px;font-weight:600;font-family:'Poppins',sans-serif;background:#f8f9fe;outline:none;cursor:pointer;">
+            ${[1,2,3,4,5].map(v => `<option value="${v}" ${v===s?'selected':''}>${v}. ${VS_LABELS.s[v]}</option>`).join('')}
+          </select>
+        </div>
+        <div>
+          <div style="font-size:9px;font-weight:700;color:#6b7498;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;">&#129299; Sentiment</div>
+          <select onchange="updateVS('${sector}','n',this.value)"
+            style="width:100%;border:1px solid #dde1ec;border-radius:6px;padding:5px 7px;font-size:10px;font-weight:600;font-family:'Poppins',sans-serif;background:#f8f9fe;outline:none;cursor:pointer;">
+            ${[1,2,3,4,5].map(v => `<option value="${v}" ${v===n?'selected':''}>${v}. ${VS_LABELS.n[v]}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:6px;font-size:9px;font-weight:600;color:#6b7498;">
+        Score impact: <span style="font-weight:800;color:${getVSImpact(s,n)>=0?'#006b30':'#b71c1c'};">${getVSImpact(s,n)>=0?'+':''}${getVSImpact(s,n)} pts</span>
+        vs neutral baseline
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function getVSImpact(s, n) {
+  return Math.round(((s-3)*EXTRA_FACTOR_WEIGHTS.s + (n-3)*EXTRA_FACTOR_WEIGHTS.n) * VS_SCALE);
+}
+
+function updateVS(sector, key, val) {
+  if (!VS_OVERRIDES[sector]) {
+    const base = SECTOR_VOLUME_SENTIMENT[sector] || {s:3, n:3};
+    VS_OVERRIDES[sector] = {...base};
+  }
+  VS_OVERRIDES[sector][key] = parseInt(val);
+  // Update impact display live
+  const all = document.querySelectorAll('#vsSectorGrid > div');
+  // Re-render just the impact number
+  renderVSPanel();  // lightweight re-render
+  try { saveEditable('vs_overrides', VS_OVERRIDES); } catch(e){}
+}
+
+function applyVolumeSentiment() {
+  // Merge VS_OVERRIDES into SECTOR_VOLUME_SENTIMENT
+  Object.entries(VS_OVERRIDES).forEach(([sector, vs]) => {
+    SECTOR_VOLUME_SENTIMENT[sector] = vs;
+  });
+  // Rebuild company master — V&S now always applied to ALL companies
+  buildCompanyMaster();
+  populateSectorFilter();
+  renderCompanyMaster();
+  if (typeof renderScenarios === 'function') renderScenarios();
+  renderVSPanel();
+  // Flash notification
+  const notif = document.createElement('div');
+  notif.className = 'notify-flash';
+  notif.textContent = '✓ Volume & Sentiment applied — all scores recalculated';
+  document.body.appendChild(notif);
+  setTimeout(() => notif.remove(), 3000);
+}
+
+function resetVolumeSentiment() {
+  VS_OVERRIDES = {};
+  // Restore original defaults
+  const orig = {
+    'Power':{s:5,n:5},'Pharma':{s:5,n:5},'AMC':{s:4,n:5},
+    'Defence':{s:5,n:5},'Auto 2W':{s:4,n:4},'Brokers/Wealth':{s:4,n:5},
+    'Capital Goods':{s:5,n:4},'Banking':{s:5,n:3},'Hospitals':{s:4,n:4},
+    'Auto Spares':{s:4,n:4},'Insurance':{s:3,n:4},'Hotels/Tourism':{s:3,n:4},
+    'Auto 4W':{s:4,n:3},'Infra/Cement':{s:4,n:3},'Reliance Group':{s:5,n:4},
+    'Chemicals':{s:3,n:3},'NBFC':{s:3,n:3},'Cement':{s:3,n:3},
+    'Gold/Jewellery':{s:3,n:3},'Retail':{s:3,n:3},'New Age Tech':{s:3,n:3},
+    'Adani Group':{s:4,n:3},'Diversified':{s:3,n:3},'Recycling/ESG':{s:2,n:3},
+    'Paints':{s:3,n:2},'Real Estate':{s:3,n:3},'SFB/MicroFin':{s:2,n:2},
+    'FMCG':{s:3,n:2},'Telecom':{s:3,n:3},'Auto':{s:4,n:3},
+    'Metals':{s:4,n:2},'Textiles':{s:2,n:2},'IT Services':{s:4,n:2}
+  };
+  Object.entries(orig).forEach(([k,v]) => { SECTOR_VOLUME_SENTIMENT[k] = v; });
+  buildCompanyMaster();
+  renderCompanyMaster();
+  renderVSPanel();
+}
+
+// Load VS overrides from localStorage on start
+(function loadVSOverrides() {
+  try {
+    const saved = loadEditable('vs_overrides');
+    if (saved) { VS_OVERRIDES = saved; applyVolumeSentiment(); }
   } catch(e) {}
 })();
 
