@@ -2936,6 +2936,64 @@ const SECTORS={
   "Real Estate":    {score:60,trend:"↑ Improving",tc:"yellow", weight:2, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
   "Adani Group":    {score:65,trend:"↔ Mixed",    tc:"yellow", weight:2, phase:"Expansion", phaseCls:"phase-expansion"}
 };
+// ── REAL DATA FROM SECTOR ANALYSIS REPORTS ──────────────────────────────
+// Auto-extracted from sector HTML dashboards. Each entry has actual Q4/FY
+// financials converted to CB factor scores (g,m,d,v,t,r scale 1-5).
+// Add new sectors by running the extraction script on each sector HTML file.
+// This block is ADDITIVE — it enriches existing scores, never replaces logic.
+const SECTOR_REAL_DATA = {
+  "Hindustan Aeronautics": {g:2,m:4,d:5,v:3,t:5,r:4,source:"Q4FY26",bse:"541154",note:"Rev ₹33,089Cr | EBITDA 25.2% | ROE 26.5% | OB 7.7x | Debt-Free | Net Cash ~₹13,6"},
+  "HAL Limited": {g:2,m:4,d:5,v:3,t:5,r:4,source:"Q4FY26",bse:"541154",note:"Rev ₹33,089Cr | EBITDA 25.2% | ROE 26.5% | OB 7.7x | Debt-Free | Net Cash ~₹13,6"},
+  "HAL": {g:2,m:4,d:5,v:3,t:5,r:4,source:"Q4FY26",bse:"541154",note:"Rev ₹33,089Cr | EBITDA 25.2% | ROE 26.5% | OB 7.7x | Debt-Free | Net Cash ~₹13,6"},
+  "Mazagon Dock Shipbuilders": {g:4,m:3,d:5,v:3,t:3,r:4,source:"Q4FY26",bse:"543237",note:"Rev ₹13,006Cr | EBITDA 18.1% | ROE 27.4% | OB 2.7x | Net Cash ~₹13,097 Cr cash+F"},
+  "MDL": {g:4,m:3,d:5,v:3,t:3,r:4,source:"Q4FY26",bse:"543237",note:"Rev ₹13,006Cr | EBITDA 18.1% | ROE 27.4% | OB 2.7x | Net Cash ~₹13,097 Cr cash+F"},
+  "Mazagon Dock": {g:4,m:3,d:5,v:3,t:3,r:4,source:"Q4FY26",bse:"543237",note:"Rev ₹13,006Cr | EBITDA 18.1% | ROE 27.4% | OB 2.7x | Net Cash ~₹13,097 Cr cash+F"},
+  "Cochin Shipyard": {g:3,m:3,d:5,v:3,t:4,r:3,source:"Q4FY26",bse:"540678",note:"Rev ₹5,021Cr | EBITDA 19.9% | ROE 16.8% | OB 4.4x | Net Cash ~₹2,400 Cr"},
+  "Cochin Shipyard Limited": {g:3,m:3,d:5,v:3,t:4,r:3,source:"Q4FY26",bse:"540678",note:"Rev ₹5,021Cr | EBITDA 19.9% | ROE 16.8% | OB 4.4x | Net Cash ~₹2,400 Cr"},
+  "CSL": {g:3,m:3,d:5,v:3,t:4,r:3,source:"Q4FY26",bse:"540678",note:"Rev ₹5,021Cr | EBITDA 19.9% | ROE 16.8% | OB 4.4x | Net Cash ~₹2,400 Cr"},
+  "Garden Reach Shipbuilders": {g:5,m:3,d:5,v:2,t:2,r:4,source:"Q4FY26",bse:"542337",note:"Rev ₹7,002Cr | EBITDA 15.3% | ROE 27.5% | OB 2.4x | Net Cash ~₹2,000 Cr"},
+  "GRSE": {g:5,m:3,d:5,v:2,t:2,r:4,source:"Q4FY26",bse:"542337",note:"Rev ₹7,002Cr | EBITDA 15.3% | ROE 27.5% | OB 2.4x | Net Cash ~₹2,000 Cr"},
+  "Bharat Electronics": {g:4,m:4,d:5,v:2,t:3,r:4,source:"Q4FY26",bse:"500049",note:"Rev ₹27,480Cr | EBITDA 24.4% | ROE 25.8% | OB 2.7x | Debt-Free | Net Cash positi"},
+  "BEL": {g:4,m:4,d:5,v:2,t:3,r:4,source:"Q4FY26",bse:"500049",note:"Rev ₹27,480Cr | EBITDA 24.4% | ROE 25.8% | OB 2.7x | Debt-Free | Net Cash positi"},
+  "Bharat Electronics Limited": {g:4,m:4,d:5,v:2,t:3,r:4,source:"Q4FY26",bse:"500049",note:"Rev ₹27,480Cr | EBITDA 24.4% | ROE 25.8% | OB 2.7x | Debt-Free | Net Cash positi"},
+  "BDL": {g:1,m:2,d:5,v:4,t:5,r:2,source:"Q4FY26",bse:"541143",note:"Rev ₹2,442Cr | EBITDA 12.1% | ROE 13.7% | OB 7.4x | Net Cash | Net D/E -1.11"},
+  "Bharat Dynamics": {g:1,m:2,d:5,v:4,t:5,r:2,source:"Q4FY26",bse:"541143",note:"Rev ₹2,442Cr | EBITDA 12.1% | ROE 13.7% | OB 7.4x | Net Cash | Net D/E -1.11"},
+  "Bharat Dynamics Limited": {g:1,m:2,d:5,v:4,t:5,r:2,source:"Q4FY26",bse:"541143",note:"Rev ₹2,442Cr | EBITDA 12.1% | ROE 13.7% | OB 7.4x | Net Cash | Net D/E -1.11"},
+  "BEML Limited": {g:2,m:2,d:5,v:3,t:3,r:1,source:"Q4FY26",bse:"500048",note:"Rev ₹4,351Cr | EBITDA 11.0% | ROE 6.5% | OB 3.7x | Virtually Debt-Free"},
+  "BEML": {g:2,m:2,d:5,v:3,t:3,r:1,source:"Q4FY26",bse:"500048",note:"Rev ₹4,351Cr | EBITDA 11.0% | ROE 6.5% | OB 3.7x | Virtually Debt-Free"},
+  "Solar Industries": {g:5,m:5,d:5,v:2,t:2,r:5,source:"Q4FY26",bse:"532725",note:"Rev ₹9,838Cr | EBITDA 28.0% | ROE 30.8% | OB 2.2x | Near Debt-Free | D/E 0.15x"},
+  "Solar Industries India Limited": {g:5,m:5,d:5,v:2,t:2,r:5,source:"Q4FY26",bse:"532725",note:"Rev ₹9,838Cr | EBITDA 28.0% | ROE 30.8% | OB 2.2x | Near Debt-Free | D/E 0.15x"},
+  "Solar Industries India": {g:5,m:5,d:5,v:2,t:2,r:5,source:"Q4FY26",bse:"532725",note:"Rev ₹9,838Cr | EBITDA 28.0% | ROE 30.8% | OB 2.2x | Near Debt-Free | D/E 0.15x"},
+  "Data Patterns": {g:5,m:4,d:5,v:2,t:1,r:3,source:"Q4FY26",bse:"543334",note:"Rev ₹835Cr | EBITDA 27.5% | ROE 18.5% | OB 1.3x | Debt-Free"},
+  "Data Patterns India": {g:5,m:4,d:5,v:2,t:1,r:3,source:"Q4FY26",bse:"543334",note:"Rev ₹835Cr | EBITDA 27.5% | ROE 18.5% | OB 1.3x | Debt-Free"},
+  "Data Patterns (India) Limited": {g:5,m:4,d:5,v:2,t:1,r:3,source:"Q4FY26",bse:"543334",note:"Rev ₹835Cr | EBITDA 27.5% | ROE 18.5% | OB 1.3x | Debt-Free"},
+  "Zen Technologies Limited": {g:5,m:5,d:5,v:2,t:2,r:3,source:"Q4FY26",bse:"533339",note:"Rev ₹688Cr | EBITDA 36.0% | ROE 18.8% | OB 1.9x | Debt-Free"},
+  "Zen Tech": {g:5,m:5,d:5,v:2,t:2,r:3,source:"Q4FY26",bse:"533339",note:"Rev ₹688Cr | EBITDA 36.0% | ROE 18.8% | OB 1.9x | Debt-Free"},
+  "Zen Technologies": {g:5,m:5,d:5,v:2,t:2,r:3,source:"Q4FY26",bse:"533339",note:"Rev ₹688Cr | EBITDA 36.0% | ROE 18.8% | OB 1.9x | Debt-Free"},
+  "Apollo Micro Systems": {g:5,m:3,d:2,v:2,t:1,r:2,source:"Q4FY26",bse:"542578",note:"Rev ₹911Cr | EBITDA 19.2% | ROE 11.8% | OB 1.0x | D/E rising post-IDL | Borrowin"},
+  "Apollo Micro Systems Limited": {g:5,m:3,d:2,v:2,t:1,r:2,source:"Q4FY26",bse:"542578",note:"Rev ₹911Cr | EBITDA 19.2% | ROE 11.8% | OB 1.0x | D/E rising post-IDL | Borrowin"},
+  "Paras Defence": {g:5,m:4,d:4,v:2,t:2,r:2,source:"Q4FY26",bse:"543367",note:"Rev ₹477Cr | EBITDA 26.0% | ROE 13.0% | OB 2.1x | Low Debt | D/E 0.2x"},
+  "Paras Defence and Space Technologies": {g:5,m:4,d:4,v:2,t:2,r:2,source:"Q4FY26",bse:"543367",note:"Rev ₹477Cr | EBITDA 26.0% | ROE 13.0% | OB 2.1x | Low Debt | D/E 0.2x"},
+  "ideaForge": {g:1,m:3,d:5,v:3,t:2,r:1,source:"Q4FY26",bse:"544048",note:"Rev ₹280Cr | EBITDA 14.3% | ROE 6.5% | OB 1.9x | Net Cash | Turnaround in Q4"},
+  "ideaForge Technology": {g:1,m:3,d:5,v:3,t:2,r:1,source:"Q4FY26",bse:"544048",note:"Rev ₹280Cr | EBITDA 14.3% | ROE 6.5% | OB 1.9x | Net Cash | Turnaround in Q4"},
+  "IdeaForge Technology": {g:1,m:3,d:5,v:3,t:2,r:1,source:"Q4FY26",bse:"544048",note:"Rev ₹280Cr | EBITDA 14.3% | ROE 6.5% | OB 1.9x | Net Cash | Turnaround in Q4"},
+  "ideaForge Technology Limited": {g:1,m:3,d:5,v:3,t:2,r:1,source:"Q4FY26",bse:"544048",note:"Rev ₹280Cr | EBITDA 14.3% | ROE 6.5% | OB 1.9x | Net Cash | Turnaround in Q4"}
+};
+
+// Look up real data for a company — checks exact name then partial match
+function getRealData(name) {
+  if (!name) return null;
+  // Exact match first
+  if (SECTOR_REAL_DATA[name]) return SECTOR_REAL_DATA[name];
+  // Case-insensitive partial match
+  const nl = name.toLowerCase();
+  for (const [k, v] of Object.entries(SECTOR_REAL_DATA)) {
+    if (k.toLowerCase() === nl) return v;
+    if (k.toLowerCase().includes(nl.substring(0,8)) || nl.includes(k.toLowerCase().substring(0,8))) return v;
+  }
+  return null;
+}
+
 // ── NSE/BSE MARKET CAP RANK LOOKUP (approx. rank by market cap, mid-2025) ────
 const COMPANY_RANKS = {
   "Reliance Industries":1,"TCS":2,"HDFC Bank":3,"Bharti Airtel":4,"ICICI Bank":5,
@@ -6389,15 +6447,27 @@ function buildCompanyMaster() {
     const sectorVS = SECTOR_VOLUME_SENTIMENT[sector] || {s:3, n:3};
     cos.forEach(c => {
       // Compute CB score if not explicitly set (for g,m,d,v,t,r notation)
+      // ── REAL DATA MERGE ──────────────────────────────────────────────
+      // If real sector analysis data exists for this company, use those
+      // factor scores (higher weight) instead of estimates
+      const realD = getRealData(c.name);
+      const effC = realD ? {
+        g: realD.g, m: realD.m, d: realD.d,
+        v: realD.v, t: realD.t, r: realD.r,
+        s: c.s, n: c.n, score: c.score,
+        _realData: true, _source: realD.source,
+        _note: realD.note, _bse: realD.bse
+      } : c;
+
       // Inject volume (s) and sentiment (n) — company overrides sector default
-      const vol  = c.s !== undefined ? c.s : sectorVS.s;
-      const sent = c.n !== undefined ? c.n : sectorVS.n;
+      const vol  = effC.s !== undefined ? effC.s : sectorVS.s;
+      const sent = effC.n !== undefined ? effC.n : sectorVS.n;
       // Compute V&S adjustment: max ±8 points, calibrated
       const vsAdj = Math.round(((vol-3)*EXTRA_FACTOR_WEIGHTS.s + (sent-3)*EXTRA_FACTOR_WEIGHTS.n) * VS_SCALE);
-      // Base score: from explicit value OR computed from g,m,d,v,t,r factors
-      let baseScore = c.score;
+      // Base score: real data factors OR explicit score OR estimated factors
+      let baseScore = effC._realData ? undefined : effC.score;
       if (baseScore === undefined) {
-        baseScore = Math.round(((c.g||3)+(c.m||3)+(c.d||3)+(c.v||3)+(c.t||3)+(c.r||3))*100/30);
+        baseScore = Math.round(((effC.g||3)+(effC.m||3)+(effC.d||3)+(effC.v||3)+(effC.t||3)+(effC.r||3))*100/30);
       }
       // Final score = base + V&S adjustment (always live)
       const score = Math.min(99, Math.max(20, baseScore + vsAdj));
@@ -6409,11 +6479,16 @@ function buildCompanyMaster() {
       COMPANY_MASTER.push({
         name: c.name, sector, score, rank,
         s: vol, n: sent,
-        roce: c.roce||(c.r>=4?'High':c.r>=3?'Moderate':'Low'),
-        debt: c.debt||debtMap[c.d]||'Moderate',
-        val: c.val||valMap[c.v]||'Reasonable',
-        growth: c.growth||(c.g>=4?'High':c.g>=3?'Moderate':'Low'),
-        note: c.note||''
+        g: effC.g||c.g||3, m: effC.m||c.m||3,
+        d: effC.d||c.d||3, v: effC.v||c.v||3,
+        t: effC.t||c.t||3, r: effC.r||c.r||3,
+        realData: effC._realData || false,
+        dataSource: effC._source || null,
+        roce: c.roce||(effC.r>=4?'High':effC.r>=3?'Moderate':'Low'),
+        debt: c.debt||debtMap[effC.d]||'Moderate',
+        val: c.val||valMap[effC.v]||'Reasonable',
+        growth: c.growth||(effC.g>=4?'High':effC.g>=3?'Moderate':'Low'),
+        note: effC._note || c.note || ''
       });
     });
   });
@@ -6468,9 +6543,14 @@ function updateCompanyFactor(idx, factor, value) {
   // Recalculate score from all factor values
   const c = COMPANY_MASTER[idx];
   const sf = getSectorFactors(c.sector || '');
+  // Merge real data factors if available
+  const rd = getRealData(c.name);
+  const fc = rd ? {...rd, s: c.s, n: c.n} : c;
+  // Update the changed factor
+  fc[factor] = val;
   let weightedSum = 0, totalWeight = 0;
   Object.entries(sf.weights).forEach(([k, w]) => {
-    weightedSum += (c[k] || 3) * w;
+    weightedSum += (fc[k] || 3) * w;
     totalWeight += w;
   });
   // Add volume & sentiment (always live)
@@ -6589,6 +6669,7 @@ function renderCompanyMaster() {
           <span class="co-research-link" data-coname="${c.name}" data-cosector="${c.sector}" title="Open in Research" style="cursor:pointer;font-size:10px;margin-left:3px;opacity:0.6;vertical-align:middle;">&#128269;</span>
         </div>
         <div style="font-size:9px;color:#6b7498;margin-top:1px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.note||''}">${c.note||''}</div>
+        ${c.realData ? '<span title="Score computed from actual Q4/FY financials — '+( c.dataSource||'real data')+'" style="font-size:8px;font-weight:800;padding:1px 5px;background:#E1F5EE;color:#0F6E56;border-radius:4px;border:1px solid #1D9E75;margin-top:2px;display:inline-block;">⚡ '+( c.dataSource||'Real')+'</span>' : ''}
       </td>
       <td style="padding:4px 6px;">
         <select onchange="updateCompanyField(${origIdx},'sector',this.value)"
@@ -7463,11 +7544,26 @@ document.addEventListener('DOMContentLoaded', () => {
 // Replace DATA_REPO_URL with your GitHub repo raw URL when ready
 // ══════════════════════════════════════════════════════════════
 
+// ── CB RESEARCH PORTAL INTEGRATION ─────────────────────────────────────
+// Reads sector analysis HTML files directly from your GitHub Pages portal
+// No separate JSON files needed — works with files you already upload
+
+const CB_PORTAL = {
+  enabled: true,
+  portalBase: 'https://elangocauvery.github.io/CB-Finance',
+  refreshHours: 6,
+  // sector-index.json in your GitHub repo controls the file list
+  // You NEVER need to edit CB Finance26 again — just update sector-index.json
+  indexFile: 'sector-index.json',
+  sectorFiles: []  // populated automatically from sector-index.json
+};
+
+// Legacy config (kept for compatibility)
 const GITHUB_CONFIG = {
-  enabled: false,  // Set to true once your GitHub repo is ready
+  enabled: false,
   baseUrl: 'https://raw.githubusercontent.com/YOUR_USERNAME/cbfinance26-data/main',
   refreshIntervalMinutes: 30,
-  token: null  // Optional: for private repos — set via setGithubToken()
+  token: null
 };
 
 function setGithubToken(token) {
@@ -7489,95 +7585,274 @@ async function fetchGithubJson(path) {
   return res.json();
 }
 
-async function loadLiveData() {
-  if (!GITHUB_CONFIG.enabled) return;
-  const badge = document.getElementById('dataStatusBadge');
+// ══════════════════════════════════════════════════════════════════════
+// CB RESEARCH PORTAL READER
+// Fetches your sector HTML files from elangocauvery.github.io/CB-Finance
+// Extracts CO{} data → converts to CB factors → enriches company scores
+// You upload files as normal to your portal. This reads them automatically.
+// ══════════════════════════════════════════════════════════════════════
+
+// Sector type mapping — tells extractor which margin thresholds to use
+const SECTOR_TYPE_MAP = {
+  'Defence': 'mfg', 'Power': 'mfg', 'Capital Goods': 'mfg',
+  'CapGoods': 'mfg', 'Auto': 'mfg', 'Metals': 'mfg',
+  'Infra': 'mfg', 'Railways': 'mfg', 'Chemicals': 'mfg',
+  'Pharma': 'pharma', 'CDMO': 'pharma', 'Hospitals': 'pharma',
+  'IT': 'it', 'Banking': 'banking', 'NBFC': 'banking',
+  'Insurance': 'insurance', 'FMCG': 'fmcg', 'Retail': 'fmcg',
+  'AMC': 'finsvc', 'Brokers': 'finsvc',
+};
+
+// CB factor score converters (sector-aware)
+function _g(cagr) {
+  return cagr>=25?5:cagr>=15?4:cagr>=8?3:cagr>=3?2:1;
+}
+function _m(margin, stype) {
+  const t = {
+    mfg:      [28,20,14, 8],
+    pharma:   [25,18,12, 7],
+    it:       [25,18,12, 8],
+    fmcg:     [20,14, 9, 5],
+    banking:  [4.5,3.5,2.8,2.0],
+    insurance:[30,22,15, 8],
+    finsvc:   [40,28,18,10],
+  }[stype] || [22,15,10,6];
+  return margin>=t[0]?5:margin>=t[1]?4:margin>=t[2]?3:margin>=t[3]?2:1;
+}
+function _d(bs) {
+  const b = (bs||'').toLowerCase();
+  if (b.includes('debt-free')||b.includes('net cash')) return 5;
+  if (b.includes('virtually')||b.includes('near debt')||b.includes('low debt')) return 4;
+  if (/d\/e\s*0\.[123]/.test(b)) return 4;
+  if (b.includes('rising')||b.includes('borrowings')) return 2;
+  if (b.includes('high debt')||b.includes('stressed')) return 1;
+  if (/d\/e\s*[2-9]/.test(b)) return 1;
+  return 3;
+}
+function _t(obr) {
+  return obr>=6?5:obr>=4?4:obr>=2.5?3:obr>=1.5?2:obr>0?2:3;
+}
+function _r(roe) {
+  return roe>=28?5:roe>=20?4:roe>=14?3:roe>=9?2:1;
+}
+function _v(roe, margin, cagr) {
+  // Quality proxy: high quality = usually expensive
+  const q = (roe||0)/30 + margin/30 + Math.max(0,cagr)/30;
+  return q>2.5?2:q>1.8?3:q>1.0?4:3;
+}
+
+// Extract CO{} object text from fetched HTML
+function extractCOFromHTML(html) {
+  const idx = html.indexOf('var CO={');
+  if (idx < 0) return null;
+  // Find balanced closing }
+  let depth = 0, i = idx + 7, inStr = false, strChar = '';
+  while (i < html.length) {
+    const ch = html[i];
+    if (!inStr && (ch==='"'||ch==="'")) { inStr=true; strChar=ch; }
+    else if (inStr && ch===strChar && html[i-1]!=='\\'  ) inStr=false;
+    else if (!inStr) {
+      if (ch==='{') depth++;
+      else if (ch==='}') { depth--; if (depth===0) break; }
+    }
+    i++;
+  }
+  return html.substring(idx + 7, i + 1);
+}
+
+// Parse a single field value from CO entry text
+function parseField(text, field) {
+  const re = new RegExp(field + "\\s*:\s*([\\d.-]+)");
+  const m = text.match(re);
+  return m ? parseFloat(m[1]) : null;
+}
+function parseStrField(text, field) {
+  const re = new RegExp(field + "\\s*:\s*'([^']*)'");
+  const m = text.match(re);
+  return m ? m[1] : '';
+}
+
+// Parse the full fy{} block
+function parseFY(text) {
+  const fyM = text.match(/fy\s*:\s*\{([^}]+)\}/);
+  if (!fyM) return {};
+  const fy = {};
+  fyM[1].replace(/(\w+)\s*:\s*([-\d.]+)/g, (_, k, v) => { fy[k] = parseFloat(v); });
+  return fy;
+}
+
+// Convert one CO entry text → CB factors object
+function coEntryToCBFactors(entryText, stype, period) {
+  const fy = parseFY(entryText);
+  const q4 = {};
+  const q4M = entryText.match(/q4\s*:\s*\{([^}]+)\}/);
+  if (q4M) q4M[1].replace(/(\w+)\s*:\s*([-\d.]+)/g, (_,k,v) => { q4[k]=parseFloat(v); });
+
+  const rev24 = fy.rev24||0, rev26 = fy.rev26||0;
+  const cagr = (rev24>0&&rev26>0) ? ((rev26/rev24)**0.5-1)*100 : (q4.yoy||8);
+  const margin = fy.ebitdaM26 || q4.ebitdaM || 15;
+  const roe = parseField(entryText,'roe') || 15;
+  const obr = parseField(entryText,'obr') || 0;
+  const bs  = parseStrField(entryText,'bs');
+  const bse = parseStrField(entryText,'bse');
+
+  const g=_g(cagr), m=_m(margin,stype), d=_d(bs),
+        v=_v(roe,margin,cagr), t=_t(obr), r=_r(roe);
+
+  return {
+    g,m,d,v,t,r,
+    source: period||'Live',
+    bse,
+    note: `Rev ₹${Math.round(rev26||q4.rev||0).toLocaleString('en-IN')}Cr | EBITDA ${margin}% | ROE ${roe}% | OB ${obr}x | ${bs.substring(0,40)}`
+  };
+}
+
+// Fetch one sector file, extract all companies, merge into SECTOR_REAL_DATA
+async function fetchAndMergeSectorFile(filename) {
+  const url = CB_PORTAL.portalBase + '/' + filename;
+  const res = await fetch(url, { mode: 'cors' });
+  if (!res.ok) throw new Error('HTTP ' + res.status + ' for ' + filename);
+  const html = await res.text();
+
+  const coText = extractCOFromHTML(html);
+  if (!coText) {
+    console.warn('CB Finance26: No CO{} found in', filename);
+    return 0;
+  }
+
+  // Detect sector from filename
+  const sectorName = filename.split('_')[0];
+  const stype = SECTOR_TYPE_MAP[sectorName] || 'mfg';
+  // Detect period from filename (e.g. Q4FY26)
+  const periodM = filename.match(/(Q[1-4]FY\d{2})/i);
+  const period = periodM ? periodM[1] : 'Live';
+
+  // Parse each company entry
+  let count = 0;
+  const entryRe = /(\w+)\s*:\s*\{name\s*:\s*'([^']+)'/g;
+  const seenIds = new Set();
+  let m;
+  while ((m = entryRe.exec(coText)) !== null) {
+    const cid = m[1], nameStr = m[2];
+    if (seenIds.has(cid)) continue;
+    seenIds.add(cid);
+
+    // Extract this company's block
+    const start = coText.indexOf(cid + ':{name:', m.index);
+    if (start < 0) continue;
+    const entryText = coText.substring(start, start + 4000);
+
+    const factors = coEntryToCBFactors(entryText, stype, period);
+
+    // Short name = before ' — '
+    const shortName = nameStr.split(' — ')[0].trim();
+
+    // Register under both short name and full name
+    SECTOR_REAL_DATA[shortName] = factors;
+    if (nameStr !== shortName) SECTOR_REAL_DATA[nameStr] = factors;
+    count++;
+  }
+  return count;
+}
+
+// Main portal sync — fetches all configured sector files
+async function syncFromPortal() {
+  if (!CB_PORTAL.enabled || !CB_PORTAL.sectorFiles.length) return;
+
+  // Skip fetch when running as local file
+  if (window.location.protocol === 'file:') {
+    const badge = document.getElementById('dataStatusBadge');
+    if (badge) {
+      badge.style.display = 'inline-block';
+      badge.textContent = '⚡ Built-in data';
+      badge.style.background = '#f5f6fa';
+      badge.style.color = '#6b7498';
+      badge.style.borderColor = '#dde1ec44';
+    }
+    return;
+  }
+
+  // Step 1: Fetch sector-index.json to get the current list of sector files
+  // You only update this one JSON file whenever you add a new sector
   try {
-    if (badge) { badge.style.display='inline-block'; badge.textContent='↻ Loading...'; badge.style.background='#fff3e0'; badge.style.color='#b35c00'; badge.style.borderColor='#ff7c0044'; }
-
-    // Fetch all data files in parallel
-    const [liveSectors, liveCompanies, liveScreener, liveMeta] = await Promise.all([
-      fetchGithubJson('sectors.json'),
-      fetchGithubJson('companies.json'),
-      fetchGithubJson('screener.json'),
-      fetchGithubJson('meta.json').catch(() => null)
-    ]);
-
-    // Merge sectors
-    if (liveSectors) Object.assign(SECTORS, liveSectors);
-
-    // Merge companies (replace per-sector arrays)
-    if (liveCompanies) {
-      Object.entries(liveCompanies).forEach(([sector, cos]) => {
-        COMPANIES[sector] = cos;
-      });
+    const idxUrl = CB_PORTAL.portalBase + '/' + CB_PORTAL.indexFile;
+    const idxRes = await fetch(idxUrl, { mode: 'cors' });
+    if (idxRes.ok) {
+      const idx = await idxRes.json();
+      // index file can be: ["file1.html","file2.html"] or {files:["file1.html",...]}
+      CB_PORTAL.sectorFiles = Array.isArray(idx) ? idx : (idx.files || []);
+      console.log('CB Finance26: sector index loaded —', CB_PORTAL.sectorFiles.length, 'files');
     }
+  } catch(e) {
+    console.log('CB Finance26: sector-index.json not found, using built-in data');
+    return;
+  }
 
-    // Replace screener data
-    if (liveScreener && Array.isArray(liveScreener)) {
-      SCREENER_DATA.splice(0, SCREENER_DATA.length, ...liveScreener);
+  if (!CB_PORTAL.sectorFiles.length) return;
+
+  const badge = document.getElementById('dataStatusBadge');
+  if (badge) {
+    badge.style.display = 'inline-block';
+    badge.textContent = '↻ Syncing...';
+    badge.style.background = '#fff3e0';
+    badge.style.color = '#b35c00';
+    badge.style.borderColor = '#ff7c0044';
+  }
+
+  let totalLoaded = 0, filesLoaded = 0, errors = [];
+
+  for (const file of CB_PORTAL.sectorFiles) {
+    try {
+      const n = await fetchAndMergeSectorFile(file);
+      totalLoaded += n;
+      filesLoaded++;
+      console.log(`CB Finance26: Loaded ${n} companies from ${file}`);
+    } catch(e) {
+      errors.push(file);
+      console.log('CB Finance26: portal sync skipped -', file);
     }
+  }
 
-    // Re-render all affected components
+  if (totalLoaded > 0) {
+    // Rebuild company master with enriched real data
     buildCompanyMaster();
-    populateSectorFilter();
     renderCompanyMaster();
-    updateAll();
-    renderScreener('all');
-    ddRender();
+    if (typeof renderVSPanel === 'function') renderVSPanel();
+  }
 
-    // Update status badge
-    const ts = liveMeta?.lastUpdated || new Date().toLocaleString('en-IN');
-    if (badge) {
-      badge.style.display = 'inline-block';
-      badge.innerHTML = '✓ Live · ' + ts;
-      badge.style.background = '#e6f4ef';
-      badge.style.color = '#006b30';
-      badge.style.borderColor = '#00a85444';
-    }
-
-    console.log('CB Finance26: Live data loaded from GitHub');
-
-  } catch(err) {
-    console.warn('CB Finance26: GitHub data load failed, using built-in data.', err.message);
-    if (badge) {
-      badge.style.display = 'inline-block';
-      badge.innerHTML = '⚡ Built-in data';
+  // Update badge
+  if (badge) {
+    if (totalLoaded > 0) {
+      badge.textContent = `⚡ Live · ${totalLoaded} cos · ${filesLoaded} sector${filesLoaded>1?'s':''}`;
+      badge.style.background = '#E1F5EE';
+      badge.style.color = '#0F6E56';
+      badge.style.borderColor = '#1D9E7555';
+    } else {
+      badge.textContent = errors.length ? '⚠ Portal unreachable' : '⚡ Built-in data';
       badge.style.background = '#f5f6fa';
       badge.style.color = '#6b7498';
       badge.style.borderColor = '#dde1ec44';
     }
   }
+
+  // Cache timestamp
+  try { localStorage.setItem('cbf26_portal_sync', new Date().toISOString()); } catch(e){}
 }
 
-// Auto-refresh at configured interval
-function startLiveDataRefresh() {
-  if (!GITHUB_CONFIG.enabled) return;
-  loadLiveData();
-  setInterval(loadLiveData, GITHUB_CONFIG.refreshIntervalMinutes * 60 * 1000);
+// Auto-refresh every N hours
+function startPortalSync() {
+  syncFromPortal();
+  setInterval(syncFromPortal, CB_PORTAL.refreshHours * 60 * 60 * 1000);
 }
 
-// Enable GitHub live data (call this from console or inject after auth)
-// Usage: enableGithubLiveData('https://raw.githubusercontent.com/user/repo/main', 'optional_token')
+// Legacy compatibility stubs
+async function loadLiveData() { return syncFromPortal(); }
+function startLiveDataRefresh() { return startPortalSync(); }
 window.enableGithubLiveData = function(baseUrl, token) {
-  GITHUB_CONFIG.enabled = true;
-  if (baseUrl) GITHUB_CONFIG.baseUrl = baseUrl;
-  if (token) GITHUB_CONFIG.token = token;
-  localStorage.setItem('cbf26_github_config', JSON.stringify({ enabled: true, baseUrl: GITHUB_CONFIG.baseUrl }));
-  loadLiveData();
-  console.log('CB Finance26: GitHub live data enabled from', GITHUB_CONFIG.baseUrl);
+  CB_PORTAL.enabled = true;
+  if (baseUrl) CB_PORTAL.portalBase = baseUrl;
+  syncFromPortal();
 };
-
-// Check if previously enabled
-(function restoreGithubConfig() {
-  try {
-    const saved = JSON.parse(localStorage.getItem('cbf26_github_config') || '{}');
-    if (saved.enabled && saved.baseUrl) {
-      GITHUB_CONFIG.enabled = true;
-      GITHUB_CONFIG.baseUrl = saved.baseUrl;
-    }
-  } catch(e) {}
-})();
 
 
 // ══════════════════════════════════════════════════════════════
