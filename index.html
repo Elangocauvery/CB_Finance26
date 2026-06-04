@@ -317,13 +317,41 @@ tr:last-child td{border-bottom:none;}
 body{padding-bottom:52px;}
 
 @media(max-width:700px){
-  .page{padding:12px;}
+  .page{padding:10px;}
   .grid-2,.grid-3{grid-template-columns:1fr;}
   .portfolio-bar{flex-direction:column;align-items:flex-start;}
   .portfolio-summary{margin-left:0;text-align:left;}
-  .nav-tab{padding:12px 10px;font-size:10px;}
+  .nav-tabs{display:none;}
   .kpi-grid{grid-template-columns:repeat(2,1fr);}
   .drill-grid{grid-template-columns:1fr;}
+  .header{padding:14px 16px;}
+  .header h1{font-size:17px;}
+  .header p{font-size:11px;}
+  .header-meta{gap:6px;}
+  .badge{font-size:10px;padding:4px 8px;}
+  .card{padding:14px;}
+  .card h2{font-size:13px;}
+  table{font-size:11px;}
+  th,td{padding:7px 8px;}
+  .kpi-val{font-size:20px;}
+  .portfolio-bar input{width:100%;}
+  .screener-filters{flex-direction:column;align-items:flex-start;}
+  .panel-header{flex-direction:column;align-items:flex-start;}
+  .back-btn{margin-left:0;}
+  .score-number{font-size:36px;}
+  .alloc-amt{display:none;}
+  .macro-row{flex-wrap:wrap;gap:6px;}
+  .rc-row{flex-direction:column;}
+  .tab-bar{overflow-x:auto;flex-wrap:nowrap;}
+  .tab-btn,.alt-tab-btn{white-space:nowrap;}
+  .ss-pills{gap:5px;}
+  .breadcrumb{font-size:10px;}
+  h2{font-size:13px!important;}
+}
+@media(max-width:480px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .nav-logo{font-size:13px;}
+  .page{padding:8px;}
 }
 </style>
 </head>
@@ -331,43 +359,47 @@ body{padding-bottom:52px;}
 <!-- NAV -->
 
 <!-- ═══ ACCESS GATE ═══ -->
-<div id="accessGate" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;background:linear-gradient(135deg,#1a1e2e 0%,#0d1117 100%);display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;">
-  <div style="background:#fff;border-radius:20px;padding:40px 48px;max-width:480px;width:90%;text-align:center;box-shadow:0 24px 80px #00000060;">
-    <!-- Logo -->
-    <div style="font-size:32px;font-weight:900;color:#c45000;margin-bottom:4px;">&#9733; CB <span style="color:#ff7c00;">Finance26</span>™</div>
-    <div style="font-size:11px;font-weight:700;color:#6b7498;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px;">Capital Allocation Intelligence System</div>
-    <div style="width:48px;height:3px;background:linear-gradient(90deg,#ff7c00,#ffc107);border-radius:3px;margin:0 auto 24px;"></div>
-
-    <!-- Lock icon -->
-    <div style="font-size:36px;margin-bottom:16px;">🔐</div>
-    <div style="font-size:16px;font-weight:800;color:#1a1e2e;margin-bottom:8px;">Authorised Access Only</div>
-    <div style="font-size:12px;font-weight:600;color:#6b7498;margin-bottom:24px;line-height:1.7;">This tool is for authorised CB Finance26 members only.<br>Enter your access code to continue.</div>
-
-    <!-- Access code input -->
-    <input type="password" id="accessCodeInput" placeholder="Enter access code"
-      style="width:100%;border:2px solid #dde1ec;border-radius:10px;padding:13px 16px;font-size:15px;font-weight:700;text-align:center;font-family:'Poppins',sans-serif;outline:none;margin-bottom:12px;color:#1a1e2e;letter-spacing:3px;"
+<style>
+#accessGate{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;background:linear-gradient(135deg,#fff8f2 0%,#fff3e8 40%,#fef9f0 100%);display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;overflow:hidden;}
+#accessGate::before{content:'';position:absolute;top:-30%;left:-10%;width:55%;height:70%;background:radial-gradient(ellipse,#ff7c0012 0%,transparent 70%);pointer-events:none;}
+#accessGate::after{content:'';position:absolute;bottom:-20%;right:-5%;width:45%;height:55%;background:radial-gradient(ellipse,#ffc10715 0%,transparent 70%);pointer-events:none;}
+.gate-card{background:#ffffff;border:1.5px solid #ffe0c0;border-radius:24px;padding:44px 48px;max-width:440px;width:90%;text-align:center;position:relative;z-index:1;box-shadow:0 12px 48px #ff7c0018,0 2px 12px #00000010;}
+.gate-logo{font-size:28px;font-weight:900;color:#c45000;margin-bottom:3px;letter-spacing:-0.5px;}
+.gate-logo span{color:#ff7c00;}
+.gate-sub{font-size:10px;font-weight:700;color:#9a7060;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:28px;}
+.gate-divider{width:40px;height:2px;background:linear-gradient(90deg,#ff7c00,#ffc107);border-radius:2px;margin:0 auto 28px;}
+.gate-icon{width:56px;height:56px;background:linear-gradient(135deg,#ff7c00,#ffab40);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 18px;box-shadow:0 4px 16px #ff7c0030;}
+.gate-title{font-size:18px;font-weight:800;color:#1a1e2e;margin-bottom:6px;}
+.gate-desc{font-size:12px;font-weight:500;color:#5a4a40;margin-bottom:28px;line-height:1.7;}
+.gate-input{width:100%;background:#fff8f4;border:1.5px solid #e8c8b0;border-radius:12px;padding:13px 18px;font-size:15px;font-weight:700;text-align:center;font-family:'Poppins',sans-serif;outline:none;margin-bottom:10px;color:#1a1e2e;letter-spacing:3px;transition:border-color 0.2s;}
+.gate-input::placeholder{color:#b09080;letter-spacing:0;}
+.gate-input:focus{border-color:#ff7c00;background:#fff;}
+.gate-btn{width:100%;background:linear-gradient(135deg,#ff7c00,#ff9a00);color:#fff;border:none;padding:14px;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;margin-bottom:18px;transition:opacity 0.2s;box-shadow:0 4px 14px #ff7c0030;}
+.gate-btn:hover{opacity:0.9;}
+.gate-error{font-size:11px;font-weight:700;color:#c0392b;margin-bottom:8px;min-height:16px;}
+.gate-legal{font-size:10px;color:#7a6858;line-height:1.8;border-top:1px solid #f0d8c8;padding-top:16px;text-align:left;}
+</style>
+<div id="accessGate">
+  <div class="gate-card">
+    <div class="gate-logo">&#9733; CB <span>Finance26</span></div>
+    <div class="gate-sub">Capital Research Framework</div>
+    <div class="gate-divider"></div>
+    <div class="gate-icon">&#128274;</div>
+    <div class="gate-title">Member Access</div>
+    <div class="gate-desc">For authorised CB Finance26 members only.<br>Enter your access code to continue.</div>
+    <input type="password" id="accessCodeInput" class="gate-input" placeholder="Access code"
       onkeydown="if(event.key==='Enter') checkAccessCode()">
-    <div id="accessError" style="font-size:11px;font-weight:700;color:#b71c1c;margin-bottom:10px;min-height:16px;"></div>
-    <button onclick="checkAccessCode()" style="width:100%;background:linear-gradient(135deg,#ff7c00,#ff9a00);color:#fff;border:none;padding:14px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;margin-bottom:20px;">
-      Enter →
-    </button>
-
-    <!-- Legal notice -->
-    <div style="background:#f8f9fe;border-radius:10px;padding:12px 14px;text-align:left;border:1px solid #dde1ec;">
-      <div style="font-size:10px;font-weight:700;color:#1a1e2e;margin-bottom:5px;">⚖️ Legal Notice</div>
-      <div style="font-size:10px;color:#6b7498;line-height:1.7;">By entering, you agree that this tool is for <strong>personal research and educational purposes only</strong>. This is <strong>NOT financial advice</strong>. CB Finance26™ is proprietary intellectual property. Redistribution, copying, or sharing without written consent is strictly prohibited. All scores are analytical frameworks, not investment recommendations.</div>
-    </div>
-
-    <!-- Copyright -->
-    <div style="margin-top:16px;font-size:10px;color:#b0bcd8;font-weight:600;">
-      © 2025 CB Finance26™. All Rights Reserved. Proprietary &amp; Confidential.
+    <div id="accessError" class="gate-error"></div>
+    <button onclick="checkAccessCode()" class="gate-btn">Enter →</button>
+    <div class="gate-legal">
+      By entering you confirm this tool is for personal research only. Not financial advice. Redistribution prohibited. All scores are analytical frameworks, not investment recommendations. © 2025 CB Finance26™ · Proprietary &amp; Confidential
     </div>
   </div>
 </div>
 
 <!-- ═══ WATERMARK (visible on all pages) ═══ -->
-<div id="watermarkOverlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9998;overflow:hidden;opacity:0.04;">
-  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-35deg);font-size:48px;font-weight:900;color:#1a1e2e;white-space:nowrap;letter-spacing:6px;user-select:none;">CB FINANCE26™ · CONFIDENTIAL</div>
+<div id="watermarkOverlay" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9998;overflow:hidden;opacity:0.035;">
+  <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:42px;font-weight:900;color:#1a1e2e;white-space:nowrap;letter-spacing:4px;user-select:none;">CB FINANCE26™ · CONFIDENTIAL</div>
 </div>
 
 <script>
@@ -427,11 +459,15 @@ document.addEventListener('copy', e=>{
 <div class="nav-shell">
   <div class="nav-header">
     <div class="nav-logo">&#9733; CB <span>Finance26</span><sup style="font-size:8px;color:#ff7c00;margin-left:1px;">™</sup></div>
+    <div id="dataStatusBadge" style="font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;background:#e6f4ef;color:#006b30;border:1px solid #00a85444;margin-left:8px;white-space:nowrap;display:none;">
+      &#128257; Live
+    </div>
     <div class="nav-tabs">
       <button class="nav-tab active" onclick="switchPage('main',this)" id="navBtn-main">&#127968; Dashboard</button>
       <button class="nav-tab" onclick="switchPage('model',this)" id="navBtn-model">&#128200; My Plan</button>
       <button class="nav-tab" onclick="switchPage('drilldown',this)" id="navBtn-drilldown">&#128269; Research</button>
       <button class="nav-tab" onclick="switchPage('altassets',this)" id="navBtn-altassets">&#128181; Debt &amp; Gold / Metals</button>
+      <button class="nav-tab" onclick="switchPage('credibility',this)" id="navBtn-credibility">&#127941; Credibility</button>
       <button class="nav-tab" onclick="switchPage('import',this)" id="navBtn-import">&#128229; My Portfolio</button>
       <button class="nav-tab" onclick="switchPage('statements',this)" id="navBtn-statements">&#128196; Statements</button>
     </div>
@@ -472,6 +508,16 @@ document.addEventListener('copy', e=>{
     <div class="hm-item" onclick="switchPage('altassets');closeHamburger()">
       <div class="hm-item-icon" style="background:#e8f5e9;">&#128181;</div>
       <div><div class="hm-item-text">Debt &amp; Alt Assets</div><div class="hm-item-sub">Debt funds, Gold, Silver, REITs, InvITs</div></div>
+    </div>
+  </div>
+
+  <div class="hm-divider"></div>
+
+  <div class="hm-section">
+    <div class="hm-section-label">Stock Credibility</div>
+    <div class="hm-item" onclick="switchPage('credibility');closeHamburger()">
+      <div class="hm-item-icon" style="background:#fff3e0;">&#127941;</div>
+      <div><div class="hm-item-text">Credibility Tracker</div><div class="hm-item-sub">Top CB Score stocks — live performance tracking</div></div>
     </div>
   </div>
 
@@ -867,6 +913,100 @@ document.addEventListener('copy', e=>{
         For ITR — download both the <strong>Capital Gains statement from CAMS/KFin</strong> and the <strong>Tax P&amp;L from your broker</strong> and reconcile with your <strong>AIS on the Income Tax portal</strong>.
       </div>
     </div>
+
+  <div class="footer">© 2025 CB Finance26™ · Not Financial Advice · For Research Purposes Only</div>
+</div>
+
+<!-- PAGE: CREDIBILITY RATING & PERFORMANCE -->
+<div class="page" id="page-credibility">
+  <div class="header">
+    <h1>&#127941; Stock Credibility Tracker</h1>
+    <p>Top CB Score stocks ranked at go-live — track how they actually perform over 1M, 3M, 6M, 1Y and 3Y. Scores vs real outcomes.</p>
+    <div class="header-meta">
+      <span class="badge">Go-Live: <span id="goLiveDateBadge">Not set</span></span>
+      <span class="badge">Tracking: <span id="trackingCountBadge">0 stocks</span></span>
+      <span class="badge">Last Updated: <span id="lastUpdatedBadge">—</span></span>
+    </div>
+  </div>
+
+  <!-- GO-LIVE SETUP BANNER -->
+  <div id="goLiveBanner" style="background:linear-gradient(135deg,#fff8f0,#fff3e0);border:1.5px solid #ffb74d;border-radius:14px;padding:20px 24px;margin-bottom:20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;">
+    <div style="font-size:32px;">&#128197;</div>
+    <div style="flex:1;min-width:200px;">
+      <div style="font-size:14px;font-weight:800;color:#1a1e2e;margin-bottom:4px;">Set Your Go-Live Date</div>
+      <div style="font-size:12px;font-weight:500;color:#5a4a40;line-height:1.6;">This locks in today's CB Score rankings as the baseline. From this date, all 1M / 3M / 6M / 1Y / 3Y windows are calculated. You enter actual stock prices at each checkpoint to measure how CB Score predictions held up.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0;">
+      <input type="date" id="goLiveDateInput" style="border:1.5px solid #ffb74d;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:700;font-family:'Poppins',sans-serif;outline:none;background:#fff;color:#1a1e2e;">
+      <button onclick="setGoLiveDate()" style="background:linear-gradient(135deg,#ff7c00,#ff9a00);color:#fff;border:none;padding:10px 22px;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;">&#9654; Set Go-Live &amp; Lock Stocks</button>
+    </div>
+  </div>
+
+  <!-- PERFORMANCE PERIOD TABS -->
+  <div class="tab-bar" id="credPeriodTabs" style="margin-bottom:18px;">
+    <button class="alt-tab-btn active" onclick="switchCredPeriod('1m',this)">1 Month</button>
+    <button class="alt-tab-btn" onclick="switchCredPeriod('3m',this)">3 Months</button>
+    <button class="alt-tab-btn" onclick="switchCredPeriod('6m',this)">6 Months</button>
+    <button class="alt-tab-btn" onclick="switchCredPeriod('1y',this)">1 Year</button>
+    <button class="alt-tab-btn" onclick="switchCredPeriod('3y',this)">3 Years</button>
+  </div>
+
+  <!-- SUMMARY KPIs (rendered by JS) -->
+  <div id="credKpiRow" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;margin-bottom:18px;"></div>
+
+  <!-- MAIN STOCK TABLE -->
+  <div class="card full">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+      <div>
+        <h2 style="margin:0;"><span class="icon">&#128200;</span>Stock Performance vs CB Score</h2>
+        <div class="section-title" style="margin:4px 0 0;">Top CB Score stocks at go-live — enter actual prices at each checkpoint to track real performance</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button onclick="exportCredibilityCSV()" style="background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;padding:7px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">&#128202; Export CSV</button>
+        <button onclick="refreshCredibility()" style="background:#e6f4ef;color:#006b30;border:1px solid #00a854;padding:7px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">&#8635; Refresh</button>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table id="credTable">
+        <thead>
+          <tr>
+            <th>CB Rank</th>
+            <th>Company</th>
+            <th>Sector</th>
+            <th>CB Score</th>
+            <th>Base Price<br><span style="font-weight:500;text-transform:none;letter-spacing:0;">(Go-Live)</span></th>
+            <th id="credPeriodHeader">Current Price<br><span style="font-weight:500;text-transform:none;letter-spacing:0;" id="credPeriodSubHeader">Enter to track</span></th>
+            <th>Return %</th>
+            <th>Nifty 500<br><span style="font-weight:500;text-transform:none;letter-spacing:0;">Benchmark</span></th>
+            <th>Alpha</th>
+            <th>Signal<br><span style="font-weight:500;text-transform:none;letter-spacing:0;">Validated?</span></th>
+          </tr>
+        </thead>
+        <tbody id="credTableBody">
+          <tr><td colspan="10" style="text-align:center;padding:40px;color:#6b7498;font-size:13px;font-weight:600;">
+            &#128197; Set your go-live date above to lock in the top 30 CB Score stocks and start tracking
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px;padding:10px 14px;background:#fff8f0;border-left:3px solid #ff7c00;border-radius:8px;font-size:11px;font-weight:600;color:#5a3a00;line-height:1.7;">
+      <strong>How it works:</strong> When you set a go-live date, the top 30 highest CB Score stocks are locked in as your baseline. Enter their actual market prices at each time checkpoint (1M, 3M, 6M, 1Y, 3Y from go-live). The tracker shows if the high-score stocks actually outperformed. This builds a real credibility record for the CB Finance26 framework. <strong>Not financial advice.</strong>
+    </div>
+  </div>
+
+  <!-- CREDIBILITY SCORE CARD -->
+  <div id="credScoreCard" style="display:none;" class="grid-2">
+    <div class="card">
+      <h2><span class="icon">&#127942;</span>Framework Credibility Score</h2>
+      <div class="section-title">Based on actual price performance since go-live</div>
+      <div id="credScoreContent"></div>
+    </div>
+    <div class="card">
+      <h2><span class="icon">&#128202;</span>Hit Rate by Score Band</h2>
+      <div class="section-title">Did high CB Score stocks actually outperform?</div>
+      <div id="credHitRateContent"></div>
+    </div>
+  </div>
 
   <div class="footer">© 2025 CB Finance26™ · Not Financial Advice · For Research Purposes Only</div>
 </div>
@@ -1713,7 +1853,7 @@ document.addEventListener('copy', e=>{
       <table id="companyMasterTable">
         <thead>
           <tr>
-            <th>#</th><th>Company Name</th><th>Sector</th><th>CB Score</th>
+            <th>#</th><th title="NSE rank primary; BSE rank (B) as fallback">Mkt Cap Rank</th><th>Company Name</th><th>Sector</th><th>CB Score</th>
             <th>ROCE</th><th>Debt</th><th>Valuation</th><th>Growth</th>
             <th>Suggested Alloc</th><th>Notes</th><th>Action</th>
           </tr>
@@ -1848,6 +1988,7 @@ document.addEventListener('copy', e=>{
   <!-- DEBT CATEGORIES TAB BAR -->
   <div class="tab-bar" style="margin-bottom:18px;">
     <button class="alt-tab-btn active" onclick="switchAltTab('debt',this)">&#128274; Debt Instruments</button>
+    <button class="alt-tab-btn" onclick="switchAltTab('nps',this)">&#127970; NPS</button>
     <button class="alt-tab-btn" onclick="switchAltTab('metals',this)">&#129760; Metals &amp; Commodities</button>
     <button class="alt-tab-btn" onclick="switchAltTab('reits',this)">&#127963; REITs &amp; InvITs</button>
     <button class="alt-tab-btn" onclick="switchAltTab('guide',this)">&#128218; When to Use What</button>
@@ -1890,6 +2031,280 @@ document.addEventListener('copy', e=>{
     </div>
   </div>
 
+  <!-- NPS TAB -->
+  <div id="alt-nps" style="display:none;">
+    <div class="header" style="margin-bottom:18px;">
+      <h1 style="font-size:18px;">&#127970; National Pension System (NPS)</h1>
+      <p>India's regulated long-term retirement savings scheme — tax-efficient, market-linked, managed by PFRDA. Ideal for salaried and self-employed individuals building a retirement corpus.</p>
+      <div class="header-meta">
+        <span class="badge">Regulator: <span>PFRDA</span></span>
+        <span class="badge">Tax Deduction: <span>Up to ₹2L/year (80C + 80CCD)</span></span>
+        <span class="badge">Lock-in: <span>Till age 60</span></span>
+      </div>
+    </div>
+
+    <!-- KPI OVERVIEW -->
+    <div class="kpi-grid" style="margin-bottom:18px;">
+      <div class="kpi-card kpi-amber">
+        <div class="kpi-label">Max 80C Deduction</div>
+        <div class="kpi-val" style="color:#ff7c00;font-size:20px;">₹1.5L</div>
+        <div class="kpi-sub">Under Sec 80C + 80CCD(1)</div>
+      </div>
+      <div class="kpi-card kpi-green">
+        <div class="kpi-label">Extra 80CCD(1B)</div>
+        <div class="kpi-val" style="color:#00a854;font-size:20px;">₹50K</div>
+        <div class="kpi-sub">Over &amp; above 80C limit</div>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-label">Employer Contribution</div>
+        <div class="kpi-val" style="color:#1976d2;font-size:20px;">10%</div>
+        <div class="kpi-sub">Of Basic salary — tax-free</div>
+      </div>
+      <div class="kpi-card kpi-gold">
+        <div class="kpi-label">Equity Allocation (Tier I)</div>
+        <div class="kpi-val" style="color:#e65100;font-size:20px;">75%</div>
+        <div class="kpi-sub">Max for private sector (&lt;50 yrs)</div>
+      </div>
+      <div class="kpi-card kpi-purple">
+        <div class="kpi-label">Expected Corpus Return</div>
+        <div class="kpi-val" style="color:#8e24aa;font-size:20px;">10–12%</div>
+        <div class="kpi-sub">Long-term CAGR (equity-heavy)</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- NPS ACCOUNT TYPES -->
+      <div class="card">
+        <h2><span class="icon">&#127970;</span>Tier I vs Tier II Account</h2>
+        <div class="section-title">Two account types with different rules</div>
+        <table>
+          <tr><th>Feature</th><th>Tier I (Pension)</th><th>Tier II (Savings)</th></tr>
+          <tr><td style="font-weight:700;">Purpose</td><td style="font-size:11px;">Retirement corpus</td><td style="font-size:11px;">Flexible savings</td></tr>
+          <tr><td style="font-weight:700;">Min Contribution</td><td class="green">₹500/year</td><td class="green">₹250 anytime</td></tr>
+          <tr><td style="font-weight:700;">Lock-in</td><td class="red">Till age 60</td><td class="green">No lock-in</td></tr>
+          <tr><td style="font-weight:700;">Tax Deduction</td><td class="green">Yes (80C + 80CCD)</td><td class="red">No (except govt employees)</td></tr>
+          <tr><td style="font-weight:700;">Withdrawal</td><td style="font-size:11px;">Partial (25% after 3Y for specific needs)</td><td class="green">Anytime</td></tr>
+          <tr><td style="font-weight:700;">Annuity on exit</td><td class="amber">40% compulsory annuity</td><td class="green">Not required</td></tr>
+          <tr><td style="font-weight:700;">Tax on maturity</td><td style="font-size:11px;">60% lump sum tax-free; 40% annuity taxed</td><td style="font-size:11px;">Normal capital gains</td></tr>
+        </table>
+      </div>
+
+      <!-- ASSET CLASSES -->
+      <div class="card">
+        <h2><span class="icon">&#128200;</span>NPS Asset Classes</h2>
+        <div class="section-title">Four asset classes — you choose the mix (Active) or let it auto-adjust (Auto)</div>
+        <table>
+          <tr><th>Class</th><th>Invests In</th><th>Max Allocation</th><th>Risk</th></tr>
+          <tr>
+            <td><strong style="color:#006b30;">E — Equity</strong></td>
+            <td style="font-size:11px;">Nifty 50 / Sensex index stocks</td>
+            <td class="green">75% (pvt) / 50% (govt)</td>
+            <td><span style="background:#fce8e8;color:#b71c1c;padding:2px 6px;border-radius:5px;font-size:10px;font-weight:700;">High</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:#1565c0;">C — Corporate Bonds</strong></td>
+            <td style="font-size:11px;">AA+ rated corporate bonds</td>
+            <td style="color:#b35c00;font-weight:700;">100%</td>
+            <td><span style="background:#fff3e0;color:#b35c00;padding:2px 6px;border-radius:5px;font-size:10px;font-weight:700;">Medium</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:#7b1fa2;">G — Government</strong></td>
+            <td style="font-size:11px;">Central &amp; State Govt securities</td>
+            <td style="color:#b35c00;font-weight:700;">100%</td>
+            <td><span style="background:#e6f4ef;color:#006b30;padding:2px 6px;border-radius:5px;font-size:10px;font-weight:700;">Low</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:#e65100;">A — Alternatives</strong></td>
+            <td style="font-size:11px;">REITs, InvITs, MBS, AIFs</td>
+            <td style="color:#b35c00;font-weight:700;">5%</td>
+            <td><span style="background:#fff3e0;color:#b35c00;padding:2px 6px;border-radius:5px;font-size:10px;font-weight:700;">Medium</span></td>
+          </tr>
+        </table>
+        <div style="margin-top:12px;padding:10px 12px;background:#e6f4ef;border-left:3px solid #00a854;border-radius:7px;font-size:11px;font-weight:600;color:#004d20;">
+          <strong>CB Finance26 Suggestion:</strong> Age &lt;40 → E:75% + C:20% + G:5%. Age 40–50 → E:50% + C:30% + G:20%. Age 50+ → E:25% + C:35% + G:40%.
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- FUND MANAGERS -->
+      <div class="card">
+        <h2><span class="icon">&#127974;</span>NPS Fund Managers (PFMs) — Performance</h2>
+        <div class="section-title">7 PFRDA-approved fund managers — Tier I Equity (E) scheme 10-year returns</div>
+        <table>
+          <tr><th>Fund Manager</th><th>10Y CAGR (E)</th><th>5Y CAGR (E)</th><th>AUM</th><th>Rating</th></tr>
+          <tr>
+            <td style="font-weight:800;">SBI Pension Fund</td>
+            <td class="green">13.8%</td><td class="green">17.2%</td>
+            <td style="font-size:11px;">₹3.2L Cr</td>
+            <td><span style="background:#e6f4ef;color:#006b30;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:800;border:1px solid #00a854;">Top Pick</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;">HDFC Pension Fund</td>
+            <td class="green">13.5%</td><td class="green">17.8%</td>
+            <td style="font-size:11px;">₹90,000 Cr</td>
+            <td><span style="background:#e6f4ef;color:#006b30;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:800;border:1px solid #00a854;">Top Pick</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;">ICICI Pru Pension</td>
+            <td class="green">13.2%</td><td class="green">16.9%</td>
+            <td style="font-size:11px;">₹75,000 Cr</td>
+            <td><span style="background:#e6f4ef;color:#006b30;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;border:1px solid #00a854;">Strong</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;">Kotak Pension Fund</td>
+            <td class="green">12.9%</td><td class="green">16.4%</td>
+            <td style="font-size:11px;">₹28,000 Cr</td>
+            <td><span style="background:#e6f4ef;color:#006b30;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;border:1px solid #00a854;">Strong</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;">UTI Retirement</td>
+            <td class="yellow">12.4%</td><td class="yellow">15.8%</td>
+            <td style="font-size:11px;">₹18,000 Cr</td>
+            <td><span style="background:#fff3e0;color:#b35c00;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;border:1px solid #ff7c00;">Average</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;">Aditya Birla Sun Life</td>
+            <td class="yellow">12.1%</td><td class="yellow">15.5%</td>
+            <td style="font-size:11px;">₹14,000 Cr</td>
+            <td><span style="background:#fff3e0;color:#b35c00;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;border:1px solid #ff7c00;">Average</span></td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;">Tata Pension Fund</td>
+            <td class="yellow">11.8%</td><td class="yellow">15.1%</td>
+            <td style="font-size:11px;">₹8,000 Cr</td>
+            <td><span style="background:#fff3e0;color:#b35c00;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:700;border:1px solid #ff7c00;">New/Growing</span></td>
+          </tr>
+        </table>
+        <div style="margin-top:10px;padding:10px;background:#fff8f0;border-left:3px solid #ff7c00;border-radius:7px;font-size:11px;font-weight:600;color:#5a3a00;">
+          <strong>Tip:</strong> You can split your NPS across 3 PFMs. SBI + HDFC + ICICI Pru is a common top-3 combination. Returns are indicative; past performance not guaranteed.
+        </div>
+      </div>
+
+      <!-- TAX BENEFITS -->
+      <div class="card">
+        <h2><span class="icon">&#128203;</span>NPS Tax Benefits — Complete Picture</h2>
+        <div class="section-title">Multiple deduction sections — can save ₹15,000–₹45,000+ in tax</div>
+        <table>
+          <tr><th>Section</th><th>Who</th><th>Limit</th><th>Tax Saved (30%)</th></tr>
+          <tr>
+            <td style="font-weight:800;">80CCD(1)</td>
+            <td style="font-size:11px;">All taxpayers</td>
+            <td class="amber">₹1.5L (within 80C)</td>
+            <td class="green">₹46,800</td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;">80CCD(1B)</td>
+            <td style="font-size:11px;">All taxpayers</td>
+            <td class="green">₹50,000 (extra)</td>
+            <td class="green">₹15,600</td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;">80CCD(2)</td>
+            <td style="font-size:11px;">Salaried only</td>
+            <td class="green">10% of Basic (no cap)</td>
+            <td class="green">Varies</td>
+          </tr>
+          <tr>
+            <td style="font-weight:800;color:#006b30;">Total Max</td>
+            <td style="font-size:11px;font-weight:700;">Salaried</td>
+            <td class="green" style="font-weight:800;">₹2L + 10% Basic</td>
+            <td class="green" style="font-weight:800;">₹62,400+</td>
+          </tr>
+        </table>
+
+        <h3 style="margin-top:16px;">Exit Rules</h3>
+        <table>
+          <tr><th>Age</th><th>Withdrawal</th><th>Annuity</th></tr>
+          <tr><td style="font-weight:700;">At 60</td><td style="font-size:11px;" class="green">60% lump sum (tax-free)</td><td style="font-size:11px;">40% compulsory</td></tr>
+          <tr><td style="font-weight:700;">Before 60</td><td style="font-size:11px;" class="red">Only 20% lump sum</td><td style="font-size:11px;">80% compulsory annuity</td></tr>
+          <tr><td style="font-weight:700;">Death</td><td style="font-size:11px;" class="green">100% to nominee</td><td style="font-size:11px;">Optional</td></tr>
+          <tr><td style="font-weight:700;">Partial (after 3Y)</td><td style="font-size:11px;">25% for house/education/illness</td><td style="font-size:11px;">N/A</td></tr>
+        </table>
+
+        <div style="margin-top:12px;padding:10px 12px;background:#e3f2fd;border-left:3px solid #1976d2;border-radius:7px;font-size:11px;font-weight:600;color:#0d47a1;line-height:1.7;">
+          <strong>New Tax Regime note:</strong> Under NTR, only <strong>employer NPS (80CCD(2))</strong> is deductible. The ₹50K extra (80CCD(1B)) and 80C employee contribution are not available. Use NPS via employer route to maximise NTR benefit.
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- HOW TO OPEN NPS -->
+      <div class="card">
+        <h2><span class="icon">&#128196;</span>How to Open NPS — Step by Step</h2>
+        <div class="section-title">Takes 10–15 minutes online</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:10px;background:#fff3e0;border-radius:9px;">
+            <div style="width:26px;height:26px;background:#ff7c00;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">1</div>
+            <div><div style="font-size:12px;font-weight:800;color:#1a1e2e;">Go to eNPS Portal</div>
+            <div style="font-size:11px;color:#4a5070;margin-top:2px;"><a href="https://enps.nsdl.com" target="_blank" style="color:#ff7c00;font-weight:700;">enps.nsdl.com</a> or via your bank's NPS page (HDFC/ICICI/SBI/Kotak all support)</div></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:10px;background:#e6f4ef;border-radius:9px;">
+            <div style="width:26px;height:26px;background:#006b30;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">2</div>
+            <div><div style="font-size:12px;font-weight:800;color:#1a1e2e;">Select Subscriber Type</div>
+            <div style="font-size:11px;color:#4a5070;margin-top:2px;">Individual (All Citizen) or Tier I / Tier II. Use Aadhaar e-KYC for instant activation.</div></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:10px;background:#e3f2fd;border-radius:9px;">
+            <div style="width:26px;height:26px;background:#1565c0;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">3</div>
+            <div><div style="font-size:12px;font-weight:800;color:#1a1e2e;">Choose Fund Manager &amp; Asset Mix</div>
+            <div style="font-size:11px;color:#4a5070;margin-top:2px;">Select Active Choice → set E/C/G allocation. Or Auto Choice (LC75/LC50/LC25) if you prefer hands-off.</div></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px;padding:10px;background:#f3e5f5;border-radius:9px;">
+            <div style="width:26px;height:26px;background:#7b1fa2;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0;">4</div>
+            <div><div style="font-size:12px;font-weight:800;color:#1a1e2e;">Make First Contribution</div>
+            <div style="font-size:11px;color:#4a5070;margin-top:2px;">Min ₹500 for Tier I. Pay via net banking / UPI. PRAN (Permanent Retirement Account Number) generated instantly.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NPS vs OTHER INSTRUMENTS -->
+      <div class="card">
+        <h2><span class="icon">&#9878;</span>NPS vs Other Retirement Options</h2>
+        <div class="section-title">How NPS compares to EPFO, PPF, and mutual funds for retirement</div>
+        <table>
+          <tr><th>Feature</th><th>NPS</th><th>PPF</th><th>EPFO</th><th>ELSS MF</th></tr>
+          <tr><td style="font-weight:700;">Returns</td><td class="green">10–12%</td><td class="yellow">7.1%</td><td class="yellow">8.25%</td><td class="green">12–15%</td></tr>
+          <tr><td style="font-weight:700;">Tax Deduction</td><td class="green">₹2L+</td><td class="green">₹1.5L</td><td class="green">₹1.5L</td><td class="green">₹1.5L</td></tr>
+          <tr><td style="font-weight:700;">Lock-in</td><td class="red">Till 60</td><td class="red">15 years</td><td class="red">Till retirement</td><td class="yellow">3 years</td></tr>
+          <tr><td style="font-weight:700;">Equity exposure</td><td class="green">Up to 75%</td><td class="red">Zero</td><td class="red">~15% (ETF)</td><td class="green">100%</td></tr>
+          <tr><td style="font-weight:700;">Maturity tax</td><td class="yellow">60% tax-free</td><td class="green">100% tax-free</td><td class="green">Tax-free (if 5Y+)</td><td class="red">LTCG 10%</td></tr>
+          <tr><td style="font-weight:700;">Flexibility</td><td class="yellow">Medium</td><td class="red">Low</td><td class="red">Low</td><td class="green">High</td></tr>
+        </table>
+        <div style="margin-top:12px;padding:10px;background:#e6f4ef;border-left:3px solid #00a854;border-radius:7px;font-size:11px;font-weight:600;color:#004d20;line-height:1.6;">
+          <strong>Best combo:</strong> Maximise EPFO (mandatory) + ₹50K in NPS Tier I for extra deduction + ELSS or index funds for remaining equity exposure. NPS shines specifically for the <strong>additional ₹50K 80CCD(1B) deduction</strong> that nothing else offers.
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #dde1ec;border-radius:14px;padding:20px;margin-bottom:18px;">
+      <h2 style="font-size:14px;font-weight:800;color:#c45000;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+        <span style="width:28px;height:28px;border-radius:7px;background:#e8ecf5;display:flex;align-items:center;justify-content:center;font-size:14px;">&#128736;</span>
+        Auto Choice Lifecycle Funds — Hands-Off Option
+      </h2>
+      <div class="section-title">PFRDA's pre-set allocation that auto-reduces equity as you age</div>
+      <div class="table-scroll"><table>
+        <tr><th>Fund</th><th>Age 25</th><th>Age 35</th><th>Age 45</th><th>Age 55</th><th>Best For</th></tr>
+        <tr>
+          <td style="font-weight:800;color:#006b30;">LC-75 (Aggressive)</td>
+          <td class="green">E:75%</td><td class="green">E:75%</td><td class="yellow">E:55%</td><td class="red">E:15%</td>
+          <td style="font-size:11px;font-weight:600;">Young investors, long horizon</td>
+        </tr>
+        <tr>
+          <td style="font-weight:800;color:#b35c00;">LC-50 (Moderate)</td>
+          <td class="green">E:50%</td><td class="yellow">E:50%</td><td class="yellow">E:30%</td><td class="red">E:10%</td>
+          <td style="font-size:11px;font-weight:600;">Default balanced option</td>
+        </tr>
+        <tr>
+          <td style="font-weight:800;color:#1565c0;">LC-25 (Conservative)</td>
+          <td class="yellow">E:25%</td><td class="yellow">E:25%</td><td class="red">E:15%</td><td class="red">E:5%</td>
+          <td style="font-size:11px;font-weight:600;">Risk-averse, near retirement</td>
+        </tr>
+      </table></div>
+    </div>
+
+    <div class="footer">© 2025 CB Finance26™ · Not Financial Advice · For Research Purposes Only</div>
+  </div>
+
   <!-- METALS TAB -->
   <div id="alt-metals" style="display:none;">
     <div class="grid-3">
@@ -1914,7 +2329,6 @@ document.addEventListener('copy', e=>{
             <tr><td style="font-weight:700;">Titan Company</td><td style="font-size:10px;">Jewellery + Watch</td><td style="font-size:10px;color:#006b30;font-weight:700;">Indirect gold demand</td></tr>
             <tr><td style="font-weight:700;">Kalyan Jewellers</td><td style="font-size:10px;">Jewellery retail</td><td style="font-size:10px;color:#006b30;font-weight:700;">Gold price tailwind</td></tr>
             <tr><td style="font-weight:700;">Muthoot Finance</td><td style="font-size:10px;">Gold lending NBFC</td><td style="font-size:10px;color:#1565c0;font-weight:700;">Gold loan book</td></tr>
-            <tr><td style="font-weight:700;">MMTC-PAMP (Unlisted)</td><td style="font-size:10px;">Refiner</td><td style="font-size:10px;color:#b35c00;font-weight:700;">Direct refining play</td></tr>
           </table>
         </div>
       </div>
@@ -2285,7 +2699,17 @@ document.addEventListener('copy', e=>{
     <h1>&#128269; Deep Research — Sectors &amp; Companies</h1>
     <p>Click any sector → see subsectors → see ranked companies with full analysis. 3–5 year India equity focus.</p>
   </div>
-  <div class="breadcrumb" id="dd-breadcrumb"><span class="crumb bc-active" onclick="ddGoLevel('top')">All Sectors</span></div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+    <div class="breadcrumb" id="dd-breadcrumb" style="margin-bottom:0;flex:1;"><span class="crumb bc-active" onclick="ddGoLevel('top')">All Sectors</span></div>
+    <div style="display:flex;align-items:center;gap:6px;">
+      <input type="text" id="ddCompanySearch" placeholder="&#128269; Search company..." 
+        oninput="ddSearchCompany(this.value)"
+        style="border:1.5px solid #dde1ec;border-radius:9px;padding:7px 12px;font-size:12px;font-weight:600;font-family:'Poppins',sans-serif;outline:none;width:200px;color:#1a1e2e;background:#f8f9fe;transition:border-color 0.2s;"
+        onfocus="this.style.borderColor='#ff7c00'" onblur="this.style.borderColor='#dde1ec'">
+      <button onclick="ddClearSearch()" style="background:#f5f6fa;border:1px solid #dde1ec;border-radius:8px;padding:7px 10px;cursor:pointer;font-size:12px;" title="Clear search">✕</button>
+    </div>
+  </div>
+  <div id="dd-search-results" style="display:none;margin-bottom:14px;"></div>
   <div class="drill-legend">
     <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>High Score</div>
     <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div>Watch</div>
@@ -2302,11 +2726,11 @@ function switchPage(id,btn){
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   const page = document.getElementById('page-'+id);
   if (page) page.classList.add('active');
-  // Match nav tab by id
   const navBtn = btn || document.getElementById('navBtn-'+id);
   if (navBtn) navBtn.classList.add('active');
   window.scrollTo({top:0,behavior:'smooth'});
   if(id==='drilldown') ddRender();
+  if(id==='credibility') renderCredibilityPage();
 }
 
 
@@ -2458,14 +2882,19 @@ const SCENARIOS=[
 ];
 const SECTORS={
   "Power":          {score:87,trend:"↑ Strong",   tc:"green",  weight:16,phase:"Expansion", phaseCls:"phase-expansion"},
-  "Defence":        {score:81,trend:"↑ Strong",   tc:"green",  weight:11,phase:"Expansion", phaseCls:"phase-expansion"},
+  "Pharma":         {score:88,trend:"↑ Strong",   tc:"green",  weight:12,phase:"Expansion", phaseCls:"phase-expansion"},
+  "Auto 2W":        {score:85,trend:"↑ Strong",   tc:"green",  weight:6, phase:"Expansion", phaseCls:"phase-expansion"},
+  "Defence":        {score:83,trend:"↑ Strong",   tc:"green",  weight:11,phase:"Expansion", phaseCls:"phase-expansion"},
+  "AMC":            {score:88,trend:"↑ Strong",   tc:"green",  weight:7, phase:"Expansion", phaseCls:"phase-expansion"},
+  "Brokers/Wealth": {score:82,trend:"↑ Strong",   tc:"green",  weight:6, phase:"Expansion", phaseCls:"phase-expansion"},
   "Capital Goods":  {score:78,trend:"↑ Improving",tc:"green",  weight:9, phase:"Expansion", phaseCls:"phase-expansion"},
-  "Pharma":         {score:75,trend:"↑ Improving",tc:"green",  weight:7, phase:"Recovery",  phaseCls:"phase-recovery"},
   "Banking":        {score:72,trend:"↔ Neutral",  tc:"yellow", weight:9, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
   "Infra/Cement":   {score:70,trend:"↔ Steady",   tc:"yellow", weight:6, phase:"Expansion", phaseCls:"phase-expansion"},
-  "Brokers/Wealth": {score:74,trend:"↑ Improving",tc:"green",  weight:4, phase:"Expansion", phaseCls:"phase-expansion"},
-  "AMC":            {score:76,trend:"↑ Strong",   tc:"green",  weight:4, phase:"Expansion", phaseCls:"phase-expansion"},
   "Insurance":      {score:68,trend:"↑ Improving",tc:"yellow", weight:3, phase:"Recovery",  phaseCls:"phase-recovery"},
+  "Hospitals":      {score:72,trend:"↑ Improving",tc:"green",  weight:3, phase:"Recovery",  phaseCls:"phase-recovery"},
+  "Auto Spares":    {score:76,trend:"↑ Strong",   tc:"green",  weight:3, phase:"Expansion", phaseCls:"phase-expansion"},
+  "Auto 4W":        {score:70,trend:"↑ Selective",tc:"yellow", weight:3, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
+  "Reliance Group": {score:68,trend:"↑ Strong",   tc:"yellow", weight:3, phase:"Expansion", phaseCls:"phase-expansion"},
   "NBFC":           {score:62,trend:"↔ Neutral",  tc:"yellow", weight:3, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
   "SFB/MicroFin":   {score:55,trend:"↔ Mixed",    tc:"yellow", weight:2, phase:"Slowdown",  phaseCls:"phase-slowdown"},
   "New Age Tech":   {score:58,trend:"↑ Improving",tc:"yellow", weight:3, phase:"Recovery",  phaseCls:"phase-recovery"},
@@ -2474,20 +2903,146 @@ const SECTORS={
   "Cement":         {score:65,trend:"↔ Steady",   tc:"yellow", weight:3, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
   "Gold/Jewellery": {score:68,trend:"↑ Improving",tc:"yellow", weight:2, phase:"Recovery",  phaseCls:"phase-recovery"},
   "Hotels/Tourism": {score:70,trend:"↑ Improving",tc:"green",  weight:2, phase:"Expansion", phaseCls:"phase-expansion"},
-  "Hospitals":      {score:72,trend:"↑ Improving",tc:"green",  weight:3, phase:"Recovery",  phaseCls:"phase-recovery"},
   "Paints":         {score:60,trend:"↔ Flat",     tc:"yellow", weight:2, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
   "Textiles":       {score:45,trend:"↓ Weak",     tc:"red",    weight:1, phase:"Slowdown",  phaseCls:"phase-slowdown"},
   "Recycling/ESG":  {score:62,trend:"↑ Emerging", tc:"yellow", weight:1, phase:"Recovery",  phaseCls:"phase-recovery"},
   "Diversified":    {score:60,trend:"↔ Mixed",    tc:"yellow", weight:2, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
   "IT Services":    {score:48,trend:"↓ Weak",     tc:"red",    weight:3, phase:"Slowdown",  phaseCls:"phase-slowdown"},
   "Telecom":        {score:55,trend:"↔ Mixed",    tc:"yellow", weight:2, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
-  "Auto":           {score:62,trend:"↑ Selective",tc:"yellow", weight:3, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
+  "Auto":           {score:72,trend:"↑ Strong",   tc:"green",  weight:3, phase:"Expansion", phaseCls:"phase-expansion"},
   "Metals":         {score:50,trend:"↔ Cyclical", tc:"yellow", weight:2, phase:"Slowdown",  phaseCls:"phase-slowdown"},
   "Chemicals":      {score:65,trend:"↑ Improving",tc:"yellow", weight:2, phase:"Recovery",  phaseCls:"phase-recovery"},
   "Real Estate":    {score:60,trend:"↑ Improving",tc:"yellow", weight:2, phase:"Mid-Cycle", phaseCls:"phase-midcycle"},
-  "Adani Group":    {score:62,trend:"↔ Mixed",    tc:"yellow", weight:2, phase:"Expansion", phaseCls:"phase-expansion"},
-  "Reliance Group": {score:66,trend:"↑ Strong",   tc:"yellow", weight:3, phase:"Expansion", phaseCls:"phase-expansion"}
+  "Adani Group":    {score:62,trend:"↔ Mixed",    tc:"yellow", weight:2, phase:"Expansion", phaseCls:"phase-expansion"}
 };
+// ── NSE/BSE MARKET CAP RANK LOOKUP (approx. rank by market cap, mid-2025) ────
+const COMPANY_RANKS = {
+  "Reliance Industries":1,"TCS":2,"HDFC Bank":3,"Bharti Airtel":4,"ICICI Bank":5,
+  "Infosys":6,"SBI":7,"State Bank of India":7,"Hindustan Unilever":8,"ITC":9,"L&T":10,
+  "Kotak Mahindra Bank":11,"Bajaj Finance":12,"HCL Technologies":13,"Maruti Suzuki":14,
+  "Sun Pharma":15,"Adani Ports & SEZ":16,"Titan Company":17,"Asian Paints":18,
+  "Tata Motors":19,"NTPC":20,"Wipro":21,"Power Grid Corp":22,"Power Grid Corporation":22,
+  "Mahindra & Mahindra":23,"Axis Bank":24,"Nestle India":25,"Bajaj Auto":26,
+  "Adani Enterprises":27,"Tech Mahindra":28,"UltraTech Cement":29,"Divi's Laboratories":30,
+  "Tata Steel":31,"Hindalco Industries":32,"Adani Green Energy":33,"ONGC":34,
+  "JSW Steel":35,"Grasim Industries":36,"Apollo Hospitals":37,"HAL":38,"Coal India":39,
+  "Bajaj Finserv":40,"Tata Consumer":41,"Cipla":42,"Dr Reddy's":43,"Eicher Motors":44,
+  "Adani Total Gas":45,"Adani Power":46,"SBI Life Insurance":47,"SBI Life":47,
+  "Britannia":48,"Vedanta":49,"Hero MotoCorp":50,
+  "TVS Motor Company":51,"HDFC Life Insurance":52,"HDFC Life":52,"LIC of India":53,
+  "Max Healthcare":54,"Trent":55,"Zomato":56,"ICICI Prudential":57,"ICICI Lombard":58,
+  "IndusInd Bank":59,"Shree Cement":60,"ABB India":61,"Siemens India":62,
+  "Mankind Pharma":63,"Godrej Consumer":64,"Avenue Supermarts":65,"Tata Power":66,
+  "BEL":67,"Polycab India":68,"Torrent Pharma":69,"Havells India":70,
+  "Colgate-Palmolive":71,"Marico":72,"Dabur India":73,"Muthoot Finance":74,
+  "Indian Hotels (Taj)":75,"Hyundai Motor India":76,"Varun Beverages":77,
+  "Persistent Systems":78,"Info Edge (Naukri)":79,"Ambuja Cements":80,
+  "PB Fintech":81,"PB Fintech (PolicyBazaar)":81,
+  "Cholamandalam Finance":82,"Cholamandalam":82,"Tata Communications":83,
+  "Cummins India":84,"Dalmia Bharat":85,"Page Industries":86,"Thermax":87,
+  "Lupin":88,"ACC":89,"Pidilite Industries":90,"HDFC AMC":91,"Biocon":92,
+  "Mazagon Dock":93,"Hindustan Zinc":94,"BHEL":95,"Bank of Baroda":96,
+  "Federal Bank":97,"Indus Towers":98,"KEI Industries":99,"NHPC":100,
+  "SJVN":101,"Torrent Power":102,"Alkem Laboratories":103,"Solar Industries":104,
+  "360 One WAM":105,"KPIT Technologies":106,"Coforge":107,"Suzlon Energy":108,
+  "Canara Bank":109,"IDFC First Bank":110,"Mphasis":111,"LTIMindtree":112,
+  "Nykaa":113,"AU Small Finance Bank":114,"Star Health":115,"Go Digit Insurance":116,
+  "Bandhan Bank":117,"IRCTC":118,"Jio Financial Services":119,
+  "Punjab National Bank":120,"PNB":120,"Garden Reach Shipbuilders":121,
+  "IEX":122,"Kalyan Jewellers":123,"Jubilant Foodworks":124,"Manappuram Finance":125,
+  "Aarti Industries":126,"Dixon Technologies":127,"SRF Limited":128,"Gland Pharma":129,
+  "Deepak Nitrite":130,"Navin Fluorine":131,"PI Industries":132,"Vinati Organics":133,
+  "Bosch India":134,"Voltas":135,"Blue Star":136,"EIH (Oberoi)":137,
+  "Lemon Tree Hotels":138,"Motherson Sumi Systems":139,"Samvardhana Motherson":139,
+  "Bharat Forge":140,"KPR Mill":141,"Sona BLW (Sona Comstar)":142,
+  "Minda Industries (Uno Minda)":143,"CESC":144,"JSW Energy":145,
+  "Cochin Shipyard":146,"Tata Elxsi":147,"KEC International":148,
+  "Kalpataru Projects":149,"Endurance Technologies":150,
+  "Amara Raja Energy":151,"Exide Industries":152,"CAMS":153,
+  "Angel One":154,"Nuvama Wealth":155,"Anand Rathi Wealth":156,
+  "Motilal Oswal":157,"Kaynes Technology":158,"RVNL":159,
+  "IRB Infrastructure":160,"Titagarh Rail Systems":161,"Jupiter Wagons":162,
+  "Genus Power":163,"Waaree Energies":164,"Premier Energies":165,
+  "KPI Green Energy":166,"Adani Energy Solutions":167,"Adani Wilmar":168,
+  "Network18 Media":169,"Hathway Cable":170,"Den Networks":171,
+  "Yes Bank":172,"Union Bank":173,"Bank of India":174,"Indian Bank":175,
+  "Central Bank of India":176,"IDBI Bank":177,"J&K Bank":178,
+  "Bank of Maharashtra":179,"UCO Bank":180,"Punjab & Sind Bank":181,
+  "IOB (Indian Overseas Bank)":182,"South Indian Bank":183,"City Union Bank":184,
+  "Karur Vysya Bank":185,"DCB Bank":186,"RBL Bank":187,
+  "Tamilnad Mercantile Bank":188,"Catholic Syrian Bank":189,
+  "DBS Bank India (ex-LVB)":190,"Dhanlaxmi Bank":191,"Nainital Bank":192,
+  "Equitas SFB":193,"Ujjivan SFB":194,"ESAF SFB":195,
+  "Spandana Sphoorty":196,"CreditAccess Grameen":197,
+  "Indiamart Intermesh":201,"Nazara Technologies":202,"Delhivery":203,
+  "CarTrade Tech":204,"EaseMyTrip":205,"Paytm":206,"Niva Bupa":207,
+  "Care Health":208,"UTI AMC":209,"Nippon India AMC":210,
+  "Aditya Birla AMC":211,"Mirae Asset AMC":212,"Sundaram AMC":213,
+  "ICICI Securities":214,"Edelweiss Financial":215,"IIFL Securities":216,
+  "Geojit Financial":217,"5Paisa Capital":218,"Greaves Cotton":219,
+  "Olectra Greentech":220,"Ola Electric":221,"Ather Energy":222,
+  "Force Motors":223,"Ashok Leyland":224,
+  "DLF Limited":226,"Godrej Properties":227,"Prestige Estates":228,
+  "Oberoi Realty":229,"Phoenix Mills":230,"Macrotech Developers":231,
+  "Brigade Enterprises":232,"Sobha Developers":233,
+  "Kolte-Patil Developers":234,"Sunteck Realty":235,
+  "Welspun Corp":236,"APL Apollo Tubes":237,"Ratnamani Metals":238,
+  "Hindustan Copper":239,"Lloyds Metals":240,"Jindal Steel & Power":241,
+  "SAIL":242,"NMDC":243,"NALCO":244,"National Aluminium (NALCO)":244,
+  "Gravita India":245,"Berger Paints":246,"Kansai Nerolac":247,
+  "Indigo Paints":248,"Akzo Nobel India":249,"Nippon Paint India":250,
+  "Shalimar Paints":251,"Vardhman Textiles":252,"Welspun Living":253,
+  "Trident":254,"Indo Count Industries":255,"Gokaldas Exports":256,
+  "Raymond":257,"Arvind":258,"Vedant Fashions":259,
+  "V-Mart":260,"Shoppers Stop":261,"Cantabil Retail":262,"Spencer's Retail":263,
+  "Dr Lal PathLabs":265,"Thyrocare":266,"Metropolis Healthcare":267,
+  "Fortis Healthcare":268,"Global Health (Medanta)":269,"Aster DM Healthcare":270,
+  "Yatharth Hospital":271,"Rainbow Children's":272,"Shalby Hospitals":273,
+  "Krsnaa Diagnostics":274,"Healthium Medtech":275,"Narayana Hrudayalaya":276,
+  "P N Gadgil & Sons":278,"Thangamayil Jewellery":279,"Senco Gold":280,
+  "TBZ (Tribhovandas)":281,"PC Jeweller":282,"Rajesh Exports":283,
+  "Devyani International":284,"Sapphire Foods":285,"Westlife Foodworld":286,
+  "Barbeque Nation":287,"ITDC":288,"Royal Orchid Hotels":289,
+  "Thomas Cook India":290,"Chalet Hotels":291,"Mahindra Holidays":292,
+  "Laurus Labs":293,"Hikal":294,"Cohance Lifesciences (ex-Suven)":295,
+  "Piramal Pharma":296,"Ajanta Pharma":297,"Abbott India":298,
+  "Pfizer India":299,"Sanofi India":300,"Natco Pharma":301,
+  "Hexaware":302,"Birlasoft":303,"Mastek":304,"Cyient":305,
+  "Intellect Design":306,"Newgen Software":307,"Happiest Minds":308,
+  "Astra Microwave":309,"Zen Technologies":310,"MTAR Technologies":311,
+  "Data Patterns":312,"Paras Defence":313,"ideaForge Technology":314,
+  "Bharat Dynamics":315,"Dynamatic Technologies":316,"Mishra Dhatu Nigam":317,
+  "Centum Electronics":318,"Apollo Micro Systems":319,"DCX Systems":320,
+  "PNC Infratech":321,"G R Infraprojects":322,"Sterlite Technologies":324,
+  "HFCL":325,"Route Mobile":326,"Tanla Platforms":327,"CMS Info Systems":328,
+  "Netweb Technologies":329,"ITI Limited":331,"Voltamp Transformers":332,
+  "Transformers & Rectifiers":333,"HPL Electric":334,"Finolex Cables":335,
+  "RR Kabel":336,"Hitachi Energy India":337,"Schneider Electric Infra":338,
+  "Sterling & Wilson":339,"REC Ltd":340,"Websol Energy":341,
+  "Grasim (Birla Opus)":360,"NDTV":361,"Azad Engineering":364,
+  "Radico Khaitan":365,"United Breweries":366,"Patanjali Foods":367,
+  "Jyothy Labs":368,"Emami":369,"P&G India":370,"Swiggy":379,
+  "JBM Auto":356,"Belrise Industries":357,"Lumax Industries":353,
+  "Suprajit Engineering":354,"Craftsman Automation":355,"Minda Corp":352,
+  "Bosch India":134,
+  "Birla Corp":400,"NCL Industries":401,"Orient Cement":402,
+  "Ramco Cement":403,"JK Cement":404,"Heidelberg India":405,
+  "Premier Explosives":419,"Sika Interplant":411,
+  "ONGC":34,"IOC":100,"BPCL":85,"HPCL":110,"GAIL":75,
+  "Adani Total Gas":45,"IGL":130,"MGL":145,"Gujarat Gas":155,
+  "Petronet LNG":90,"GSPL":200,
+  // New pharma additions
+  "Sai Life Sciences":320,
+  "Anthem Biosciences":330,
+  "Neuland Laboratories":335,
+  "Supriya Lifescience":340,
+  "Emcure Pharmaceuticals":345,
+  "Eris Lifesciences":350,
+  "Sequent Scientific":420,
+  "Solara Active Pharma":430,
+  "Cohance Lifesciences (ex-Suven)":295
+};
+
 const COMPANIES={
   "Power":[
     {name:"NTPC",g:4,m:4,d:4,v:4,t:5,r:4,note:"India's largest; 72GW; RE pivot"},
@@ -2514,10 +3069,6 @@ const COMPANIES={
     {name:"Vikram Solar",g:4,m:3,d:3,v:3,t:5,r:3,note:"Modules + EPC; global exports"},
     {name:"Cleanmax Solar",g:4,m:3,d:3,v:3,t:5,r:3,note:"C&I solar + wind; asset-light"},
     {name:"Fujama Power (Fujama)",g:4,m:3,d:3,v:3,t:4,r:3,note:"Solar EPC + IPP; emerging"},
-    {name:"Greenko Energy",g:4,m:3,d:2,v:3,t:5,r:3,note:"Renewable IPP + storage; unlisted"},
-    {name:"ReNew Power",g:4,m:3,d:2,v:3,t:5,r:3,note:"Renewable IPP; NASDAQ listed"},
-    {name:"Hero Future Energies",g:4,m:3,d:3,v:3,t:5,r:3,note:"Hero group; solar + wind IPP"},
-    {name:"Amp Energy",g:4,m:3,d:3,v:3,t:5,r:3,note:"C&I solar; asset-light; growing"},
     {name:"Azure Power",g:4,m:3,d:2,v:3,t:4,r:3,note:"Solar IPP; listed on NYSE"},
     {name:"Avaada Energy",g:4,m:3,d:3,v:3,t:5,r:3,note:"Rajasthan solar + green H2"},
     {name:"Acme Solar Holdings",g:4,m:3,d:3,v:3,t:5,r:3,note:"Solar IPP; recently listed"},
@@ -2592,7 +3143,7 @@ const COMPANIES={
     {name:"Suzlon Energy",g:4,m:3,d:3,v:3,t:5,r:3,note:"Wind turbine OEM; debt reduced"}
   ],
   "Pharma":[
-    {name:"Sun Pharma",g:4,m:4,d:5,v:3,t:4,r:4,note:"Specialty + GLP-1 + branded"},
+    {name:"Sun Pharma",g:5,m:4,d:5,v:3,t:5,r:4,note:"Specialty + GLP-1 + branded; acquired Concert Pharma (derma); Taro rationalized; US specialty grew 18% FY25; Ilumya + Cequa blockbuster pipeline"},
     {name:"Dr Reddy's",g:3,m:4,d:5,v:3,t:4,r:4,note:"US generics + biosimilars"},
     {name:"Cipla",g:3,m:3,d:5,v:3,t:4,r:3,note:"Respiratory + branded generics"},
     {name:"Divi's Laboratories",g:3,m:4,d:5,v:3,t:4,r:5,note:"Global API; GLP-1 supply"},
@@ -2609,8 +3160,16 @@ const COMPANIES={
     {name:"Lupin",g:3,m:3,d:4,v:3,t:4,r:3,note:"US + India branded generics"},
     {name:"Alkem Laboratories",g:3,m:3,d:5,v:3,t:4,r:3,note:"Domestic branded; anti-infective"},
     {name:"Hikal",g:3,m:3,d:3,v:3,t:4,r:3,note:"Pharma + agro API crossover"},
-    {name:"Suven Pharmaceuticals",g:4,m:4,d:5,v:3,t:4,r:4,note:"CDMO; niche CNS APIs"},
-    {name:"Piramal Pharma",g:3,m:3,d:3,v:3,t:4,r:3,note:"CDMO + India consumer health"}
+    {name:"Cohance Lifesciences (ex-Suven)",g:4,m:4,d:5,v:3,t:4,r:4,note:"CDMO; niche CNS APIs"},
+    {name:"Piramal Pharma",g:3,m:3,d:3,v:3,t:4,r:3,note:"CDMO + India consumer health"},
+    {name:"Sai Life Sciences",g:5,m:4,d:4,v:3,t:5,r:4,note:"CDMO pure-play; CRO+CRAMS; US/EU clients; IPO 2024; fast-growing"},
+    {name:"Anthem Biosciences",g:5,m:4,d:4,v:3,t:5,r:4,note:"CRDMO; biologics + small molecule; Bengaluru; listed 2025"},
+    {name:"Neuland Laboratories",g:4,m:4,d:4,v:3,t:4,r:4,note:"API CDMO; complex molecules; regulated market focus; Hyderabad"},
+    {name:"Supriya Lifescience",g:4,m:4,d:5,v:3,t:4,r:4,note:"API manufacturer; 40+ APIs; antihistamine + vitamins niche; Raigad"},
+    {name:"Emcure Pharmaceuticals",g:4,m:3,d:3,v:3,t:4,r:3,note:"Domestic branded generics; gynaecology + cardio; IPO 2024; Pune"},
+    {name:"Eris Lifesciences",g:4,m:4,d:5,v:3,t:4,r:4,note:"Chronic branded domestic; diabetes + cardio; acquisitions-led growth"},
+    {name:"Sequent Scientific",g:3,m:3,d:4,v:3,t:4,r:3,note:"Animal health + human API; vet CDMO; global niche"},
+    {name:"Solara Active Pharma",g:3,m:3,d:3,v:3,t:3,r:3,note:"Ibuprofen + API CDMO; restructuring; turnaround watch"}
   ],
   "Banking":[
     {name:"HDFC Bank",g:4,m:4,d:5,v:3,t:5,r:4,q:4,note:"#1 private; NIM 3.5-4%; NPA 1.2%"},
@@ -2901,6 +3460,90 @@ const COMPANIES={
     {name:"Newgen Software",g:4,m:4,d:5,v:3,t:4,r:4,q:3,note:"Document automation; cloud"},
     {name:"Happiest Minds",g:4,m:4,d:5,v:3,t:4,r:4,q:3,note:"Digital born; small cap quality"},
     {name:"Mastek",g:3,m:3,d:5,v:3,t:3,r:3,q:4,note:"UK govt + BFSI IT"}
+  ],
+  "Telecom":[
+    {name:"Bharti Airtel",g:4,m:4,d:3,v:3,t:4,r:4,note:"#1 telecom; ARPU rising; Africa ops strong"},
+    {name:"Reliance Jio",g:4,m:3,d:3,v:3,t:4,r:3,note:"Jio dominates data; 5G leader; JioFinance spinoff"},
+    {name:"Vodafone Idea (Vi)",g:2,m:1,d:1,v:3,t:2,r:1,note:"Survival mode; debt crisis; AGR dues; high risk"},
+    {name:"Indus Towers",g:3,m:4,d:3,v:3,t:4,r:4,note:"Tower infra monopoly; Vi recovery key risk"},
+    {name:"MTNL",g:1,m:1,d:2,v:3,t:2,r:1,note:"PSU; loss-making; Delhi+Mumbai only"},
+    {name:"Tata Communications",g:3,m:3,d:3,v:3,t:4,r:3,note:"Enterprise connectivity + cloud + media"},
+    {name:"HFCL",g:4,m:3,d:3,v:3,t:4,r:3,note:"Optical fibre + defence comms; 5G infra"},
+    {name:"Sterlite Technologies",g:3,m:3,d:3,v:3,t:4,r:3,note:"Optical fibre cables + network solutions"},
+    {name:"ITI Limited",g:3,m:2,d:3,v:3,t:3,r:2,note:"PSU telecom equipment; defence overlap"}
+  ],
+  "Auto 4W":[
+    {name:"Maruti Suzuki",g:3,m:4,d:5,v:3,t:4,r:5,note:"#1 passenger car; SUV + CNG + hybrid push"},
+    {name:"Tata Motors",g:4,m:3,d:3,v:3,t:4,r:3,note:"JLR turnaround + India EVs; diversified"},
+    {name:"Hyundai Motor India",g:3,m:4,d:5,v:3,t:4,r:4,note:"#2 PV; premium mix improving; recently listed"},
+    {name:"Mahindra & Mahindra",g:4,m:4,d:4,v:3,t:4,r:4,note:"SUV dominance + tractors + EV pipeline"},
+    {name:"Ashok Leyland",g:3,m:3,d:4,v:3,t:3,r:3,note:"CV leader; Hinduja group"},
+    {name:"Force Motors",g:3,m:3,d:5,v:3,t:3,r:3,note:"LCV + SUV niche; BMW engine assembly"},
+    {name:"Olectra Greentech",g:4,m:2,d:3,v:2,t:4,r:2,note:"Electric buses; growing order book"}
+  ],
+  "Auto 2W":[
+    {name:"Bajaj Auto",g:3,m:5,d:5,v:3,t:4,r:5,note:"Premium 2W + exports + EV (Chetak)"},
+    {name:"Hero MotoCorp",g:2,m:4,d:5,v:3,t:3,r:4,note:"Mass 2W; rural dependent; EV pivot slow"},
+    {name:"TVS Motor Company",g:4,m:4,d:4,v:3,t:4,r:4,note:"Premium 2W + EV + international"},
+    {name:"Eicher Motors (RE)",g:3,m:5,d:5,v:3,t:4,r:5,note:"Royal Enfield premium niche; VECV trucks"},
+    {name:"Ola Electric",g:4,m:1,d:3,v:2,t:4,r:2,note:"EV 2W leader; profitability path long"},
+    {name:"Ather Energy",g:4,m:2,d:4,v:3,t:4,r:3,note:"Premium EV scooter; tech-first brand"},
+    {name:"Ampere (Greaves Cotton)",g:3,m:2,d:4,v:3,t:3,r:2,note:"Mass EV scooter; affordable segment"}
+  ],
+  "Auto Spares":[
+    {name:"Motherson Sumi Systems",g:3,m:3,d:3,v:3,t:3,r:3,note:"Global auto components; wiring harness"},
+    {name:"Sona BLW (Sona Comstar)",g:4,m:4,d:5,v:3,t:4,r:4,note:"EV drivetrain + starter motors"},
+    {name:"Minda Industries (Uno Minda)",g:4,m:3,d:4,v:3,t:4,r:3,note:"Auto components + EV tech; switches/sensors"},
+    {name:"Bharat Forge",g:3,m:3,d:3,v:3,t:3,r:3,note:"Forging + defence + EV axles; exports"},
+    {name:"Exide Industries",g:3,m:3,d:4,v:3,t:3,r:3,note:"Lead-acid + Li-ion battery JV; EVs"},
+    {name:"Amara Raja Energy",g:3,m:3,d:4,v:3,t:3,r:3,note:"Batteries + EV charging infra"},
+    {name:"KPIT Technologies",g:4,m:4,d:5,v:2,t:5,r:4,note:"Auto software; ADAS + EV niche"},
+    {name:"Belrise Industries",g:3,m:3,d:4,v:3,t:3,r:3,note:"2W/3W structural components; Bajaj/TVS supplier"},
+    {name:"JBM Auto",g:4,m:3,d:4,v:3,t:4,r:3,note:"Bus body + EV buses; defence components"},
+    {name:"Samvardhana Motherson",g:3,m:3,d:3,v:3,t:3,r:3,note:"Global wiring harness + mirrors + plastics"},
+    {name:"Bosch India",g:3,m:4,d:5,v:3,t:4,r:4,note:"MNC auto tech; fuel injection + EV components"},
+    {name:"Lumax Industries",g:3,m:3,d:4,v:3,t:3,r:3,note:"Auto lighting; LED pivot + EV adoption"},
+    {name:"Suprajit Engineering",g:3,m:4,d:5,v:3,t:3,r:4,note:"Control cables; Wescon acquisition"},
+    {name:"Endurance Technologies",g:3,m:4,d:5,v:3,t:4,r:4,note:"Die casting + brakes + suspension for 2W"},
+    {name:"Minda Corp",g:3,m:3,d:4,v:3,t:3,r:3,note:"Auto parts; EV locks + sensors"},
+    {name:"Craftsman Automation",g:3,m:4,d:4,v:3,t:4,r:4,note:"Precision machined auto parts + agri"}
+  ],
+  "Reliance Group":[
+    {name:"Reliance Industries",g:4,m:4,d:3,v:3,t:5,r:4,note:"India's largest co.; oil + retail + Jio"},
+    {name:"Jio Financial Services",g:4,m:2,d:5,v:2,t:5,r:3,note:"NBFC + insurance + AMC; building franchise"},
+    {name:"Network18 Media",g:3,m:2,d:3,v:3,t:3,r:2,note:"News18 + CNN-News18 + OTT; RIL subsidiary"},
+    {name:"Hathway Cable (RIL stake)",g:2,m:2,d:3,v:3,t:2,r:2,note:"Cable TV + broadband; declining cable"},
+    {name:"Den Networks (RIL stake)",g:2,m:2,d:3,v:3,t:2,r:2,note:"Cable distribution; transition to fiber"}
+  ],
+  "Adani Group":[
+    {name:"Adani Enterprises",g:4,m:3,d:3,v:2,t:5,r:3,note:"Group flagship; airports + solar + roads"},
+    {name:"Adani Ports & SEZ",g:4,m:4,d:3,v:3,t:5,r:4,note:"India's largest port operator; 13 ports"},
+    {name:"Adani Green Energy",g:4,m:3,d:2,v:2,t:5,r:3,note:"Largest solar IPP; 20GW+ pipeline"},
+    {name:"Adani Total Gas",g:4,m:3,d:3,v:2,t:4,r:3,note:"City gas distribution; TOTAL JV"},
+    {name:"Adani Energy Solutions",g:4,m:3,d:3,v:3,t:4,r:3,note:"Power transmission + smart metering"},
+    {name:"Adani Power",g:3,m:4,d:3,v:3,t:3,r:3,note:"Largest private thermal power; 15GW"},
+    {name:"Adani Wilmar",g:3,m:3,d:3,v:3,t:3,r:3,note:"Fortune oil brand; agri + FMCG"},
+    {name:"Ambuja Cements",g:3,m:3,d:4,v:3,t:4,r:3,note:"Adani group; distribution push"},
+    {name:"ACC",g:3,m:3,d:4,v:3,t:4,r:3,note:"Adani group; pan-India network"},
+    {name:"NDTV (Adani stake)",g:2,m:2,d:3,v:3,t:2,r:2,note:"News media; Adani acquisition 2022"}
+  ],
+  "Metals":[
+    {name:"Tata Steel",g:3,m:3,d:3,v:3,t:3,r:3,note:"India #1 + Europe ops; cyclical"},
+    {name:"JSW Steel",g:3,m:3,d:3,v:3,t:3,r:3,note:"India #2; capacity expansion; Sajjan Jindal"},
+    {name:"SAIL",g:2,m:2,d:3,v:4,t:2,r:2,note:"PSU steel; low margins; capex heavy"},
+    {name:"Hindalco Industries",g:3,m:3,d:3,v:3,t:3,r:3,note:"Aluminium + Novelis (US auto sheet)"},
+    {name:"Vedanta",g:3,m:4,d:2,v:3,t:3,r:3,note:"Zinc + oil + aluminium; high debt; dividend"},
+    {name:"Hindustan Zinc",g:3,m:5,d:5,v:3,t:3,r:5,note:"World's 2nd largest Zn producer; Vedanta sub"},
+    {name:"NALCO",g:3,m:3,d:5,v:3,t:3,r:3,note:"PSU aluminium; dividend player"},
+    {name:"NMDC",g:3,m:4,d:5,v:3,t:3,r:4,note:"India's largest iron ore miner; PSU"},
+    {name:"Coal India",g:2,m:4,d:5,v:3,t:2,r:4,note:"PSU coal monopoly; dividend; ESG risk"},
+    {name:"Jindal Steel & Power",g:3,m:3,d:3,v:3,t:3,r:3,note:"Steel + power; Naveen Jindal group"},
+    {name:"APL Apollo Tubes",g:4,m:4,d:4,v:3,t:4,r:4,note:"Structural steel tubes; construction boom"},
+    {name:"Ratnamani Metals",g:3,m:4,d:5,v:3,t:3,r:4,note:"SS + CS pipes; oil + gas + chemical"},
+    {name:"Hindustan Copper",g:3,m:3,d:4,v:3,t:3,r:3,note:"PSU copper mining + smelting"},
+    {name:"Lloyds Metals",g:4,m:4,d:4,v:3,t:3,r:4,note:"Iron ore + sponge iron; growing"},
+    {name:"Welspun Corp",g:3,m:3,d:4,v:3,t:3,r:3,note:"Steel pipes; oil + gas infra"},
+    {name:"JSW Energy (Metal div.)",g:4,m:3,d:3,v:3,t:4,r:3,note:"Merchant + long-term PPA; RE pivot"}
   ]
 }
 
@@ -2982,12 +3625,12 @@ let THEMES={
 };
 const SCREENER_DATA=[
   {name:"Power",macro:34,earn:32,struct:34,horizon:"3-5Y Focus",reason:"Secular demand surge from AI data centres, EV, urbanisation. Grid modernisation Rs.2.5L Cr capex. Solar + thermal + transmission all firing.",risks:"Regulatory tariff lag, execution risk at scale",catalysts:"Budget allocation, rate cut, AI data-centre build"},
-  {name:"Defence",macro:33,earn:30,struct:34,horizon:"3-5Y Focus",reason:"Atmanirbhar Bharat, export push to 85+ countries, multi-year order books. HAL, BEL, MDL at record backlogs.",risks:"Execution timelines, election-year policy continuity",catalysts:"HAL orders, BEL export, budget hike"},
+  {name:"Defence",macro:33,earn:31,struct:34,horizon:"3-5Y Focus",reason:"Atmanirbhar Bharat, export push to 85+ countries, multi-year order books. HAL, BEL, MDL at record backlogs.",risks:"Execution timelines, election-year policy continuity",catalysts:"HAL orders, BEL export, budget hike"},
   {name:"Capital Goods",macro:31,earn:30,struct:30,horizon:"3-5Y Focus",reason:"Govt PLI + capex supercycle. L&T, ABB, Siemens order books at record highs. Private capex beginning to revive.",risks:"Private capex still weak; execution risk",catalysts:"PLI disbursements, rate cuts, infra awards"},
-  {name:"AMC",macro:29,earn:31,struct:32,horizon:"3-5Y Focus",reason:"SIP flows at all-time highs (Rs.20,000Cr/month). AUM doubling every 4-5Y. Asset-light, high ROE business. India MF penetration at 16% vs 50%+ in developed markets.",risks:"Market crash reduces AUM and fees; entry of new competitors",catalysts:"Rising financial literacy, mandatory pension via MF, SEBI reforms"},
-  {name:"Pharma",macro:28,earn:29,struct:32,horizon:"3-5Y Focus",reason:"US generic ramp, GLP-1 wave, China+1 API shift. Domestic branded generics 12%+ CAGR.",risks:"US FDA risk, generic pricing pressure",catalysts:"Semaglutide approvals, biosimilar launches"},
+  {name:"AMC",macro:33,earn:34,struct:34,horizon:"3-5Y Core",reason:"SIP inflows at all-time record Rs.25,000Cr+/month (June 2025). Demat accounts crossed 17Cr. AUM doubling every 4-5 years. Asset-light, zero balance sheet risk. India's financialisation megatrend directly captured. HDFC AMC, Nippon, Aditya Birla all scaling. No export risk, pure domestic compounding.",risks:"Market crash reduces AUM; equity market correction risk",catalysts:"Nifty new highs, SIP acceleration, retail investor onboarding, NFO launches"},
+  {name:"Pharma",macro:33,earn:34,struct:34,horizon:"3-5Y Core",reason:"India #1 CDMO/API destination: Sai Life, Anthem Bio, Neuland leading CRO/CDMO supercycle. No export restrictions — US, EU fully open. Rupee depreciation = automatic revenue boost (80% of revenue in USD). Big-ticket acquisitions: Sun Pharma (Concert Pharma), Dr Reddy's, Mankind. Rs.15,000Cr+ combined capex FY25-26. GLP-1 generic wave 2026. China+1 structural. Domestic CAGR 12%+.",risks:"US FDA import alerts; price erosion generics",catalysts:"Semaglutide generics, USD/INR tailwind, CDMO deal wins, Sun/DRL US launches"},
   {name:"Hospitals",macro:27,earn:28,struct:31,horizon:"3-5Y Focus",reason:"Low bed density, rising insurance, medical tourism. ARPOB expanding 12-15%/yr. Apollo, Max, Fortis executing.",risks:"Regulatory fee caps, talent shortage",catalysts:"Health insurance growth, Ayushman expansion"},
-  {name:"Brokers/Wealth",macro:28,earn:27,struct:29,horizon:"3-5Y Focus",reason:"Demat accounts crossing 16Cr. SIP + F&O volumes structurally rising. Wealth management for India's expanding HNI base is a decade-long story.",risks:"Market downturn reduces volumes and AUM fees; SEBI regulation on F&O",catalysts:"Market rally, new product launches, rising HNI population"},
+  {name:"Brokers/Wealth",macro:31,earn:32,struct:32,horizon:"3-5Y Focus",reason:"India wealth management entering hypergrowth: HNI/UHNI wealth doubling every 5Y. Angel One, 360 One WAM, Nuvama — brighter than capital goods. Demat account openings: 4-5M/month. F&O volume Rs.500Cr+ ADT. Discount broking maturing; wealth advisory premium segment accelerating. Zero capex model, 40-50% ROE businesses.",risks:"SEBI F&O regulations tightening; market downturn reduces volumes",catalysts:"Nifty bull run, SIP+SWP growth, NRI wealth management, GIFT City inflows"},
   {name:"Banking (Pvt)",macro:26,earn:27,struct:26,horizon:"3-5Y Selective",reason:"Rate cut cycle benefits NIMs. Credit growth 14-16%. HDFC, ICICI at best-in-class RoA trajectory.",risks:"NIM compression near-term, MFI book stress",catalysts:"RBI rate cuts, GDP acceleration"},
   {name:"Hotels/Tourism",macro:26,earn:26,struct:28,horizon:"3-5Y Focus",reason:"India's hotel supply gap is structural. Post-COVID revenge travel secular. Foreign tourist arrivals recovering. RevPAR expansion 15-20% YoY.",risks:"Crude oil shock, geopolitical event, oversupply in leisure",catalysts:"Air connectivity growth, visa liberalisation, G20 push"},
   {name:"Insurance",macro:25,earn:25,struct:30,horizon:"3-5Y Selective",reason:"Extremely low penetration vs peers. IRDAI reforms driving distribution. Life + health both structural.",risks:"Mis-selling regulation, LIC competition",catalysts:"IRDAI bima reforms, Bima Sugam platform"},
@@ -3003,17 +3646,17 @@ const SCREENER_DATA=[
   {name:"PSU Banks",macro:22,earn:20,struct:22,horizon:"Watch",reason:"NPA cycle cleaned. RoE improving from 4% to 12%+. SBI is only one worth owning. Structural ROE ceiling lower.",risks:"NPA resurgence, political lending pressure",catalysts:"GDP acceleration, asset quality hold"},
   {name:"SFB/MicroFin",macro:18,earn:17,struct:19,horizon:"Watch",reason:"Small Finance Banks building deposit franchise. AU SFB best quality. MFI sector stressed due to overleveraging in rural areas but long-term penetration story intact.",risks:"Credit stress in MFI portfolios, over-indebtedness, RBI norms",catalysts:"Rural income recovery, NBFC-to-bank conversion, rate cuts"},
   {name:"Diversified",macro:22,earn:21,struct:22,horizon:"Watch",reason:"Select picks: Varun Beverages (Pepsi franchise) steady compounder; IEX (power exchange monopoly) earnings visibility; Azad Engineering niche aerospace play.",risks:"Company-specific concentration risk; commodity exposure for some",catalysts:"Power market deregulation, new beverage launches, aerospace orders"},
-  {name:"Auto & EV",macro:22,earn:23,struct:24,horizon:"Watch",reason:"EV transition structural but competitive. ICE SUV cycle strong. 2W rural recovery underway.",risks:"EV subsidy cuts, raw material costs",catalysts:"EV PLI, rural demand revival"},
-  {name:"Consumer Durables",macro:20,earn:19,struct:21,horizon:"Watch",reason:"AC, refrigerator: premiumisation driving volume + value growth. PLI for white goods. But valuations rich.",risks:"Raw material cost spikes, rural slowdown",catalysts:"Summer cycle, premiumisation, PLI benefits"},
   {name:"Recycling/ESG",macro:18,earn:18,struct:20,horizon:"Watch",reason:"Circular economy regulations tightening globally. Gravita India strong recycler. ESG-mandated procurement by large corporations driving demand for recycled materials.",risks:"Commodity price volatility, regulatory execution risk",catalysts:"EPR (Extended Producer Responsibility) mandates, battery recycling growth"},
   {name:"IT Services",macro:14,earn:15,struct:16,horizon:"Skip",reason:"Global tech spending in pause mode. US recession risk, AI disruption threatening traditional outsourcing.",risks:"AI replacing headcount, client budget freeze",catalysts:"US economy re-acceleration, large deal wins"},
-  {name:"FMCG (Large Cap)",macro:13,earn:14,struct:17,horizon:"Skip",reason:"Volume growth under 4%, premium valuations (50-60x PE). Defensive but expensive — poor risk/reward.",risks:"Overvaluation, rural slowdown, private label",catalysts:"None near-term — purely defensive"},
+  {name:"FMCG",macro:13,earn:14,struct:17,horizon:"Skip",reason:"Volume growth under 4%, premium valuations (50-60x PE). Defensive but expensive — poor risk/reward.",risks:"Overvaluation, rural slowdown, private label",catalysts:"None near-term — purely defensive"},
   {name:"Textiles",macro:15,earn:13,struct:16,horizon:"Skip",reason:"China+1 is real but India hasn't captured the shift. Labour/logistics issues. PLI impact slow. Only Page Industries and KPR Mill have structural moats.",risks:"Bangladesh competition, labour costs, forex",catalysts:"US-China trade war, PLI scale-up, brand building"},
-  {name:"Media / Entertainment",macro:12,earn:11,struct:13,horizon:"Skip",reason:"OTT disrupting linear TV; ad revenue lumpy. No structural compounding story for 3-5 years.",risks:"Cord-cutting, OTT losses, cyclical ad spend",catalysts:"IPL value, streaming profitability"},
-  {name:"Aviation",macro:14,earn:12,struct:15,horizon:"Skip",reason:"Structural demand growth but perpetually capital-destructive. High fuel dependency, thin margins.",risks:"Crude oil spike, airport capacity crunch",catalysts:"Open skies, fleet expansion profitability"},
-  {name:"Telecom",macro:16,earn:14,struct:18,horizon:"Skip",reason:"Duopoly with pricing power but capex intensity enormous. 5G monetisation unclear.",risks:"Spectrum costs, ARPU ceiling",catalysts:"ARPU hike cycle, enterprise 5G"},
-  {name:"Metals & Mining",macro:18,earn:16,struct:16,horizon:"Skip",reason:"Pure cyclical. China demand and global recession are primary drivers — too uncertain for 3-5Y thesis.",risks:"China slowdown, USD strength",catalysts:"Global infrastructure cycle"},
-  {name:"Commodities",macro:17,earn:15,struct:15,horizon:"Skip",reason:"Commodity prices volatile and China-driven. No structural compounding visible.",risks:"Global recession, demand destruction",catalysts:"Infra supercycle, supply disruptions"}
+  {name:"Metals",macro:18,earn:16,struct:16,horizon:"Skip",reason:"Pure cyclical. China demand and global recession are primary drivers — too uncertain for 3-5Y thesis.",risks:"China slowdown, USD strength",catalysts:"Global infrastructure cycle"},
+  {name:"Telecom",macro:22,earn:20,struct:20,horizon:"Selective",reason:"Airtel ARPU rising + Africa strong. Jio 5G dominance. Tower infra plays benefit. Avoid Vi entirely.",risks:"AGR dues, spectrum costs, Vi survival risk",catalysts:"5G monetisation, data ARPU growth, tower co monetisation"},
+  {name:"Auto 4W",macro:24,earn:22,struct:22,horizon:"Selective",reason:"Premiumisation wave: Maruti SUV, M&M Scorpio, Hyundai Creta. CNG + hybrid driving volume up.",risks:"BYD/China EV imports, insurance changes, rural slowdown",catalysts:"New model launches, EV mainstream adoption"},
+  {name:"Auto 2W",macro:30,earn:29,struct:30,horizon:"3-5Y Core",reason:"Royal Enfield (Eicher) premium motorcycle niche scaling globally. Bajaj Auto: strong Nigeria/Africa/LATAM exports — rupee depreciation = export bonus. TVS EV leadership + premium Jupiter/Apache mix. Hero recovering rural. India 2W market 20M+/year, export growth 30%+. EV 2W: 10% penetration and rising fast with Ola, Ather, TVS.",risks:"EV disruption timeline; fuel price shocks; monsoon rural income dependency",catalysts:"Rural recovery, export market expansion, premiumisation, EV penetration 15%+"},
+  {name:"Auto Spares",macro:30,earn:28,struct:30,horizon:"3Y Focus",reason:"Rising auto content per vehicle. EV creates new component opportunities. India suppliers gaining global wallet share.",risks:"EV disruption of legacy ICE parts, customer concentration",catalysts:"EV content growth, PLI for auto components, China+1 supply shift"},
+  {name:"Reliance Group",macro:26,earn:25,struct:28,horizon:"3-5Y Core",reason:"RIL: diversified moat across energy, retail, and telecom. Jio Financial emerging NBFC + insurance. Green energy.",risks:"Execution delays, 5G ROI timeline, regulatory changes",catalysts:"Jio Financial scale-up, green hydrogen milestones, retail monetisation"},
+  {name:"Adani Group",macro:24,earn:22,struct:26,horizon:"Selective",reason:"Ports + airports + green energy portfolio strong. Governance premium demanded post-Hindenburg.",risks:"High group debt, corporate governance concerns, regulatory scrutiny",catalysts:"Green energy delivery, airport profitability, credit rating improvements"}
 ];
 
 // ── RISK INDICATORS WITH TOOLTIPS ────────────────────────────────────────
@@ -3548,9 +4191,9 @@ const DRILL=[
         {name:"RVNL",score:82,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"20%",note:"Govt railway EPC — massive order book"},
         {name:"Titagarh Rail Systems",score:80,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"28%",note:"Freight wagons + metro coaches"},
         {name:"Jupiter Wagons",score:76,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"25%",note:"Wagons + defence engineering"}]}]}]},
-  {id:"pharma",name:"Pharma",score:82,verdict:"strong",horizon:"3-5Y Core",macro:28,earn:29,struct:32,
-   thesis:"US generic ramp, GLP-1 wave, China+1 API shift. Domestic market 12%+ CAGR.",
-   risks:"US FDA regulatory risk; pricing pressure on generics",catalysts:"Semaglutide approvals, biosimilar launches, US restocking",
+  {id:"pharma",name:"Pharma",score:91,verdict:"strong",horizon:"3-5Y Core",macro:33,earn:34,struct:34,
+   thesis:"India #2 sector. No export restrictions + rupee depreciation bonus + big-ticket acquisitions + CDMO supercycle. Sun Pharma Concert acquisition; GLP-1 generics 2026; Sai Life/Anthem Bio CDMO scaling.",
+   risks:"US FDA import alerts; USD/INR reversal; generic pricing erosion",catalysts:"Semaglutide generic approvals, CDMO deal wins, USD tailwind, Sun Pharma US specialty, Concert Pharma derm launches, US restocking",
    subsectors:[
     {id:"usgeneric",name:"US Generics",score:84,verdict:"strong",thesis:"ANDA filings accelerating. Semaglutide is the biggest generic opportunity in a decade.",subsubsectors:[
       {id:"usg-cmplx",name:"Complex Generics (Injectables, Inhalers)",score:86,verdict:"strong",thesis:"High barriers = pricing power. Injectables, inhalers, patches — fewer players, higher margins.",companies:[
@@ -3562,18 +4205,28 @@ const DRILL=[
         {name:"Dr Reddy's",score:86,roce:"High",debt:"Low",val:"Reasonable",growth:"16%",note:"Filed for semaglutide generic"},
         {name:"Natco Pharma",score:82,roce:"Moderate",debt:"Low",val:"Cheap",growth:"20%",note:"Para-IV filer; high-risk high-reward"},
         {name:"Biocon Biologics",score:78,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"22%",note:"Biosimilar semaglutide pipeline"},
-        {name:"Sun Pharma",score:80,roce:"Strong",debt:"Low",val:"Fair",growth:"18%",note:"Specialty + follow-on GLP-1 play"}]}]},
+        {name:"Sun Pharma",score:88,roce:"Strong",debt:"Low",val:"Fair",growth:"18%",note:"Specialty + GLP-1 pipeline; Concert Pharma acquisition adds derm blockbusters; US revenue 35% of total"}]}]},
     {id:"api",name:"API / Bulk Drug (CDMO)",score:80,verdict:"strong",thesis:"China+1 shift in APIs is structural. India captures specialty API contracts. CDMO margins expanding.",subsubsectors:[
       {id:"api-spec",name:"Specialty API Manufacturers",score:82,verdict:"strong",thesis:"HPAPIs, fermentation-based APIs: high margin, long regulatory moats.",companies:[
-        {name:"Divi's Laboratories",score:86,roce:"High",debt:"Low",val:"Reasonable",growth:"16%",note:"Global API leader — GLP-1 API supply"},
-        {name:"Laurus Labs",score:78,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"20%",note:"ARV + CDMO + finished dose"},
-        {name:"Hikal",score:72,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"16%",note:"Pharma + agro API crossover"}]}]},
+        {name:"Divi's Laboratories",score:86,roce:"High",debt:"Low",val:"Reasonable",growth:"16%",note:"Global API leader — GLP-1 API supply; custom synthesis"},
+        {name:"Sai Life Sciences",score:84,roce:"High",debt:"Low",val:"Reasonable",growth:"32%",note:"CDMO pure-play; CRO+CRAMS+FDF; US/EU clients; fast-growing"},
+        {name:"Anthem Biosciences",score:82,roce:"High",debt:"Low",val:"Reasonable",growth:"28%",note:"CRDMO; biologics + small molecule CDMO; Bengaluru; listed 2025"},
+        {name:"Neuland Laboratories",score:80,roce:"High",debt:"Low",val:"Reasonable",growth:"22%",note:"API CDMO; complex molecules; regulated US/EU markets; Hyderabad"},
+        {name:"Laurus Labs",score:78,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"20%",note:"ARV + CDMO + finished dose; capacity expansion"},
+        {name:"Cohance Lifesciences (ex-Suven)",score:76,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"18%",note:"CDMO niche CNS APIs; rebranded from Suven Pharma 2024"},
+        {name:"Hikal",score:72,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"16%",note:"Pharma + agro API crossover"},
+        {name:"Supriya Lifescience",score:74,roce:"High",debt:"Low",val:"Reasonable",growth:"20%",note:"API manufacturer; 40+ APIs; antihistamine + vitamins niche"},
+        {name:"Sequent Scientific",score:68,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"14%",note:"Animal health + human API; vet CDMO; global niche"},
+        {name:"Solara Active Pharma",score:58,roce:"Low",debt:"High",val:"Cheap",growth:"10%",note:"Ibuprofen API; restructuring after debt issues; turnaround watch"}]}]},
     {id:"domestic",name:"Domestic Formulations",score:78,verdict:"watch",thesis:"12%+ CAGR in branded generics. MR-driven model with pricing power in chronic therapies.",subsubsectors:[
       {id:"dom-branded",name:"Branded Generics (Chronic)",score:78,verdict:"watch",thesis:"Cardiac, diabetic, oncology: 15%+ CAGR. Ageing India = structural demand.",companies:[
-        {name:"Sun Pharma (Domestic)",score:84,roce:"Strong",debt:"Low",val:"Fair",growth:"16%",note:"Largest domestic branded pharma"},
+        {name:"Sun Pharma",score:88,roce:"Strong",debt:"Low",val:"Fair",growth:"18%",note:"Largest domestic + specialty; acquired Concert Pharma (derma); Ilumya + Cequa blockbuster US pipeline; specialty grew 18% FY25"},
         {name:"Mankind Pharma",score:80,roce:"High",debt:"Low",val:"Reasonable",growth:"14%",note:"Mass-market branded generics"},
         {name:"Torrent Pharma",score:78,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"13%",note:"Cardiac + CNS branded generics"},
-        {name:"Ajanta Pharma",score:74,roce:"High",debt:"Low",val:"Reasonable",growth:"15%",note:"Ophthalmology + cardio niche"}]}]}]},
+        {name:"Ajanta Pharma",score:74,roce:"High",debt:"Low",val:"Reasonable",growth:"15%",note:"Ophthalmology + cardio niche"},
+        {name:"Emcure Pharmaceuticals",score:72,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"15%",note:"Domestic branded; gynaecology + cardio; IPO 2024; Pune-based"},
+        {name:"Eris Lifesciences",score:76,roce:"High",debt:"Low",val:"Reasonable",growth:"18%",note:"Chronic branded; diabetes + cardio; acquisitions-led growth; asset-light"},
+        {name:"Supriya Lifescience",score:74,roce:"High",debt:"Low",val:"Reasonable",growth:"20%",note:"API + branded domestic; niche vitamins/antihistamine segments"}]}]}]},
   {id:"banking",name:"Banking (Pvt)",score:78,verdict:"strong",horizon:"3-5Y Selective",macro:26,earn:27,struct:26,
    thesis:"Rate cut cycle benefits NIMs selectively. Credit growth 14-16%. Asset quality improved.",
    risks:"NIM compression; MFI book stress",catalysts:"RBI rate cuts, GDP acceleration, retail credit pickup",
@@ -3634,7 +4287,7 @@ const DRILL=[
         {name:"Bajaj Auto",score:76,roce:"High",debt:"Low",val:"Reasonable",growth:"16%",note:"Pulsar + CNG 3W + export"},
         {name:"Hero MotoCorp",score:72,roce:"High",debt:"Low",val:"Reasonable",growth:"10%",note:"Mass market; EV catch-up"},
         {name:"Eicher Motors",score:78,roce:"High",debt:"Low",val:"Reasonable",growth:"14%",note:"Premium lifestyle 2W niche"}]}]}]},
-  {id:"amc",name:"AMC",score:82,verdict:"strong",horizon:"3-5Y Core",macro:29,earn:31,struct:32,
+  {id:"amc",name:"AMC",score:91,verdict:"strong",horizon:"3-5Y Core",macro:33,earn:31,struct:32,
    thesis:"SIP flows at all-time highs (Rs.20,000Cr/month). AUM doubling every 4-5 years. Asset-light, very high-ROE model. India MF penetration at 16% vs 50%+ globally.",
    risks:"Market crash reduces AUM and fees; new low-cost entrants",catalysts:"Rising financial literacy, pension reforms, SEBI index fund push",
    subsectors:[
@@ -3644,7 +4297,7 @@ const DRILL=[
         {name:"Nippon India AMC",score:80,roce:"High",debt:"Low",val:"Reasonable",growth:"18%",note:"ETF + direct plan specialist; growing retail base"},
         {name:"UTI AMC",score:70,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"14%",note:"PSU AMC; re-rating potential as brand improves"},
         {name:"Aditya Birla AMC",score:73,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"16%",note:"Balanced fund house; passive push gaining traction"}]}]}]},
-  {id:"brokers",name:"Brokers/Wealth",score:80,verdict:"strong",horizon:"3-5Y Core",macro:28,earn:27,struct:29,
+  {id:"brokers",name:"Brokers/Wealth",score:85,verdict:"strong",horizon:"3-5Y Core",macro:28,earn:27,struct:29,
    thesis:"Demat accounts crossed 16Cr. F&O volumes structurally rising. Wealth management for India's HNI base is a decade-long opportunity.",
    risks:"Market downturn reduces volumes; SEBI F&O regulation; margin compression",catalysts:"Market rally, rising HNI population, new product launches",
    subsectors:[
@@ -3813,7 +4466,98 @@ const DRILL=[
         {name:"IEX (Indian Energy Exchange)",score:72,roce:"Very High",debt:"Low",val:"Expensive",growth:"16%",note:"Power market exchange; near-monopoly with pricing power"},
         {name:"Azad Engineering",score:70,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"28%",note:"Precision aerospace + energy + nuclear components"},
         {name:"Westlife Foodworld",score:60,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"14%",note:"McDonald's franchisee West+South India"},
-        {name:"G R Infraprojects",score:65,roce:"High",debt:"Low",val:"Reasonable",growth:"16%",note:"Road + railway EPC; strong order book"}]}]}]}
+        {name:"G R Infraprojects",score:65,roce:"High",debt:"Low",val:"Reasonable",growth:"16%",note:"Road + railway EPC; strong order book"}]}]}]},
+  {id:"auto2w",name:"Auto 2W",score:85,verdict:"strong",horizon:"3-5Y Core",macro:30,earn:29,struct:30,
+   thesis:"Royal Enfield premium scaling globally. Bajaj Auto Nigeria/Africa/LATAM exports — rupee depreciation = export bonus. TVS EV leadership + premium mix. India 2W market 20M+/year, export growth 30%+. EV penetration rising fast.",
+   risks:"EV disruption of ICE; monsoon rural income dependency; fuel price shocks",catalysts:"Rural recovery, Bajaj export ramp, RE global expansion, TVS EV scale",
+   subsectors:[
+    {id:"2w-premium",name:"Premium 2W (150cc+)",score:88,verdict:"strong",thesis:"Royal Enfield dominates 350cc+ premium niche globally. Bajaj Pulsar/Dominar export-led growth. Eicher VECV trucks bonus.",subsubsectors:[
+      {id:"2w-re",name:"Royal Enfield / Eicher",score:90,verdict:"strong",thesis:"Monopoly in 350cc+ globally. 20%+ volume growth. UK, US, Europe, LATAM all scaling.",companies:[
+        {name:"Eicher Motors",score:90,roce:"High",debt:"Low",val:"Reasonable",growth:"20%",note:"Royal Enfield monopoly 350cc+; global expansion; VECV trucks"},
+        {name:"TVS Motor Company",score:84,roce:"High",debt:"Low",val:"Reasonable",growth:"18%",note:"Apache + Jupiter premium; EV iQube leader; global exports"},
+        {name:"Bajaj Auto",score:88,roce:"High",debt:"Low",val:"Reasonable",growth:"22%",note:"#1 exports; Nigeria/Africa/LATAM; Chetak EV; Triumph JV"}]},
+      {id:"2w-ev",name:"EV 2W — Electric",score:82,verdict:"strong",thesis:"EV 2W at 10%+ penetration. Ola Electric listed; Ather premium; TVS mass EV.",companies:[
+        {name:"Ola Electric",score:78,roce:"Low",debt:"Medium",val:"Reasonable",growth:"35%",note:"Largest EV 2W by volume; profitability path long"},
+        {name:"Ather Energy",score:80,roce:"Low",debt:"Low",val:"Reasonable",growth:"30%",note:"Premium EV scooter; tech-first; HERO backed"},
+        {name:"TVS Motor (iQube)",score:82,roce:"High",debt:"Low",val:"Reasonable",growth:"28%",note:"TVS EV leadership + ICE premium mix"}]},
+      {id:"2w-mass",name:"Mass Market 2W",score:76,verdict:"watch",thesis:"Hero MotoCorp rural recovery. Bajaj Platina/CT mass segment stable.",companies:[
+        {name:"Hero MotoCorp",score:76,roce:"High",debt:"Low",val:"Reasonable",growth:"10%",note:"Mass 2W market leader; rural dependent; EV pivot slow"},
+        {name:"Bajaj Auto (Mass)",score:80,roce:"High",debt:"Low",val:"Reasonable",growth:"12%",note:"Platina/CT + Pulsar; export engine"}]}]}]},
+  {id:"telecom",name:"Telecom",score:60,verdict:"watch",horizon:"Selective",macro:22,earn:20,struct:22,
+   thesis:"Airtel ARPU rising; Africa ops strong; 5G monetisation beginning. Jio dominance in data. Avoid Vi entirely. Tower infra (Indus) beneficiary.",
+   risks:"AGR dues; Vi survival risk; 5G capex heavy",catalysts:"5G ARPU premium, Jio JioFinancial, Airtel Africa listing",
+   subsectors:[
+    {id:"tel-pvt",name:"Private Telecom Operators",score:65,verdict:"watch",thesis:"Duopoly: Airtel + Jio. ARPU Rs.200+ target. Vi is a drag on sector.",subsubsectors:[
+      {id:"tel-airtel",name:"Bharti Airtel",score:72,verdict:"strong",thesis:"ARPU rising 15% YoY; Africa strong; 5G premium services beginning.",companies:[
+        {name:"Bharti Airtel",score:82,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"16%",note:"#1 telecom ARPU; Africa ops 35% EBITDA; 5G leader"},
+        {name:"Indus Towers",score:72,roce:"High",debt:"Low",val:"Reasonable",growth:"12%",note:"Tower infra; Vi recovery key risk; passive infra"}]},
+      {id:"tel-vi",name:"Vodafone Idea",score:35,verdict:"skip",thesis:"Debt-laden; AGR dues; survival mode. FPO done but viability uncertain.",companies:[
+        {name:"Vodafone Idea",score:30,roce:"Low",debt:"Very High",val:"Speculative",growth:"-5%",note:"Survival mode; AGR dues Rs.70,000Cr; high risk"}]},
+      {id:"tel-infra",name:"Telecom Infrastructure & Cables",score:68,verdict:"watch",thesis:"5G rollout creating fibre + equipment demand. HFCL, Sterlite Tech beneficiary.",companies:[
+        {name:"HFCL",score:72,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"18%",note:"Optical fibre + defence comms; 5G infra"},
+        {name:"Sterlite Technologies",score:68,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"15%",note:"Optical fibre cables; network solutions"},
+        {name:"Tata Communications",score:70,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"14%",note:"Enterprise connectivity + cloud + media"}]}]}]},
+  {id:"metals",name:"Metals & Steel",score:52,verdict:"watch",horizon:"Cyclical Watch",macro:18,earn:16,struct:18,
+   thesis:"Steel: Tata Steel + JSW domestic India infra demand solid. Cyclical — global slowdown risk. Hindalco Novelis US auto sheet profitable. Zinc: Hindustan Zinc near-monopoly with 60%+ EBITDA margins.",
+   risks:"China steel dumping; global recession; commodity price cycles",catalysts:"India infra capex, China demand revival, green steel premiums",
+   subsectors:[
+    {id:"steel",name:"Steel",score:58,verdict:"watch",thesis:"Domestic demand India infra solid. Tata Steel Europe drag. JSW capacity expansion.",subsubsectors:[
+      {id:"steel-major",name:"Integrated Steel Majors",score:60,verdict:"watch",thesis:"Tata + JSW domestic India strong; cyclical global exposure.",companies:[
+        {name:"Tata Steel",score:65,roce:"Moderate",debt:"High",val:"Reasonable",growth:"12%",note:"India #1; Europe ops drag; green steel pivot"},
+        {name:"JSW Steel",score:68,roce:"Moderate",debt:"High",val:"Reasonable",growth:"15%",note:"India #2; Sajjan Jindal; capacity expansion"},
+        {name:"Jindal Steel & Power",score:62,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"12%",note:"Steel + power; Naveen Jindal group"},
+        {name:"SAIL",score:52,roce:"Low",debt:"High",val:"Cheap",growth:"8%",note:"PSU steel; low margins; capex heavy"}]}]},
+    {id:"alum-zinc",name:"Aluminium & Zinc",score:72,verdict:"watch",thesis:"Hindustan Zinc near-monopoly, 60%+ EBITDA. Hindalco Novelis US profitable.",subsubsectors:[
+      {id:"zinc-lead",name:"Zinc & Lead",score:76,verdict:"strong",thesis:"Hindustan Zinc world #2 zinc producer. Near-monopoly India.",companies:[
+        {name:"Hindustan Zinc",score:82,roce:"Very High",debt:"Low",val:"Reasonable",growth:"10%",note:"World #2 Zn; Vedanta sub; 60%+ EBITDA; high dividend"},
+        {name:"Vedanta",score:62,roce:"Moderate",debt:"High",val:"Cheap",growth:"8%",note:"Zinc+oil+aluminium; high debt; dividend play"}]},
+      {id:"alum",name:"Aluminium",score:68,verdict:"watch",thesis:"Hindalco Novelis US auto sheet premium growing. NALCO PSU value.",companies:[
+        {name:"Hindalco Industries",score:72,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"12%",note:"Aluminium + Novelis (US auto sheet premium)"},
+        {name:"NALCO",score:62,roce:"Moderate",debt:"Low",val:"Cheap",growth:"8%",note:"PSU aluminium; dividend play; stable"}]}]},
+    {id:"metal-tubes",name:"Specialty Metal Products",score:74,verdict:"strong",thesis:"APL Apollo structural tubes: construction boom proxy. Ratnamani SS pipes for chemicals/oil.",subsubsectors:[
+      {id:"tubes-pipes",name:"Tubes & Pipes",score:76,verdict:"strong",thesis:"Structural steel tubes demand from real estate + infra supercycle.",companies:[
+        {name:"APL Apollo Tubes",score:82,roce:"High",debt:"Low",val:"Reasonable",growth:"18%",note:"Structural steel tubes; construction boom proxy"},
+        {name:"Ratnamani Metals",score:76,roce:"High",debt:"Low",val:"Reasonable",growth:"15%",note:"SS + CS pipes; oil + gas + chemical"},
+        {name:"Welspun Corp",score:68,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"12%",note:"Steel pipes; oil + gas infra"}]}]}]},
+  {id:"itservices",name:"IT Services",score:48,verdict:"skip",horizon:"Avoid Near-Term",macro:14,earn:15,struct:16,
+   thesis:"AI disruption + US tech spending uncertainty. Deal ramp-up slow. Only bottom-up quality plays: Persistent, KPIT, LTIMindtree. Tier-1 under structural pressure.",
+   risks:"AI replacing outsourcing; US recession; visa restrictions",catalysts:"Large deal wins, AI services monetisation, US Fed rate cuts boosting tech budgets",
+   subsectors:[
+    {id:"it-tier1",name:"Tier-1 IT (Large Cap)",score:50,verdict:"skip",thesis:"TCS, Infosys, Wipro: AI headwind. Revenue growth 5-8% vs 15-20% historical.",subsubsectors:[
+      {id:"it-t1-cos",name:"Large IT Companies",score:52,verdict:"skip",thesis:"Volume led. Limited pricing power. AI tools automating mid-level work.",companies:[
+        {name:"TCS",score:58,roce:"High",debt:"Low",val:"Reasonable",growth:"7%",note:"EBIT 25%; AI disruption headwind; massive cash"},
+        {name:"Infosys",score:55,roce:"High",debt:"Low",val:"Reasonable",growth:"6%",note:"EBIT 21%; large deal recovery slow"},
+        {name:"HCL Technologies",score:60,roce:"High",debt:"Low",val:"Reasonable",growth:"8%",note:"Products+services; EBIT 19%; diversified"},
+        {name:"Wipro",score:48,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"4%",note:"EBIT 16%; structural challenges; weak growth"}]}]},
+    {id:"it-midcap",name:"Mid-Cap IT (Quality Picks)",score:76,verdict:"strong",thesis:"Persistent, KPIT, LTIMindtree: niche leadership + 20-35% growth. Quality island in weak sector.",subsubsectors:[
+      {id:"it-quality",name:"High-Growth Niche IT",score:78,verdict:"strong",thesis:"AI-native + domain specialist mid-caps growing 20-35% despite sector headwinds.",companies:[
+        {name:"Persistent Systems",score:82,roce:"High",debt:"Low",val:"Reasonable",growth:"35%",note:"Digital engineering; AI services; 35% growth"},
+        {name:"KPIT Technologies",score:80,roce:"High",debt:"Low",val:"Reasonable",growth:"25%",note:"Auto software; ADAS + EV — sector independent"},
+        {name:"LTIMindtree",score:76,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"14%",note:"L&T IT; EBIT 17%; quality franchise"},
+        {name:"Coforge",score:74,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"22%",note:"BFSI + travel IT; 25% growth"},
+        {name:"Mphasis",score:74,roce:"High",debt:"Low",val:"Reasonable",growth:"14%",note:"BFSI focus; DXC parentage; quality"}]}]}]},
+  {id:"reliance",name:"Reliance Group",score:70,verdict:"strong",horizon:"3-5Y Core",macro:26,earn:25,struct:28,
+   thesis:"India's largest company. Jio 5G + JioFinancial emerging. Retail largest. New Energy Rs.75,000Cr green investment. RIL is a megatrend proxy for India's growth story.",
+   risks:"Execution delays; 5G ROI timeline; group size creates complexity",catalysts:"Jio Financial scale-up, green H2 milestone, retail monetisation, RIL delisting of subs",
+   subsectors:[
+    {id:"ril-core",name:"RIL Core Business",score:74,verdict:"strong",thesis:"O2C + retail + Jio: three independent engines each world-scale.",subsubsectors:[
+      {id:"ril-cos",name:"Reliance Industries",score:76,verdict:"strong",thesis:"O2C refining + petchem stable; Jio 5G ARPU rising; Retail India largest.",companies:[
+        {name:"Reliance Industries",score:82,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"14%",note:"Diversified; oil + retail + Jio; India's largest"},
+        {name:"Jio Financial Services",score:72,roce:"Low",debt:"Low",val:"Reasonable",growth:"30%",note:"NBFC + insurance + AMC; building franchise; early stage"}]}]}]},
+  {id:"adani",name:"Adani Group",score:65,verdict:"watch",horizon:"Selective",macro:24,earn:22,struct:26,
+   thesis:"Ports + airports + green energy: three solid franchises. Adani Ports world-class. Post-Hindenburg governance premium demanded but operationals strong.",
+   risks:"High group debt; governance concerns; regulatory scrutiny",catalysts:"Green energy delivery, airport profitability, credit rating upgrade, debt reduction",
+   subsectors:[
+    {id:"adani-ports",name:"Adani Ports & Infrastructure",score:78,verdict:"strong",thesis:"Largest private port operator. 13 ports. Logistics play on India trade.",subsubsectors:[
+      {id:"adani-p-cos",name:"Adani Ports Companies",score:78,verdict:"strong",thesis:"Port + logistics + airports: world-class infrastructure at India scale.",companies:[
+        {name:"Adani Ports & SEZ",score:84,roce:"High",debt:"Medium",val:"Reasonable",growth:"18%",note:"India's largest port + SEZ; Colombo + Haifa international"},
+        {name:"Adani Enterprises",score:70,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"15%",note:"Group flagship; airports + solar + roads + FMCG"}]}]},
+    {id:"adani-green",name:"Adani Green Energy & Cement",score:72,verdict:"watch",thesis:"Largest solar IPP India. Ambuja+ACC: #2 cement group after Adani acquisition.",subsubsectors:[
+      {id:"adani-g-cos",name:"Adani Green & Cement",score:72,verdict:"watch",thesis:"Green energy + cement — solid franchises but debt-heavy.",companies:[
+        {name:"Adani Green Energy",score:72,roce:"Moderate",debt:"High",val:"Reasonable",growth:"28%",note:"Largest solar IPP; 20GW+ pipeline; high debt"},
+        {name:"Ambuja Cements",score:74,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"12%",note:"Adani group; #2 cement; distribution push"},
+        {name:"ACC",score:70,roce:"Moderate",debt:"Low",val:"Reasonable",growth:"10%",note:"Adani group; pan-India network; improving margins"},
+        {name:"Adani Total Gas",score:72,roce:"Moderate",debt:"Medium",val:"Reasonable",growth:"18%",note:"City gas distribution; TOTAL JV; 30+ GAs"}]}]}]}
 ];
 
 // ── DRILL STATE + HELPERS ────────────────────────────────────────────────
@@ -3830,6 +4574,92 @@ function ddPillBar(val,label){
   return `<div class="bar-row"><span class="bar-label">${label}</span><div class="bar-track"><div style="width:${pct}%;height:100%;border-radius:3px;background:${pct>=80?"var(--green)":pct>=57?"var(--gold)":"var(--red)"}"></div></div><span class="bar-val ${ddSc(pct)}">${val}</span></div>`;
 }
 function ddGoLevel(level,sId,ssId){ddState.level=level;ddState.sectorId=sId||null;ddState.subsectorId=ssId||null;ddState.filterSS=null;ddRender();}
+// ── SECTOR → DRILL ID MAPPING ──────────────────────────────────────────
+const SECTOR_TO_DRILL = {
+  'Power':          'power',
+  'Defence':        'defence',
+  'Capital Goods':  'capgoods',
+  'Pharma':         'pharma',
+  'Banking':        'banking',
+  'Hospitals':      'healthcare',
+  'Hospitals / Healthcare': 'healthcare',
+  'Chemicals':      'chemicals',
+  'Auto':           'auto',
+  'Auto 4W':        'auto',
+  'Auto 2W':        'auto',
+  'Auto Spares':    'auto',
+  'AMC':            'amc',
+  'Brokers/Wealth': 'brokers',
+  'Insurance':      'insurance2',
+  'NBFC':           'nbfc2',
+  'SFB/MicroFin':   'sfb2',
+  'New Age Tech':   'newagetech',
+  'Retail':         'retail2',
+  'FMCG':           'fmcg2',
+  'Cement':         'cement2',
+  'Gold/Jewellery': 'goldjwl',
+  'Hotels/Tourism': 'hotels2',
+  'Paints':         'paints2',
+  'Textiles':       'textiles2',
+  'Recycling/ESG':  'recycling2',
+  'Diversified':    'diversified2',
+  'IT Services':    null,
+  'Telecom':        null,
+  'Metals':         null,
+  'Real Estate':    null,
+  'Reliance Group': null,
+  'Adani Group':    null
+};
+
+// Navigate to Research tab at the right sector for a given company
+function goToResearch(companyName, sector) {
+  const drillId = SECTOR_TO_DRILL[sector];
+  switchPage('drilldown');
+
+  if (drillId) {
+    // Navigate to the sector level in drilldown
+    ddState.level = 'sector';
+    ddState.sectorId = drillId;
+    ddState.subsectorId = null;
+    ddState.filterSS = null;
+    ddRender();
+
+    // Highlight the searched company name after render
+    setTimeout(() => {
+      // Try to find and highlight the company in the rendered table
+      const cells = document.querySelectorAll('#dd-content .co-name');
+      cells.forEach(cell => {
+        if (cell.textContent.trim() === companyName) {
+          cell.closest('tr').style.background = '#fff8e6';
+          cell.closest('tr').style.borderLeft = '3px solid #ff7c00';
+          cell.closest('tr').scrollIntoView({behavior:'smooth', block:'center'});
+        }
+      });
+    }, 200);
+  } else {
+    // Sector not in DRILL — go to top level with a search hint
+    ddState.level = 'top';
+    ddState.sectorId = null;
+    ddState.subsectorId = null;
+    ddRender();
+    setTimeout(() => {
+      // Show search in screener if available
+      const hint = document.getElementById('dd-search-hint');
+      if (hint) {
+        hint.textContent = 'Searching: ' + companyName + ' (sector not yet in drill-down)';
+        hint.style.display = 'block';
+      }
+    }, 100);
+  }
+
+  // Flash notification
+  const n = document.createElement('div');
+  n.className = 'notify-flash';
+  n.textContent = '🔍 ' + companyName + ' → Research';
+  document.body.appendChild(n);
+  setTimeout(() => n.remove(), 2500);
+}
+
 function ddSetFilter(id){ddState.filterSS=id;ddRender();}
 
 function ddRenderBreadcrumb(){
@@ -3911,9 +4741,10 @@ function ddRenderSubsector(sId,ssId){
     ${ss.subsubsectors.map(sss=>`<span class="ss-pill ${af===sss.id?'active':''}" onclick="ddSetFilter('${sss.id}')">${sss.name}</span>`).join("")}
   </div>
   <div class="full table-scroll"><table class="co-table">
-    <thead><tr><th>#</th><th>Company</th><th>Sub-Segment</th><th>Score</th><th>ROCE</th><th>Debt</th><th>Valuation</th><th>Growth</th><th>Key Note</th></tr></thead>
+    <thead><tr><th>#</th><th>NSE Rank</th><th>Company</th><th>Sub-Segment</th><th>Score</th><th>ROCE</th><th>Debt</th><th>Valuation</th><th>Growth</th><th>Key Note</th></tr></thead>
     <tbody>${cos.map((c,i)=>`<tr>
       <td class="co-rank">${i+1}</td>
+      <td style="text-align:center;">${COMPANY_RANKS[c.name] ? '<span style="font-size:10px;font-weight:800;padding:2px 6px;border-radius:5px;background:#e8f0fe;color:#1a56db;border:1px solid #c7d7fd;">#'+COMPANY_RANKS[c.name]+'</span>' : '<span style="font-size:10px;color:#b0bcd8;">—</span>'}</td>
       <td><div class="co-name">${c.name}</div><div class="co-subsub">${c.subsubName}</div></td>
       <td><span class="tag ${ddTagCls(c.verdict)}" style="font-size:9px;">${c.subsubName.split(' ').slice(0,2).join(' ')}</span></td>
       <td><div class="prog-wrap"><div class="progress" style="width:65px;"><div class="${ddFillCls(c.score)}" style="width:${c.score}%;height:100%;border-radius:4px;"></div></div><span class="${ddSc(c.score)}" style="font-weight:900;font-size:12px;">${c.score}</span></div></td>
@@ -3924,6 +4755,138 @@ function ddRenderSubsector(sId,ssId){
       <td style="font-size:10px;color:var(--text-muted);font-weight:600;max-width:150px;">${c.note}</td>
     </tr>`).join("")}</tbody>
   </table></div>`;
+}
+
+
+// ── RESEARCH TAB COMPANY SEARCH ──────────────────────────────────────────
+function ddSearchCompany(query) {
+  const resultsDiv = document.getElementById('dd-search-results');
+  if (!resultsDiv) return;
+  query = (query || '').trim().toLowerCase();
+  if (query.length < 2) { resultsDiv.style.display = 'none'; return; }
+
+  const matches = [];
+  DRILL.forEach(sector => {
+    sector.subsectors.forEach(sub => {
+      sub.subsubsectors.forEach(sss => {
+        (sss.companies || []).forEach(co => {
+          if (co.name.toLowerCase().includes(query)) {
+            matches.push({ name: co.name, score: co.score, note: co.note,
+              sssName: sss.name, sectorId: sector.id, sectorName: sector.name });
+          }
+        });
+      });
+    });
+  });
+
+  const drillNames = new Set(matches.map(m => m.name.toLowerCase()));
+  Object.entries(COMPANIES).forEach(([sector, cos]) => {
+    cos.forEach(c => {
+      if (c.name.toLowerCase().includes(query) && !drillNames.has(c.name.toLowerCase())) {
+        const score = c.score !== undefined ? c.score
+          : Math.round(((c.g||3)+(c.m||3)+(c.d||3)+(c.v||3)+(c.t||3)+(c.r||3))*100/30);
+        matches.push({ name: c.name, score, note: c.note,
+          sssName: sector, sectorId: null, sectorName: sector });
+      }
+    });
+  });
+
+  if (matches.length === 0) {
+    resultsDiv.style.display = 'block';
+    resultsDiv.innerHTML = `<div style="padding:14px;background:#fff8f0;border:1px solid #ffe0c0;border-radius:10px;font-size:12px;font-weight:600;color:#b35c00;">No companies found matching "<strong>${query}</strong>"</div>`;
+    return;
+  }
+
+  const scColor = s => s >= 75 ? '#006b30' : s >= 55 ? '#b35c00' : '#b71c1c';
+  const scBg    = s => s >= 75 ? '#e6f4ef' : s >= 55 ? '#fff3e0' : '#fce8e8';
+
+  const cards = matches.slice(0, 12).map(m => {
+    const sc = m.score || 60;
+    return `<div class="dd-search-result-card"
+            data-sectorid="${m.sectorId || ''}"
+            data-coname="${m.name.replace(/"/g, '&quot;')}"
+            data-sectorname="${m.sectorName}"
+            data-conote="${(m.note||'').replace(/"/g, '&quot;')}"
+            data-coscore="${sc}"
+            style="padding:10px 12px;background:#f8f9fe;border:1px solid #dde1ec;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:10px;"
+            onmouseover="this.style.borderColor='#ff7c00';this.style.background='#fff8f0'"
+            onmouseout="this.style.borderColor='#dde1ec';this.style.background='#f8f9fe'">
+            <span style="font-size:14px;font-weight:900;padding:4px 8px;border-radius:7px;background:${scBg(sc)};color:${scColor(sc)};min-width:32px;text-align:center;">${sc}</span>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:12px;font-weight:800;color:#1a1e2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${m.name}</div>
+              <div style="font-size:10px;color:#6b7498;font-weight:600;">${m.sectorName}${m.sssName !== m.sectorName ? ' › ' + m.sssName : ''}</div>
+            </div>
+            <span style="font-size:11px;color:#ff7c00;font-weight:800;">${m.sectorId ? '&#128269;' : '&#8594;'}</span>
+          </div>`;
+  }).join('');
+
+  resultsDiv.style.display = 'block';
+  resultsDiv.innerHTML = `
+    <div style="background:#fff;border:1.5px solid #ff7c0044;border-radius:12px;padding:14px;box-shadow:0 2px 12px #ff7c0015;">
+      <div style="font-size:11px;font-weight:800;color:#b35c00;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">
+        &#128269; ${matches.length} result${matches.length>1?'s':''} for "${query}"
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;">${cards}</div>
+      ${matches.length > 12 ? `<div style="font-size:10px;color:#6b7498;margin-top:8px;font-weight:600;">Showing top 12 of ${matches.length} results. Refine your search.</div>` : ''}
+    </div>`;
+}
+
+
+function ddHighlightCompany(name) {
+  const rows = document.querySelectorAll('#dd-content .co-name, #dd-content .card-name');
+  let found = false;
+  rows.forEach(el => {
+    if (el.textContent.trim() === name) {
+      const row = el.closest('tr') || el.closest('.drill-card');
+      if (row) {
+        row.style.background = '#fff8e6';
+        row.style.outline = '2px solid #ff7c00';
+        row.style.borderRadius = '6px';
+        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => { row.style.background=''; row.style.outline=''; }, 3000);
+        found = true;
+      }
+    }
+  });
+  if (!found) {
+    // Try highlighting in table cells
+    document.querySelectorAll('#dd-content td').forEach(td => {
+      if (td.querySelector('.co-name')?.textContent.trim() === name) {
+        td.closest('tr').style.background = '#fff8e6';
+        td.closest('tr').scrollIntoView({ behavior:'smooth', block:'center' });
+        setTimeout(() => td.closest('tr').style.background = '', 3000);
+      }
+    });
+  }
+}
+
+function ddShowCompanyCard(co, sectorName) {
+  // For companies not in DRILL, show a quick card overlay
+  const resultsDiv = document.getElementById('dd-search-results');
+  const scColor = s => s >= 75 ? '#006b30' : s >= 55 ? '#b35c00' : '#b71c1c';
+  const scBg    = s => s >= 75 ? '#e6f4ef' : s >= 55 ? '#fff3e0' : '#fce8e8';
+  const score = co.score || 60;
+  const rank = COMPANY_RANKS[co.name];
+
+  resultsDiv.innerHTML += `
+    <div style="margin-top:10px;background:#fff;border:1.5px solid ${scColor(score)}44;border-radius:12px;padding:16px;box-shadow:0 2px 12px #0000001a;">
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:22px;font-weight:900;padding:6px 12px;border-radius:10px;background:${scBg(score)};color:${scColor(score)};border:1px solid ${scColor(score)}44;">${score}</span>
+        <div>
+          <div style="font-size:16px;font-weight:900;color:#1a1e2e;">${co.name}</div>
+          <div style="font-size:11px;color:#6b7498;font-weight:600;">${sectorName} ${rank ? '· #'+rank+' NSE' : ''}</div>
+        </div>
+      </div>
+      ${co.note ? `<div style="margin-top:10px;font-size:12px;font-weight:600;color:#5a6080;background:#f8f9fe;padding:8px 12px;border-radius:7px;border:1px solid #dde1ec;">${co.note}</div>` : ''}
+      <div style="margin-top:10px;font-size:11px;color:#b35c00;font-weight:600;background:#fff8f0;padding:8px 12px;border-radius:7px;">&#9432; Detailed drill-down not yet available for this sector. CB Score and overview shown above.</div>
+    </div>`;
+}
+
+function ddClearSearch() {
+  const inp = document.getElementById('ddCompanySearch');
+  if (inp) inp.value = '';
+  const res = document.getElementById('dd-search-results');
+  if (res) res.style.display = 'none';
 }
 
 function ddRender(){
@@ -3938,7 +4901,7 @@ function ddRender(){
 
 // ── ALT ASSETS PAGE ──────────────────────────────────────────────────────
 function switchAltTab(tab, btn) {
-  ['debt','metals','reits','guide'].forEach(t => {
+  ['debt','nps','metals','reits','guide'].forEach(t => {
     const el = document.getElementById('alt-'+t);
     if (el) el.style.display = (t === tab) ? 'block' : 'none';
   });
@@ -4000,7 +4963,7 @@ const DEBT_FUNDS = [
   {name:"Credit Risk Fund", risk:"High", horizon:"3+ years", returns:"8.5–10%", taxNote:"Slab rate (debt)", verdict:"skip",
    desc:"Invests in AA and below rated bonds for higher yield. Significant default risk. IL&FS, DHFL, Vodafone events showed the downside.",
    funds:"Avoid unless very sophisticated. Franklin Templeton crisis was from this category.",
-   when:"AVOID for most investors. Only for risk-seeking investors who understand credit analysis."},
+   when:"AVOID for most investors. Only for risk-seeking investors who understand credit analysis."}
 ];
 
 function renderDebtFunds() {
@@ -4070,7 +5033,7 @@ const DIRECT_DEBT = [
   {name:"State Dev Loans (SDL)", yield:"7.3–7.6%", risk:"Near-zero", platform:"RBI Retail Direct", note:"State government bonds. Slightly higher yield than central Gsec. Same safety profile."},
   {name:"Sovereign Gold Bond", yield:"2.5% + gold price", risk:"Gold price risk", platform:"RBI / Exchange", note:"8-year bond. 2.5% p.a. interest + capital gain. Tax-FREE on maturity. Best gold investment."},
   {name:"RBI Floating Rate Bond", yield:"NSC + 0.35% (~8%)", risk:"Zero", platform:"RBI Retail Direct / Banks", note:"7-year tenure. Interest resets every 6 months. No capital gain on price — only interest."},
-  {name:"NCD (Listed Corp Bond)", yield:"8–10%", risk:"Credit risk", platform:"NSE/BSE", note:"Non-convertible debentures. AA+ only for safety. Higher yield but company default risk."},
+  {name:"NCD (Listed Corp Bond)", yield:"8–10%", risk:"Credit risk", platform:"NSE/BSE", note:"Non-convertible debentures. AA+ only for safety. Higher yield but company default risk."}
 ];
 
 function renderDirectDebt() {
@@ -4184,6 +5147,9 @@ const STOCK_SECTOR_MAP = {
   'SUNPHARMA':'Pharma','DRREDDY':'Pharma','CIPLA':'Pharma','NATCOPHARM':'Pharma',
   'GLAND':'Pharma','DIVISLAB':'Pharma','LAURUSLABS':'Pharma','MANKIND':'Pharma',
   'TORNTPHARM':'Pharma','AJANTPHARM':'Pharma','BIOCON':'Pharma','HIKAL':'Pharma',
+  'SAILIFE':'Pharma','ANTHEMBI':'Pharma','NEULANDLAB':'Pharma','SUPRIYA':'Pharma',
+  'EMCURE':'Pharma','ERIS':'Pharma','SOLARA':'Pharma','SEQUENT':'Pharma',
+  'COHANCE':'Pharma','PIRAMALPH':'Pharma',
   // BANKING
   'HDFCBANK':'Banking','ICICIBANK':'Banking','SBIN':'Banking',
   'KOTAKBANK':'Banking','AXISBANK':'Banking','BANDHANBNK':'Banking',
@@ -4262,6 +5228,24 @@ const STOCK_SECTOR_MAP = {
   'WESTLIFE':'Diversified','GRINFRA':'Diversified','DEVYANI':'Diversified',
   // TELECOM
   'BHARTIARTL':'Telecom','IDEA':'Telecom','INDUSTOWER':'Telecom',
+  'MTNL':'Telecom','TATACOMM':'Telecom','HFCL':'Telecom','STLTECH':'Telecom',
+  // AUTO 4W
+  'MARUTI':'Auto 4W','TATAMOTORS':'Auto 4W','HYUNDAI':'Auto 4W','M&M':'Auto 4W',
+  'ASHOKLEY':'Auto 4W','FORCEMOT':'Auto 4W','OLECTRA':'Auto 4W',
+  // AUTO 2W
+  'TVSMOTORS':'Auto 2W','BAJAJ-AUTO':'Auto 2W','HEROMOTOCO':'Auto 2W','EICHERMOT':'Auto 2W',
+  'OLAELEC':'Auto 2W',
+  // AUTO SPARES
+  'MOTHERSON':'Auto Spares','SONACOMS':'Auto Spares','UNOMINDA':'Auto Spares','BHAFORG':'Auto Spares',
+  'EXIDEIND':'Auto Spares','AMARAJABAT':'Auto Spares','KPIT':'Auto Spares','LUMAX':'Auto Spares',
+  'ENDURANCE':'Auto Spares','BOSCH':'Auto Spares','CRAFTSMAN':'Auto Spares',
+  // RELIANCE GROUP
+  'RELIANCE':'Reliance Group','JFS':'Reliance Group','NETWORK18':'Reliance Group',
+  'HATHWAY':'Reliance Group','DEN':'Reliance Group',
+  // ADANI GROUP
+  'ADANIENT':'Adani Group','ADANIPORTS':'Adani Group','ADANIGREEN':'Adani Group',
+  'ATGL':'Adani Group','ADANIENSOL':'Adani Group','ADANIPOWER':'Adani Group',
+  'ADANIWILM':'Adani Group','AMBUJACEM':'Adani Group','ACC':'Adani Group','NDTV':'Adani Group',
   // CONSUMER DURABLES
   'HAVELLS':'Consumer Durables','POLYCAB':'Consumer Durables','KEI':'Consumer Durables',
   'DIXON':'Consumer Durables','VOLTAS':'Consumer Durables','BLUESTARCO':'Consumer Durables',
@@ -4285,113 +5269,11 @@ const SECTOR_ASSET = {
   'Textiles':'Equity','Recycling/ESG':'Equity','Diversified':'Equity',
   'Gold':'Gold','Silver':'Gold',
   'Liquid/Cash':'Cash',
-  "Telecom":[
-    {name:"Bharti Airtel",       g:4,m:4,d:3,v:3,t:4,r:4,note:"#1 telecom; ARPU rising; Africa ops strong"},
-    {name:"Reliance Jio (Jio Financial / RJIL)",g:4,m:3,d:3,v:3,t:4,r:3,note:"Jio dominates data; 5G leader; JioFinance spinoff"},
-    {name:"Vodafone Idea (Vi)",   g:2,m:1,d:1,v:3,t:2,r:1,note:"Survival mode; debt crisis; AGR dues; high risk"},
-    {name:"Indus Towers",        g:3,m:4,d:3,v:3,t:4,r:4,note:"Tower infra monopoly; Vi recovery key risk"},
-    {name:"MTNL",                g:1,m:1,d:2,v:3,t:2,r:1,note:"PSU; loss-making; Delhi+Mumbai only"},
-    {name:"BSNL (unlisted)",     g:1,m:1,d:3,v:3,t:2,r:1,note:"PSU; 4G rollout underway; restructuring"},
-    {name:"Tata Communications", g:3,m:3,d:3,v:3,t:4,r:3,note:"Enterprise connectivity + cloud + media"},
-    {name:"HFCL",               g:4,m:3,d:3,v:3,t:4,r:3,note:"Optical fibre + defence comms; 5G infra"},
-    {name:"Sterlite Technologies",g:3,m:3,d:3,v:3,t:4,r:3,note:"Optical fibre cables + network solutions"},
-    {name:"ITI Limited",         g:3,m:2,d:3,v:3,t:3,r:2,note:"PSU telecom equipment; defence overlap"}
-  ],
-  "Auto":[
-    {name:"Maruti Suzuki",       g:3,m:4,d:5,v:3,t:4,r:5,note:"#1 passenger car; SUV + CNG + hybrid push"},
-    {name:"Tata Motors",         g:4,m:3,d:3,v:3,t:4,r:3,note:"JLR turnaround + India EVs; diversified"},
-    {name:"Hyundai Motor India", g:3,m:4,d:5,v:3,t:4,r:4,note:"#2 PV; premium mix improving; recently listed"},
-    {name:"Mahindra & Mahindra", g:4,m:4,d:4,v:3,t:4,r:4,note:"SUV dominance + tractors + EV pipeline"},
-    {name:"Bajaj Auto",          g:3,m:5,d:5,v:3,t:4,r:5,note:"Premium 2W + exports + EV (Chetak)"},
-    {name:"Hero MotoCorp",       g:2,m:4,d:5,v:3,t:3,r:4,note:"Mass 2W; rural dependent; EV pivot slow"},
-    {name:"TVS Motor Company",   g:4,m:4,d:4,v:3,t:4,r:4,note:"Premium 2W + EV + international"},
-    {name:"Eicher Motors",       g:3,m:5,d:5,v:3,t:4,r:5,note:"Royal Enfield premium niche; VECV trucks"},
-    {name:"Ashok Leyland",       g:3,m:3,d:4,v:3,t:3,r:3,note:"CV leader; Hinduja group"},
-    {name:"Tata Advanced Systems",g:4,m:3,d:4,v:3,t:4,r:3,note:"Commercial EVs + defence vehicles"},
-    {name:"Force Motors",        g:3,m:3,d:5,v:3,t:3,r:3,note:"LCV + SUV niche; BMW engine assembly"},
-    {name:"Motherson Sumi",      g:3,m:3,d:3,v:3,t:3,r:3,note:"Global auto components; wiring harness"},
-    {name:"Sona BLW (Sona Comstar)",g:4,m:4,d:5,v:3,t:4,r:4,note:"EV drivetrain + starter motors"},
-    {name:"Minda Industries",    g:4,m:3,d:4,v:3,t:4,r:3,note:"Auto components + EV tech"},
-    {name:"Bharat Forge",        g:3,m:3,d:3,v:3,t:3,r:3,note:"Forging + defence + EV axles; exports"},
-    {name:"Exide Industries",    g:3,m:3,d:4,v:3,t:3,r:3,note:"Lead-acid + Li-ion battery JV; EVs"},
-    {name:"Amara Raja Energy",   g:3,m:3,d:4,v:3,t:3,r:3,note:"Batteries + EV charging infra"},
-    {name:"Greaves Cotton",      g:3,m:2,d:4,v:3,t:4,r:3,note:"Ampere EV + engines + aftermarket"},
-    {name:"Olectra Greentech",   g:4,m:2,d:3,v:2,t:4,r:2,note:"Electric buses; growing order book"},
-    {name:"KPIT Technologies",   g:4,m:4,d:5,v:2,t:5,r:4,note:"Auto software; ADAS + EV niche"}
-  ],
-  "Metals":[
-    {name:"Tata Steel",          g:3,m:3,d:3,v:3,t:3,r:3,note:"India #1 + Europe ops; cyclical"},
-    {name:"JSW Steel",           g:3,m:3,d:3,v:3,t:3,r:3,note:"India #2; capacity expansion; Sajjan Jindal"},
-    {name:"SAIL (Steel Authority)",g:2,m:2,d:3,v:4,t:2,r:2,note:"PSU steel; low margins; capex heavy"},
-    {name:"Hindalco Industries", g:3,m:3,d:3,v:3,t:3,r:3,note:"Aluminium + Novelis (US auto sheet)"},
-    {name:"Vedanta",             g:3,m:4,d:2,v:3,t:3,r:3,note:"Zinc + oil + aluminium; high debt; dividend"},
-    {name:"Hindustan Zinc",      g:3,m:5,d:5,v:3,t:3,r:5,note:"World's 2nd largest Zn producer; Vedanta sub"},
-    {name:"National Aluminium (NALCO)",g:3,m:3,d:5,v:3,t:3,r:3,note:"PSU aluminium; dividend player"},
-    {name:"NMDC",                g:3,m:4,d:5,v:3,t:3,r:4,note:"India's largest iron ore miner; PSU"},
-    {name:"Coal India",          g:2,m:4,d:5,v:3,t:2,r:4,note:"PSU coal monopoly; dividend; ESG risk"},
-    {name:"Jindal Steel & Power",g:3,m:3,d:3,v:3,t:3,r:3,note:"Steel + power; Naveen Jindal group"},
-    {name:"JSW Energy",          g:4,m:3,d:3,v:3,t:4,r:3,note:"Merchant + long-term PPA; RE pivot"},
-    {name:"Welspun Corp",        g:3,m:3,d:4,v:3,t:3,r:3,note:"Steel pipes; oil + gas infra"},
-    {name:"APL Apollo Tubes",    g:4,m:4,d:4,v:3,t:4,r:4,note:"Structural steel tubes; construction boom"},
-    {name:"Ratnamani Metals",    g:3,m:4,d:5,v:3,t:3,r:4,note:"SS + CS pipes; oil + gas + chemical"},
-    {name:"Hindustan Copper",    g:3,m:3,d:4,v:3,t:3,r:3,note:"PSU copper mining + smelting"},
-    {name:"Lloyds Metals",       g:4,m:4,d:4,v:3,t:3,r:4,note:"Iron ore + sponge iron; growing"}
-  ],
-  "Chemicals":[
-    {name:"Asian Paints (Chemicals div.)",g:2,m:4,d:5,v:2,t:3,r:4,note:"See Paints sector for main listing"},
-    {name:"PI Industries",       g:4,m:4,d:5,v:3,t:4,r:4,note:"Agro-chem CSM + domestic; export moat"},
-    {name:"SRF Limited",         g:3,m:4,d:4,v:3,t:4,r:4,note:"Fluorochemicals + packaging + specialty"},
-    {name:"Deepak Nitrite",      g:3,m:4,d:5,v:3,t:4,r:4,note:"Basic + fine + specialty chemicals"},
-    {name:"Navin Fluorine",      g:4,m:4,d:5,v:3,t:4,r:4,note:"Fluorine chemistry; CDMO + CRAMS"},
-    {name:"Aarti Industries",    g:3,m:3,d:4,v:3,t:4,r:3,note:"Benzene derivatives; pharma + agro API"},
-    {name:"Vinati Organics",     g:3,m:4,d:5,v:3,t:4,r:5,note:"ATBS + IBB global leader; niche"},
-    {name:"UPL Limited",         g:3,m:3,d:2,v:3,t:3,r:2,note:"Agro-chem; debt concern post Arysta"},
-    {name:"Bayer CropScience",   g:2,m:4,d:5,v:3,t:3,r:4,note:"MNC agro; crop protection + seeds"},
-    {name:"Sumitomo Chemical",   g:3,m:4,d:5,v:3,t:4,r:4,note:"MNC agro + specialty chemicals"},
-    {name:"Gujarat Fluorochemicals",g:4,m:4,d:4,v:3,t:4,r:4,note:"Fluoropolymers + EV battery chemicals"},
-    {name:"Clean Science & Tech",g:4,m:5,d:5,v:3,t:4,r:5,note:"Niche functional chemicals; very high ROCE"},
-    {name:"Galaxy Surfactants",  g:3,m:4,d:5,v:3,t:3,r:4,note:"Surfactants for FMCG; domestic + export"},
-    {name:"Tata Chemicals",      g:3,m:3,d:3,v:3,t:3,r:3,note:"Soda ash + lithium battery materials"},
-    {name:"NOCIL",               g:3,m:4,d:5,v:3,t:3,r:4,note:"Rubber chemicals; sole Indian producer"}
-  ],
-  "Real Estate":[
-    {name:"DLF Limited",         g:4,m:4,d:4,v:3,t:4,r:3,note:"Premium residential + Gurgaon commercial"},
-    {name:"Godrej Properties",   g:4,m:3,d:4,v:3,t:4,r:3,note:"Pan-India launches; Godrej brand trust"},
-    {name:"Prestige Estates",    g:4,m:3,d:3,v:3,t:4,r:3,note:"South + Mumbai; diversified RE"},
-    {name:"Oberoi Realty",       g:4,m:4,d:5,v:3,t:4,r:4,note:"Mumbai luxury; debt-free; high margins"},
-    {name:"Phoenix Mills",       g:4,m:4,d:3,v:3,t:4,r:4,note:"Retail malls + residential; consumption play"},
-    {name:"Brigade Enterprises", g:3,m:3,d:3,v:3,t:4,r:3,note:"South India residential + commercial"},
-    {name:"Sobha Limited",       g:3,m:3,d:3,v:3,t:3,r:3,note:"South India quality builder; plotted dev"},
-    {name:"Lodha (Macrotech)",   g:4,m:3,d:3,v:3,t:4,r:3,note:"Mumbai mass + premium; fastest launches"},
-    {name:"Raymond Realty",      g:4,m:3,d:4,v:3,t:4,r:3,note:"Mumbai Thane micro-city; new listing"},
-    {name:"Mahindra Lifespace",  g:3,m:3,d:4,v:3,t:3,r:3,note:"Affordable + industrial parks"},
-    {name:"Kolte-Patil",         g:3,m:3,d:4,v:3,t:3,r:3,note:"Pune + Mumbai residential"},
-    {name:"Signature Global",    g:4,m:3,d:3,v:3,t:4,r:3,note:"Affordable NCR housing; fast growth"}
-  ],
-  "Adani Group":[
-    {name:"Adani Enterprises",   g:4,m:3,d:3,v:2,t:4,r:3,note:"Holding + incubator: airports, data centres, roads, solar"},
-    {name:"Adani Ports & SEZ",   g:4,m:4,d:3,v:3,t:4,r:4,note:"India's largest port operator; 15 ports + logistics"},
-    {name:"Adani Green Energy",  g:5,m:3,d:2,v:2,t:5,r:3,note:"Largest solar IPP; 20GW+ target; high debt"},
-    {name:"Adani Energy Solutions",g:4,m:3,d:3,v:3,t:5,r:3,note:"Power transmission lines + smart meters"},
-    {name:"Adani Total Gas",     g:4,m:4,d:3,v:2,t:4,r:4,note:"City gas distribution + CNG + PNG"},
-    {name:"Adani Power",         g:3,m:3,d:3,v:3,t:4,r:3,note:"Thermal power; merchant + PPA mix"},
-    {name:"Ambuja Cements",      g:3,m:3,d:4,v:3,t:4,r:3,note:"Adani group cement; #2 by capacity"},
-    {name:"ACC",                 g:3,m:3,d:4,v:3,t:4,r:3,note:"Adani group cement; pan-India"},
-    {name:"Adani Wilmar",        g:3,m:2,d:4,v:3,t:3,r:2,note:"Fortune edible oil + food products"},
-    {name:"NDTV (Adani)",        g:2,m:2,d:4,v:3,t:3,r:2,note:"News media; Adani acquired 64% stake"},
-    {name:"Adani Bravura (New Listed)",g:3,m:3,d:3,v:3,t:4,r:3,note:"Recently listed Adani entity"},
-    {name:"Mumbai Airport (MIAL)",g:4,m:3,d:3,v:3,t:4,r:3,note:"CSIA Mumbai; Adani group concession"},
-    {name:"Navi Mumbai Airport", g:4,m:2,d:3,v:3,t:5,r:2,note:"Greenfield; under construction; 2026 opening"}
-  ],
-  "Reliance Group":[
-    {name:"Reliance Industries",  g:4,m:4,d:3,v:3,t:5,r:4,note:"O2C + Jio + Retail + Green Energy; India's largest co"},
-    {name:"Reliance Jio Platforms",g:4,m:3,d:3,v:3,t:4,r:3,note:"Telecom + digital services; 500Mn users"},
-    {name:"Reliance Retail Ventures",g:4,m:3,d:3,v:3,t:5,r:3,note:"India's largest retailer; JioMart + stores"},
-    {name:"Jio Financial Services",g:4,m:2,d:5,v:3,t:5,r:2,note:"Fintech: lending + insurance + broking; early stage"},
-    {name:"Reliance Power",       g:2,m:1,d:2,v:3,t:2,r:1,note:"ADAG group; NOT Mukesh — stressed entity"},
-    {name:"Reliance Infrastructure",g:2,m:1,d:2,v:3,t:2,r:1,note:"ADAG group; debt-laden; separate from RIL"}
-  ]
+  'Auto 4W':'Equity','Auto 2W':'Equity','Auto Spares':'Equity',
+  'Reliance Group':'Equity','Adani Group':'Equity',
+  'Auto 4W':'Equity','Auto 2W':'Equity','Auto Spares':'Equity'
 };
+// Legacy company data (also referenced in COMPANIES obj above)
 
 let zhHoldings = [];
 let zhFilterSector = 'All';
@@ -4609,7 +5491,7 @@ function renderZerodhaResults() {
     {label:'Equity',  actual:currentEqPct,   target:A.eq,   color:'#ff7c00'},
     {label:'Debt',    actual:currentDebtPct,  target:A.debt, color:'#00a854'},
     {label:'Gold',    actual:currentGoldPct,  target:A.gold, color:'#ffc107'},
-    {label:'Cash',    actual:currentCashPct,  target:A.cash, color:'#9e9e9e'},
+    {label:'Cash',    actual:currentCashPct,  target:A.cash, color:'#9e9e9e'}
   ];
   const totalValL = totalVal / 100000;
   let gapHTML = '';
@@ -4756,7 +5638,7 @@ function downloadPortfolioCSV() {
     ['Cash',    A.cash+'%',(total*A.cash/100).toFixed(2), (total*A.cash/10000).toFixed(4)],
     [''],
     ['SECTOR ALLOCATION (within Equity)'],
-    ['Sector', 'Score', 'Trend', 'Phase', 'Weight %', 'Rs. Lakhs Allocated'],
+    ['Sector', 'Score', 'Trend', 'Phase', 'Weight %', 'Rs. Lakhs Allocated']
   ];
   Object.entries(SECTORS).sort((a,b)=>b[1].score-a[1].score).forEach(([nm,s])=>{
     const sAmt = eqL * s.weight / tw;
@@ -4781,7 +5663,7 @@ function downloadScreenerCSV() {
     ['CB Finance26 — Sector Screener Report'],
     ['Generated', date],
     [''],
-    ['Rank', 'Sector', 'Macro Score (/35)', 'Earnings Score (/35)', 'Structural Score (/35)', 'Composite (/100)', 'Verdict', '3-5Y Horizon', 'Investment Thesis', 'Key Risks', 'Catalysts'],
+    ['Rank', 'Sector', 'Macro Score (/35)', 'Earnings Score (/35)', 'Structural Score (/35)', 'Composite (/100)', 'Verdict', '3-5Y Horizon', 'Investment Thesis', 'Key Risks', 'Catalysts']
   ];
   const data = SCREENER_DATA
     .map(s=>({...s, composite:sComposite(s), verdict:sVerdict(sComposite(s))}))
@@ -4804,7 +5686,7 @@ function downloadCompaniesCSV() {
     ['Generated', date],
     ['Portfolio Size (Rs. Lakhs)', total],
     [''],
-    ['Sector', 'Rank', 'Company', 'CB Score', 'ROCE Quality', 'Debt Level', 'Valuation', 'Revenue Growth', 'Rs. Lakhs Suggested', 'Sector Allocation (Rs. L)'],
+    ['Sector', 'Rank', 'Company', 'CB Score', 'ROCE Quality', 'Debt Level', 'Valuation', 'Revenue Growth', 'Rs. Lakhs Suggested', 'Sector Allocation (Rs. L)']
   ];
   Object.entries(SECTORS).sort((a,b)=>b[1].score-a[1].score).forEach(([nm,s])=>{
     const sAmt = eqL * s.weight / tw;
@@ -5189,7 +6071,7 @@ const MCAP_RANK={
   "Transformers & Rectifiers":219,"Mankind Pharma":220,"Natco Pharma":221,
   "Gland Pharma":222,"Laurus Labs":223,"Biocon":224,"Ajanta Pharma":225,
   "Torrent Pharma":226,"Abbott India":227,"Pfizer India":228,"Sanofi India":229,
-  "Lupin":230,"Alkem Laboratories":231,"Hikal":232,"Suven Pharmaceuticals":233,"Piramal Pharma":234,
+  "Lupin":230,"Alkem Laboratories":231,"Hikal":232,"Cohance Lifesciences (ex-Suven)":233,"Piramal Pharma":234,
   "LTIMindtree":235,"Mphasis":236,"Persistent Systems":237,"Coforge":238,"Birlasoft":239,
   "Hexaware":240,"KPIT Technologies":241,"Tata Elxsi":242,"Cyient":243,
   "Intellect Design":244,"Newgen Software":245,"Happiest Minds":246,"Mastek":247,
@@ -5309,7 +6191,7 @@ function renderRiskIndicators(){
     {dot:'ri-crude', label:'ri-crude-label',
      level: score>5?{d:'🟢',l:'Low/Stable',c:'#006b30',bg:'#e6f4ef'} : score>0?{d:'🟡',l:'Moderate',c:'#b35c00',bg:'#fff3e0'} : {d:'🔴',l:'High — Pressure',c:'#b71c1c',bg:'#fce8e8'}},
     {dot:'ri-capex', label:'ri-capex-label',
-     level: score>3?{d:'🟢',l:'Strong',c:'#006b30',bg:'#e6f4ef'} : score>-1?{d:'🟡',l:'Moderate',c:'#b35c00',bg:'#fff3e0'} : {d:'🔴',l:'Slowing',c:'#b71c1c',bg:'#fce8e8'}},
+     level: score>3?{d:'🟢',l:'Strong',c:'#006b30',bg:'#e6f4ef'} : score>-1?{d:'🟡',l:'Moderate',c:'#b35c00',bg:'#fff3e0'} : {d:'🔴',l:'Slowing',c:'#b71c1c',bg:'#fce8e8'}}
   ];
   updates.forEach(u=>{
     const dot=document.getElementById(u.dot);
@@ -5379,10 +6261,23 @@ function buildCompanyMaster() {
   COMPANY_MASTER = [];
   Object.entries(COMPANIES).forEach(([sector, cos]) => {
     cos.forEach(c => {
+      // Compute CB score if not explicitly set (for g,m,d,v,t,r notation)
+      let score = c.score;
+      if (score === undefined) {
+        score = Math.round(((c.g||3)+(c.m||3)+(c.d||3)+(c.v||3)+(c.t||3)+(c.r||3))*100/30);
+        score = Math.min(99, Math.max(20, score));
+      }
+      // Map debt notation
+      const debtMap = {5:'Low',4:'Low',3:'Moderate',2:'High',1:'Very High'};
+      const valMap = {5:'Very Cheap',4:'Cheap',3:'Reasonable',2:'Expensive',1:'Very Expensive'};
+      // Lookup market cap rank
+      const rank = COMPANY_RANKS[c.name] || null;
       COMPANY_MASTER.push({
-        name: c.name, sector, score: c.score,
-        roce: c.roce||'Moderate', debt: c.debt||'Low',
-        val: c.val||'Reasonable', growth: c.growth||'—',
+        name: c.name, sector, score, rank,
+        roce: c.roce||(c.r>=4?'High':c.r>=3?'Moderate':'Low'),
+        debt: c.debt||debtMap[c.d]||'Moderate',
+        val: c.val||valMap[c.v]||'Reasonable',
+        growth: c.growth||(c.g>=4?'High':c.g>=3?'Moderate':'Low'),
         note: c.note||''
       });
     });
@@ -5481,21 +6376,23 @@ function renderCompanyMaster() {
         ${facSel(origIdx,k,c[k]||3,allScales[k]||['—','1','2','3','4','5'])}
       </td>`).join('');
 
-    const mcapRank = getMCapRank(c.name);
-    const rankBadge = mcapRank
-      ? `<span style="display:inline-block;background:#1565c0;color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:4px;margin-left:4px;vertical-align:middle;">${mcapRank.replace(' on BSE by Mkt Cap','')}</span>`
-      : '';
-    const nameTitle = mcapRank ? `BSE Market Cap Rank: ${mcapRank.replace('#','')} | Based on market capitalisation (size of company), not performance` : 'Not in BSE top 320 by market cap';
+    const nameTitle = c.rank ? `NSE/BSE Market Cap Rank #${c.rank}` : 'Rank not available';
     return `<tr style="border-left:3px solid ${scColor(sc)}55;">
       <td style="color:#6b7498;font-size:11px;font-weight:700;text-align:center;padding:4px 6px;">${di+1}</td>
+      <td style="text-align:center;padding:4px 8px;">${(()=>{
+        const nse = c.rank;
+        const bse = MCAP_RANK[c.name];
+        if(nse) return '<span style="font-size:11px;font-weight:800;padding:2px 7px;border-radius:6px;background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;" title="NSE Market Cap Rank">#'+nse+'</span>';
+        if(bse) return '<span style="font-size:11px;font-weight:800;padding:2px 7px;border-radius:6px;background:#f3e5f5;color:#7b1fa2;border:1px solid #ce93d8;" title="BSE Market Cap Rank (fallback)">#'+bse+'<sup style=\'font-size:7px;\'>B</sup></span>';
+        return '<span style="font-size:10px;color:#b0bcd8;">—</span>';
+      })()}</td>
       <td style="padding:4px 6px;min-width:150px;">
         <div style="display:flex;align-items:center;gap:3px;flex-wrap:wrap;">
-          <span title="${nameTitle}" style="font-size:12px;font-weight:700;color:#1a1e2e;cursor:default;white-space:nowrap;">${c.name}</span>
-          ${rankBadge}
+          <span class="co-research-link" data-coname="${c.name}" data-cosector="${c.sector}"
+            style="font-size:12px;font-weight:700;color:#1565c0;cursor:pointer;white-space:nowrap;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;">${c.name}</span>
+          <span class="co-research-link" data-coname="${c.name}" data-cosector="${c.sector}" title="Open in Research" style="cursor:pointer;font-size:10px;margin-left:3px;opacity:0.6;vertical-align:middle;">&#128269;</span>
         </div>
-        <input value="${c.name}" oninput="updateCompanyField(${origIdx},'name',this.value)"
-          style="width:140px;border:1px solid #e0e4f0;border-radius:5px;padding:3px 6px;font-size:10px;font-family:'Poppins',sans-serif;outline:none;color:#6b7498;margin-top:2px;">
-        <div style="font-size:9px;color:#6b7498;margin-top:2px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.note||''}">${c.note||''}</div>
+        <div style="font-size:9px;color:#6b7498;margin-top:1px;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${c.note||''}">${c.note||''}</div>
       </td>
       <td style="padding:4px 6px;">
         <select onchange="updateCompanyField(${origIdx},'sector',this.value)"
@@ -5513,7 +6410,9 @@ function renderCompanyMaster() {
       <td style="text-align:center;padding:4px 6px;white-space:nowrap;">
         <div style="font-size:13px;font-weight:900;color:#ff7c00;">${fmt(coAlloc)}</div>
       </td>
-      <td style="padding:4px 6px;">
+      <td style="padding:4px 6px;white-space:nowrap;">
+        <button class="co-research-link" data-coname="${c.name}" data-cosector="${c.sector}"
+          title="Open in Research" style="background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;margin-right:4px;">&#128269;</button>
         <button onclick="deleteCompanyRow(${origIdx})"
           style="background:#fce8e8;color:#b71c1c;border:1px solid #ffcdd2;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">✕</button>
       </td>
@@ -5697,7 +6596,7 @@ function loadSamplePortfolio() {
     {symbol:'POLYCAB',   name:'Polycab India',     sector:'Consumer Durables',qty:40,avg:4200,ltp:7100},
     {symbol:'TCS',       name:'TCS Ltd',           sector:'IT Services',   qty:15,  avg:3800, ltp:4100},
     {symbol:'GOLDBEES',  name:'Nippon Gold ETF',   sector:'Gold',          qty:100, avg:52,   ltp:68},
-    {symbol:'LIQUIDBEES',name:'Liquid BeES',       sector:'Liquid/Cash',   qty:500, avg:1000, ltp:1001},
+    {symbol:'LIQUIDBEES',name:'Liquid BeES',       sector:'Liquid/Cash',   qty:500, avg:1000, ltp:1001}
   ];
   renderPortfolioTable();
   calculateMyPortfolio();
@@ -5846,7 +6745,7 @@ function calculateMyPortfolio() {
     {label:'Equity',  actual:eqPct,   target:A.eq,   color:'#ff7c00'},
     {label:'Debt',    actual:debtPct, target:A.debt, color:'#00a854'},
     {label:'Gold',    actual:goldPct, target:A.gold, color:'#ffc107'},
-    {label:'Cash',    actual:cashPct, target:A.cash, color:'#9e9e9e'},
+    {label:'Cash',    actual:cashPct, target:A.cash, color:'#9e9e9e'}
   ];
   const totalL = totalVal / 100000;
   document.getElementById('myGap').innerHTML = gaps.map(g => {
@@ -5906,6 +6805,561 @@ document.addEventListener("DOMContentLoaded",()=>{
   ddRender();
   renderPortfolioTable();
 });
+
+// ══════════════════════════════════════════════════════
+// CREDIBILITY TRACKER — Stock-Level Performance Tracking
+// ══════════════════════════════════════════════════════
+
+const CRED_STORAGE_KEY = 'cbf26_credibility_v1';
+let credState = null;
+let currentCredPeriod = '1m';
+
+const PERIOD_LABELS = {
+  '1m':  '1 Month',
+  '3m':  '3 Months',
+  '6m':  '6 Months',
+  '1y':  '1 Year',
+  '3y':  '3 Years'
+};
+
+const PERIOD_DAYS = {
+  '1m': 30, '3m': 91, '6m': 182, '1y': 365, '3y': 1095
+};
+
+function loadCredState() {
+  try {
+    const raw = localStorage.getItem(CRED_STORAGE_KEY);
+    if (raw) credState = JSON.parse(raw);
+  } catch(e) { credState = null; }
+}
+
+function saveCredState() {
+  try { localStorage.setItem(CRED_STORAGE_KEY, JSON.stringify(credState)); } catch(e) {}
+}
+
+function setGoLiveDate() {
+  const inp = document.getElementById('goLiveDateInput');
+  const dateVal = inp ? inp.value : '';
+  if (!dateVal) { alert('Please select a go-live date first.'); return; }
+
+  // Lock in top 30 CB Score stocks from COMPANY_MASTER
+  buildCompanyMaster();
+  const top30 = [...COMPANY_MASTER]
+    .sort((a,b) => b.score - a.score)
+    .slice(0, 30)
+    .map(c => ({
+      name: c.name,
+      sector: c.sector,
+      cbScore: c.score,
+      rank: c.rank || null,
+      basePrice: null,
+      periods: { '1m': null, '3m': null, '6m': null, '1y': null, '3y': null }
+    }));
+
+  credState = {
+    goLiveDate: dateVal,
+    lockedAt: new Date().toISOString(),
+    nifty500Base: null,
+    nifty500Periods: { '1m': null, '3m': null, '6m': null, '1y': null, '3y': null },
+    stocks: top30
+  };
+  saveCredState();
+
+  // Hide go-live banner
+  const banner = document.getElementById('goLiveBanner');
+  if (banner) banner.style.display = 'none';
+
+  renderCredibilityPage();
+  const n = document.createElement('div');
+  n.className = 'notify-flash';
+  n.textContent = 'Go-Live locked! ' + top30.length + ' stocks tracked from ' + dateVal;
+  document.body.appendChild(n);
+  setTimeout(() => n.remove(), 3000);
+}
+
+function switchCredPeriod(period, btn) {
+  currentCredPeriod = period;
+  document.querySelectorAll('#credPeriodTabs .alt-tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderCredibilityTable();
+}
+
+function renderCredibilityPage() {
+  loadCredState();
+  if (!credState) {
+    // Show setup banner, set today as default date
+    const inp = document.getElementById('goLiveDateInput');
+    if (inp) inp.value = new Date().toISOString().split('T')[0];
+    document.getElementById('goLiveBanner').style.display = 'flex';
+    document.getElementById('goLiveDateBadge').textContent = 'Not set';
+    document.getElementById('trackingCountBadge').textContent = '0 stocks';
+    return;
+  }
+
+  // Update header badges
+  document.getElementById('goLiveDateBadge').textContent = credState.goLiveDate;
+  document.getElementById('trackingCountBadge').textContent = (credState.stocks||[]).length + ' stocks';
+  document.getElementById('lastUpdatedBadge').textContent = new Date().toLocaleDateString('en-IN');
+
+  // Hide banner if already set
+  const banner = document.getElementById('goLiveBanner');
+  if (banner) banner.style.display = 'none';
+
+  renderCredibilityTable();
+  renderCredKpis();
+}
+
+function renderCredKpis() {
+  const kpiRow = document.getElementById('credKpiRow');
+  if (!kpiRow || !credState) return;
+
+  const p = currentCredPeriod;
+  const stocks = credState.stocks || [];
+  const withData = stocks.filter(s => s.basePrice && s.periods[p]);
+  const gainers = withData.filter(s => getReturn(s, p) > 0);
+  const beaters = withData.filter(s => {
+    const ret = getReturn(s, p);
+    const bench = credState.nifty500Periods[p] && credState.nifty500Base
+      ? ((credState.nifty500Periods[p] - credState.nifty500Base) / credState.nifty500Base * 100) : null;
+    return bench !== null ? ret > bench : ret > 0;
+  });
+  const avgReturn = withData.length
+    ? (withData.reduce((s,c) => s + getReturn(c, p), 0) / withData.length).toFixed(1)
+    : '—';
+
+  kpiRow.innerHTML = `
+    <div class="kpi-card kpi-amber">
+      <div class="kpi-label">Period</div>
+      <div class="kpi-val" style="font-size:20px;color:#ff7c00;">${PERIOD_LABELS[p]}</div>
+      <div class="kpi-sub">From ${credState.goLiveDate}</div>
+    </div>
+    <div class="kpi-card kpi-green">
+      <div class="kpi-label">Stocks Tracked</div>
+      <div class="kpi-val" style="color:#00a854;">${stocks.length}</div>
+      <div class="kpi-sub">${withData.length} with price data</div>
+    </div>
+    <div class="kpi-card kpi-blue">
+      <div class="kpi-label">In Positive</div>
+      <div class="kpi-val" style="color:#1976d2;">${withData.length ? gainers.length : '—'}</div>
+      <div class="kpi-sub">of ${withData.length} with data</div>
+    </div>
+    <div class="kpi-card kpi-gold">
+      <div class="kpi-label">Avg Return</div>
+      <div class="kpi-val" style="color:#e65100;font-size:22px;">${avgReturn}${avgReturn !== '—' ? '%' : ''}</div>
+      <div class="kpi-sub">Top 30 CB Score stocks</div>
+    </div>
+    <div class="kpi-card kpi-purple">
+      <div class="kpi-label">Beat Benchmark</div>
+      <div class="kpi-val" style="color:#8e24aa;">${withData.length ? beaters.length : '—'}</div>
+      <div class="kpi-sub">vs Nifty 500</div>
+    </div>
+  `;
+}
+
+function getReturn(stock, period) {
+  if (!stock.basePrice || !stock.periods[period]) return null;
+  return ((stock.periods[period] - stock.basePrice) / stock.basePrice * 100);
+}
+
+function renderCredibilityTable() {
+  const tbody = document.getElementById('credTableBody');
+  if (!credState || !tbody) return;
+
+  const p = currentCredPeriod;
+  const niftyBase = credState.nifty500Base;
+  const niftyP = credState.nifty500Periods[p];
+  const niftyRet = (niftyBase && niftyP) ? ((niftyP - niftyBase) / niftyBase * 100) : null;
+
+  // Update period header
+  const dueDate = credState.goLiveDate ? addDays(credState.goLiveDate, PERIOD_DAYS[p]) : null;
+  document.getElementById('credPeriodHeader').innerHTML =
+    `${PERIOD_LABELS[p]} Price<br><span style="font-weight:500;text-transform:none;letter-spacing:0;font-size:9px;">${dueDate ? 'Due: ' + dueDate : 'Enter to track'}</span>`;
+
+  // Nifty 500 row at top
+  const niftyRow = `<tr style="background:#f0f8ff;border-left:4px solid #1565c0;">
+    <td style="text-align:center;font-size:10px;font-weight:700;color:#1565c0;">BENCH</td>
+    <td style="font-weight:800;color:#1565c0;font-size:12px;">Nifty 500 Index</td>
+    <td style="font-size:10px;color:#6b7498;">Benchmark</td>
+    <td style="text-align:center;">—</td>
+    <td style="text-align:center;">
+      <input type="number" placeholder="Base level" value="${credState.nifty500Base||''}"
+        onchange="updateNiftyBase(this.value)"
+        style="width:80px;border:1px solid #90caf9;border-radius:5px;padding:4px 6px;font-size:11px;font-family:'Poppins',sans-serif;text-align:right;outline:none;">
+    </td>
+    <td style="text-align:center;">
+      <input type="number" placeholder="${PERIOD_LABELS[p]} level" value="${credState.nifty500Periods[p]||''}"
+        onchange="updateNiftyPeriod('${p}', this.value)"
+        style="width:90px;border:1px solid #90caf9;border-radius:5px;padding:4px 6px;font-size:11px;font-family:'Poppins',sans-serif;text-align:right;outline:none;">
+    </td>
+    <td style="text-align:center;font-weight:800;font-size:12px;color:${niftyRet===null?'#6b7498':niftyRet>=0?'#006b30':'#b71c1c'};">
+      ${niftyRet===null ? '—' : (niftyRet>=0?'+':'')+niftyRet.toFixed(1)+'%'}
+    </td>
+    <td style="text-align:center;color:#6b7498;font-size:10px;">Reference</td>
+    <td style="text-align:center;">—</td>
+    <td style="text-align:center;">—</td>
+  </tr>`;
+
+  const stockRows = (credState.stocks || []).map((s, i) => {
+    const ret = getReturn(s, p);
+    const alpha = (ret !== null && niftyRet !== null) ? (ret - niftyRet) : null;
+    const retColor = ret === null ? '#6b7498' : ret >= 0 ? '#006b30' : '#b71c1c';
+    const alphaColor = alpha === null ? '#6b7498' : alpha >= 0 ? '#006b30' : '#b71c1c';
+
+    let signal = '—';
+    if (ret !== null) {
+      if (s.cbScore >= 75) {
+        signal = ret > 10 ? '<span style="background:#e6f4ef;color:#006b30;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:800;border:1px solid #00a854;">✓ Validated</span>'
+                : ret > 0 ? '<span style="background:#fff3e0;color:#b35c00;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:800;border:1px solid #ff7c00;">~ Partial</span>'
+                : '<span style="background:#fce8e8;color:#b71c1c;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:800;border:1px solid #e53935;">✗ Miss</span>';
+      } else {
+        signal = '<span style="background:#f3e5f5;color:#7b1fa2;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:800;">Mid</span>';
+      }
+    }
+
+    const scoreBg = s.cbScore >= 75 ? '#e6f4ef' : s.cbScore >= 55 ? '#fff3e0' : '#fce8e8';
+    const scoreColor = s.cbScore >= 75 ? '#006b30' : s.cbScore >= 55 ? '#b35c00' : '#b71c1c';
+
+    return `<tr style="border-left:3px solid ${scoreColor}44;">
+      <td style="text-align:center;font-size:11px;font-weight:800;color:#6b7498;">${i+1}</td>
+      <td>
+        <div style="font-size:12px;font-weight:800;color:#1a1e2e;">${s.name}</div>
+        ${s.rank ? `<span style="font-size:9px;font-weight:700;padding:1px 5px;background:#e8f0fe;color:#1565c0;border-radius:4px;">#${s.rank} NSE</span>` : ''}
+      </td>
+      <td style="font-size:11px;font-weight:600;color:#5a6080;">${s.sector}</td>
+      <td style="text-align:center;">
+        <span style="font-size:13px;font-weight:900;padding:3px 8px;border-radius:7px;background:${scoreBg};color:${scoreColor};border:1px solid ${scoreColor}44;">${s.cbScore}</span>
+      </td>
+      <td style="text-align:center;">
+        <input type="number" placeholder="Go-live price" value="${s.basePrice||''}"
+          onchange="updateStockPrice(${i},'base',this.value)"
+          style="width:85px;border:1px solid #dde1ec;border-radius:5px;padding:4px 6px;font-size:11px;font-family:'Poppins',sans-serif;text-align:right;outline:none;${s.basePrice?'border-color:#00a854;background:#f0fff8;':''}">
+      </td>
+      <td style="text-align:center;">
+        <input type="number" placeholder="${PERIOD_LABELS[p]}" value="${s.periods[p]||''}"
+          onchange="updateStockPrice(${i},'${p}',this.value)"
+          style="width:85px;border:1px solid #dde1ec;border-radius:5px;padding:4px 6px;font-size:11px;font-family:'Poppins',sans-serif;text-align:right;outline:none;${s.periods[p]?'border-color:#ff7c00;background:#fff8f0;':''}">
+      </td>
+      <td style="text-align:center;font-weight:800;font-size:13px;color:${retColor};">
+        ${ret === null ? '<span style="color:#b0bcd8;font-size:11px;">Enter price</span>' : (ret>=0?'+':'')+ret.toFixed(1)+'%'}
+      </td>
+      <td style="text-align:center;font-size:12px;font-weight:700;color:${niftyRet===null?'#b0bcd8':niftyRet>=0?'#006b30':'#b71c1c'};">
+        ${niftyRet===null ? '—' : (niftyRet>=0?'+':'')+niftyRet.toFixed(1)+'%'}
+      </td>
+      <td style="text-align:center;font-weight:800;font-size:13px;color:${alphaColor};">
+        ${alpha===null ? '—' : (alpha>=0?'+':'')+alpha.toFixed(1)+'%'}
+      </td>
+      <td style="text-align:center;">${signal}</td>
+    </tr>`;
+  }).join('');
+
+  tbody.innerHTML = niftyRow + stockRows;
+  renderCredKpis();
+  renderCredScoreCard();
+}
+
+function renderCredScoreCard() {
+  const card = document.getElementById('credScoreCard');
+  if (!credState || !card) return;
+
+  const p = currentCredPeriod;
+  const stocks = credState.stocks || [];
+  const withData = stocks.filter(s => s.basePrice && s.periods[p]);
+  if (withData.length === 0) { card.style.display = 'none'; return; }
+
+  card.style.display = 'grid';
+  const niftyBase = credState.nifty500Base;
+  const niftyP = credState.nifty500Periods[p];
+  const niftyRet = (niftyBase && niftyP) ? ((niftyP - niftyBase) / niftyBase * 100) : null;
+
+  // High score (≥75) vs medium (55-74) vs low (<55)
+  const high = withData.filter(s => s.cbScore >= 75);
+  const med  = withData.filter(s => s.cbScore >= 55 && s.cbScore < 75);
+  const low  = withData.filter(s => s.cbScore < 55);
+
+  const avgRet = arr => arr.length ? (arr.reduce((s,c) => s + getReturn(c,p), 0) / arr.length) : null;
+  const highAvg = avgRet(high), medAvg = avgRet(med), lowAvg = avgRet(low);
+
+  const fmtRet = v => v===null ? '—' : (v>=0?'+':'')+v.toFixed(1)+'%';
+  const retColor = v => v===null ? '#6b7498' : v>=0 ? '#006b30' : '#b71c1c';
+
+  // Credibility score: % of high-score stocks that beat nifty
+  const beatCount = niftyRet !== null ? high.filter(s => getReturn(s,p) > niftyRet).length : null;
+  const credScore = beatCount !== null && high.length ? Math.round(beatCount/high.length*100) : null;
+
+  document.getElementById('credScoreContent').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">
+      <div style="background:#e6f4ef;border-radius:10px;padding:14px;text-align:center;border:1px solid #00a85455;">
+        <div style="font-size:10px;font-weight:700;color:#006b30;margin-bottom:4px;">HIGH SCORE (≥75)</div>
+        <div style="font-size:24px;font-weight:900;color:${retColor(highAvg)};">${fmtRet(highAvg)}</div>
+        <div style="font-size:10px;color:#006b30;">${high.length} stocks avg</div>
+      </div>
+      <div style="background:#fff3e0;border-radius:10px;padding:14px;text-align:center;border:1px solid #ff7c0055;">
+        <div style="font-size:10px;font-weight:700;color:#b35c00;margin-bottom:4px;">MEDIUM (55–74)</div>
+        <div style="font-size:24px;font-weight:900;color:${retColor(medAvg)};">${fmtRet(medAvg)}</div>
+        <div style="font-size:10px;color:#b35c00;">${med.length} stocks avg</div>
+      </div>
+    </div>
+    <div style="background:#f8f9fe;border-radius:10px;padding:14px;border:1px solid #dde1ec;">
+      <div style="font-size:10px;font-weight:700;color:#6b7498;margin-bottom:6px;">NIFTY 500 BENCHMARK</div>
+      <div style="font-size:22px;font-weight:900;color:${retColor(niftyRet)};">${fmtRet(niftyRet)}</div>
+      <div style="font-size:10px;color:#6b7498;">Reference index return</div>
+    </div>
+    ${credScore !== null ? `
+    <div style="margin-top:12px;background:linear-gradient(135deg,#1a1e2e,#2a3050);border-radius:10px;padding:16px;text-align:center;">
+      <div style="font-size:11px;font-weight:700;color:#ffab40;margin-bottom:4px;">FRAMEWORK CREDIBILITY SCORE</div>
+      <div style="font-size:40px;font-weight:900;color:#fff;">${credScore}<span style="font-size:18px;">%</span></div>
+      <div style="font-size:10px;color:#8899bb;">${beatCount} of ${high.length} high-score stocks beat Nifty 500</div>
+    </div>` : ''}
+  `;
+
+  document.getElementById('credHitRateContent').innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="font-size:11px;font-weight:700;color:#006b30;">High Score (≥75) hit rate</span>
+          <span style="font-size:11px;font-weight:800;color:#006b30;">${beatCount!==null&&high.length?Math.round(beatCount/high.length*100)+'%':'—'}</span>
+        </div>
+        <div class="progress" style="height:10px;"><div class="fill-green" style="width:${beatCount!==null&&high.length?Math.round(beatCount/high.length*100):0}%"></div></div>
+      </div>
+      <div style="background:#f8f9fe;border-radius:10px;padding:12px;font-size:11px;font-weight:600;color:#5a6080;line-height:1.8;border:1px solid #dde1ec;">
+        <strong>Period:</strong> ${PERIOD_LABELS[p]} from ${credState.goLiveDate}<br>
+        <strong>Stocks with data:</strong> ${withData.length} of ${stocks.length}<br>
+        <strong>High Score stocks:</strong> ${high.length}<br>
+        <strong>Beat benchmark:</strong> ${beatCount !== null ? beatCount : '—'}<br>
+        <strong>Alpha generated:</strong> ${highAvg!==null&&niftyRet!==null ? fmtRet(highAvg-niftyRet) : '—'}
+      </div>
+    </div>
+  `;
+}
+
+function updateStockPrice(idx, field, val) {
+  if (!credState || !credState.stocks[idx]) return;
+  const v = parseFloat(val) || null;
+  if (field === 'base') credState.stocks[idx].basePrice = v;
+  else credState.stocks[idx].periods[field] = v;
+  saveCredState();
+  renderCredKpis();
+  renderCredScoreCard();
+}
+
+function updateNiftyBase(val) {
+  if (!credState) return;
+  credState.nifty500Base = parseFloat(val) || null;
+  saveCredState();
+  renderCredibilityTable();
+}
+
+function updateNiftyPeriod(period, val) {
+  if (!credState) return;
+  credState.nifty500Periods[period] = parseFloat(val) || null;
+  saveCredState();
+  renderCredibilityTable();
+}
+
+function refreshCredibility() {
+  loadCredState();
+  renderCredibilityPage();
+}
+
+function exportCredibilityCSV() {
+  if (!credState) { alert('No credibility data. Set go-live date first.'); return; }
+  const p = currentCredPeriod;
+  let csv = 'CB Rank,Company,Sector,CB Score,NSE Rank,Base Price,'+PERIOD_LABELS[p]+' Price,Return %,Nifty 500 Return %,Alpha %\n';
+  const niftyBase = credState.nifty500Base;
+  const niftyP = credState.nifty500Periods[p];
+  const niftyRet = (niftyBase && niftyP) ? ((niftyP - niftyBase) / niftyBase * 100).toFixed(2) : '';
+  (credState.stocks||[]).forEach((s,i) => {
+    const ret = getReturn(s, p);
+    const alpha = (ret !== null && niftyRet !== '') ? (ret - parseFloat(niftyRet)).toFixed(2) : '';
+    csv += `${i+1},"${s.name}","${s.sector}",${s.cbScore},${s.rank||''},${ s.basePrice||''},${s.periods[p]||''},${ret!==null?ret.toFixed(2):''},${niftyRet},${alpha}\n`;
+  });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'CBFinance26_Credibility_'+p+'_'+credState.goLiveDate+'.csv';
+  a.click();
+}
+
+function addDays(dateStr, days) {
+  const d = new Date(dateStr);
+  d.setDate(d.getDate() + days);
+  return d.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+}
+
+// Init credibility when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  loadCredState();
+  startLiveDataRefresh();  // Start GitHub live data if configured
+
+  // Delegated click handler — handles both My Plan links and Research search results
+  document.addEventListener('click', function(e) {
+    // My Plan table: company name / icon links
+    const link = e.target.closest('.co-research-link');
+    if (link) {
+      const name = link.getAttribute('data-coname');
+      const sector = link.getAttribute('data-cosector');
+      if (name && sector) goToResearch(name, sector);
+      return;
+    }
+    // Research search result cards
+    const card = e.target.closest('.dd-search-result-card');
+    if (card) {
+      const sectorId = card.getAttribute('data-sectorid');
+      const name = card.getAttribute('data-coname');
+      const note = card.getAttribute('data-conote');
+      const score = parseInt(card.getAttribute('data-coscore')) || 60;
+      const sectorName = card.getAttribute('data-sectorname');
+      if (sectorId) {
+        ddGoLevel('sector', sectorId);
+        setTimeout(() => ddHighlightCompany(name), 250);
+        switchPage('drilldown');
+      } else {
+        // Show inline info for sectors not in drill-down
+        const rank = COMPANY_RANKS[name];
+        const sc = score;
+        const scColor = sc >= 75 ? '#006b30' : sc >= 55 ? '#b35c00' : '#b71c1c';
+        const scBg = sc >= 75 ? '#e6f4ef' : sc >= 55 ? '#fff3e0' : '#fce8e8';
+        const infoDiv = document.getElementById('dd-search-results');
+        if (infoDiv) {
+          infoDiv.innerHTML += `<div style="margin-top:10px;background:#fff;border:1.5px solid ${scColor}44;border-radius:12px;padding:16px;">
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <span style="font-size:22px;font-weight:900;padding:6px 12px;border-radius:10px;background:${scBg};color:${scColor};">${sc}</span>
+              <div>
+                <div style="font-size:16px;font-weight:900;color:#1a1e2e;">${name}</div>
+                <div style="font-size:11px;color:#6b7498;font-weight:600;">${sectorName}${rank ? ' · #'+rank+' NSE' : ''}</div>
+              </div>
+            </div>
+            ${note ? `<div style="margin-top:10px;font-size:12px;font-weight:600;color:#5a6080;background:#f8f9fe;padding:8px 12px;border-radius:7px;">${note}</div>` : ''}
+            <div style="margin-top:10px;font-size:11px;color:#b35c00;font-weight:600;background:#fff8f0;padding:8px 12px;border-radius:7px;">&#9432; Detailed drill-down not yet available for this sector.</div>
+          </div>`;
+        }
+      }
+    }
+  });
+});
+
+
+// ══════════════════════════════════════════════════════════════
+// GITHUB LIVE DATA LOADER
+// Replace DATA_REPO_URL with your GitHub repo raw URL when ready
+// ══════════════════════════════════════════════════════════════
+
+const GITHUB_CONFIG = {
+  enabled: false,  // Set to true once your GitHub repo is ready
+  baseUrl: 'https://raw.githubusercontent.com/YOUR_USERNAME/cbfinance26-data/main',
+  refreshIntervalMinutes: 30,
+  token: null  // Optional: for private repos — set via setGithubToken()
+};
+
+function setGithubToken(token) {
+  GITHUB_CONFIG.token = token;
+  sessionStorage.setItem('cbf26_gh_token', token);
+}
+
+function getGithubToken() {
+  return GITHUB_CONFIG.token || sessionStorage.getItem('cbf26_gh_token') || null;
+}
+
+async function fetchGithubJson(path) {
+  const url = GITHUB_CONFIG.baseUrl + '/' + path;
+  const headers = { 'Accept': 'application/json' };
+  const token = getGithubToken();
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  const res = await fetch(url, { headers });
+  if (!res.ok) throw new Error('HTTP ' + res.status + ' for ' + path);
+  return res.json();
+}
+
+async function loadLiveData() {
+  if (!GITHUB_CONFIG.enabled) return;
+  const badge = document.getElementById('dataStatusBadge');
+  try {
+    if (badge) { badge.style.display='inline-block'; badge.textContent='↻ Loading...'; badge.style.background='#fff3e0'; badge.style.color='#b35c00'; badge.style.borderColor='#ff7c0044'; }
+
+    // Fetch all data files in parallel
+    const [liveSectors, liveCompanies, liveScreener, liveMeta] = await Promise.all([
+      fetchGithubJson('sectors.json'),
+      fetchGithubJson('companies.json'),
+      fetchGithubJson('screener.json'),
+      fetchGithubJson('meta.json').catch(() => null)
+    ]);
+
+    // Merge sectors
+    if (liveSectors) Object.assign(SECTORS, liveSectors);
+
+    // Merge companies (replace per-sector arrays)
+    if (liveCompanies) {
+      Object.entries(liveCompanies).forEach(([sector, cos]) => {
+        COMPANIES[sector] = cos;
+      });
+    }
+
+    // Replace screener data
+    if (liveScreener && Array.isArray(liveScreener)) {
+      SCREENER_DATA.splice(0, SCREENER_DATA.length, ...liveScreener);
+    }
+
+    // Re-render all affected components
+    buildCompanyMaster();
+    populateSectorFilter();
+    renderCompanyMaster();
+    updateAll();
+    renderScreener('all');
+    ddRender();
+
+    // Update status badge
+    const ts = liveMeta?.lastUpdated || new Date().toLocaleString('en-IN');
+    if (badge) {
+      badge.style.display = 'inline-block';
+      badge.innerHTML = '✓ Live · ' + ts;
+      badge.style.background = '#e6f4ef';
+      badge.style.color = '#006b30';
+      badge.style.borderColor = '#00a85444';
+    }
+
+    console.log('CB Finance26: Live data loaded from GitHub');
+
+  } catch(err) {
+    console.warn('CB Finance26: GitHub data load failed, using built-in data.', err.message);
+    if (badge) {
+      badge.style.display = 'inline-block';
+      badge.innerHTML = '⚡ Built-in data';
+      badge.style.background = '#f5f6fa';
+      badge.style.color = '#6b7498';
+      badge.style.borderColor = '#dde1ec44';
+    }
+  }
+}
+
+// Auto-refresh at configured interval
+function startLiveDataRefresh() {
+  if (!GITHUB_CONFIG.enabled) return;
+  loadLiveData();
+  setInterval(loadLiveData, GITHUB_CONFIG.refreshIntervalMinutes * 60 * 1000);
+}
+
+// Enable GitHub live data (call this from console or inject after auth)
+// Usage: enableGithubLiveData('https://raw.githubusercontent.com/user/repo/main', 'optional_token')
+window.enableGithubLiveData = function(baseUrl, token) {
+  GITHUB_CONFIG.enabled = true;
+  if (baseUrl) GITHUB_CONFIG.baseUrl = baseUrl;
+  if (token) GITHUB_CONFIG.token = token;
+  localStorage.setItem('cbf26_github_config', JSON.stringify({ enabled: true, baseUrl: GITHUB_CONFIG.baseUrl }));
+  loadLiveData();
+  console.log('CB Finance26: GitHub live data enabled from', GITHUB_CONFIG.baseUrl);
+};
+
+// Check if previously enabled
+(function restoreGithubConfig() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('cbf26_github_config') || '{}');
+    if (saved.enabled && saved.baseUrl) {
+      GITHUB_CONFIG.enabled = true;
+      GITHUB_CONFIG.baseUrl = saved.baseUrl;
+    }
+  } catch(e) {}
+})();
+
 </script>
 
 <!-- FIXED BOTTOM DOWNLOAD BAR -->
