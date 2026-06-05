@@ -1844,6 +1844,238 @@ document.addEventListener('copy', e=>{
     </div>
   </div>
 
+  <!-- ════════════════════════════════════════════════════════════════════
+       STEP 3.5 — LIVE MARKET INTELLIGENCE (Volume + Sentiment Data)
+       ════════════════════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════════════════════
+       STEP 3.5 — LIVE MARKET INTELLIGENCE (Auto-fetch from NSE)
+       ════════════════════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════════════════════════
+       STEP 3.5 — DAILY MARKET DASHBOARD (All 760 Companies)
+       ════════════════════════════════════════════════════════════════════ -->
+  <div class="card full" id="liveIntelCard" style="border-top:3px solid #1976d2;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+      <h2 style="margin-bottom:0;"><span class="icon">📡</span>Step 3.5 — Daily Market Dashboard
+        <span style="font-size:11px;font-weight:600;color:#fff;background:#1976d2;padding:3px 9px;border-radius:10px;margin-left:8px;">LIVE NSE</span>
+      </h2>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <span id="dashLastUpdate" style="font-size:10px;font-weight:700;color:#6b7498;"></span>
+        <button onclick="dashExportToday()" style="background:linear-gradient(135deg,#006b30,#00a854);color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;">📥 Export Today → Excel</button>
+        <button onclick="dashExportHistory()" style="background:linear-gradient(135deg,#7b1fa2,#8e24aa);color:#fff;border:none;padding:7px 14px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;">📚 Export Full History → Excel</button>
+        <button onclick="dashClearHistory()" style="background:#fce8e8;color:#b71c1c;border:1px solid #ffcdd2;padding:6px 12px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">🗑 Clear History</button>
+      </div>
+    </div>
+
+    <div style="font-size:11px;font-weight:600;color:#5a6080;margin-bottom:14px;line-height:1.7;background:#e3f2fd;padding:10px 14px;border-radius:8px;border-left:3px solid #1976d2;">
+      All <strong id="dashTotalCount">765</strong> CB Finance26 companies organised by sector. Fetch live NSE data in one click — Volume, Delivery %, FII/DII, PCR, Bulk Deals, Price Change and CB Score are auto-computed and applied.
+      Data is <strong>stored daily in your browser</strong> and exportable to Excel anytime. Last 7 days shown as sparklines per stock.
+    </div>
+
+    <!-- CONTROL BAR -->
+    <div style="background:#1a1e2e;border-radius:12px;padding:14px 18px;margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      <!-- Sector filter -->
+      <div>
+        <label style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Filter Sector</label>
+        <select id="dashSectorFilter" onchange="dashRenderTable()"
+          style="padding:8px 12px;border:1.5px solid #2a3050;border-radius:7px;font-size:12px;font-weight:700;font-family:'Poppins',sans-serif;outline:none;background:#0d1117;color:#ffab40;">
+          <option value="all">All Sectors</option>
+        </select>
+      </div>
+      <!-- Search -->
+      <div style="flex:1;min-width:160px;">
+        <label style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Search Company</label>
+        <input id="dashSearch" placeholder="Type name or NSE symbol…" oninput="dashRenderTable()"
+          style="width:100%;padding:8px 12px;border:1.5px solid #2a3050;border-radius:7px;font-size:12px;font-weight:700;font-family:'Poppins',sans-serif;outline:none;background:#0d1117;color:#c8d0e8;">
+      </div>
+      <!-- Sort -->
+      <div>
+        <label style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;">Sort By</label>
+        <select id="dashSort" onchange="dashRenderTable()"
+          style="padding:8px 12px;border:1.5px solid #2a3050;border-radius:7px;font-size:12px;font-weight:700;font-family:'Poppins',sans-serif;outline:none;background:#0d1117;color:#ffab40;">
+          <option value="sector">Sector A→Z</option>
+          <option value="volScore_d">Vol Score ↓</option>
+          <option value="sentScore_d">Sent Score ↓</option>
+          <option value="cbScore_d">CB Score ↓</option>
+          <option value="del_d">Delivery % ↓</option>
+          <option value="pct_d">Price Change ↓</option>
+        </select>
+      </div>
+      <!-- Fetch buttons -->
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:14px;">
+        <button onclick="dashFetchSector()" id="dashFetchSectorBtn"
+          style="background:linear-gradient(135deg,#ff7c00,#ff9a00);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;white-space:nowrap;">
+          ⚡ Fetch Filtered Sector
+        </button>
+        <button onclick="dashFetchAll()" id="dashFetchAllBtn"
+          style="background:linear-gradient(135deg,#1565c0,#1976d2);color:#fff;border:none;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;white-space:nowrap;">
+          🔄 Fetch All (Batch)
+        </button>
+      </div>
+      <!-- Progress -->
+      <div style="flex:1;min-width:180px;margin-top:14px;">
+        <div id="dashProgressLabel" style="font-size:10px;font-weight:700;color:#8a9bbf;margin-bottom:5px;">Ready</div>
+        <div style="height:6px;background:#0d1117;border-radius:3px;overflow:hidden;">
+          <div id="dashProgressBar" style="height:100%;width:0%;background:linear-gradient(90deg,#ff7c00,#ffab40);border-radius:3px;transition:width 0.3s;"></div>
+        </div>
+        <div id="dashProgressCount" style="font-size:9px;color:#6b7498;margin-top:3px;"></div>
+      </div>
+    </div>
+
+    <!-- FII/DII MARKET-WIDE BANNER (fetched once, applies to all) -->
+    <div id="dashFIIBanner" style="display:none;background:linear-gradient(135deg,#1a1e2e,#2a3050);border-radius:10px;padding:12px 18px;margin-bottom:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+      <div style="text-align:center;">
+        <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">FII Net Today</div>
+        <div id="dbFIINet" style="font-size:22px;font-weight:900;color:#9e9e9e;">—</div>
+        <div style="font-size:9px;color:#6b7498;">₹ Crore</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">DII Net Today</div>
+        <div id="dbDIINet" style="font-size:22px;font-weight:900;color:#9e9e9e;">—</div>
+        <div style="font-size:9px;color:#6b7498;">₹ Crore</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">Market Signal</div>
+        <div id="dbFIISignal" style="font-size:13px;font-weight:800;color:#ffab40;margin-top:4px;">—</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">Nifty Option PCR</div>
+        <div id="dbNiftyPCR" style="font-size:22px;font-weight:900;color:#9e9e9e;">—</div>
+        <div id="dbPCRSignal" style="font-size:9px;color:#6b7498;">—</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">Date</div>
+        <div id="dbDate" style="font-size:13px;font-weight:800;color:#c8d0e8;margin-top:4px;">—</div>
+      </div>
+    </div>
+
+    <!-- BHAVCOPY CSV PASTE (batch) -->
+    <div style="background:#f8f9fe;border:1px solid #c5d4f0;border-radius:10px;padding:14px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+        <div style="font-size:12px;font-weight:800;color:#b35c00;">📋 Paste Full Bhavcopy CSV (Instant Batch Fill)</div>
+        <a href="https://www.nseindia.com/report-detail/eq_security" target="_blank"
+          style="font-size:10px;font-weight:700;color:#1976d2;text-decoration:none;">↗ Download Bhavcopy</a>
+        <span style="font-size:9px;color:#6b7498;">Paste the entire CM Bhavcopy CSV — all your companies auto-populate in one go</span>
+      </div>
+      <textarea id="dashBhavPaste" rows="4"
+        placeholder="Paste NSE CM Bhavcopy CSV here — NEW format (post Jul 2024) or OLD format, auto-detected&#10;NEW: TradDt,BizDt,Sgmt,Src,FinInstrmTp,FinInstrmId,ISIN,TckrSymb,SctySrs,…,OpnPric,HghPric,LwPric,ClsPric,LastPric,PrvsClsgPric,TtlTradgVol,TtlTrfVal,…&#10;OLD: SYMBOL,SERIES,OPEN,HIGH,LOW,CLOSE,LAST,PREVCLOSE,TOTTRDQTY,TOTTRDVAL,TIMESTAMP,TOTALTRADES,ISIN&#10;Header row is required — it is used to auto-detect format"
+        style="width:100%;padding:10px;border:1.5px solid #b0bcd8;border-radius:8px;font-size:10px;font-family:'Poppins',sans-serif;outline:none;background:#fff;resize:vertical;">
+      </textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap;">
+        <button onclick="dashParseBhavcopy()"
+          style="background:linear-gradient(135deg,#b35c00,#ff7c00);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;">
+          ⚡ Parse & Load All Companies
+        </button>
+        <button onclick="document.getElementById('dashBhavPaste').value='';dashBhavStatus.textContent=''"
+          style="background:#f5f6fa;color:#6b7498;border:1px solid #dde1ec;padding:7px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">
+          ✕ Clear
+        </button>
+        <div id="dashBhavStatus" style="font-size:11px;font-weight:700;color:#006b30;"></div>
+      </div>
+    </div>
+
+    <!-- DELIVERY DATA PASTE (separate NSE file) -->
+    <div style="background:#fff8f0;border:1px solid #ffd0a0;border-radius:10px;padding:14px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+        <div style="font-size:12px;font-weight:800;color:#b35c00;">📦 Paste Security-wise Delivery Data CSV (for Delivery %)</div>
+        <a href="https://www.nseindia.com/all-reports" target="_blank" style="font-size:10px;font-weight:700;color:#1976d2;text-decoration:none;">↗ NSE All Reports → Security-wise Delivery Data</a>
+        <span style="font-size:9px;color:#6b7498;">Delivery % is in a separate NSE file — "Security-wise Delivery Data" under Capital Market section</span>
+      </div>
+      <textarea id="dashDelivPaste" rows="3"
+        placeholder="Paste NSE Security-wise Delivery Data CSV here&#10;Format: SYMBOL,SERIES,QUANTITY_TRADED,DELIVERABLE_QTY,% DELI QTY TO TRADED QTY&#10;RELIANCE,EQ,4523167,2876543,63.59&#10;HDFCBANK,EQ,…"
+        style="width:100%;padding:10px;border:1.5px solid #ffd0a0;border-radius:8px;font-size:10px;font-family:'Poppins',sans-serif;outline:none;background:#fff;resize:vertical;">
+      </textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center;">
+        <button onclick="dashParseDelivery()"
+          style="background:linear-gradient(135deg,#b35c00,#ff9a00);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;">
+          📦 Merge Delivery % into Dashboard
+        </button>
+        <div id="dashDelivStatus" style="font-size:11px;font-weight:700;color:#006b30;"></div>
+      </div>
+    </div>
+
+    <!-- MAIN DATA TABLE -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+      <div style="font-size:12px;font-weight:800;color:#1565c0;text-transform:uppercase;letter-spacing:0.5px;">
+        📊 Daily Data — <span id="dashRowCount">0</span> companies shown
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button onclick="dashApplyAllScores()"
+          style="background:linear-gradient(135deg,#006b30,#00a854);color:#fff;border:none;padding:7px 16px;border-radius:8px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;">
+          ✔ Apply All Scores → CB Scores
+        </button>
+        <label style="font-size:10px;font-weight:700;color:#6b7498;">
+          <input type="checkbox" id="dashOnlyFetched" onchange="dashRenderTable()" style="margin-right:4px;">
+          Show fetched only
+        </label>
+      </div>
+    </div>
+
+    <div class="table-scroll" id="dashTableWrap">
+      <table id="dashTable" style="font-size:11px;">
+        <thead>
+          <tr style="position:sticky;top:0;z-index:10;background:#f5f6fa;">
+            <th style="min-width:32px;">#</th>
+            <th style="min-width:90px;">Sector</th>
+            <th style="min-width:140px;">Company</th>
+            <th style="min-width:60px;">Symbol</th>
+            <th style="min-width:55px;" title="CB Score (0-100)">CB Score</th>
+            <th style="min-width:70px;" title="Today's close price">Close ₹</th>
+            <th style="min-width:65px;" title="% change vs prev close">Chg %</th>
+            <th style="min-width:75px;" title="Traded volume today">Volume</th>
+            <th style="min-width:60px;" title="Delivery % of traded qty">Del %</th>
+            <th style="min-width:70px;" title="Turnover in ₹ Crore">₹Cr Turn</th>
+            <th style="min-width:70px;" title="FII net buy/sell ₹Cr">FII Net</th>
+            <th style="min-width:55px;" title="Put/Call Ratio">PCR</th>
+            <th style="min-width:80px;" title="Bulk/Block deals today">Bulk Deal</th>
+            <th style="min-width:55px;" title="Volume Score 1-5">Vol ⭐</th>
+            <th style="min-width:55px;" title="Sentiment Score 1-5">Sent ⭐</th>
+            <th style="min-width:110px;" title="7-day Vol Score trend">7d Trend</th>
+            <th style="min-width:60px;">Status</th>
+          </tr>
+        </thead>
+        <tbody id="dashTableBody">
+          <tr><td colspan="17" style="text-align:center;padding:32px;color:#9e9e9e;font-size:12px;">
+            Click <strong>⚡ Fetch Filtered Sector</strong> or paste Bhavcopy CSV above to load data
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- TREND CHART PANEL -->
+    <div id="dashTrendPanel" style="display:none;margin-top:14px;background:#f8f9fe;border:1px solid #c5d4f0;border-radius:12px;padding:16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:800;color:#1565c0;" id="dashTrendTitle">7-Day Trend</div>
+        <button onclick="document.getElementById('dashTrendPanel').style.display='none'"
+          style="background:#f0f2f8;border:1px solid #dde1ec;padding:4px 10px;border-radius:6px;font-size:11px;cursor:pointer;font-family:'Poppins',sans-serif;">✕ Close</button>
+      </div>
+      <canvas id="dashTrendChart" style="max-height:260px;"></canvas>
+    </div>
+
+    <!-- HISTORY VIEWER -->
+    <div style="margin-top:14px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap;">
+        <div style="font-size:12px;font-weight:800;color:#7b1fa2;text-transform:uppercase;letter-spacing:0.5px;">📅 Stored History</div>
+        <select id="dashHistoryDate" onchange="dashShowHistory()" style="border:1px solid #dde1ec;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;font-family:'Poppins',sans-serif;outline:none;">
+          <option value="">Select a date to review…</option>
+        </select>
+        <span id="dashHistoryCount" style="font-size:10px;color:#6b7498;font-weight:700;"></span>
+      </div>
+      <div id="dashHistoryWrap" style="display:none;" class="table-scroll">
+        <table id="dashHistoryTable" style="font-size:10px;">
+          <thead><tr>
+            <th>Company</th><th>Symbol</th><th>Sector</th>
+            <th>Close ₹</th><th>Chg %</th><th>Volume</th><th>Del %</th><th>Turnover ₹Cr</th>
+            <th>FII Net</th><th>PCR</th><th>Bulk</th><th>Vol ⭐</th><th>Sent ⭐</th>
+          </tr></thead>
+          <tbody id="dashHistoryBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <!-- END STEP 3.5 -->
+
+
   <!-- COMPANY-FIRST MASTER TABLE -->
   <div class="card full" style="border-top:3px solid #ff7c00;">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
@@ -2750,7 +2982,7 @@ function switchPage(id,btn){
   window.scrollTo({top:0,behavior:'smooth'});
   if(id==='drilldown') ddRender();
   if(id==='credibility') renderCredibilityPage();
-  if(id==='model') setTimeout(renderVSPanel, 100);
+  if(id==='model') { setTimeout(renderVSPanel, 100); setTimeout(populateLiveDataLists, 150); }
 }
 
 
@@ -3227,6 +3459,8 @@ const COMPANIES={
   "Capital Goods":[
     {name:"L&T",g:4,m:4,d:3,v:3,t:5,r:4,note:"Largest EPC; record order book"},
     {name:"BHEL",g:3,m:2,d:3,v:3,t:4,r:2,note:"PSU heavy electrical; revival"},
+    {name:"Shakti Pumps",g:4,m:3,d:4,v:3,t:4,r:3,note:"Solar & agri pumps; PM-KUSUM tailwind"},
+    {name:"Shaily Engineering",g:3,m:3,d:4,v:3,t:4,r:3,note:"Precision plastics; pharma + consumer packaging"},
     {name:"Siemens India",g:4,m:4,d:5,v:2,t:5,r:5,note:"Grid tech + factory automation"},
     {name:"ABB India",g:4,m:4,d:5,v:2,t:5,r:5,note:"Switchgear + transformer leader"},
     {name:"Thermax",g:3,m:3,d:5,v:3,t:4,r:4,note:"Industrial energy; clean pivot"},
@@ -3396,6 +3630,9 @@ const COMPANIES={
   ],
   "Brokers/Wealth":[
     {name:"360 One WAM",g:5,m:5,d:5,v:3,t:5,r:4,note:"Ultra-HNI wealth leader"},
+    {name:"BSE Ltd",g:4,m:4,d:5,v:3,t:5,r:4,note:"Stock exchange; high operating leverage"},
+    {name:"CDSL",g:4,m:4,d:5,v:3,t:5,r:4,note:"Depository; duopoly with NSDL; demat growth"},
+    {name:"NSDL",g:3,m:4,d:5,v:3,t:5,r:4,note:"Depository; institutional-heavy demat book"},
     {name:"Angel One",g:4,m:4,d:5,v:3,t:5,r:4,note:"Discount broker + wealth + AMC"},
     {name:"ICICI Securities",g:3,m:4,d:5,v:3,t:4,r:4,note:"Full-service + digital platform"},
     {name:"Nuvama Wealth",g:4,m:4,d:5,v:3,t:5,r:4,note:"Edelweiss wealth arm"},
@@ -7991,6 +8228,1001 @@ function resetVolumeSentiment() {
   } catch(e) {}
 })();
 
+// ═══════════════════════════════════════════════════════════════════════
+// STEP 3.5 — DAILY MARKET DASHBOARD (All companies, localStorage, Excel)
+// ═══════════════════════════════════════════════════════════════════════
+
+// NSE Symbol map: CB Finance26 company name → NSE ticker
+const NSE_SYMBOL_MAP = {
+  // Banking PSU & Large Private
+  "HDFC Bank":"HDFCBANK","ICICI Bank":"ICICIBANK","SBI":"SBIN","Kotak Mahindra Bank":"KOTAKBANK",
+  "Axis Bank":"AXISBANK","Bank of Baroda":"BANKBARODA","Punjab National Bank":"PNB",
+  "Canara Bank":"CANBK","Union Bank":"UNIONBANK","IndusInd Bank":"INDUSINDBK",
+  "Federal Bank":"FEDERALBNK","IDFC First Bank":"IDFCFIRSTB","Yes Bank":"YESBANK",
+  "Bandhan Bank":"BANDHANBNK","RBL Bank":"RBLBANK","South Indian Bank":"SOUTHBANK",
+  "Karur Vysya Bank":"KARURVYSYA","City Union Bank":"CUB","DCB Bank":"DCBBANK",
+  "Karnataka Bank":"KTKBANK","Jammu & Kashmir Bank":"J&KBANK","CSB Bank":"CSBBANK",
+  "Ujjivan Small Finance Bank":"UJJIVANSFB","AU Small Finance Bank":"AUBANK",
+  "Equitas Small Finance Bank":"EQUITASBNK","Suryoday Small Finance Bank":"SURYODAY",
+  "ESAF Small Finance Bank":"ESAFSFB","Utkarsh Small Finance Bank":"UTKARSHBNK",
+  // NBFC
+  "Bajaj Finance":"BAJFINANCE","Bajaj Finserv":"BAJAJFINSV","Muthoot Finance":"MUTHOOTFIN",
+  "Shriram Finance":"SHRIRAMFIN","Chola Finance":"CHOLAFIN","L&T Finance":"LTF",
+  "Mahindra Finance":"M&MFIN","Sundaram Finance":"SUNDARMFIN","LIC Housing Finance":"LICHSGFIN",
+  "PNB Housing":"PNBHOUSING","Can Fin Homes":"CANFINHOME","Home First Finance":"HOMEFIRST",
+  "Aptus Value Housing":"APTUS","Aavas Financiers":"AAVAS","India Shelter Finance":"INDIASHLTR",
+  "Manappuram Finance":"MANAPPURAM","IIFL Finance":"IIFL","Five Star Finance":"FIVESTAR",
+  "Credit Access Grameen":"CREDITACC","Spandana Sphoorty":"SPANDANA",
+  // Insurance
+  "SBI Life":"SBILIFE","HDFC Life":"HDFCLIFE","ICICI Prudential Life":"ICICIPRULI",
+  "Max Life Insurance":"MAXLIFE","Star Health Insurance":"STARHEALTH","Niva Bupa":"NIVABUPA",
+  "Go Digit Insurance":"GODIGIT","ICICI Lombard":"ICICIGI","New India Assurance":"NIACL",
+  "General Insurance Corp":"GICRE",
+  // IT Services
+  "TCS":"TCS","Infosys":"INFY","Wipro":"WIPRO","HCL Technologies":"HCLTECH",
+  "Tech Mahindra":"TECHM","LTIMindtree":"LTIM","Mphasis":"MPHASIS",
+  "Persistent Systems":"PERSISTENT","Coforge":"COFORGE","Hexaware":"HEXAWARE",
+  "KPIT Technologies":"KPITTECH","Cyient":"CYIENT","Mastek":"MASTEK",
+  "Birlasoft":"BSOFT","Zensar Technologies":"ZENSARTECH","Sonata Software":"SONATSOFTW",
+  // Power & Energy
+  "NTPC":"NTPC","Power Grid Corp":"POWERGRID","NHPC":"NHPC","SJVN":"SJVN",
+  "CESC":"CESC","Tata Power":"TATAPOWER","Adani Green":"ADANIGREEN",
+  "Adani Energy Solutions":"ADANIENSOL","Torrent Power":"TORNTPOWER","JSW Energy":"JSWENERGY",
+  "Waaree Energies":"WAAREEENER","Premier Energies":"PREMIERENE","KPI Green Energy":"KPIGREEN",
+  "KEC International":"KEC","Genus Power":"GENUSPOWER","Hitachi Energy India":"POWERINDIA",
+  "Voltamp Transformers":"VOLTAMP","Transformers & Rectifiers":"TRIL",
+  "Sterling & Wilson":"STLTECH","Websol Energy":"WEBSOL",
+  // Auto
+  "Maruti Suzuki":"MARUTI","Tata Motors":"TATAMOTORS","Mahindra & Mahindra":"M&M",
+  "Hyundai Motor India":"HYUNDAI","Bajaj Auto":"BAJAJ-AUTO","Hero MotoCorp":"HEROMOTOCO",
+  "TVS Motor":"TVSMOTOR","Eicher Motors":"EICHERMOT","Ashok Leyland":"ASHOKLEY",
+  "Force Motors":"FORCEMOT","Escorts Kubota":"ESCORTS","Ola Electric":"OLAELEC",
+  // Pharma
+  "Sun Pharma":"SUNPHARMA","Dr Reddy's":"DRREDDY","Cipla":"CIPLA","Divi's Lab":"DIVISLAB",
+  "Lupin":"LUPIN","Aurobindo Pharma":"AUROPHARMA","Mankind Pharma":"MANKIND",
+  "Zydus Lifesciences":"ZYDUSLIFE","Abbott India":"ABBOTINDIA","Pfizer India":"PFIZER",
+  "Sanofi India":"SANOFI","Gland Pharma":"GLAND","Biocon":"BIOCON",
+  "Laurus Labs":"LAURUSLABS","Ipca Laboratories":"IPCALAB","Alkem Laboratories":"ALKEM",
+  // Metals & Mining
+  "Tata Steel":"TATASTEEL","JSW Steel":"JSWSTEEL","Hindalco":"HINDALCO",
+  "SAIL":"SAIL","NMDC":"NMDC","Vedanta":"VEDL","Coal India":"COALINDIA",
+  "NALCO":"NATIONALUM","Hindustan Zinc":"HINDZINC","Hindustan Copper":"HINDCOPPER",
+  "MOIL":"MOIL","Godawari Power":"GPIL","Welspun Corp":"WELCORP",
+  "APL Apollo Tubes":"APLAPOLLO","Ratnamani Metals":"RATNAMANI",
+  // Conglomerates / large
+  "Reliance Industries":"RELIANCE","Adani Ports":"ADANIPORTS","Adani Enterprises":"ADANIENT",
+  "Adani Total Gas":"ATGL","Adani Wilmar":"AWL","Adani Power":"ADANIPOWER",
+  "Ambuja Cements":"AMBUJACEM","ACC":"ACC","ONGC":"ONGC","IOC":"IOC",
+  "BPCL":"BPCL","HPCL":"HPCL","GAIL":"GAIL","IGL":"IGL","MGL":"MGL",
+  "Petronet LNG":"PETRONET","Larsen & Toubro":"LT","Siemens India":"SIEMENS",
+  "ABB India":"ABB","Havells India":"HAVELLS","Bharat Electronics":"BEL",
+  "HAL":"HAL","BDL":"BDL","BEML":"BEML","Mazagon Dock":"MAZDOCK",
+  "Cochin Shipyard":"COCHINSHIP","GRSE":"GRSE","Data Patterns":"DATAPATTNS",
+  "Paras Defence":"PARAS","MTAR Tech":"MTAR","Bharat Forge":"BHARATFORG",
+  "Titagarh Rail":"TITAGARH",
+  // New Age Tech
+  "Zomato":"ZOMATO","Swiggy":"SWIGGY","Nykaa":"NYKAA","PayTM":"PAYTM",
+  "Policy Bazaar":"POLICYBZR","Nazara Technologies":"NAZARA","CarTrade Tech":"CARTRADE",
+  "EaseMyTrip":"EASEMYTRIP","Indiamart":"INDIAMART","Info Edge":"NAUKRI",
+  "Delhivery":"DELHIVERY",
+  // Telecom
+  "Airtel":"BHARTIARTL","Vodafone Idea":"IDEA","Indus Towers":"INDUSTOWER",
+  "Railtel":"RAILTEL","Tata Teleservices":"TTML",
+  // Cement
+  "UltraTech Cement":"ULTRACEMCO","Shree Cement":"SHREECEM","Dalmia Bharat":"DALBHARAT",
+  "JK Cement":"JKCEMENT","Ramco Cement":"RAMCOCEM","Nuvoco Vistas":"NUVOCO",
+  "Birla Corporation":"BIRLACORPN",
+  // FMCG
+  "HUL":"HINDUNILVR","ITC":"ITC","Nestle India":"NESTLEIND","Britannia":"BRITANNIA",
+  "Dabur":"DABUR","Marico":"MARICO","Godrej Consumer":"GODREJCP","Emami":"EMAMILTD",
+  "Colgate":"COLPAL","Varun Beverages":"VBL","Tata Consumer":"TATACONSUM",
+  // Real Estate
+  "DLF":"DLF","Godrej Properties":"GODREJPROP","Prestige Estates":"PRESTIGE",
+  "Macrotech":"LODHA","Oberoi Realty":"OBEROIRLTY","Brigade Enterprises":"BRIGADE",
+  "Sobha":"SOBHA","Puravankara":"PURVA","Signature Global":"SIGNATURE",
+  // Capital Goods
+  "Shakti Pumps":"SHAKTIPUMP","Shaily Engineering":"SHAILYENG",
+  "Thermax":"THERMAX","Bharat Heavy Electricals":"BHEL","Cummins India":"CUMMINSIND",
+  "Voltas":"VOLTAS","Blue Star":"BLUESTAR","Polycab":"POLYCAB",
+  "Finolex Cables":"FINCABLES","KEI Industries":"KEI","V-Guard":"VGUARD",
+  "Astral":"ASTRAL","Supreme Industries":"SUPREMEIND",
+  // Brokers / Wealth / AMC
+  "BSE Ltd":"BSE","CDSL":"CDSL","NSDL":"NSDL",
+  "Angel One":"ANGELONE","ICICI Securities":"ISEC","Motilal Oswal":"MOTILALOFS",
+  "360 One WAM":"360ONE","Nuvama Wealth":"NUVAMA","Nippon India AMC":"NAM-INDIA",
+  "HDFC AMC":"HDFCAMC","UTI AMC":"UTIAMC","Aditya Birla Sun Life":"ABSLAMC",
+  "Edelweiss":"EDELWEISS","Anand Rathi":"ANANDRATHI","JM Financial":"JMFINANCL",
+  // Hospitals
+  "Apollo Hospitals":"APOLLOHOSP","Fortis Healthcare":"FORTIS","Max Healthcare":"MAXHEALTH",
+  "Narayana Health":"NH","HCG Oncology":"HCG","Aster DM Healthcare":"ASTERDM",
+  "Global Health":"MEDANTA","Yatharth Hospital":"YATHARTH",
+  // Retail / Consumer
+  "Avenue Supermarts":"DMART","Trent":"TRENT","V-Mart Retail":"VMART",
+  "Shoppers Stop":"SHOPERSTOP","Titan Company":"TITAN","Kalyan Jewellers":"KALYANKJIL",
+  "Senco Gold":"SENCO","PC Jeweller":"PCJEWELLER","Rajesh Exports":"RAJESHEXPO",
+  // Hotels
+  "Indian Hotels":"INDHOTEL","EIH":"EIHOTEL","Lemon Tree Hotels":"LEMONTREE",
+  "Chalet Hotels":"CHALET","Mahindra Holidays":"MHRIL","Club Mahindra":"CLUBMAHINDRA",
+  // Paints
+  "Asian Paints":"ASIANPAINT","Berger Paints":"BERGEPAINT","Kansai Nerolac":"KANSAINER",
+  "Indigo Paints":"INDIGOPNTS","Grasim Industries":"GRASIM","Akzo Nobel":"AKZOINDIA",
+  // Textiles
+  "Page Industries":"PAGEIND","KPR Mill":"KPRMILL","Welspun India":"WELSPUNIND",
+  "Vardhman Textiles":"VTL","Raymond":"RAYMOND","Trident":"TRIDENT",
+  // Chemicals
+  "SRF":"SRF","PI Industries":"PIIND","Aarti Industries":"AARTIIND",
+  "Navin Fluorine":"NAVINFLUOR","Clean Science":"CLEAN","Galaxy Surfactants":"GALAXYSURF",
+  // Gold / Jewellery
+  "Muthoot Finance":"MUTHOOTFIN","Manappuram Finance":"MANAPPURAM",
+  "Senco Gold":"SENCO","MMTC":"MMTC",
+  // Infra
+  "IRB Infrastructure":"IRB","KNR Constructions":"KNRCON","PNC Infratech":"PNCINFRA",
+  "H.G. Infra":"HGINFRA","Ahluwalia Contracts":"AHLUCONT","NCC":"NCC",
+  "Kalpataru Projects":"KPIL","J Kumar Infra":"JKIL",
+};
+
+// Reverse map: NSE symbol → company name
+const NSE_REVERSE_MAP = {};
+Object.entries(NSE_SYMBOL_MAP).forEach(function(kv){ NSE_REVERSE_MAP[kv[1]] = kv[0]; });
+
+// ── STORAGE KEYS ──────────────────────────────────────────────────────
+var DASH_STORAGE_KEY = 'cbf26_daily_dash_v2';
+var DASH_FII_KEY     = 'cbf26_fii_today';
+
+// ── IN-MEMORY STATE ───────────────────────────────────────────────────
+var DASH_TODAY = {};        // symbol → {close, prevClose, vol, del, turnover, fiiNet, diiNet, pcr, callOI, putOI, bulkDeals, volScore, sentScore, fetchTime}
+var DASH_FII_GLOBAL = { fiiNet: null, diiNet: null, niftyPCR: null, fetched: false };
+var DASH_FETCH_ABORT = false;
+var DASH_TREND_CHART_OBJ = null;
+
+function dashTodayKey() {
+  var d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+// ── CORS PROXY ────────────────────────────────────────────────────────
+var PROXY = 'https://api.allorigins.win/get?url=';
+function nseUrl(path){ return PROXY + encodeURIComponent('https://www.nseindia.com' + path); }
+
+// ── INIT ──────────────────────────────────────────────────────────────
+function dashInit() {
+  dashBuildSectorFilter();
+  dashLoadFromStorage();
+  dashBuildHistoryDropdown();
+  populateLiveDataLists();
+  dashRenderTable();
+  // Show FII banner if we have data
+  var fiiSaved = dashLoadFIICache();
+  if (fiiSaved) { DASH_FII_GLOBAL = fiiSaved; dashUpdateFIIBanner(); }
+}
+
+function dashBuildSectorFilter() {
+  var sel = document.getElementById('dashSectorFilter');
+  if (!sel) return;
+  var sectors = Object.keys(COMPANIES).sort();
+  sel.innerHTML = '<option value="all">All Sectors (' + dashCountAll() + ')</option>' +
+    sectors.map(function(s){ return '<option value="'+s+'">'+s+' ('+COMPANIES[s].length+')</option>'; }).join('');
+}
+
+function dashCountAll() {
+  return Object.values(COMPANIES).reduce(function(a,b){ return a + b.length; }, 0);
+}
+
+// ── FETCH: FII/DII (once per session) ────────────────────────────────
+async function dashFetchFIIDII() {
+  try {
+    var resp = await fetch(nseUrl('/api/fiidiiTradeReact'));
+    var raw  = await resp.json();
+    var data = JSON.parse(raw.contents);
+    var rows = Array.isArray(data) ? data : (data.data || []);
+    var fiiRow = rows.find(function(r){ return (r.category||'').toLowerCase().includes('fii') || (r.category||'').toLowerCase().includes('foreign'); });
+    var diiRow = rows.find(function(r){ return (r.category||'').toLowerCase().includes('dii') || (r.category||'').toLowerCase().includes('domestic'); });
+    if (fiiRow) DASH_FII_GLOBAL.fiiNet = parseFloat(fiiRow.netPurchases || fiiRow.net || 0);
+    if (diiRow) DASH_FII_GLOBAL.diiNet = parseFloat(diiRow.netPurchases || diiRow.net || 0);
+    DASH_FII_GLOBAL.fetched = true;
+    dashSaveFIICache();
+    dashUpdateFIIBanner();
+  } catch(e) { /* silent */ }
+}
+
+async function dashFetchNiftyPCR() {
+  try {
+    var resp = await fetch(nseUrl('/api/option-chain-indices?symbol=NIFTY'));
+    var raw  = await resp.json();
+    var data = JSON.parse(raw.contents);
+    var f = data.filtered || {};
+    var pOI = (f.PE || {}).totOI || 0;
+    var cOI = (f.CE || {}).totOI || 0;
+    DASH_FII_GLOBAL.niftyPCR = cOI > 0 ? (pOI/cOI).toFixed(2) : null;
+    dashUpdateFIIBanner();
+  } catch(e) { /* silent */ }
+}
+
+function dashUpdateFIIBanner() {
+  var banner = document.getElementById('dashFIIBanner');
+  if (banner) banner.style.display = 'grid';
+  var fii = DASH_FII_GLOBAL.fiiNet, dii = DASH_FII_GLOBAL.diiNet;
+  var fiiEl = document.getElementById('dbFIINet');
+  var diiEl = document.getElementById('dbDIINet');
+  var sigEl = document.getElementById('dbFIISignal');
+  var pcrEl = document.getElementById('dbNiftyPCR');
+  var pcrSig = document.getElementById('dbPCRSignal');
+  var dateEl = document.getElementById('dbDate');
+
+  if (fiiEl) { fiiEl.textContent = fii !== null ? (fii>=0?'+':'')+dashFmt(fii) : '—'; fiiEl.style.color = fii>=0?'#00a854':'#e53935'; }
+  if (diiEl) { diiEl.textContent = dii !== null ? (dii>=0?'+':'')+dashFmt(dii) : '—'; diiEl.style.color = dii>=0?'#00a854':'#e53935'; }
+  if (sigEl) {
+    var sig = '—';
+    if (fii!==null && dii!==null) {
+      if (fii>0&&dii>0) sig = '✅ Both buying — Bullish';
+      else if (fii<0&&dii<0) sig = '🔴 Both selling — Danger';
+      else if (fii>0) sig = '🟡 FII buying, DII selling';
+      else sig = '🟡 DII absorbing FII sell';
+    }
+    sigEl.textContent = sig;
+  }
+  if (pcrEl) pcrEl.textContent = DASH_FII_GLOBAL.niftyPCR || '—';
+  if (pcrSig && DASH_FII_GLOBAL.niftyPCR) {
+    var p = parseFloat(DASH_FII_GLOBAL.niftyPCR);
+    pcrSig.textContent = p > 1.2 ? 'Bullish' : p < 0.8 ? 'Bearish' : 'Neutral';
+    pcrSig.style.color = p > 1.2 ? '#00a854' : p < 0.8 ? '#e53935' : '#f59e0b';
+  }
+  if (dateEl) dateEl.textContent = dashTodayKey();
+}
+
+// ── FETCH: Single symbol quote ────────────────────────────────────────
+async function dashFetchSymbol(symbol) {
+  var result = { symbol: symbol, company: NSE_REVERSE_MAP[symbol] || symbol, fetchTime: new Date().toISOString() };
+  try {
+    var resp = await fetch(nseUrl('/api/quote-equity?symbol=' + encodeURIComponent(symbol)));
+    var raw  = await resp.json();
+    var data = JSON.parse(raw.contents);
+    var pi   = data.priceInfo || {};
+    result.close    = pi.lastPrice || pi.close || null;
+    result.prevClose= pi.previousClose || null;
+    result.pctChg   = (result.close && result.prevClose) ? (((result.close - result.prevClose)/result.prevClose)*100).toFixed(2) : null;
+    result.vol      = pi.totalTradedVolume || null;
+    result.turnover = pi.totalTradedValue ? (pi.totalTradedValue/1e7).toFixed(2) : null;
+    if (data.deliveryInfo) {
+      result.del = data.deliveryInfo.deliveryPercent || null;
+      if (!result.vol) result.vol = data.deliveryInfo.tradedQuantity || null;
+    }
+    result.fiiNet   = DASH_FII_GLOBAL.fiiNet;
+    result.diiNet   = DASH_FII_GLOBAL.diiNet;
+    result.pcr      = DASH_FII_GLOBAL.niftyPCR;
+  } catch(e) {
+    result.error = 'fetch_failed';
+  }
+  // Compute scores
+  result = dashComputeScores(result);
+  return result;
+}
+
+// ── SCORE COMPUTATION ─────────────────────────────────────────────────
+function dashComputeScores(r) {
+  // Volume score
+  var volScore = 3;
+  if (r.del !== null && r.del !== undefined) {
+    var dp = parseFloat(r.del);
+    volScore = dp>=65?5 : dp>=50?4 : dp>=35?3 : dp>=20?2 : 1;
+  }
+  r.volScore = volScore;
+
+  // Sentiment score (weighted from available signals)
+  var comps = [], wTotal = 0, wSum = 0;
+  if (r.del  !== null && r.del  !== undefined) { var s=parseFloat(r.del)>=60?5:parseFloat(r.del)>=48?4:parseFloat(r.del)>=34?3:parseFloat(r.del)>=20?2:1; comps.push({s:s,w:20}); }
+  if (r.fiiNet!== null && r.fiiNet!==undefined) {
+    var fs = r.fiiNet>2000?5 : r.fiiNet>500?4 : r.fiiNet>-500?3 : r.fiiNet>-2000?2 : 1;
+    comps.push({s:fs,w:18});
+  }
+  if (r.pcr !== null && r.pcr !== undefined) {
+    var p=parseFloat(r.pcr); comps.push({s:p>1.5?5:p>1.2?4:p>0.8?3:p>0.5?2:1, w:12});
+  }
+  if (r.pctChg !== null && r.pctChg !== undefined) {
+    var pc=parseFloat(r.pctChg); comps.push({s:pc>3?5:pc>1?4:pc>-1?3:pc>-3?2:1, w:10});
+  }
+  comps.forEach(function(c){ wSum += c.s*c.w; wTotal += c.w; });
+  r.sentScore = wTotal > 0 ? Math.min(5,Math.max(1,Math.round(wSum/wTotal))) : 3;
+  return r;
+}
+
+// ── BATCH FETCH ───────────────────────────────────────────────────────
+async function dashFetchAll() {
+  var sector = document.getElementById('dashSectorFilter').value;
+  var symbols = dashGetSymbolsForSector(sector === 'all' ? null : sector);
+  await dashBatchFetch(symbols, 'Fetching all ' + symbols.length + ' symbols…');
+}
+
+async function dashFetchSector() {
+  var sector = document.getElementById('dashSectorFilter').value;
+  var symbols = dashGetSymbolsForSector(sector === 'all' ? null : sector);
+  await dashBatchFetch(symbols, 'Fetching ' + symbols.length + ' symbols' + (sector!=='all' ? ' in ' + sector : '') + '…');
+}
+
+function dashGetSymbolsForSector(sector) {
+  var out = [];
+  var sectorList = sector ? [sector] : Object.keys(COMPANIES);
+  sectorList.forEach(function(sec) {
+    var companies = COMPANIES[sec] || [];
+    companies.forEach(function(c) {
+      var sym = NSE_SYMBOL_MAP[c.name];
+      if (sym && out.indexOf(sym) === -1) out.push(sym);
+    });
+  });
+  return out;
+}
+
+async function dashBatchFetch(symbols, label) {
+  DASH_FETCH_ABORT = false;
+  // First fetch FII/DII and Nifty PCR once
+  dashSetProgress(0, symbols.length, 'Fetching FII/DII + Nifty PCR…');
+  await dashFetchFIIDII();
+  await dashFetchNiftyPCR();
+
+  var btn = document.getElementById('dashFetchAllBtn');
+  if (btn) { btn.textContent = '⏹ Stop Fetch'; btn.onclick = function(){ DASH_FETCH_ABORT = true; }; }
+
+  for (var i = 0; i < symbols.length; i++) {
+    if (DASH_FETCH_ABORT) break;
+    var sym = symbols[i];
+    dashSetProgress(i+1, symbols.length, 'Fetching ' + sym + ' (' + (i+1) + '/' + symbols.length + ')…');
+    var result = await dashFetchSymbol(sym);
+    DASH_TODAY[sym] = result;
+    // Persist to storage every 10
+    if ((i+1) % 10 === 0) dashSaveToStorage();
+    dashRenderTable();
+    // Rate limit: 400ms between requests to avoid NSE throttle
+    await new Promise(function(r){ setTimeout(r, 400); });
+  }
+
+  dashSaveToStorage();
+  dashRenderTable();
+  dashBuildHistoryDropdown();
+  var now = new Date().toLocaleTimeString('en-IN');
+  var lastEl = document.getElementById('dashLastUpdate');
+  if (lastEl) lastEl.textContent = 'Last updated: ' + now;
+
+  if (btn) { btn.textContent = '🔄 Fetch All (Batch)'; btn.onclick = dashFetchAll; }
+  dashSetProgress(symbols.length, symbols.length, '✔ Done — ' + Object.keys(DASH_TODAY).length + ' companies loaded');
+}
+
+function dashSetProgress(done, total, label) {
+  var pct = total > 0 ? Math.round((done/total)*100) : 0;
+  var bar = document.getElementById('dashProgressBar');
+  var lbl = document.getElementById('dashProgressLabel');
+  var cnt = document.getElementById('dashProgressCount');
+  if (bar) bar.style.width = pct + '%';
+  if (lbl) lbl.textContent = label;
+  if (cnt) cnt.textContent = done + ' / ' + total + ' (' + pct + '%)';
+}
+
+// ── BHAVCOPY CSV PASTE (Batch) ────────────────────────────────────────
+function dashParseBhavcopy() {
+  var raw = (document.getElementById('dashBhavPaste').value || '').trim();
+  if (!raw) return;
+  var lines = raw.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+  if (lines.length < 1) { alert('No data found — please paste the CSV content'); return; }
+
+  // ── AUTO-DETECT FORMAT ───────────────────────────────────────────────
+  // Three possible pastes:
+  // A) New UDiFF WITH header:    header[0]='TradDt', data[0]='2026-06-05'
+  // B) New UDiFF WITHOUT header: line[0] starts with '2026-' (date), col[7]=symbol
+  // C) Old CM format WITH header: header contains 'SYMBOL','SERIES'
+  // D) Old CM format WITHOUT header: line[0] is a stock symbol like 'RELIANCE'
+
+  // ── DETECT DELIMITER (comma vs tab) ─────────────────────────────────
+  // When user opens CSV in Excel and does Ctrl+A → Ctrl+C, Excel copies as TAB-separated.
+  // When user opens in Notepad and copies, it stays comma-separated.
+  // Detect by counting tabs vs commas in the first line.
+  var firstLineRaw = lines[0];
+  var delimiter = (firstLineRaw.split('\t').length > firstLineRaw.split(',').length) ? '\t' : ',';
+
+  var firstLine = firstLineRaw.split(delimiter).map(function(s){ return s.trim(); });
+  var firstCol  = firstLine[0];
+
+  // Detect new UDiFF header
+  var hasNewHeader = lines[0].indexOf('TckrSymb') !== -1 || lines[0].indexOf('TtlTradgVol') !== -1 || lines[0].indexOf('TradDt') !== -1;
+  // Detect new UDiFF data row (no header) — col[0] is a date like 2026-06-05
+  var isDateCol0  = /^\d{4}-\d{2}-\d{2}$/.test(firstCol);
+  // Detect old CM header
+  var hasOldHeader = lines[0].indexOf('SYMBOL') !== -1 && lines[0].indexOf('SERIES') !== -1;
+
+  var isNewFormat = hasNewHeader || isDateCol0;
+
+  var col = {};
+  var dataLines;
+
+  if (hasNewHeader) {
+    firstLine.forEach(function(h, i){ col[h] = i; });
+    dataLines = lines.slice(1);
+  } else if (isDateCol0) {
+    col['TradDt']       = 0;
+    col['TckrSymb']     = 7;
+    col['SctySrs']      = 8;
+    col['ClsPric']      = 17;
+    col['PrvsClsgPric'] = 19;
+    col['TtlTradgVol']  = 24;
+    col['TtlTrfVal']    = 25;
+    col['FinInstrmTp']  = 4;
+    dataLines = lines;
+  } else if (hasOldHeader) {
+    firstLine.forEach(function(h, i){ col[h] = i; });
+    dataLines = lines.slice(1);
+  } else {
+    dataLines = lines;
+  }
+
+  var loaded = 0, skipped = 0;
+
+  // Clear today's data before loading fresh — removes any stale/bad data from previous runs
+  DASH_TODAY = {};
+
+  dashFetchFIIDII();
+  dashFetchNiftyPCR();
+
+  dataLines.forEach(function(line) {
+    if (!line) return;
+    var p = line.split(delimiter).map(function(s){ return s.trim(); }); // use same delimiter
+    var symbol, series, close, prevClose, vol, turnoverR, delivPer;
+
+    if (isNewFormat) {
+      // ── NEW FORMAT (UDiFF, post Jul 2024) ────────────────────────
+      // Key columns: TckrSymb, SctySrs, ClsPric, PrvsClsgPric, TtlTradgVol, TtlTrfVal
+      // NOTE: Delivery % is NOT in this file — comes from separate Security-wise Delivery Data file
+      symbol    = col['TckrSymb']    !== undefined ? (p[col['TckrSymb']]   ||'').trim().toUpperCase() : null;
+      series    = col['SctySrs']     !== undefined ? (p[col['SctySrs']]    ||'').trim().toUpperCase() : 'EQ';
+      close     = col['ClsPric']     !== undefined ? parseFloat(p[col['ClsPric']])     || null : null;
+      prevClose = col['PrvsClsgPric']!== undefined ? parseFloat(p[col['PrvsClsgPric']])|| null : null;
+      vol       = col['TtlTradgVol'] !== undefined ? parseFloat(p[col['TtlTradgVol']]) || null : null;
+      turnoverR = col['TtlTrfVal']   !== undefined ? parseFloat(p[col['TtlTrfVal']])   || null : null;
+      delivPer  = null; // Not in this file — loaded separately via dashParseDelivery()
+    } else {
+      // ── OLD FORMAT (pre Jul 2024) ─────────────────────────────────
+      // Positional: SYMBOL(0),SERIES(1),OPEN(2),HIGH(3),LOW(4),CLOSE(5),LAST(6),PREVCLOSE(7),TOTTRDQTY(8),TOTTRDVAL(9),...,ISIN(12),DELIV_QTY(13),DELIV_PER(14)
+      symbol    = col['SYMBOL']   !== undefined ? (p[col['SYMBOL']]   ||'').trim().toUpperCase() : (p[0]||'').trim().toUpperCase();
+      series    = col['SERIES']   !== undefined ? (p[col['SERIES']]   ||'').trim().toUpperCase() : (p[1]||'').trim().toUpperCase();
+      close     = col['CLOSE']    !== undefined ? parseFloat(p[col['CLOSE']])    || null : parseFloat(p[5]) || null;
+      prevClose = col['PREVCLOSE']!== undefined ? parseFloat(p[col['PREVCLOSE']])|| null : parseFloat(p[7]) || null;
+      vol       = col['TOTTRDQTY']!== undefined ? parseFloat(p[col['TOTTRDQTY']])|| null : parseFloat(p[8]) || null;
+      turnoverR = col['TOTTRDVAL']!== undefined ? parseFloat(p[col['TOTTRDVAL']])|| null : parseFloat(p[9]) || null;
+      delivPer  = col['DELIV_PER']!== undefined ? parseFloat(p[col['DELIV_PER']])|| null : parseFloat(p[14]) || null;
+    }
+
+    if (!symbol) { skipped++; return; }
+    // Filter EQ series only (skip futures, options, currency rows)
+    if (series && series !== 'EQ') { skipped++; return; }
+    // Also filter by FinInstrmTp = STK in new format
+    if (isNewFormat && col['FinInstrmTp'] !== undefined) {
+      var instrType = (p[col['FinInstrmTp']] || '').trim();
+      if (instrType && instrType !== 'STK') { skipped++; return; }
+    }
+
+    var pctChg = (close && prevClose) ? (((close - prevClose) / prevClose) * 100).toFixed(2) : null;
+
+    // Preserve any existing delivery data if we already have it
+    var existing = DASH_TODAY[symbol] || {};
+    var result = {
+      symbol:   symbol,
+      company:  NSE_REVERSE_MAP[symbol] || existing.company || symbol,
+      close:    close,
+      prevClose:prevClose,
+      pctChg:   pctChg,
+      vol:      vol,
+      del:      delivPer !== null ? delivPer : (existing.del || null),  // preserve if already loaded
+      turnover: turnoverR ? (turnoverR / 1e7).toFixed(2) : null,
+      fiiNet:   DASH_FII_GLOBAL.fiiNet,
+      diiNet:   DASH_FII_GLOBAL.diiNet,
+      pcr:      DASH_FII_GLOBAL.niftyPCR,
+      bulkDeals:[],
+      fetchTime: new Date().toISOString(),
+      format:   isNewFormat ? 'UDiFF_2024' : 'CM_legacy'
+    };
+    result = dashComputeScores(result);
+    DASH_TODAY[symbol] = result;
+    loaded++;
+  });
+
+  dashSaveToStorage();
+  dashRenderTable();
+  dashBuildHistoryDropdown();
+
+  var delimLabel = delimiter === '\t' ? 'tab-separated (Excel copy)' : 'comma-separated';
+  var fmt = isNewFormat
+    ? (hasNewHeader ? 'UDiFF with header' : 'UDiFF without header') + ' · ' + delimLabel
+    : (hasOldHeader ? 'Old CM with header' : 'Old CM without header') + ' · ' + delimLabel;
+  var statusEl = document.getElementById('dashBhavStatus');
+  if (statusEl) {
+    statusEl.textContent = '✔ ' + loaded + ' companies loaded [' + fmt + ']' +
+      (skipped > 0 ? ' · ' + skipped + ' rows skipped' : '') +
+      (isNewFormat ? ' — now paste MTO Delivery file below' : '');
+    statusEl.style.color = loaded > 0 ? '#006b30' : '#e53935';
+  }
+  var lastEl = document.getElementById('dashLastUpdate');
+  if (lastEl) lastEl.textContent = 'Bhavcopy loaded: ' + new Date().toLocaleTimeString('en-IN') + ' (' + loaded + ' stocks in memory)';
+}
+
+// ── PARSE DELIVERY DATA (separate NSE file, post Jul 2024) ───────────
+// File: "Security-wise Delivery Data" from NSE All Reports → Capital Market
+// Columns: SYMBOL, SERIES, QUANTITY_TRADED, DELIVERABLE_QTY, % DELI QTY TO TRADED QTY
+function dashParseDelivery() {
+  var raw = (document.getElementById('dashDelivPaste').value || '').trim();
+  if (!raw) return;
+  var lines = raw.split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+  if (lines.length < 2) return;
+
+  // ── MTO FILE STRUCTURE (NSE Security-wise Delivery Position) ─────────
+  // Line 0: "Security Wise Delivery Position - Compulsory Rolling Settlement"
+  // Line 1: "10,MTO,05062026,..."
+  // Line 2: "Trade Date <05-JUN-2026>,Settlement Type <N>"
+  // Line 3: "Record Type,Sr No,Name of Security,Quantity Traded,..."  ← column header
+  // Line 4+: "20,1,SYMBOL,SERIES,QtyTraded,DelivQty,Del%"             ← data rows
+  //
+  // All data rows start with "20," — this is the reliable identifier.
+  // Symbol = col[2], Series = col[3], Del% = col[6]
+
+  var merged = 0, notFound = 0;
+
+  lines.forEach(function(line) {
+    // Only process data rows — they always start with "20,"
+    if (!line.startsWith('20,')) return;
+
+    var p = line.split(',');
+    // Need at least 7 columns: RecType,SrNo,Symbol,Series,QtyTraded,DelivQty,Del%
+    if (p.length < 7) return;
+
+    var sym    = (p[2] || '').trim().toUpperCase();
+    var ser    = (p[3] || '').trim().toUpperCase();
+    var delPer = parseFloat(p[6]);
+
+    if (!sym) return;
+    if (ser !== 'EQ') return; // only regular equity
+    if (isNaN(delPer) || delPer < 0 || delPer > 100) return;
+
+    if (DASH_TODAY[sym]) {
+      DASH_TODAY[sym].del = delPer;
+      DASH_TODAY[sym] = dashComputeScores(DASH_TODAY[sym]);
+      merged++;
+    } else {
+      notFound++;
+    }
+  });
+
+  dashSaveToStorage();
+  dashRenderTable();
+
+  var inMemory = Object.keys(DASH_TODAY).length;
+  var statusEl = document.getElementById('dashDelivStatus');
+  if (statusEl) {
+    if (inMemory === 0) {
+      statusEl.textContent = '⚠ Bhavcopy not in memory — paste and load Bhavcopy first, then merge delivery';
+      statusEl.style.color = '#e53935';
+    } else if (merged === 0) {
+      statusEl.textContent = '⚠ 0 merged (' + inMemory + ' stocks in memory) — check that symbols match e.g. RELIANCE, HDFCBANK';
+      statusEl.style.color = '#e53935';
+    } else {
+      statusEl.textContent = '✔ Delivery % merged for ' + merged + ' of ' + inMemory + ' companies in memory' +
+        (notFound > 0 ? ' · ' + notFound + ' in MTO not matched' : '');
+      statusEl.style.color = '#006b30';
+    }
+  }
+}
+
+// ── RENDER TABLE ──────────────────────────────────────────────────────
+function dashRenderTable() {
+  var body = document.getElementById('dashTableBody');
+  if (!body) return;
+
+  var sector    = (document.getElementById('dashSectorFilter')||{}).value || 'all';
+  var search    = ((document.getElementById('dashSearch')||{}).value || '').toLowerCase().trim();
+  var sortKey   = (document.getElementById('dashSort')||{}).value || 'sector';
+  var onlyFetch = (document.getElementById('dashOnlyFetched')||{}).checked;
+
+  // Build rows from COMPANIES + DASH_TODAY overlay
+  var rows = [];
+  Object.entries(COMPANIES).forEach(function(kv) {
+    var sec = kv[0], cos = kv[1];
+    if (sector !== 'all' && sec !== sector) return;
+    cos.forEach(function(c) {
+      var sym  = NSE_SYMBOL_MAP[c.name] || null;
+      var live = sym ? (DASH_TODAY[sym] || null) : null;
+      if (onlyFetch && !live) return;
+      if (search && !c.name.toLowerCase().includes(search) && !(sym||'').toLowerCase().includes(search)) return;
+      rows.push({ sector: sec, company: c.name, symbol: sym, live: live, cbBase: c });
+    });
+  });
+
+  // Sort
+  rows.sort(function(a,b) {
+    if (sortKey === 'sector') return a.sector.localeCompare(b.sector) || a.company.localeCompare(b.company);
+    var la = a.live, lb = b.live;
+    if (sortKey === 'volScore_d')  return ((lb&&lb.volScore)||0) - ((la&&la.volScore)||0);
+    if (sortKey === 'sentScore_d') return ((lb&&lb.sentScore)||0) - ((la&&la.sentScore)||0);
+    if (sortKey === 'del_d')       return ((lb&&parseFloat(lb.del))||0) - ((la&&parseFloat(la.del))||0);
+    if (sortKey === 'pct_d')       return ((lb&&parseFloat(lb.pctChg))||0) - ((la&&parseFloat(la.pctChg))||0);
+    if (sortKey === 'cbScore_d') {
+      var sa = la ? (la.volScore||3)*8/5 + (la.sentScore||3)*7/5 : 0;
+      var sb = lb ? (lb.volScore||3)*8/5 + (lb.sentScore||3)*7/5 : 0;
+      return sb - sa;
+    }
+    return 0;
+  });
+
+  var countEl = document.getElementById('dashRowCount');
+  if (countEl) countEl.textContent = rows.length;
+
+  if (rows.length === 0) {
+    body.innerHTML = '<tr><td colspan="17" style="text-align:center;padding:24px;color:#9e9e9e;">No companies match current filters</td></tr>';
+    return;
+  }
+
+  var SCOLS = {'1':'#e53935','2':'#ff7c00','3':'#f59e0b','4':'#006b30','5':'#1565c0'};
+  var html = '';
+  rows.forEach(function(r, i) {
+    var l = r.live;
+    var hasData = !!l && !l.error;
+
+    var pctChg = hasData && l.pctChg !== null ? parseFloat(l.pctChg) : null;
+    var pctCol  = pctChg === null ? '#6b7498' : pctChg >= 2 ? '#006b30' : pctChg >= 0 ? '#00a854' : pctChg >= -2 ? '#e53935' : '#b71c1c';
+
+    var spark = dashGetSparkline(r.symbol);
+
+    html += '<tr style="' + (hasData ? '' : 'opacity:0.55;') + '">' +
+      '<td style="font-size:10px;color:#9e9e9e;">' + (i+1) + '</td>' +
+      '<td><span style="font-size:9px;font-weight:700;background:#e8ecf5;color:#5a6080;padding:2px 6px;border-radius:5px;white-space:nowrap;">' + r.sector + '</span></td>' +
+      '<td style="font-weight:800;font-size:11px;color:#1a1e2e;">' + r.company +
+        (r.symbol ? '<div style="font-size:8px;font-weight:600;color:#9e9e9e;">'+r.symbol+'</div>' : '') +
+      '</td>' +
+      '<td style="font-weight:800;font-size:11px;color:#ff7c00;">' + (r.symbol || '—') + '</td>' +
+      // CB Score (estimated from volScore + sentScore)
+      '<td style="font-weight:900;font-size:13px;color:' + (hasData ? '#1565c0' : '#9e9e9e') + ';">' + (hasData ? dashEstCBScore(l) : '—') + '</td>' +
+      '<td style="font-weight:700;">' + (hasData && l.close ? '₹' + parseFloat(l.close).toLocaleString('en-IN') : '—') + '</td>' +
+      '<td style="font-weight:800;color:' + pctCol + ';">' + (pctChg !== null ? (pctChg>=0?'+':'') + pctChg + '%' : '—') + '</td>' +
+      '<td>' + (hasData && l.vol ? dashFmt(l.vol) : '—') + '</td>' +
+      '<td style="font-weight:800;color:' + (hasData && l.del ? (parseFloat(l.del)>=55?'#006b30':parseFloat(l.del)>=35?'#f59e0b':'#e53935') : '#9e9e9e') + ';">' +
+        (hasData && l.del ? parseFloat(l.del).toFixed(1) + '%' : '—') + '</td>' +
+      '<td>' + (hasData && l.turnover ? '₹' + l.turnover : '—') + '</td>' +
+      '<td style="font-weight:700;color:' + (hasData && l.fiiNet !== null ? (l.fiiNet>=0?'#006b30':'#e53935') : '#9e9e9e') + ';">' +
+        (hasData && l.fiiNet !== null ? (l.fiiNet>=0?'+':'') + dashFmt(l.fiiNet) : '—') + '</td>' +
+      '<td style="font-size:11px;">' + (hasData && l.pcr ? l.pcr : '—') + '</td>' +
+      '<td style="font-size:9px;color:' + (hasData && l.bulkDeals && l.bulkDeals.length ? '#ff7c00' : '#9e9e9e') + ';font-weight:700;">' +
+        (hasData && l.bulkDeals && l.bulkDeals.length ? l.bulkDeals.length + ' deal(s)' : 'None') + '</td>' +
+      '<td style="font-weight:900;font-size:15px;color:' + (SCOLS[l&&l.volScore] || '#9e9e9e') + ';">' + (hasData && l.volScore ? l.volScore + '/5' : '—') + '</td>' +
+      '<td style="font-weight:900;font-size:15px;color:' + (SCOLS[l&&l.sentScore] || '#9e9e9e') + ';">' + (hasData && l.sentScore ? l.sentScore + '/5' : '—') + '</td>' +
+      '<td>' + (spark ? '<canvas id="spark_' + r.symbol + '" width="100" height="28" style="cursor:pointer;" onclick="dashShowTrend(\'' + r.symbol + '\',\'' + r.company + '\')"></canvas>' : '<span style="font-size:9px;color:#9e9e9e;">No history</span>') + '</td>' +
+      '<td>' + (hasData ? '<span style="font-size:9px;font-weight:700;color:#fff;background:#006b30;padding:2px 6px;border-radius:5px;">Live</span>' :
+        (r.symbol ? '<span style="font-size:9px;color:#9e9e9e;">Pending</span>' : '<span style="font-size:9px;color:#e53935;">No symbol</span>')) + '</td>' +
+    '</tr>';
+  });
+  body.innerHTML = html;
+
+  // Draw sparklines after render
+  rows.forEach(function(r) {
+    if (r.symbol) { var d = dashGetSparkline(r.symbol); if (d) dashDrawSparkline('spark_' + r.symbol, d); }
+  });
+}
+
+function dashEstCBScore(l) {
+  if (!l) return '—';
+  var base = 60;
+  if (l.volScore) base += (l.volScore - 3) * 8/2;
+  if (l.sentScore) base += (l.sentScore - 3) * 7/2;
+  return Math.min(100, Math.max(0, Math.round(base)));
+}
+
+// ── SPARKLINES ────────────────────────────────────────────────────────
+function dashGetSparkline(symbol) {
+  if (!symbol) return null;
+  try {
+    var hist = JSON.parse(localStorage.getItem(DASH_STORAGE_KEY) || '{}');
+    var dates = Object.keys(hist).sort().slice(-7);
+    var vals  = dates.map(function(d){ return hist[d] && hist[d][symbol] ? hist[d][symbol].volScore : null; });
+    if (vals.filter(Boolean).length < 2) return null;
+    return vals;
+  } catch(e) { return null; }
+}
+
+function dashDrawSparkline(canvasId, data) {
+  setTimeout(function() {
+    var canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+    var valid = data.filter(function(v){ return v !== null; });
+    if (valid.length < 2) return;
+    var min = Math.min.apply(null, valid), max = Math.max.apply(null, valid);
+    if (max === min) { min = Math.max(1, min-1); max = Math.min(5, max+1); }
+    var pts = [];
+    var step = W / (data.length - 1);
+    data.forEach(function(v, i) {
+      if (v === null) return;
+      var x = i * step;
+      var y = H - ((v - min)/(max - min)) * (H - 4) - 2;
+      pts.push({x:x, y:y, v:v});
+    });
+    if (pts.length < 2) return;
+    ctx.beginPath();
+    var COLORS = ['','#e53935','#ff7c00','#f59e0b','#00a854','#1565c0'];
+    ctx.strokeStyle = COLORS[pts[pts.length-1].v] || '#6b7498';
+    ctx.lineWidth = 2;
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (var i=1;i<pts.length;i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.stroke();
+    // Dot at last point
+    var last = pts[pts.length-1];
+    ctx.beginPath();
+    ctx.arc(last.x, last.y, 3, 0, Math.PI*2);
+    ctx.fillStyle = COLORS[last.v] || '#6b7498';
+    ctx.fill();
+  }, 50);
+}
+
+// ── TREND CHART (7-day full view) ────────────────────────────────────
+function dashShowTrend(symbol, company) {
+  var panel = document.getElementById('dashTrendPanel');
+  var title = document.getElementById('dashTrendTitle');
+  if (!panel || !title) return;
+
+  try {
+    var hist  = JSON.parse(localStorage.getItem(DASH_STORAGE_KEY) || '{}');
+    var dates = Object.keys(hist).sort().slice(-14);
+    var volScores  = dates.map(function(d){ return hist[d]&&hist[d][symbol] ? hist[d][symbol].volScore  : null; });
+    var sentScores = dates.map(function(d){ return hist[d]&&hist[d][symbol] ? hist[d][symbol].sentScore : null; });
+    var closes     = dates.map(function(d){ return hist[d]&&hist[d][symbol] ? hist[d][symbol].close     : null; });
+
+    title.textContent = '14-Day Trend — ' + company + ' (' + symbol + ')';
+    panel.style.display = 'block';
+
+    var canvas = document.getElementById('dashTrendChart');
+    if (DASH_TREND_CHART_OBJ) { DASH_TREND_CHART_OBJ.destroy(); }
+    if (typeof Chart === 'undefined') return;
+
+    DASH_TREND_CHART_OBJ = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: dates,
+        datasets: [
+          { label: 'Vol Score', data: volScores,  borderColor: '#1976d2', backgroundColor: '#1976d211', tension: 0.3, yAxisID: 'y1', spanGaps: true },
+          { label: 'Sent Score', data: sentScores, borderColor: '#7b1fa2', backgroundColor: '#7b1fa211', tension: 0.3, yAxisID: 'y1', spanGaps: true },
+          { label: 'Close ₹',   data: closes,      borderColor: '#ff7c00', backgroundColor: '#ff7c0011', tension: 0.3, yAxisID: 'y2', spanGaps: true }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true,
+        plugins: { legend: { position: 'top' } },
+        scales: {
+          y1: { type:'linear', position:'left',  min:1, max:5, title:{ display:true, text:'Score (1-5)' } },
+          y2: { type:'linear', position:'right', title:{ display:true, text:'Price ₹' }, grid:{ drawOnChartArea:false } }
+        }
+      }
+    });
+  } catch(e) { /* silent */ }
+}
+
+// ── APPLY ALL SCORES → CB SCORE ───────────────────────────────────────
+function dashApplyAllScores() {
+  var applied = 0;
+  Object.values(DASH_TODAY).forEach(function(r) {
+    if (!r.volScore && !r.sentScore) return;
+    var match = getAllCompaniesFlat().find(function(c) {
+      return c.name === r.company || NSE_SYMBOL_MAP[c.name] === r.symbol;
+    });
+    if (!match) return;
+    var sec = match.sector;
+    if (!VS_OVERRIDES[sec]) VS_OVERRIDES[sec] = {};
+    if (!VS_OVERRIDES[sec]._companies) VS_OVERRIDES[sec]._companies = {};
+    if (!VS_OVERRIDES[sec]._companies[match.name]) VS_OVERRIDES[sec]._companies[match.name] = {};
+    if (r.volScore)  VS_OVERRIDES[sec]._companies[match.name].s = r.volScore;
+    if (r.sentScore) VS_OVERRIDES[sec]._companies[match.name].n = r.sentScore;
+    applied++;
+  });
+  if (typeof buildCompanyMaster === 'function') buildCompanyMaster();
+  if (typeof renderCompanyMaster === 'function') renderCompanyMaster();
+  if (typeof saveEditable === 'function') saveEditable('vs_overrides', VS_OVERRIDES);
+  alert('✔ Applied live scores to ' + applied + ' companies in CB Score rankings.');
+}
+
+// ── LOCALSTORAGE ──────────────────────────────────────────────────────
+function dashSaveToStorage() {
+  try {
+    var dateKey = dashTodayKey();
+    var hist = JSON.parse(localStorage.getItem(DASH_STORAGE_KEY) || '{}');
+    hist[dateKey] = DASH_TODAY;
+    // Keep last 30 days
+    var dates = Object.keys(hist).sort();
+    if (dates.length > 30) dates.slice(0, dates.length-30).forEach(function(d){ delete hist[d]; });
+    localStorage.setItem(DASH_STORAGE_KEY, JSON.stringify(hist));
+  } catch(e) { console.warn('DashStorage save error:', e); }
+}
+
+function dashLoadFromStorage() {
+  try {
+    var dateKey = dashTodayKey();
+    var hist = JSON.parse(localStorage.getItem(DASH_STORAGE_KEY) || '{}');
+    if (hist[dateKey]) {
+      var todayData = hist[dateKey];
+      // Sanity check: keys should be NSE symbols (letters/numbers), not dates
+      // A date key looks like '2026-06-05' — if majority of keys look like dates, discard
+      var keys = Object.keys(todayData);
+      var dateKeyCount = keys.filter(function(k){ return /^\d{4}-\d{2}-\d{2}$/.test(k); }).length;
+      if (dateKeyCount > keys.length * 0.1) {
+        // More than 10% of keys are dates → stale bad data, discard it
+        delete hist[dateKey];
+        localStorage.setItem(DASH_STORAGE_KEY, JSON.stringify(hist));
+        console.log('CB Finance26: discarded stale Bhavcopy data (' + dateKeyCount + ' date-keys found)');
+      } else {
+        DASH_TODAY = todayData;
+      }
+    }
+  } catch(e) { DASH_TODAY = {}; }
+}
+
+function dashSaveFIICache() {
+  try { localStorage.setItem(DASH_FII_KEY, JSON.stringify(DASH_FII_GLOBAL)); } catch(e){}
+}
+
+function dashLoadFIICache() {
+  try { return JSON.parse(localStorage.getItem(DASH_FII_KEY) || 'null'); } catch(e){ return null; }
+}
+
+function dashClearHistory() {
+  if (!confirm('Clear ALL stored market history? This cannot be undone.')) return;
+  localStorage.removeItem(DASH_STORAGE_KEY);
+  localStorage.removeItem(DASH_FII_KEY);
+  DASH_TODAY = {};
+  DASH_FII_GLOBAL = { fiiNet:null, diiNet:null, niftyPCR:null, fetched:false };
+  dashBuildHistoryDropdown();
+  dashRenderTable();
+  alert('History cleared.');
+}
+
+// ── HISTORY DROPDOWN & VIEWER ─────────────────────────────────────────
+function dashBuildHistoryDropdown() {
+  try {
+    var sel = document.getElementById('dashHistoryDate');
+    if (!sel) return;
+    var hist  = JSON.parse(localStorage.getItem(DASH_STORAGE_KEY) || '{}');
+    var dates = Object.keys(hist).sort().reverse();
+    var countEl = document.getElementById('dashHistoryCount');
+    if (countEl) countEl.textContent = dates.length + ' days stored';
+    sel.innerHTML = '<option value="">Select a date to review…</option>' +
+      dates.map(function(d){ return '<option value="'+d+'">'+d+'</option>'; }).join('');
+  } catch(e) {}
+}
+
+function dashShowHistory() {
+  var sel   = document.getElementById('dashHistoryDate');
+  var wrap  = document.getElementById('dashHistoryWrap');
+  var tbody = document.getElementById('dashHistoryBody');
+  if (!sel || !wrap || !tbody) return;
+  var dateKey = sel.value;
+  if (!dateKey) { wrap.style.display='none'; return; }
+
+  try {
+    var hist = JSON.parse(localStorage.getItem(DASH_STORAGE_KEY) || '{}');
+    var day  = hist[dateKey] || {};
+    var rows = Object.values(day);
+    if (rows.length === 0) { tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:#9e9e9e;padding:16px;">No data for this date</td></tr>'; wrap.style.display='block'; return; }
+
+    var SCOLS = {'1':'#e53935','2':'#ff7c00','3':'#f59e0b','4':'#006b30','5':'#1565c0'};
+    tbody.innerHTML = rows.map(function(r) {
+      var pct = r.pctChg !== null ? parseFloat(r.pctChg) : null;
+      return '<tr>' +
+        '<td style="font-weight:700;">' + r.company + '</td>' +
+        '<td style="font-weight:800;color:#ff7c00;">' + r.symbol + '</td>' +
+        '<td style="font-size:9px;color:#6b7498;">' + (r.sector||'—') + '</td>' +
+        '<td>' + (r.close ? '₹'+parseFloat(r.close).toLocaleString('en-IN') : '—') + '</td>' +
+        '<td style="font-weight:700;color:' + (pct!==null?(pct>=0?'#006b30':'#e53935'):'#6b7498') + ';">' + (pct!==null?(pct>=0?'+':'')+pct+'%':'—') + '</td>' +
+        '<td>' + (r.vol ? dashFmt(r.vol) : '—') + '</td>' +
+        '<td style="font-weight:700;">' + (r.del ? parseFloat(r.del).toFixed(1)+'%' : '—') + '</td>' +
+        '<td>' + (r.turnover ? '₹'+r.turnover : '—') + '</td>' +
+        '<td style="color:' + (r.fiiNet!==null&&r.fiiNet!==undefined?(r.fiiNet>=0?'#006b30':'#e53935'):'#9e9e9e') + ';font-weight:700;">' + (r.fiiNet!==null&&r.fiiNet!==undefined?(r.fiiNet>=0?'+':'')+dashFmt(r.fiiNet):'—') + '</td>' +
+        '<td>' + (r.pcr||'—') + '</td>' +
+        '<td>' + (r.bulkDeals&&r.bulkDeals.length?r.bulkDeals.length+' deal(s)':'None') + '</td>' +
+        '<td style="font-weight:900;color:' + (SCOLS[r.volScore]||'#9e9e9e') + ';">' + (r.volScore?r.volScore+'/5':'—') + '</td>' +
+        '<td style="font-weight:900;color:' + (SCOLS[r.sentScore]||'#9e9e9e') + ';">' + (r.sentScore?r.sentScore+'/5':'—') + '</td>' +
+      '</tr>';
+    }).join('');
+    wrap.style.display = 'block';
+  } catch(e) { tbody.innerHTML = '<tr><td colspan="13" style="color:#e53935;">Error loading history</td></tr>'; wrap.style.display='block'; }
+}
+
+// ── EXCEL EXPORT ──────────────────────────────────────────────────────
+function dashExportToday() {
+  var rows = Object.values(DASH_TODAY);
+  if (rows.length === 0) { alert('No data fetched today. Fetch or paste Bhavcopy first.'); return; }
+  dashExportToCSV(rows, 'CB_Finance26_Daily_' + dashTodayKey() + '.csv');
+}
+
+function dashExportHistory() {
+  try {
+    var hist  = JSON.parse(localStorage.getItem(DASH_STORAGE_KEY) || '{}');
+    var allRows = [];
+    Object.entries(hist).sort().forEach(function(kv) {
+      var date = kv[0], day = kv[1];
+      Object.values(day).forEach(function(r) {
+        allRows.push(Object.assign({ date: date }, r));
+      });
+    });
+    if (allRows.length === 0) { alert('No stored history to export.'); return; }
+    dashExportToCSV(allRows, 'CB_Finance26_History_All.csv', true);
+  } catch(e) { alert('Export failed: ' + e.message); }
+}
+
+function dashExportToCSV(rows, filename, includeDate) {
+  var headers = (includeDate ? ['Date,'] : []) +
+    'Symbol,Company,Sector,Close_INR,Chg_Pct,Volume,Delivery_Pct,Turnover_Cr,FII_Net_Cr,DII_Net_Cr,PCR,Bulk_Deals,Vol_Score,Sent_Score,Fetch_Time';
+  var lines = [typeof headers === 'string' ? headers : headers.join('')];
+
+  rows.forEach(function(r) {
+    var cols = [
+      includeDate ? (r.date || '') : null,
+      r.symbol || '', '"' + (r.company||'').replace(/"/g,'""') + '"',
+      '"' + (r.sector||'').replace(/"/g,'""') + '"',
+      r.close || '', r.pctChg || '',
+      r.vol || '', r.del ? parseFloat(r.del).toFixed(2) : '',
+      r.turnover || '', r.fiiNet !== undefined ? r.fiiNet : '',
+      r.diiNet !== undefined ? r.diiNet : '', r.pcr || '',
+      r.bulkDeals ? r.bulkDeals.length : 0,
+      r.volScore || '', r.sentScore || '',
+      r.fetchTime ? r.fetchTime.slice(0,19).replace('T',' ') : ''
+    ].filter(function(c){ return c !== null; });
+    lines.push(cols.join(','));
+  });
+
+  var blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────
+function dashFmt(n) {
+  if (n === null || n === undefined || isNaN(n)) return '—';
+  var abs = Math.abs(n);
+  if (abs >= 1e7) return (n/1e7).toFixed(1) + 'Cr';
+  if (abs >= 1e5) return (n/1e5).toFixed(1) + 'L';
+  return parseFloat(n).toLocaleString('en-IN', {maximumFractionDigits:0});
+}
+
+// ── CORE HELPERS (shared with rest of app) ────────────────────────────
+function getAllCompaniesFlat() {
+  var flat = [];
+  Object.entries(COMPANIES).forEach(function(kv) {
+    var sector = kv[0], arr = kv[1];
+    if (Array.isArray(arr)) arr.forEach(function(c){ flat.push(Object.assign({},c,{sector:sector})); });
+  });
+  return flat;
+}
+
+function findCompanyByName(query) {
+  var q = (query||'').toLowerCase().trim();
+  if (!q) return null;
+  var all = getAllCompaniesFlat();
+  return all.find(function(c){ return c.name.toLowerCase()===q; }) ||
+         all.find(function(c){ return c.name.toLowerCase().startsWith(q); }) ||
+         all.find(function(c){ return c.name.toLowerCase().includes(q)||q.includes(c.name.toLowerCase().split(' ')[0]); }) || null;
+}
+
+function populateLiveDataLists() {
+  var syms   = Object.values(NSE_SYMBOL_MAP).sort();
+  var names  = getAllCompaniesFlat().map(function(c){ return c.name; }).sort(function(a,b){ return a.localeCompare(b); });
+  var symDl  = document.getElementById('autoSymbolList');
+  if (symDl) symDl.innerHTML = syms.map(function(s){ return '<option value="'+s+'">'; }).join('') + names.map(function(n){ return '<option value="'+n+'">'; }).join('');
+}
+
+// ── INITIALIZE ────────────────────────────────────────────────────────
+(function(){
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', dashInit);
+  } else {
+    dashInit();
+  }
+})();
+
 </script>
 
 <!-- FIXED BOTTOM DOWNLOAD BAR -->
@@ -8028,7 +9260,7 @@ function resetVolumeSentiment() {
     <span>Not Financial Advice</span>
   </div>
   <div style="font-size:10px;color:#4a5070;font-weight:600;">
-    Version 10.0 · For Authorised Members Only · All data processed locally on your device
+    Version 13.0 · For Authorised Members Only · All data processed locally on your device
   </div>
 </div>
 
