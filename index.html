@@ -488,54 +488,54 @@ document.addEventListener('copy', e=>{
   </div>
 
   <div class="hm-section">
-    <div class="hm-section-label">Main Modules</div>
+    <div class="hm-section-label">Navigation</div>
     <div class="hm-item" onclick="switchPage('main');closeHamburger()">
       <div class="hm-item-icon" style="background:#fff3e0;">&#127968;</div>
-      <div><div class="hm-item-text">Main Board</div><div class="hm-item-sub">KPIs, portfolio overview, opportunity meter</div></div>
+      <div><div class="hm-item-text">Dashboard</div><div class="hm-item-sub">KPIs, portfolio overview, opportunity meter</div></div>
     </div>
     <div class="hm-item" onclick="switchPage('screener');closeHamburger()">
       <div class="hm-item-icon" style="background:#e6f4ef;">&#127919;</div>
-      <div><div class="hm-item-text">Sector Screener</div><div class="hm-item-sub">23 sectors scored with CB Score</div></div>
+      <div><div class="hm-item-text">Sector Screener</div><div class="hm-item-sub">33 sectors scored — part of Research tab</div></div>
     </div>
     <div class="hm-item" onclick="switchPage('model');closeHamburger()">
       <div class="hm-item-icon" style="background:#e3f2fd;">&#128200;</div>
-      <div><div class="hm-item-text">Allocation Model</div><div class="hm-item-sub">Macro engine, heatmap, company rankings</div></div>
+      <div><div class="hm-item-text">My Plan</div><div class="hm-item-sub">Macro engine, sector heatmap, company rankings</div></div>
     </div>
     <div class="hm-item" onclick="switchPage('drilldown');closeHamburger()">
       <div class="hm-item-icon" style="background:#f3e5f5;">&#128269;</div>
-      <div><div class="hm-item-text">Sector Drill-Down</div><div class="hm-item-sub">Sector → Subsector → Company deep dive</div></div>
+      <div><div class="hm-item-text">Research</div><div class="hm-item-sub">Sector → Subsector → Company deep dive</div></div>
     </div>
     <div class="hm-item" onclick="switchPage('altassets');closeHamburger()">
       <div class="hm-item-icon" style="background:#e8f5e9;">&#128181;</div>
-      <div><div class="hm-item-text">Debt &amp; Alt Assets</div><div class="hm-item-sub">Debt funds, Gold, Silver, REITs, InvITs</div></div>
+      <div><div class="hm-item-text">Debt &amp; Gold / Metals</div><div class="hm-item-sub">Debt funds, NPS, Gold, Silver, REITs, InvITs</div></div>
     </div>
   </div>
 
   <div class="hm-divider"></div>
 
   <div class="hm-section">
-    <div class="hm-section-label">Stock Credibility</div>
+    <div class="hm-section-label">Credibility</div>
     <div class="hm-item" onclick="switchPage('credibility');closeHamburger()">
       <div class="hm-item-icon" style="background:#fff3e0;">&#127941;</div>
-      <div><div class="hm-item-text">Credibility Tracker</div><div class="hm-item-sub">Top CB Score stocks — live performance tracking</div></div>
+      <div><div class="hm-item-text">Credibility</div><div class="hm-item-sub">Top CB Score stocks — live performance tracking</div></div>
     </div>
   </div>
 
   <div class="hm-divider"></div>
 
   <div class="hm-section">
-    <div class="hm-section-label">Portfolio Import</div>
+    <div class="hm-section-label">My Portfolio</div>
     <div class="hm-item" onclick="switchPage('import');closeHamburger()">
       <div class="hm-item-icon" style="background:#e3f2fd;">&#128229;</div>
-      <div><div class="hm-item-text">Import from Zerodha</div><div class="hm-item-sub">Upload holdings CSV → get real allocation</div></div>
+      <div><div class="hm-item-text">My Portfolio — Zerodha</div><div class="hm-item-sub">Upload holdings CSV → get real allocation</div></div>
     </div>
     <div class="hm-item" onclick="switchPage('import');closeHamburger();setTimeout(()=>document.getElementById('growwImportSection')?.scrollIntoView({behavior:'smooth'}),300)">
       <div class="hm-item-icon" style="background:#e8f5e9;">&#128229;</div>
-      <div><div class="hm-item-text">Import from Groww</div><div class="hm-item-sub">Upload Groww portfolio CSV</div></div>
+      <div><div class="hm-item-text">My Portfolio — Groww</div><div class="hm-item-sub">Upload Groww portfolio CSV</div></div>
     </div>
     <div class="hm-item" onclick="switchPage('import');closeHamburger();setTimeout(()=>document.getElementById('casImportSection')?.scrollIntoView({behavior:'smooth'}),300)">
       <div class="hm-item-icon" style="background:#fff8e1;">&#128196;</div>
-      <div><div class="hm-item-text">Import CAS / CDSL</div><div class="hm-item-sub">Consolidated Account Statement</div></div>
+      <div><div class="hm-item-text">My Portfolio — CAS / CDSL</div><div class="hm-item-sub">Consolidated Account Statement</div></div>
     </div>
   </div>
 
@@ -545,7 +545,7 @@ document.addEventListener('copy', e=>{
     <div class="hm-section-label">Download Statements</div>
     <div class="hm-item" onclick="switchPage('statements');closeHamburger()">
       <div class="hm-item-icon" style="background:#fce4ec;">&#128196;</div>
-      <div><div class="hm-item-text">Statement Download Guide</div><div class="hm-item-sub">Zerodha, CDSL, NSDL, CAMS, RBI, IT Portal</div></div>
+      <div><div class="hm-item-text">Statements</div><div class="hm-item-sub">Zerodha, CDSL, NSDL, CAMS, RBI, IT Portal</div></div>
     </div>
     <div class="hm-item" onclick="downloadPortfolioCSV();closeHamburger()">
       <div class="hm-item-icon" style="background:#e3f2fd;">&#128202;</div>
@@ -2977,7 +2977,13 @@ const SECTOR_REAL_DATA = {
   "ideaForge": {g:1,m:3,d:5,v:3,t:2,r:1,source:"Q4FY26",bse:"544048",note:"Rev ₹280Cr | EBITDA 14.3% | ROE 6.5% | OB 1.9x | Net Cash | Turnaround in Q4"},
   "ideaForge Technology": {g:1,m:3,d:5,v:3,t:2,r:1,source:"Q4FY26",bse:"544048",note:"Rev ₹280Cr | EBITDA 14.3% | ROE 6.5% | OB 1.9x | Net Cash | Turnaround in Q4"},
   "IdeaForge Technology": {g:1,m:3,d:5,v:3,t:2,r:1,source:"Q4FY26",bse:"544048",note:"Rev ₹280Cr | EBITDA 14.3% | ROE 6.5% | OB 1.9x | Net Cash | Turnaround in Q4"},
-  "ideaForge Technology Limited": {g:1,m:3,d:5,v:3,t:2,r:1,source:"Q4FY26",bse:"544048",note:"Rev ₹280Cr | EBITDA 14.3% | ROE 6.5% | OB 1.9x | Net Cash | Turnaround in Q4"}
+  "ideaForge Technology Limited": {g:1,m:3,d:5,v:3,t:2,r:1,source:"Q4FY26",bse:"544048",note:"Rev ₹280Cr | EBITDA 14.3% | ROE 6.5% | OB 1.9x | Net Cash | Turnaround in Q4"},
+  // ── POWER / CAPITAL GOODS / WATER Q4FY26 ─────────────────────────────
+  "VA Tech Wabag": {g:4,m:2,d:5,v:4,t:4,r:3,source:"Q4FY26",bse:"533269",note:"Rev CAGR 17.5% | EBITDA 12.2% | ROE 16% | OB 4.4x | Debt-Free"},
+  "Wabag": {g:4,m:2,d:5,v:4,t:4,r:3,source:"Q4FY26",bse:"533269",note:"Rev CAGR 17.5% | EBITDA 12.2% | ROE 16% | OB 4.4x | Debt-Free"},
+  "CG Power": {g:4,m:2,d:5,v:3,t:1,r:4,source:"Q4FY26",bse:"500093",note:"Rev CAGR 24.2% | EBITDA 13.5% | ROE 20% | Transformers+Semiconductors"},
+  "CG Power and Industrial Solutions": {g:4,m:2,d:5,v:3,t:1,r:4,source:"Q4FY26",bse:"500093",note:"Rev CAGR 24.2% | EBITDA 13.5% | ROE 20%"},
+  "Bajel Projects": {g:5,m:1,d:4,v:3,t:1,r:1,source:"Q4FY26",bse:"544042",note:"Rev CAGR 54% | EBITDA 3.2% | ROE 3% | Early-stage T&D EPC carve-out"}
 };
 
 // Look up real data for a company — checks exact name then partial match
