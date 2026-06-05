@@ -7643,7 +7643,8 @@ function _v(roe, margin, cagr) {
 
 // Extract CO{} object text from fetched HTML
 function extractCOFromHTML(html) {
-  const idx = html.indexOf('var CO={');
+  let idx = html.indexOf('var CO={');
+  if (idx < 0) idx = html.indexOf('var CO = {');
   if (idx < 0) return null;
   // Find balanced closing }
   let depth = 0, i = idx + 7, inStr = false, strChar = '';
