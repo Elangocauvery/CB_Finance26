@@ -90,7 +90,7 @@ tr:last-child td{border-bottom:none;}
 .clickable-row{cursor:pointer;transition:background 0.15s;}
 .clickable-row:hover{background:#f0f4ff;}
 .clickable-row.active{background:#e8eeff;border-left:3px solid var(--orange);}
-.table-scroll{overflow-x:auto;}
+.table-scroll{overflow-x:auto;width:100%;display:block;-webkit-overflow-scrolling:touch;}
 
 /* COLOURS */
 .green{color:var(--green);font-weight:700;}.red{color:var(--red);font-weight:700;}.yellow{color:var(--yellow);font-weight:700;}
@@ -353,6 +353,28 @@ body{padding-bottom:52px;}
   .nav-logo{font-size:13px;}
   .page{padding:8px;}
 }
+
+/* ── NSE Leaderboard buttons ── */
+.lb-btn { background:#f0f2f8; color:#5a6080; border:1px solid #dde1ec; padding:6px 14px;
+  border-radius:16px; font-size:11px; font-weight:700; cursor:pointer; font-family:'Poppins',sans-serif;
+  transition:all 0.15s; min-height:34px; white-space:nowrap; }
+.lb-btn:hover { background:#e3f2fd; color:#1565c0; border-color:#90caf9; }
+.lb-btn.lb-active { background:#1565c0; color:#fff; border-color:#1565c0; }
+.lb-table { width:100%; border-collapse:collapse; font-size:11px; font-family:'Poppins',sans-serif; }
+.lb-table th { background:#1a1e2e; color:#c8d0e8; padding:8px 12px; text-align:left;
+  font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; position:sticky; top:0; }
+.lb-table td { padding:7px 12px; border-bottom:1px solid #f0f2f8; }
+.lb-table tr:hover td { background:#f0f4ff; }
+.lb-rank { font-weight:900; color:#9e9e9e; width:32px; }
+.lb-name { font-weight:800; color:#1a1e2e; }
+.lb-sector { font-size:9px; color:#6b7498; }
+.lb-val { font-weight:800; text-align:right; }
+.lb-score-5 { color:#006b30; } .lb-score-4 { color:#1565c0; }
+.lb-score-3 { color:#7f6000; } .lb-score-2 { color:#c55a11; } .lb-score-1 { color:#c00000; }
+.lb-up { color:#006b30; font-weight:800; } .lb-dn { color:#c00000; font-weight:800; }
+.lb-inlist { background:#e8f5e9; } .lb-notlist { opacity:0.7; }
+.lb-empty { text-align:center; padding:32px; color:#9e9e9e; font-size:12px; }
+
 </style>
 </head>
 <body>
@@ -1922,29 +1944,61 @@ document.addEventListener('copy', e=>{
     </div>
 
     <!-- FII/DII MARKET-WIDE BANNER (fetched once, applies to all) -->
-    <div id="dashFIIBanner" style="display:none;background:linear-gradient(135deg,#1a1e2e,#2a3050);border-radius:10px;padding:12px 18px;margin-bottom:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+    <div id="dashFIIBanner" style="background:linear-gradient(135deg,#1a1e2e,#2a3050);border-radius:10px;padding:12px 18px;margin-bottom:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+      <!-- FII Net -->
       <div style="text-align:center;">
-        <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">FII Net Today</div>
-        <div id="dbFIINet" style="font-size:22px;font-weight:900;color:#9e9e9e;">—</div>
-        <div style="font-size:9px;color:#6b7498;">₹ Crore</div>
+        <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">FII Net ₹Cr</div>
+        <div id="dbFIINet" style="font-size:20px;font-weight:900;color:#9e9e9e;">—</div>
+        <div style="margin-top:5px;display:flex;align-items:center;justify-content:center;gap:4px;">
+          <input id="fiiManualInput" type="number" step="1" placeholder="e.g. -1200"
+            style="width:80px;padding:3px 6px;border:1px solid #3a4a6b;border-radius:5px;font-size:11px;font-weight:700;font-family:'Poppins',sans-serif;background:#0d1117;color:#00e676;outline:none;text-align:center;"
+            onkeydown="if(event.key==='Enter')dashSetManualFIIDII()">
+          <button onclick="dashSetManualFIIDII()"
+            style="background:#1565c0;color:#fff;border:none;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">Set</button>
+        </div>
+        <div style="font-size:8px;color:#6b7498;margin-top:2px;">+buy / −sell</div>
       </div>
+      <!-- DII Net -->
       <div style="text-align:center;">
-        <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">DII Net Today</div>
-        <div id="dbDIINet" style="font-size:22px;font-weight:900;color:#9e9e9e;">—</div>
-        <div style="font-size:9px;color:#6b7498;">₹ Crore</div>
+        <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">DII Net ₹Cr</div>
+        <div id="dbDIINet" style="font-size:20px;font-weight:900;color:#9e9e9e;">—</div>
+        <div style="margin-top:5px;display:flex;align-items:center;justify-content:center;gap:4px;">
+          <input id="diiManualInput" type="number" step="1" placeholder="e.g. +800"
+            style="width:80px;padding:3px 6px;border:1px solid #3a4a6b;border-radius:5px;font-size:11px;font-weight:700;font-family:'Poppins',sans-serif;background:#0d1117;color:#00e676;outline:none;text-align:center;"
+            onkeydown="if(event.key==='Enter')dashSetManualFIIDII()">
+          <button onclick="dashSetManualFIIDII()"
+            style="background:#1565c0;color:#fff;border:none;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">Set</button>
+        </div>
+        <div style="font-size:8px;color:#6b7498;margin-top:2px;">+buy / −sell</div>
       </div>
+      <!-- Market Signal -->
       <div style="text-align:center;">
         <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">Market Signal</div>
-        <div id="dbFIISignal" style="font-size:13px;font-weight:800;color:#ffab40;margin-top:4px;">—</div>
+        <div id="dbFIISignal" style="font-size:12px;font-weight:800;color:#ffab40;margin-top:8px;">—</div>
       </div>
+      <!-- PCR -->
       <div style="text-align:center;">
-        <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">Nifty Option PCR</div>
-        <div id="dbNiftyPCR" style="font-size:22px;font-weight:900;color:#9e9e9e;">—</div>
+        <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">Nifty PCR</div>
+        <div id="dbNiftyPCR" style="font-size:20px;font-weight:900;color:#9e9e9e;">—</div>
         <div id="dbPCRSignal" style="font-size:9px;color:#6b7498;">—</div>
+        <div style="margin-top:5px;display:flex;align-items:center;justify-content:center;gap:4px;">
+          <input id="pcrManualInput" type="number" step="0.01" min="0" max="5" placeholder="e.g. 0.70"
+            style="width:70px;padding:3px 6px;border:1px solid #3a4a6b;border-radius:5px;font-size:11px;font-weight:700;font-family:'Poppins',sans-serif;background:#0d1117;color:#ffab40;outline:none;text-align:center;"
+            onkeydown="if(event.key==='Enter')dashSetManualPCR()">
+          <button onclick="dashSetManualPCR()"
+            style="background:#1565c0;color:#fff;border:none;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">Set</button>
+        </div>
+        <div style="font-size:8px;color:#6b7498;margin-top:2px;">Sensibull / NSE</div>
       </div>
+      <!-- Date -->
       <div style="text-align:center;">
         <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">Date</div>
         <div id="dbDate" style="font-size:13px;font-weight:800;color:#c8d0e8;margin-top:4px;">—</div>
+        <div style="margin-top:6px;">
+          <button onclick="dashClearManualInputs()"
+            style="background:#b71c1c;color:#fff;border:none;padding:3px 10px;border-radius:5px;font-size:9px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">🗑 Clear All</button>
+        </div>
+        <div style="font-size:8px;color:#6b7498;margin-top:2px;">Resets FII/DII/PCR</div>
       </div>
     </div>
 
@@ -1993,6 +2047,37 @@ document.addEventListener('copy', e=>{
       </div>
     </div>
 
+    <!-- BULK DEAL CSV PASTE -->
+    <div style="background:#f3e5f5;border:1px solid #ce93d8;border-radius:10px;padding:14px;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
+        <div style="font-size:12px;font-weight:800;color:#6a1b9a;">🏦 Paste Bulk/Block Deal CSV (Tag companies)</div>
+        <a href="https://www.nseindia.com/reports/bulk-deals" target="_blank"
+          style="font-size:10px;font-weight:700;color:#1976d2;text-decoration:none;">↗ NSE Bulk Deals Page → Download CSV</a>
+        <span style="font-size:9px;color:#6b7498;">Paste NSE bulk/block deal CSV — matching companies get tagged in the dashboard table</span>
+      </div>
+      <textarea id="dashBulkPaste" rows="3"
+        placeholder="Paste NSE Bulk Deal CSV here&#10;Format: Symbol,Security Name,Client Name,Deal Type,Quantity,Trade Price,Remarks&#10;RELIANCE,Reliance Industries Ltd,ABC Fund,BUY,500000,2850.00,Block Deal&#10;(Download from NSE → Reports → Bulk Deals → select date → Download)"
+        style="width:100%;padding:10px;border:1.5px solid #ce93d8;border-radius:8px;font-size:10px;font-family:'Poppins',sans-serif;outline:none;background:#fff;resize:vertical;">
+      </textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center;flex-wrap:wrap;">
+        <button onclick="dashParseBulkDeals()"
+          style="background:linear-gradient(135deg,#6a1b9a,#8e24aa);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;">
+          🏦 Parse & Tag Bulk Deals
+        </button>
+        <button onclick="document.getElementById('dashBulkPaste').value='';document.getElementById('dashBulkStatus').textContent=''"
+          style="background:#f5f6fa;color:#6b7498;border:1px solid #dde1ec;padding:7px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">
+          ✕ Clear Paste
+        </button>
+        <button onclick="dashClearBulkDeals()"
+          style="background:#fce8e8;color:#b71c1c;border:1px solid #ffcdd2;padding:7px 12px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">
+          🗑 Remove Tags
+        </button>
+        <div id="dashBulkStatus" style="font-size:11px;font-weight:700;color:#6a1b9a;"></div>
+      </div>
+      <!-- Bulk deal tags summary -->
+      <div id="dashBulkSummary" style="display:none;margin-top:10px;background:#fff;border-radius:8px;padding:10px;border:1px solid #ce93d8;font-size:11px;"></div>
+    </div>
+
     <!-- MAIN DATA TABLE -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
       <div style="font-size:12px;font-weight:800;color:#1565c0;text-transform:uppercase;letter-spacing:0.5px;">
@@ -2010,31 +2095,28 @@ document.addEventListener('copy', e=>{
       </div>
     </div>
 
-    <div class="table-scroll" id="dashTableWrap">
-      <table id="dashTable" style="font-size:11px;">
+    <div class="table-scroll" id="dashTableWrap" style="max-height:480px;overflow-y:auto;">
+      <table id="dashTable" style="font-size:11px;min-width:700px;width:100%;">
         <thead>
           <tr style="position:sticky;top:0;z-index:10;background:#f5f6fa;">
-            <th style="min-width:32px;">#</th>
-            <th style="min-width:90px;">Sector</th>
-            <th style="min-width:140px;">Company</th>
-            <th style="min-width:60px;">Symbol</th>
+            <th style="min-width:28px;">#</th>
+            <th style="min-width:80px;">Sector</th>
+            <th style="min-width:130px;">Company</th>
+            <th style="min-width:70px;">Symbol</th>
             <th style="min-width:55px;" title="CB Score (0-100)">CB Score</th>
             <th style="min-width:70px;" title="Today's close price">Close ₹</th>
-            <th style="min-width:65px;" title="% change vs prev close">Chg %</th>
-            <th style="min-width:75px;" title="Traded volume today">Volume</th>
-            <th style="min-width:60px;" title="Delivery % of traded qty">Del %</th>
-            <th style="min-width:70px;" title="Turnover in ₹ Crore">₹Cr Turn</th>
-            <th style="min-width:70px;" title="FII net buy/sell ₹Cr">FII Net</th>
-            <th style="min-width:55px;" title="Put/Call Ratio">PCR</th>
-            <th style="min-width:80px;" title="Bulk/Block deals today">Bulk Deal</th>
-            <th style="min-width:55px;" title="Volume Score 1-5">Vol ⭐</th>
-            <th style="min-width:55px;" title="Sentiment Score 1-5">Sent ⭐</th>
-            <th style="min-width:110px;" title="7-day Vol Score trend">7d Trend</th>
-            <th style="min-width:60px;">Status</th>
+            <th style="min-width:60px;" title="% change vs prev close">Chg %</th>
+            <th style="min-width:70px;" title="Traded volume today">Volume</th>
+            <th style="min-width:55px;" title="Delivery % of traded qty">Del %</th>
+            <th style="min-width:65px;" title="Turnover in ₹ Crore">₹Cr Turn</th>
+            <th style="min-width:50px;" title="Volume Score 1-5">Vol ⭐</th>
+            <th style="min-width:50px;" title="Sentiment Score 1-5">Sent ⭐</th>
+            <th style="min-width:75px;" title="Bulk/Block deals — parsed from NSE CSV">Bulk Deal</th>
+            <th style="min-width:90px;" title="7-day Vol Score trend">7d Trend</th>
           </tr>
         </thead>
         <tbody id="dashTableBody">
-          <tr><td colspan="17" style="text-align:center;padding:32px;color:#9e9e9e;font-size:12px;">
+          <tr><td colspan="14" style="text-align:center;padding:32px;color:#9e9e9e;font-size:12px;">
             Click <strong>⚡ Fetch Filtered Sector</strong> or paste Bhavcopy CSV above to load data
           </td></tr>
         </tbody>
@@ -2052,7 +2134,7 @@ document.addEventListener('copy', e=>{
     </div>
 
     <!-- NSE DATA LEADERBOARDS (toggles) -->
-    <div id="nseLeaderboards" style="margin-bottom:16px;">
+    <div id="nseLeaderboards" style="margin-bottom:16px;margin-top:20px;padding-top:16px;border-top:2px dashed #e0e7ef;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
         <div style="font-size:12px;font-weight:800;color:#1565c0;text-transform:uppercase;letter-spacing:0.5px;">📊 NSE Data Leaderboards</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;" id="leaderboardBtns">
@@ -2072,7 +2154,7 @@ document.addEventListener('copy', e=>{
     </div>
 
     <!-- STORED HISTORY -->
-    <div style="margin-top:14px;">
+    <div style="margin-top:20px;padding-top:16px;border-top:2px dashed #e0e7ef;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap;">
         <div style="font-size:12px;font-weight:800;color:#7b1fa2;text-transform:uppercase;letter-spacing:0.5px;">📅 Stored History</div>
         <select id="dashHistoryDate" onchange="dashShowHistory()" style="border:1px solid #dde1ec;border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;font-family:'Poppins',sans-serif;outline:none;">
@@ -8427,6 +8509,41 @@ function dashInit() {
   // Show FII banner if we have data
   var fiiSaved = dashLoadFIICache();
   if (fiiSaved) { DASH_FII_GLOBAL = fiiSaved; dashUpdateFIIBanner(); }
+  // Restore manually entered FII / DII / PCR
+  var savedFII = localStorage.getItem('cbf_manual_fii');
+  var savedDII = localStorage.getItem('cbf_manual_dii');
+  var savedPCR = localStorage.getItem('cbf_manual_pcr');
+  if (savedFII !== null) {
+    DASH_FII_GLOBAL.fiiNet = parseFloat(savedFII);
+    var fiiInp = document.getElementById('fiiManualInput');
+    if (fiiInp) fiiInp.value = savedFII;
+  }
+  if (savedDII !== null) {
+    DASH_FII_GLOBAL.diiNet = parseFloat(savedDII);
+    var diiInp = document.getElementById('diiManualInput');
+    if (diiInp) diiInp.value = savedDII;
+  }
+  if (savedPCR) {
+    DASH_FII_GLOBAL.niftyPCR = savedPCR;
+    var pcrInp = document.getElementById('pcrManualInput');
+    if (pcrInp) pcrInp.value = savedPCR;
+  }
+  if (savedFII !== null || savedDII !== null || savedPCR) {
+    DASH_FII_GLOBAL.fetched = true;
+    dashUpdateFIIBanner();
+  }
+  // Restore bulk deals into DASH_TODAY
+  var savedBulk = localStorage.getItem('cbf_bulk_deals');
+  if (savedBulk) {
+    try {
+      var bd = JSON.parse(savedBulk);
+      Object.keys(bd).forEach(function(sym){
+        if (DASH_TODAY[sym]) DASH_TODAY[sym].bulkDeals = bd[sym];
+        else DASH_TODAY[sym] = { symbol:sym, bulkDeals: bd[sym] };
+      });
+      dashRenderTable();
+    } catch(e) {}
+  }
 }
 
 function dashBuildSectorFilter() {
@@ -8769,9 +8886,11 @@ async function dashBatchFetch(symbols, label) {
     dashSetProgress(i+1, symbols.length, 'Fetching ' + sym + ' (' + (i+1) + '/' + symbols.length + ')…');
     var result = await dashFetchSymbol(sym);
     DASH_TODAY[sym] = result;
-    // Persist to storage every 10
-    if ((i+1) % 10 === 0) dashSaveToStorage();
-    dashRenderTable();
+    // Persist + render every 25 stocks only — avoid DOM thrash on every tick
+    if ((i+1) % 25 === 0) {
+      dashSaveToStorage();
+      dashRenderTable();
+    }
     // Rate limit: 400ms between requests to avoid NSE throttle
     await new Promise(function(r){ setTimeout(r, 400); });
   }
@@ -8816,7 +8935,8 @@ function dashParseBhavcopy() {
   // When user opens in Notepad and copies, it stays comma-separated.
   // Detect by counting tabs vs commas in the first line.
   var firstLineRaw = lines[0];
-  var delimiter = (firstLineRaw.split('\t').length > firstLineRaw.split(',').length) ? '\t' : ',';
+  var delimiter  = (firstLineRaw.split('\t').length > firstLineRaw.split(',').length) ? '\t' : ',';
+  var delimLabel = (delimiter === '\t') ? 'tab-separated (Excel copy)' : 'comma-separated';
 
   var firstLine = firstLineRaw.split(delimiter).map(function(s){ return s.trim(); });
   var firstCol  = firstLine[0];
@@ -8926,9 +9046,11 @@ function dashParseBhavcopy() {
   });
 
   dashSaveToStorage();
+  var _sy = window.scrollY;
   dashRenderTable();
   dashBuildHistoryDropdown();
   renderLeaderboard();
+  window.scrollTo(0, _sy);
   var fmt = isNewFormat
     ? (hasNewHeader ? 'UDiFF with header' : 'UDiFF without header') + ' · ' + delimLabel
     : (hasOldHeader ? 'Old CM with header' : 'Old CM without header') + ' · ' + delimLabel;
@@ -8991,8 +9113,10 @@ function dashParseDelivery() {
 
   dashBuildHistCache();
   dashSaveToStorage();
+  var _sy2 = window.scrollY;
   dashRenderTable();
   renderLeaderboard();
+  window.scrollTo(0, _sy2);
 
   var inMemory = Object.keys(DASH_TODAY).length;
   var statusEl = document.getElementById('dashDelivStatus');
@@ -9055,7 +9179,7 @@ function dashRenderTable() {
   if (countEl) countEl.textContent = rows.length;
 
   if (rows.length === 0) {
-    body.innerHTML = '<tr><td colspan="17" style="text-align:center;padding:24px;color:#9e9e9e;">No companies match current filters</td></tr>';
+    body.innerHTML = '<tr><td colspan="13" style="text-align:center;padding:24px;color:#9e9e9e;">No companies match current filters</td></tr>';
     return;
   }
 
@@ -9085,18 +9209,19 @@ function dashRenderTable() {
       '<td style="font-weight:800;color:' + (hasData && l.del ? (parseFloat(l.del)>=55?'#006b30':parseFloat(l.del)>=35?'#f59e0b':'#e53935') : '#9e9e9e') + ';">' +
         (hasData && l.del ? parseFloat(l.del).toFixed(1) + '%' : '—') + '</td>' +
       '<td>' + (hasData && l.turnover ? '₹' + l.turnover : '—') + '</td>' +
-      '<td style="font-weight:700;color:' + (hasData && l.fiiNet !== null ? (l.fiiNet>=0?'#006b30':'#e53935') : '#9e9e9e') + ';">' +
-        (hasData && l.fiiNet !== null ? (l.fiiNet>=0?'+':'') + dashFmt(l.fiiNet) : '—') + '</td>' +
-      '<td style="font-size:11px;">' + (hasData && l.pcr ? l.pcr : '—') + '</td>' +
-      '<td style="font-size:9px;color:' + (hasData && l.bulkDeals && l.bulkDeals.length ? '#ff7c00' : '#9e9e9e') + ';font-weight:700;">' +
-        (hasData && l.bulkDeals && l.bulkDeals.length ? l.bulkDeals.length + ' deal(s)' : 'None') + '</td>' +
       '<td style="font-weight:900;font-size:15px;color:' + (SCOLS[l&&l.volScore] || '#9e9e9e') + ';" title="' + (hasData && l.volRationale ? l.volRationale : '') + '">' +
         (hasData && l.volScore ? l.volScore + '/5' + (l.histDays > 0 ? '<sup style="font-size:8px;color:#6b7498;">'+l.histDays+'d</sup>' : '') : '—') + '</td>' +
       '<td style="font-weight:900;font-size:15px;color:' + (SCOLS[l&&l.sentScore] || '#9e9e9e') + ';" title="' + (hasData && l.sentRationale ? l.sentRationale : '') + '">' +
         (hasData && l.sentScore ? l.sentScore + '/5' : '—') + '</td>' +
-      '<td>' + (spark ? '<canvas id="spark_' + r.symbol + '" width="100" height="28" style="cursor:pointer;" onclick="dashShowTrend(\'' + r.symbol + '\',\'' + r.company + '\')"></canvas>' : '<span style="font-size:9px;color:#9e9e9e;">No history</span>') + '</td>' +
-      '<td>' + (hasData ? '<span style="font-size:9px;font-weight:700;color:#fff;background:#006b30;padding:2px 6px;border-radius:5px;">Live</span>' :
-        (r.symbol ? '<span style="font-size:9px;color:#9e9e9e;">Pending</span>' : '<span style="font-size:9px;color:#e53935;">No symbol</span>')) + '</td>' +
+      '<td style="font-size:9px;">' + (function(){
+        var bd = (l && l.bulkDeals && l.bulkDeals.length) ? l.bulkDeals : [];
+        if (!bd.length) return '<span style="color:#9e9e9e;">—</span>';
+        return bd.slice(0,2).map(function(d){
+          var col = d.type==='BUY'?'#006b30':'#e53935';
+          return '<span style="color:'+col+';font-weight:800;">'+d.type+'</span><span style="color:#6b7498;"> '+d.client.substring(0,12)+(d.client.length>12?'…':'')+'</span>';
+        }).join('<br>');
+      })() + '</td>' +
+      '<td>' + (spark ? '<canvas id="spark_' + r.symbol + '" width="100" height="28" style="cursor:pointer;" onclick="dashShowTrend(\'' + r.symbol + '\',\'' + r.company + '\')"></canvas>' : '<span style="font-size:9px;color:#9e9e9e;">—</span>') + '</td>' +
     '</tr>';
   });
   body.innerHTML = html;
@@ -9271,6 +9396,197 @@ function dashLoadFIICache() {
   try { return JSON.parse(localStorage.getItem(DASH_FII_KEY) || 'null'); } catch(e){ return null; }
 }
 
+// ── MANUAL FII / DII INPUT ───────────────────────────────────────────
+function dashSetManualFIIDII() {
+  var fiiInp = document.getElementById('fiiManualInput');
+  var diiInp = document.getElementById('diiManualInput');
+  var changed = false;
+
+  if (fiiInp && fiiInp.value !== '') {
+    var fii = parseFloat(fiiInp.value);
+    if (!isNaN(fii)) {
+      DASH_FII_GLOBAL.fiiNet = fii;
+      localStorage.setItem('cbf_manual_fii', fii.toString());
+      fiiInp.style.border = '2px solid #00a854';
+      setTimeout(function(){ fiiInp.style.border = '1px solid #3a4a6b'; }, 1500);
+      changed = true;
+    }
+  }
+  if (diiInp && diiInp.value !== '') {
+    var dii = parseFloat(diiInp.value);
+    if (!isNaN(dii)) {
+      DASH_FII_GLOBAL.diiNet = dii;
+      localStorage.setItem('cbf_manual_dii', dii.toString());
+      diiInp.style.border = '2px solid #00a854';
+      setTimeout(function(){ diiInp.style.border = '1px solid #3a4a6b'; }, 1500);
+      changed = true;
+    }
+  }
+  if (changed) {
+    DASH_FII_GLOBAL.fetched = true;
+    dashUpdateFIIBanner();
+  }
+}
+
+// ── MANUAL PCR INPUT ─────────────────────────────────────────────────
+function dashSetManualPCR() {
+  var inp = document.getElementById('pcrManualInput');
+  if (!inp || !inp.value) return;
+  var val = parseFloat(inp.value);
+  if (isNaN(val) || val <= 0) { alert('Enter a valid PCR value e.g. 0.70'); return; }
+  var str = val.toFixed(2);
+  DASH_FII_GLOBAL.niftyPCR = str;
+  localStorage.setItem('cbf_manual_pcr', str);
+  dashUpdateFIIBanner();
+  inp.style.border = '2px solid #00a854';
+  setTimeout(function(){ inp.style.border = '1px solid #3a4a6b'; }, 1500);
+}
+
+// ── CLEAR ALL MANUAL INPUTS ──────────────────────────────────────────
+function dashClearManualInputs() {
+  if (!confirm('Clear all manually entered FII, DII and PCR values?')) return;
+  localStorage.removeItem('cbf_manual_fii');
+  localStorage.removeItem('cbf_manual_dii');
+  localStorage.removeItem('cbf_manual_pcr');
+  DASH_FII_GLOBAL.fiiNet = null;
+  DASH_FII_GLOBAL.diiNet = null;
+  DASH_FII_GLOBAL.niftyPCR = null;
+  DASH_FII_GLOBAL.fetched = false;
+  ['fiiManualInput','diiManualInput','pcrManualInput'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  dashUpdateFIIBanner();
+}
+
+// ── BULK DEAL CSV PARSER ──────────────────────────────────────────────
+// NSE Bulk Deal CSV format:
+// Symbol,Security Name,Client Name,Deal Type (BUY/SELL),Quantity Traded,Trade Price / Wt. Avg. Price,Remarks
+function dashParseBulkDeals() {
+  var raw = (document.getElementById('dashBulkPaste') || {}).value || '';
+  var status = document.getElementById('dashBulkStatus');
+  var summary = document.getElementById('dashBulkSummary');
+  if (!raw.trim()) { if(status) status.textContent = '⚠ Paste bulk deal CSV first'; return; }
+
+  var lines = raw.trim().split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
+  if (lines.length < 2) { if(status) status.textContent = '⚠ Too few rows — check CSV format'; return; }
+
+  // Auto-detect header row
+  var startRow = 0;
+  var header = lines[0].toUpperCase();
+  if (header.indexOf('SYMBOL') !== -1 || header.indexOf('CLIENT') !== -1 || header.indexOf('DEAL TYPE') !== -1) {
+    startRow = 1;
+  }
+
+  // Parse: handle both comma and tab delimiters
+  var delim = lines[startRow] && lines[startRow].split('	').length > 3 ? '	' : ',';
+
+  var bySymbol = {};  // symbol → [{client, type, qty, price}]
+  var parsed = 0, skipped = 0;
+
+  for (var i = startRow; i < lines.length; i++) {
+    var cols = lines[i].split(delim).map(function(c){ return c.replace(/^"|"$/g,'').trim(); });
+    if (cols.length < 4) { skipped++; continue; }
+
+    // NSE format: Symbol, Security Name, Client Name, Deal Type, Quantity, Price, Remarks
+    // Also handle: Symbol, Client Name, Deal Type, Quantity, Price (5-col short format)
+    var sym, client, dealType, qty, price;
+    if (cols.length >= 6) {
+      sym      = (cols[0] || '').toUpperCase().trim();
+      client   = cols[2] || '';
+      dealType = (cols[3] || '').toUpperCase().trim();
+      qty      = parseFloat((cols[4] || '').replace(/,/g,'')) || 0;
+      price    = parseFloat((cols[5] || '').replace(/,/g,'')) || 0;
+    } else if (cols.length >= 5) {
+      sym      = (cols[0] || '').toUpperCase().trim();
+      client   = cols[1] || '';
+      dealType = (cols[2] || '').toUpperCase().trim();
+      qty      = parseFloat((cols[3] || '').replace(/,/g,'')) || 0;
+      price    = parseFloat((cols[4] || '').replace(/,/g,'')) || 0;
+    } else { skipped++; continue; }
+
+    if (!sym || (dealType !== 'BUY' && dealType !== 'SELL' && dealType !== 'S' && dealType !== 'B')) {
+      skipped++; continue;
+    }
+    if (dealType === 'B') dealType = 'BUY';
+    if (dealType === 'S') dealType = 'SELL';
+
+    if (!bySymbol[sym]) bySymbol[sym] = [];
+    bySymbol[sym].push({ client: client, type: dealType, qty: qty, price: price });
+    parsed++;
+  }
+
+  if (parsed === 0) {
+    if(status) status.textContent = '⚠ No valid bulk deal rows found — check format';
+    return;
+  }
+
+  // Save to localStorage (keyed by today's date)
+  localStorage.setItem('cbf_bulk_deals', JSON.stringify(bySymbol));
+  localStorage.setItem('cbf_bulk_date', dashTodayKey());
+
+  // Merge into DASH_TODAY
+  var matched = 0;
+  Object.keys(bySymbol).forEach(function(sym){
+    if (!DASH_TODAY[sym]) DASH_TODAY[sym] = { symbol: sym };
+    DASH_TODAY[sym].bulkDeals = bySymbol[sym];
+    matched++;
+  });
+
+  dashSaveToStorage();
+  var _sy = window.scrollY;
+  dashRenderTable();
+  renderLeaderboard();
+  window.scrollTo(0, _sy);
+
+  if(status) status.textContent = '✔ ' + parsed + ' deals parsed · ' + matched + ' companies tagged';
+
+  // Build summary panel
+  if (summary) {
+    var rows = Object.keys(bySymbol).map(function(sym){
+      var deals = bySymbol[sym];
+      var buys  = deals.filter(function(d){ return d.type==='BUY'; });
+      var sells = deals.filter(function(d){ return d.type==='SELL'; });
+      return '<tr>' +
+        '<td style="font-weight:800;color:#1a1e2e;padding:5px 10px;">' + sym + '</td>' +
+        '<td style="padding:5px 10px;color:#6b7498;font-size:10px;">' + (NSE_REVERSE_MAP[sym] || '') + '</td>' +
+        '<td style="padding:5px 10px;">' + (buys.length ? '<span style="color:#006b30;font-weight:800;">▲ ' + buys.length + ' BUY</span>' : '—') + '</td>' +
+        '<td style="padding:5px 10px;">' + (sells.length ? '<span style="color:#e53935;font-weight:800;">▼ ' + sells.length + ' SELL</span>' : '—') + '</td>' +
+        '<td style="padding:5px 10px;font-size:10px;color:#5a6080;">' +
+          deals.slice(0,2).map(function(d){ return d.client.substring(0,20); }).join(', ') +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    summary.style.display = 'block';
+    summary.innerHTML =
+      '<div style="font-size:11px;font-weight:800;color:#6a1b9a;margin-bottom:8px;">🏦 Bulk Deal Summary — ' + Object.keys(bySymbol).length + ' companies · ' + parsed + ' deals</div>' +
+      '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;">' +
+        '<thead><tr style="background:#f3e5f5;">' +
+          '<th style="padding:5px 10px;text-align:left;font-size:10px;color:#6a1b9a;">Symbol</th>' +
+          '<th style="padding:5px 10px;text-align:left;font-size:10px;color:#6a1b9a;">Company</th>' +
+          '<th style="padding:5px 10px;text-align:left;font-size:10px;color:#006b30;">Buys</th>' +
+          '<th style="padding:5px 10px;text-align:left;font-size:10px;color:#e53935;">Sells</th>' +
+          '<th style="padding:5px 10px;text-align:left;font-size:10px;color:#6a1b9a;">Clients</th>' +
+        '</tr></thead>' +
+        '<tbody>' + rows + '</tbody>' +
+      '</table></div>';
+  }
+}
+
+function dashClearBulkDeals() {
+  localStorage.removeItem('cbf_bulk_deals');
+  localStorage.removeItem('cbf_bulk_date');
+  Object.keys(DASH_TODAY).forEach(function(sym){
+    if (DASH_TODAY[sym]) delete DASH_TODAY[sym].bulkDeals;
+  });
+  var status = document.getElementById('dashBulkStatus');
+  if (status) status.textContent = 'Bulk deals cleared';
+  var summary = document.getElementById('dashBulkSummary');
+  if (summary) { summary.style.display = 'none'; summary.innerHTML = ''; }
+  dashRenderTable();
+}
+
 function dashClearHistory() {
   if (!confirm('Clear ALL stored market history? This cannot be undone.')) return;
   localStorage.removeItem(DASH_STORAGE_KEY);
@@ -9374,6 +9690,16 @@ function dashShowHistory() {
     wrap.style.display = 'block';
     return;
   }
+
+  // ── Load this day's data into DASH_TODAY so leaderboard buttons work ──
+  DASH_TODAY = {};
+  rows.forEach(function(r){ if (r.symbol) DASH_TODAY[r.symbol] = r; });
+  var _sy3 = window.scrollY;
+  dashRenderTable();
+  renderLeaderboard();
+  window.scrollTo(0, _sy3);
+  var lastEl = document.getElementById('dashLastUpdate');
+  if (lastEl) lastEl.textContent = 'Viewing history: ' + dateKey + ' (' + rows.length + ' stocks)';
 
   // Sort by sentiment + volume score descending
   rows.sort(function(a,b) {
@@ -9501,32 +9827,7 @@ function populateLiveDataLists() {
 }
 
 // ── NSE DATA LEADERBOARDS ─────────────────────────────────────────────
-// CSS for toggle buttons (injected once)
-(function addLBStyles(){
-  var s = document.createElement('style');
-  s.textContent = `
-    .lb-btn { background:#f0f2f8; color:#5a6080; border:1px solid #dde1ec; padding:5px 12px;
-      border-radius:16px; font-size:11px; font-weight:700; cursor:pointer; font-family:'Poppins',sans-serif;
-      transition:all 0.15s; }
-    .lb-btn:hover { background:#e3f2fd; color:#1565c0; border-color:#90caf9; }
-    .lb-btn.lb-active { background:#1565c0; color:#fff; border-color:#1565c0; }
-    .lb-table { width:100%; border-collapse:collapse; font-size:11px; font-family:'Poppins',sans-serif; }
-    .lb-table th { background:#1a1e2e; color:#c8d0e8; padding:8px 12px; text-align:left;
-      font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; position:sticky; top:0; }
-    .lb-table td { padding:7px 12px; border-bottom:1px solid #f0f2f8; }
-    .lb-table tr:hover td { background:#f0f4ff; }
-    .lb-rank { font-weight:900; color:#9e9e9e; width:32px; }
-    .lb-name { font-weight:800; color:#1a1e2e; }
-    .lb-sector { font-size:9px; color:#6b7498; }
-    .lb-val { font-weight:800; text-align:right; }
-    .lb-score-5 { color:#006b30; } .lb-score-4 { color:#1565c0; }
-    .lb-score-3 { color:#7f6000; } .lb-score-2 { color:#c55a11; } .lb-score-1 { color:#c00000; }
-    .lb-up { color:#006b30; font-weight:800; } .lb-dn { color:#c00000; font-weight:800; }
-    .lb-inlist { background:#e8f5e9; } .lb-notlist { opacity:0.7; }
-    .lb-empty { text-align:center; padding:32px; color:#9e9e9e; font-size:12px; }
-  `;
-  document.head.appendChild(s);
-})();
+// (CSS for lb-btn is in the main <style> block above)
 
 var LB_ACTIVE = 'vol';
 
@@ -9547,164 +9848,167 @@ function showLeaderboard(type) {
 function renderLeaderboard() {
   var panel = document.getElementById('leaderboardContent');
   if (!panel) return;
-
   var data = Object.values(DASH_TODAY);
   if (data.length === 0) {
-    panel.innerHTML = '<div class="lb-empty">No NSE data loaded yet — paste Bhavcopy above to see leaderboards</div>';
+    panel.innerHTML = '<div class="lb-empty">No NSE data loaded yet \u2014 paste Bhavcopy above</div>';
     return;
   }
-
-  // Helper: safely parse any numeric field
-  function n(v) { var f = parseFloat(v); return isNaN(f) ? null : f; }
-  function nn(v) { var f = n(v); return f !== null ? f : 0; } // 0 fallback for sorting
-
-  // Build set of our company symbols for green highlighting
+  var safeNum  = function(v){ var f=parseFloat(v); return (isNaN(f)||v===null||v===undefined)?null:f; };
+  var safeNum0 = function(v){ var f=safeNum(v); return f!==null?f:0; };
   var ourSymbols = new Set();
-  getAllCompaniesFlat().forEach(function(c) {
-    var sym = NSE_SYMBOL_MAP[c.name];
+  getAllCompaniesFlat().forEach(function(co){
+    var sym = NSE_SYMBOL_MAP[co.name];
     if (sym) ourSymbols.add(sym);
   });
-
   var rows, title, cols;
 
   switch (LB_ACTIVE) {
 
     case 'vol':
-      title = '🔥 Top 25 by Traded Volume (Shares)';
-      rows = data.filter(function(r){ return n(r.vol) !== null; })
-        .sort(function(a,b){ return nn(b.vol) - nn(a.vol); }).slice(0,25);
-      cols = ['#','Company','Symbol','Sector','Volume','Delivery %','Turnover ₹Cr','Chg %'];
+      title = '\ud83d\udd25 Top 25 by Traded Volume';
+      rows = data.filter(function(r){ return safeNum(r.vol)!==null; })
+               .sort(function(a,b){ return safeNum0(b.vol)-safeNum0(a.vol); }).slice(0,25);
+      cols = ['#','Company','Symbol','Sector','Volume','Del %','Turnover \u20b9Cr','Chg %'];
       panel.innerHTML = buildLBTable(title, cols, rows.map(function(r,i){
-        return [i+1, r.company||r.symbol||'—', r.symbol||'—', r.sector||'—',
+        return [i+1, r.company||r.symbol||'\u2014', r.symbol||'\u2014', r.sector||'\u2014',
           '<span class="lb-val">'+dashFmt(r.vol)+'</span>',
-          n(r.del) !== null ? fmtDel(n(r.del)) : '—',
-          n(r.turnover) !== null ? '₹'+parseFloat(r.turnover).toFixed(1)+'Cr' : '—',
+          safeNum(r.del)!==null ? fmtDel(safeNum(r.del)) : '\u2014',
+          safeNum(r.turnover)!==null ? '\u20b9'+parseFloat(r.turnover).toFixed(1)+'Cr' : '\u2014',
           fmtPct(r.pctChg)];
       }), ourSymbols, rows);
       break;
 
     case 'del':
-      title = '📦 Top 25 by Delivery % (Highest Conviction)';
-      rows = data.filter(function(r){ return n(r.del) !== null && nn(r.vol) > 10000; })
-        .sort(function(a,b){ return nn(b.del) - nn(a.del); }).slice(0,25);
-      cols = ['#','Company','Symbol','Del %','Volume','Chg %','Vol Score'];
+      title = '\ud83d\udce6 Top 25 by Delivery % (Conviction)';
+      rows = data.filter(function(r){ return safeNum(r.del)!==null && safeNum0(r.vol)>10000; })
+               .sort(function(a,b){ return safeNum0(b.del)-safeNum0(a.del); }).slice(0,25);
+      cols = ['#','Company','Symbol','Del %','Volume','Chg %','Vol \u2b50'];
       panel.innerHTML = buildLBTable(title, cols, rows.map(function(r,i){
-        return [i+1, r.company||r.symbol||'—', r.symbol||'—',
-          fmtDel(n(r.del)), dashFmt(r.vol), fmtPct(r.pctChg),
-          r.volScore ? '<span class="lb-score-'+r.volScore+'">'+r.volScore+'/5</span>' : '—'];
+        return [i+1, r.company||r.symbol||'\u2014', r.symbol||'\u2014',
+          fmtDel(safeNum(r.del)), dashFmt(r.vol), fmtPct(r.pctChg),
+          r.volScore ? '<span class="lb-score-'+r.volScore+'">'+r.volScore+'/5</span>' : '\u2014'];
       }), ourSymbols, rows);
       break;
 
     case 'turn':
-      title = '💰 Top 25 by Turnover (₹ Crore)';
-      rows = data.filter(function(r){ return n(r.turnover) !== null; })
-        .sort(function(a,b){ return nn(b.turnover) - nn(a.turnover); }).slice(0,25);
-      cols = ['#','Company','Symbol','Turnover ₹Cr','Volume','Del %','Chg %'];
+      title = '\ud83d\udcb0 Top 25 by Turnover (\u20b9 Crore)';
+      rows = data.filter(function(r){ return safeNum(r.turnover)!==null; })
+               .sort(function(a,b){ return safeNum0(b.turnover)-safeNum0(a.turnover); }).slice(0,25);
+      cols = ['#','Company','Symbol','Turnover \u20b9Cr','Volume','Del %','Chg %'];
       panel.innerHTML = buildLBTable(title, cols, rows.map(function(r,i){
-        return [i+1, r.company||r.symbol||'—', r.symbol||'—',
-          '<span class="lb-val">₹'+nn(r.turnover).toFixed(1)+'Cr</span>',
+        return [i+1, r.company||r.symbol||'\u2014', r.symbol||'\u2014',
+          '<span class="lb-val">\u20b9'+safeNum0(r.turnover).toFixed(1)+'Cr</span>',
           dashFmt(r.vol),
-          n(r.del) !== null ? fmtDel(n(r.del)) : '—',
+          safeNum(r.del)!==null ? fmtDel(safeNum(r.del)) : '\u2014',
           fmtPct(r.pctChg)];
       }), ourSymbols, rows);
       break;
 
     case 'gain':
-      title = '📈 Top 25 Gainers Today';
-      rows = data.filter(function(r){ return n(r.pctChg) !== null; })
-        .sort(function(a,b){ return nn(b.pctChg) - nn(a.pctChg); }).slice(0,25);
-      cols = ['#','Company','Symbol','Chg %','Close ₹','Del %','Volume','Sent Score'];
+      title = '\ud83d\udcc8 Top 25 Gainers Today';
+      rows = data.filter(function(r){ return safeNum(r.pctChg)!==null; })
+               .sort(function(a,b){ return safeNum0(b.pctChg)-safeNum0(a.pctChg); }).slice(0,25);
+      cols = ['#','Company','Symbol','Chg %','Close \u20b9','Del %','Volume','Sent \u2b50'];
       panel.innerHTML = buildLBTable(title, cols, rows.map(function(r,i){
-        return [i+1, r.company||r.symbol||'—', r.symbol||'—',
+        return [i+1, r.company||r.symbol||'\u2014', r.symbol||'\u2014',
           fmtPct(r.pctChg),
-          n(r.close) !== null ? '₹'+nn(r.close).toLocaleString('en-IN') : '—',
-          n(r.del) !== null ? fmtDel(n(r.del)) : '—',
+          safeNum(r.close)!==null ? '\u20b9'+safeNum0(r.close).toLocaleString('en-IN') : '\u2014',
+          safeNum(r.del)!==null ? fmtDel(safeNum(r.del)) : '\u2014',
           dashFmt(r.vol),
-          r.sentScore ? '<span class="lb-score-'+r.sentScore+'">'+r.sentScore+'/5</span>' : '—'];
+          r.sentScore ? '<span class="lb-score-'+r.sentScore+'">'+r.sentScore+'/5</span>' : '\u2014'];
       }), ourSymbols, rows);
       break;
 
     case 'loss':
-      title = '📉 Top 25 Losers Today';
-      rows = data.filter(function(r){ return n(r.pctChg) !== null; })
-        .sort(function(a,b){ return nn(a.pctChg) - nn(b.pctChg); }).slice(0,25);
-      cols = ['#','Company','Symbol','Chg %','Close ₹','Del %','Volume','Signal'];
+      title = '\ud83d\udcc9 Top 25 Losers Today';
+      rows = data.filter(function(r){ return safeNum(r.pctChg)!==null; })
+               .sort(function(a,b){ return safeNum0(a.pctChg)-safeNum0(b.pctChg); }).slice(0,25);
+      cols = ['#','Company','Symbol','Chg %','Close \u20b9','Del %','Volume','Signal'];
       panel.innerHTML = buildLBTable(title, cols, rows.map(function(r,i){
-        var dp = n(r.del);
-        var signal = dp !== null
-          ? (dp > 50 ? '<span style="color:#c00000;font-weight:700;">High Del — Real Selling ⚠</span>'
-            : dp < 25 ? '<span style="color:#ff7c00;font-weight:700;">Low Del — Intraday Panic</span>'
-            : '<span style="color:#7f6000;">Mixed</span>')
-          : '—';
-        return [i+1, r.company||r.symbol||'—', r.symbol||'—',
+        var dp = safeNum(r.del);
+        var sig = dp!==null
+          ? (dp>50 ? '<span style="color:#c00000;font-weight:700;">High Del\u2014Real Selling</span>'
+              : dp<25 ? '<span style="color:#ff7c00;font-weight:700;">Low Del\u2014Intraday Panic</span>'
+              : 'Mixed')
+          : '\u2014';
+        return [i+1, r.company||r.symbol||'\u2014', r.symbol||'\u2014',
           fmtPct(r.pctChg),
-          n(r.close) !== null ? '₹'+nn(r.close).toLocaleString('en-IN') : '—',
-          dp !== null ? fmtDel(dp) : '—',
-          dashFmt(r.vol), signal];
+          safeNum(r.close)!==null ? '\u20b9'+safeNum0(r.close).toLocaleString('en-IN') : '\u2014',
+          dp!==null ? fmtDel(dp) : '\u2014',
+          dashFmt(r.vol), sig];
       }), ourSymbols, rows);
       break;
 
     case 'vscore':
-      title = '⭐ Top 25 by Volume Score';
-      rows = data.filter(function(r){ return r.volScore && parseInt(r.volScore) > 0; })
-        .sort(function(a,b){ return parseInt(b.volScore||0) - parseInt(a.volScore||0) || nn(b.del) - nn(a.del); }).slice(0,25);
-      cols = ['#','Company','Symbol','Vol Score','Del %','Volume','Rationale'];
+      title = '\u2b50 Top 25 by Volume Score';
+      rows = data.filter(function(r){ return r.volScore && parseInt(r.volScore)>0; })
+               .sort(function(a,b){
+                 return parseInt(b.volScore||0)-parseInt(a.volScore||0) || safeNum0(b.del)-safeNum0(a.del);
+               }).slice(0,25);
+      cols = ['#','Company','Symbol','Vol \u2b50','Del %','Volume','Rationale'];
       panel.innerHTML = buildLBTable(title, cols, rows.map(function(r,i){
-        return [i+1, r.company||r.symbol||'—', r.symbol||'—',
+        return [i+1, r.company||r.symbol||'\u2014', r.symbol||'\u2014',
           '<span class="lb-score-'+r.volScore+'">'+r.volScore+'/5</span>',
-          n(r.del) !== null ? fmtDel(n(r.del)) : '—',
+          safeNum(r.del)!==null ? fmtDel(safeNum(r.del)) : '\u2014',
           dashFmt(r.vol),
-          '<span style="font-size:9px;color:#5a6080;">'+(r.volRationale||'—')+'</span>'];
+          '<span style="font-size:9px;color:#5a6080;">'+(r.volRationale||'\u2014')+'</span>'];
       }), ourSymbols, rows);
       break;
 
     case 'sscore':
-      title = '😊 Top 25 by Sentiment Score';
-      rows = data.filter(function(r){ return r.sentScore && parseInt(r.sentScore) > 0; })
-        .sort(function(a,b){ return parseInt(b.sentScore||0) - parseInt(a.sentScore||0) || nn(b.pctChg) - nn(a.pctChg); }).slice(0,25);
-      cols = ['#','Company','Symbol','Sent Score','Vol Score','Del %','Chg %','Signals'];
+      title = '\ud83d\ude0a Top 25 by Sentiment Score';
+      rows = data.filter(function(r){ return r.sentScore && parseInt(r.sentScore)>0; })
+               .sort(function(a,b){
+                 return parseInt(b.sentScore||0)-parseInt(a.sentScore||0) || safeNum0(b.pctChg)-safeNum0(a.pctChg);
+               }).slice(0,25);
+      cols = ['#','Company','Symbol','Sent \u2b50','Vol \u2b50','Del %','Chg %','Signals'];
       panel.innerHTML = buildLBTable(title, cols, rows.map(function(r,i){
-        return [i+1, r.company||r.symbol||'—', r.symbol||'—',
+        return [i+1, r.company||r.symbol||'\u2014', r.symbol||'\u2014',
           '<span class="lb-score-'+r.sentScore+'">'+r.sentScore+'/5</span>',
-          r.volScore ? '<span class="lb-score-'+r.volScore+'">'+r.volScore+'/5</span>' : '—',
-          n(r.del) !== null ? fmtDel(n(r.del)) : '—',
+          r.volScore ? '<span class="lb-score-'+r.volScore+'">'+r.volScore+'/5</span>' : '\u2014',
+          safeNum(r.del)!==null ? fmtDel(safeNum(r.del)) : '\u2014',
           fmtPct(r.pctChg),
-          '<span style="font-size:9px;color:#5a6080;">'+(r.sentRationale||'—')+'</span>'];
+          '<span style="font-size:9px;color:#5a6080;">'+(r.sentRationale||'\u2014')+'</span>'];
       }), ourSymbols, rows);
       break;
 
     case 'ourlist':
-      title = '🎯 Our 765 Companies — Today\'s NSE Data';
       var ourData = data.filter(function(r){ return ourSymbols.has(r.symbol); })
         .sort(function(a,b){
-          return (parseInt(b.volScore||0) + parseInt(b.sentScore||0)) -
-                 (parseInt(a.volScore||0) + parseInt(a.sentScore||0));
+          return (parseInt(b.volScore||0)+parseInt(b.sentScore||0))
+               - (parseInt(a.volScore||0)+parseInt(a.sentScore||0));
         });
-      var notFetched = getAllCompaniesFlat().filter(function(c){
-        var sym = NSE_SYMBOL_MAP[c.name];
+      var notFetched = getAllCompaniesFlat().filter(function(co){
+        var sym = NSE_SYMBOL_MAP[co.name];
         return sym && !DASH_TODAY[sym];
       });
       rows = ourData;
-      cols = ['#','Company','Symbol','Sector','Vol ⭐','Sent ⭐','Del %','Chg %','Volume'];
-      var note = notFetched.length > 0
-        ? '<div style="font-size:10px;color:#ff7c00;font-weight:700;padding:8px 12px;background:#fff8f0;border-bottom:1px solid #ffd0a0;">⚠ '+notFetched.length+' of our companies not in today\'s data</div>'
+      cols = ['#','Company','Symbol','Sector','Vol \u2b50','Sent \u2b50','Del %','Chg %','Volume'];
+      var lbNote = notFetched.length > 0
+        ? '<div style="font-size:10px;color:#ff7c00;font-weight:700;padding:8px 12px;background:#fff8f0;border-bottom:1px solid #ffd0a0;">'
+          + notFetched.length + ' companies not in today\'s data</div>'
         : '';
-      panel.innerHTML = (ourData.length === 0
-        ? '<div class="lb-empty">None of our 765 companies found in today\'s data yet</div>'
-        : note + buildLBTable(title, cols, ourData.map(function(r,i){
-            return [i+1, r.company||r.symbol||'—', r.symbol||'—', r.sector||'—',
-              r.volScore  ? '<span class="lb-score-'+r.volScore+'">'+r.volScore+'/5</span>'  : '—',
-              r.sentScore ? '<span class="lb-score-'+r.sentScore+'">'+r.sentScore+'/5</span>' : '—',
-              n(r.del) !== null ? fmtDel(n(r.del)) : '—',
+      if (ourData.length === 0) {
+        panel.innerHTML = '<div class="lb-empty">None of our 765 companies in today\'s data yet</div>';
+      } else {
+        panel.innerHTML = lbNote + buildLBTable(
+          '\ud83c\udfaf Our 765 Companies', cols,
+          ourData.map(function(r,i){
+            return [i+1, r.company||r.symbol||'\u2014', r.symbol||'\u2014', r.sector||'\u2014',
+              r.volScore  ? '<span class="lb-score-'+r.volScore+'">'+r.volScore+'/5</span>'  : '\u2014',
+              r.sentScore ? '<span class="lb-score-'+r.sentScore+'">'+r.sentScore+'/5</span>' : '\u2014',
+              safeNum(r.del)!==null ? fmtDel(safeNum(r.del)) : '\u2014',
               fmtPct(r.pctChg), dashFmt(r.vol)];
-          }), ourSymbols, rows));
+          }),
+          ourSymbols, rows
+        );
+      }
       break;
 
     default:
-      panel.innerHTML = '<div class="lb-empty">Select a leaderboard tab above</div>';
+      panel.innerHTML = '<div class="lb-empty">Select a leaderboard above</div>';
   }
 }
-
 function buildLBTable(title, cols, dataRows, ourSymbols, rawRows) {
   function esc(s) {
     if (s === null || s === undefined) return '—';
