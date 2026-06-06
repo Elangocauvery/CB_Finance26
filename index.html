@@ -8386,6 +8386,7 @@ function nseUrl(path){ return PROXY + encodeURIComponent('https://www.nseindia.c
 
 // ── INIT ──────────────────────────────────────────────────────────────
 function dashInit() {
+  dashBuildHistCache();  // build historical averages from localStorage on startup
   dashBuildSectorFilter();
   dashLoadFromStorage();
   dashBuildHistoryDropdown();
@@ -8499,30 +8500,198 @@ async function dashFetchSymbol(symbol) {
 }
 
 // ── SCORE COMPUTATION ─────────────────────────────────────────────────
-function dashComputeScores(r) {
-  // Volume score
-  var volScore = 3;
-  if (r.del !== null && r.del !== undefined) {
-    var dp = parseFloat(r.del);
-    volScore = dp>=65?5 : dp>=50?4 : dp>=35?3 : dp>=20?2 : 1;
-  }
-  r.volScore = volScore;
+// ── HISTORICAL AVERAGES ENGINE ────────────────────────────────────────
+// Reads localStorage history to compute per-symbol averages
+// Called once after Bhavcopy load, cached in DASH_HIST_CACHE
+var DASH_HIST_CACHE = {}; // symbol → {avgVol5, avgVol10, avgVol30, avgDel5, avgPct5, days}
 
-  // Sentiment score (weighted from available signals)
-  var comps = [], wTotal = 0, wSum = 0;
-  if (r.del  !== null && r.del  !== undefined) { var s=parseFloat(r.del)>=60?5:parseFloat(r.del)>=48?4:parseFloat(r.del)>=34?3:parseFloat(r.del)>=20?2:1; comps.push({s:s,w:20}); }
-  if (r.fiiNet!== null && r.fiiNet!==undefined) {
-    var fs = r.fiiNet>2000?5 : r.fiiNet>500?4 : r.fiiNet>-500?3 : r.fiiNet>-2000?2 : 1;
-    comps.push({s:fs,w:18});
+function dashBuildHistCache() {
+  DASH_HIST_CACHE = {};
+  try {
+    var hist = JSON.parse(localStorage.getItem(DASH_STORAGE_KEY) || '{}');
+    var today = dashTodayKey();
+    // Collect past days (exclude today — we're computing today's score against history)
+    var pastDates = Object.keys(hist).filter(function(d){ return d < today; }).sort();
+    if (pastDates.length === 0) return; // no history yet
+
+    // Build per-symbol history arrays
+    var symHist = {}; // symbol → [{date, vol, del, pctChg}]
+    pastDates.forEach(function(date) {
+      var day = hist[date] || {};
+      Object.entries(day).forEach(function(kv) {
+        var sym = kv[0], r = kv[1];
+        if (!symHist[sym]) symHist[sym] = [];
+        symHist[sym].push({
+          date:   date,
+          vol:    r.vol    ? parseFloat(r.vol)    : null,
+          del:    r.del    ? parseFloat(r.del)    : null,
+          pctChg: r.pctChg ? parseFloat(r.pctChg) : null,
+          close:  r.close  ? parseFloat(r.close)  : null
+        });
+      });
+    });
+
+    // Compute averages for each symbol
+    Object.entries(symHist).forEach(function(kv) {
+      var sym = kv[0];
+      var rows = kv[1].sort(function(a,b){ return a.date.localeCompare(b.date); }); // oldest first
+      var days = rows.length;
+
+      function avg(arr, field, n) {
+        var slice = arr.slice(-n).map(function(r){ return r[field]; }).filter(function(v){ return v !== null && !isNaN(v); });
+        return slice.length > 0 ? slice.reduce(function(a,b){ return a+b; }, 0) / slice.length : null;
+      }
+
+      DASH_HIST_CACHE[sym] = {
+        days:     days,
+        avgVol5:  avg(rows, 'vol',    5),
+        avgVol10: avg(rows, 'vol',   10),
+        avgVol30: avg(rows, 'vol',   30),
+        avgDel5:  avg(rows, 'del',    5),
+        avgDel10: avg(rows, 'del',   10),
+        avgPct5:  avg(rows, 'pctChg', 5),
+        // Trend: is delivery rising or falling vs 5-day avg?
+        lastDel:  rows.length > 0 ? rows[rows.length-1].del : null,
+        lastVol:  rows.length > 0 ? rows[rows.length-1].vol : null,
+        // Price trend: last 3 closes
+        closes:   rows.slice(-3).map(function(r){ return r.close; }).filter(Boolean)
+      };
+    });
+  } catch(e) { console.warn('HistCache error:', e); }
+}
+
+// ── MAIN SCORING ENGINE (v2 — history-aware) ─────────────────────────
+function dashComputeScores(r) {
+  var sym  = r.symbol;
+  var hist = DASH_HIST_CACHE[sym] || null;
+  var days = hist ? hist.days : 0;
+
+  // ════════════════════════════════════════════════
+  // VOLUME SCORE (1-5)
+  // ════════════════════════════════════════════════
+  var volScore = 3;
+  var volRationale = [];
+  var volComponents = [];
+
+  var todayVol = r.vol   ? parseFloat(r.vol)   : null;
+  var delPct   = r.del   ? parseFloat(r.del)   : null;
+
+  // Component A: Volume Ratio vs historical average (primary, weight 50%)
+  if (todayVol && hist) {
+    var avgVol = hist.avgVol10 || hist.avgVol5 || hist.avgVol30;
+    var avgLabel = hist.avgVol10 ? '10d' : hist.avgVol5 ? '5d' : '30d';
+    if (avgVol && avgVol > 0) {
+      var ratio = todayVol / avgVol;
+      var rs = ratio >= 2.5 ? 5 : ratio >= 1.5 ? 4 : ratio >= 0.8 ? 3 : ratio >= 0.5 ? 2 : 1;
+      volComponents.push({ score: rs, weight: 50, label: 'Vol ratio ' + ratio.toFixed(2) + '× vs ' + avgLabel + ' avg' });
+      volRationale.push('Vol ' + ratio.toFixed(2) + '× avg (' + avgLabel + ')');
+    }
+  } else if (todayVol) {
+    // No history — can't compute ratio, use neutral
+    volRationale.push('Vol: ' + dashFmt(todayVol) + ' (no history for ratio)');
   }
+
+  // Component B: Delivery % (weight 35%)
+  if (delPct !== null) {
+    var ds = delPct >= 65 ? 5 : delPct >= 50 ? 4 : delPct >= 35 ? 3 : delPct >= 20 ? 2 : 1;
+    volComponents.push({ score: ds, weight: 35, label: 'Del% ' + delPct.toFixed(1) + '%' });
+    volRationale.push('Del ' + delPct.toFixed(1) + '%');
+  }
+
+  // Component C: Delivery trend — rising vs 5-day avg (weight 15%)
+  if (delPct !== null && hist && hist.avgDel5 !== null) {
+    var delTrend = delPct - hist.avgDel5;
+    var dts = delTrend > 10 ? 5 : delTrend > 3 ? 4 : delTrend > -3 ? 3 : delTrend > -10 ? 2 : 1;
+    volComponents.push({ score: dts, weight: 15, label: 'Del trend ' + (delTrend >= 0 ? '+' : '') + delTrend.toFixed(1) + '% vs 5d avg' });
+    volRationale.push('Del trend ' + (delTrend >= 0 ? '+' : '') + delTrend.toFixed(1) + '%');
+  }
+
+  // Compute weighted volume score
+  if (volComponents.length > 0) {
+    var vwSum = 0, vwTot = 0;
+    volComponents.forEach(function(c){ vwSum += c.score * c.weight; vwTot += c.weight; });
+    volScore = Math.min(5, Math.max(1, Math.round(vwSum / vwTot)));
+  } else if (delPct !== null) {
+    // Fallback: delivery only (no history, no volume)
+    volScore = delPct >= 65 ? 5 : delPct >= 50 ? 4 : delPct >= 35 ? 3 : delPct >= 20 ? 2 : 1;
+    volRationale.push('Del% only (no volume data)');
+  }
+
+  r.volScore      = volScore;
+  r.volRationale  = volRationale.join(' · ');
+  r.volComponents = volComponents;
+
+  // ════════════════════════════════════════════════
+  // SENTIMENT SCORE (1-5)
+  // ════════════════════════════════════════════════
+  var sentComps = [];
+  var sentRationale = [];
+
+  // Signal 1: Delivery % conviction (weight 20)
+  if (delPct !== null) {
+    var s1 = delPct >= 60 ? 5 : delPct >= 48 ? 4 : delPct >= 34 ? 3 : delPct >= 20 ? 2 : 1;
+    sentComps.push({ s: s1, w: 20, label: 'Del% ' + delPct.toFixed(1) + '%' });
+    sentRationale.push('Del: ' + s1 + '/5');
+  }
+
+  // Signal 2: FII/DII market-wide flows (weight 18)
+  if (r.fiiNet !== null && r.fiiNet !== undefined) {
+    var fs = r.fiiNet > 3000 ? 5 : r.fiiNet > 500 ? 4 : r.fiiNet > -500 ? 3 : r.fiiNet > -3000 ? 2 : 1;
+    var diiBoost = (r.diiNet !== null && r.diiNet !== undefined && r.diiNet > 500) ? 0.5 : 0;
+    fs = Math.min(5, fs + diiBoost);
+    sentComps.push({ s: Math.round(fs), w: 18, label: 'FII ₹' + dashFmt(r.fiiNet) + 'Cr' });
+    sentRationale.push('FII/DII: ' + Math.round(fs) + '/5');
+  }
+
+  // Signal 3: Options PCR — Nifty level (weight 10)
   if (r.pcr !== null && r.pcr !== undefined) {
-    var p=parseFloat(r.pcr); comps.push({s:p>1.5?5:p>1.2?4:p>0.8?3:p>0.5?2:1, w:12});
+    var pcr = parseFloat(r.pcr);
+    var ps = pcr > 1.5 ? 5 : pcr > 1.2 ? 4 : pcr > 0.8 ? 3 : pcr > 0.5 ? 2 : 1;
+    sentComps.push({ s: ps, w: 10, label: 'PCR ' + pcr });
+    sentRationale.push('PCR: ' + ps + '/5');
   }
+
+  // Signal 4: Today's price change % (weight 15)
   if (r.pctChg !== null && r.pctChg !== undefined) {
-    var pc=parseFloat(r.pctChg); comps.push({s:pc>3?5:pc>1?4:pc>-1?3:pc>-3?2:1, w:10});
+    var pc = parseFloat(r.pctChg);
+    var pcs = pc > 4 ? 5 : pc > 1.5 ? 4 : pc > -1.5 ? 3 : pc > -4 ? 2 : 1;
+    sentComps.push({ s: pcs, w: 15, label: (pc >= 0 ? '+' : '') + pc + '% today' });
+    sentRationale.push('Price: ' + pcs + '/5');
   }
-  comps.forEach(function(c){ wSum += c.s*c.w; wTotal += c.w; });
-  r.sentScore = wTotal > 0 ? Math.min(5,Math.max(1,Math.round(wSum/wTotal))) : 3;
+
+  // Signal 5: Price momentum — 3-day trend from history (weight 15)
+  if (hist && hist.avgPct5 !== null) {
+    var mom = hist.avgPct5;
+    var ms  = mom > 1.5 ? 5 : mom > 0.3 ? 4 : mom > -0.3 ? 3 : mom > -1.5 ? 2 : 1;
+    sentComps.push({ s: ms, w: 15, label: '5d price avg ' + (mom >= 0 ? '+' : '') + mom.toFixed(2) + '%/day' });
+    sentRationale.push('Momentum: ' + ms + '/5');
+  }
+
+  // Signal 6: Volume acceleration — today vs yesterday (weight 12)
+  if (todayVol && hist && hist.lastVol && hist.lastVol > 0) {
+    var volAcc = todayVol / hist.lastVol;
+    var vas = volAcc > 2 ? 5 : volAcc > 1.3 ? 4 : volAcc > 0.7 ? 3 : volAcc > 0.4 ? 2 : 1;
+    sentComps.push({ s: vas, w: 12, label: 'Vol accel ' + volAcc.toFixed(2) + '× yesterday' });
+    sentRationale.push('VolAcc: ' + vas + '/5');
+  }
+
+  // Signal 7: Delivery trend vs 5d avg (weight 10)
+  if (delPct !== null && hist && hist.avgDel5 !== null) {
+    var dt = delPct - hist.avgDel5;
+    var dts2 = dt > 12 ? 5 : dt > 4 ? 4 : dt > -4 ? 3 : dt > -12 ? 2 : 1;
+    sentComps.push({ s: dts2, w: 10, label: 'Del trend ' + (dt >= 0 ? '+' : '') + dt.toFixed(1) + '%' });
+    sentRationale.push('DelTrend: ' + dts2 + '/5');
+  }
+
+  var swSum = 0, swTot = 0;
+  sentComps.forEach(function(c){ swSum += c.s * c.w; swTot += c.w; });
+  var sentScore = swTot > 0 ? Math.min(5, Math.max(1, Math.round(swSum / swTot))) : 3;
+
+  r.sentScore      = sentScore;
+  r.sentRationale  = sentRationale.join(' · ');
+  r.sentComponents = sentComps;
+  r.histDays       = days; // how many history days used
+
   return r;
 }
 
@@ -8656,6 +8825,8 @@ function dashParseBhavcopy() {
 
   // Clear today's data before loading fresh — removes any stale/bad data from previous runs
   DASH_TODAY = {};
+  // Rebuild history cache from localStorage so scores use historical averages
+  dashBuildHistCache();
 
   dashFetchFIIDII();
   dashFetchNiftyPCR();
@@ -8787,6 +8958,7 @@ function dashParseDelivery() {
     }
   });
 
+  dashBuildHistCache(); // rebuild with latest delivery data before recomputing scores
   dashSaveToStorage();
   dashRenderTable();
 
@@ -8886,8 +9058,10 @@ function dashRenderTable() {
       '<td style="font-size:11px;">' + (hasData && l.pcr ? l.pcr : '—') + '</td>' +
       '<td style="font-size:9px;color:' + (hasData && l.bulkDeals && l.bulkDeals.length ? '#ff7c00' : '#9e9e9e') + ';font-weight:700;">' +
         (hasData && l.bulkDeals && l.bulkDeals.length ? l.bulkDeals.length + ' deal(s)' : 'None') + '</td>' +
-      '<td style="font-weight:900;font-size:15px;color:' + (SCOLS[l&&l.volScore] || '#9e9e9e') + ';">' + (hasData && l.volScore ? l.volScore + '/5' : '—') + '</td>' +
-      '<td style="font-weight:900;font-size:15px;color:' + (SCOLS[l&&l.sentScore] || '#9e9e9e') + ';">' + (hasData && l.sentScore ? l.sentScore + '/5' : '—') + '</td>' +
+      '<td style="font-weight:900;font-size:15px;color:' + (SCOLS[l&&l.volScore] || '#9e9e9e') + ';" title="' + (hasData && l.volRationale ? l.volRationale : '') + '">' +
+        (hasData && l.volScore ? l.volScore + '/5' + (l.histDays > 0 ? '<sup style="font-size:8px;color:#6b7498;">'+l.histDays+'d</sup>' : '') : '—') + '</td>' +
+      '<td style="font-weight:900;font-size:15px;color:' + (SCOLS[l&&l.sentScore] || '#9e9e9e') + ';" title="' + (hasData && l.sentRationale ? l.sentRationale : '') + '">' +
+        (hasData && l.sentScore ? l.sentScore + '/5' : '—') + '</td>' +
       '<td>' + (spark ? '<canvas id="spark_' + r.symbol + '" width="100" height="28" style="cursor:pointer;" onclick="dashShowTrend(\'' + r.symbol + '\',\'' + r.company + '\')"></canvas>' : '<span style="font-size:9px;color:#9e9e9e;">No history</span>') + '</td>' +
       '<td>' + (hasData ? '<span style="font-size:9px;font-weight:700;color:#fff;background:#006b30;padding:2px 6px;border-radius:5px;">Live</span>' :
         (r.symbol ? '<span style="font-size:9px;color:#9e9e9e;">Pending</span>' : '<span style="font-size:9px;color:#e53935;">No symbol</span>')) + '</td>' +
@@ -9151,7 +9325,7 @@ function dashExportHistory() {
 
 function dashExportToCSV(rows, filename, includeDate) {
   var headers = (includeDate ? ['Date,'] : []) +
-    'Symbol,Company,Sector,Close_INR,Chg_Pct,Volume,Delivery_Pct,Turnover_Cr,FII_Net_Cr,DII_Net_Cr,PCR,Bulk_Deals,Vol_Score,Sent_Score,Fetch_Time';
+    'Symbol,Company,Sector,Close_INR,Chg_Pct,Volume,Delivery_Pct,Turnover_Cr,FII_Net_Cr,DII_Net_Cr,PCR,Bulk_Deals,Vol_Score,Sent_Score,History_Days,Vol_Rationale,Sent_Rationale,Fetch_Time';
   var lines = [typeof headers === 'string' ? headers : headers.join('')];
 
   rows.forEach(function(r) {
@@ -9165,6 +9339,9 @@ function dashExportToCSV(rows, filename, includeDate) {
       r.diiNet !== undefined ? r.diiNet : '', r.pcr || '',
       r.bulkDeals ? r.bulkDeals.length : 0,
       r.volScore || '', r.sentScore || '',
+      r.histDays || 0,
+      '"' + (r.volRationale||'').replace(/"/g,'""') + '"',
+      '"' + (r.sentRationale||'').replace(/"/g,'""') + '"',
       r.fetchTime ? r.fetchTime.slice(0,19).replace('T',' ') : ''
     ].filter(function(c){ return c !== null; });
     lines.push(cols.join(','));
