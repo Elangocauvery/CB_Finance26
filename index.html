@@ -4221,9 +4221,11 @@ const EXTRA_FACTOR_SCALES  = {
 const _calcScoreBase = calcScore;
 function calcScore(c){
   const base = _calcScoreBase(c);
+  if (isNaN(base)) return 60;
   // V&S adjustment: max ±8 points using calibrated VS_SCALE
   const adj = Math.round(((( c.s||3)-3)*EXTRA_FACTOR_WEIGHTS.s + ((c.n||3)-3)*EXTRA_FACTOR_WEIGHTS.n) * VS_SCALE);
-  return Math.min(99, Math.max(20, base + adj));
+  const safeAdj = isNaN(adj) ? 0 : adj;
+  return Math.min(99, Math.max(20, base + safeAdj));
 }
 
 // ── EDITABLE STORAGE (localStorage with fallback) ─────────────────────────
@@ -6821,11 +6823,13 @@ function buildCompanyMaster() {
       const vsAdj = Math.round(((vol-3)*EXTRA_FACTOR_WEIGHTS.s + (sent-3)*EXTRA_FACTOR_WEIGHTS.n) * VS_SCALE);
       // Base score: real data factors OR explicit score OR estimated factors
       let baseScore = effC._realData ? undefined : effC.score;
-      if (baseScore === undefined) {
+      if (baseScore === undefined || isNaN(baseScore)) {
         baseScore = Math.round(((effC.g||3)+(effC.m||3)+(effC.d||3)+(effC.v||3)+(effC.t||3)+(effC.r||3))*100/30);
       }
+      if (isNaN(baseScore)) baseScore = 60; // final NaN guard
+      const safeVsAdj = isNaN(vsAdj) ? 0 : vsAdj;
       // Final score = base + V&S adjustment (always live)
-      const score = Math.min(99, Math.max(20, baseScore + vsAdj));
+      const score = Math.min(99, Math.max(20, baseScore + safeVsAdj));
       // Map debt notation
       const debtMap = {5:'Low',4:'Low',3:'Moderate',2:'High',1:'Very High'};
       const valMap = {5:'Very Cheap',4:'Cheap',3:'Reasonable',2:'Expensive',1:'Very Expensive'};
@@ -6976,7 +6980,7 @@ function renderCompanyMaster() {
 
   tbody.innerHTML = data.map((c,di)=>{
     const origIdx=COMPANY_MASTER.indexOf(c);
-    const sc=c.score;
+    const sc = (isNaN(c.score) || c.score === undefined) ? 60 : c.score;
     const sf=getSectorFactors(c.sector);
     const sData=SECTORS[c.sector];
     const sW=sData?sData.weight:5;
