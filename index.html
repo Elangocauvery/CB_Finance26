@@ -1976,17 +1976,50 @@ document.addEventListener('copy', e=>{
         <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">Market Signal</div>
         <div id="dbFIISignal" style="font-size:12px;font-weight:800;color:#ffab40;margin-top:8px;">—</div>
       </div>
-      <!-- PCR -->
-      <div style="text-align:center;">
-        <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;">Nifty PCR</div>
-        <div id="dbNiftyPCR" style="font-size:20px;font-weight:900;color:#9e9e9e;">—</div>
-        <div id="dbPCRSignal" style="font-size:9px;color:#6b7498;">—</div>
+      <!-- PCR Panel -->
+      <div style="text-align:center;position:relative;">
+        <div style="font-size:9px;font-weight:700;color:#8a9bbf;text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">PCR</div>
+        <!-- Two PCR values side by side -->
+        <div style="display:flex;gap:10px;justify-content:center;align-items:flex-start;flex-wrap:wrap;">
+          <!-- Nifty 50 PCR -->
+          <div style="min-width:90px;">
+            <div style="font-size:8px;color:#8a9bbf;font-weight:700;margin-bottom:1px;">Nifty 50</div>
+            <div id="dbNiftyPCR" style="font-size:18px;font-weight:900;color:#9e9e9e;">—</div>
+            <div id="dbPCRSignal" style="font-size:9px;color:#6b7498;">—</div>
+            <div style="margin-top:4px;display:flex;align-items:center;justify-content:center;gap:3px;">
+              <input id="pcrManualInput" type="number" step="0.01" min="0" max="5" placeholder="0.00"
+                style="width:55px;padding:2px 5px;border:1px solid #3a4a6b;border-radius:5px;font-size:11px;font-weight:700;font-family:'Poppins',sans-serif;background:#0d1117;color:#ffab40;outline:none;text-align:center;"
+                onkeydown="if(event.key==='Enter')dashSetManualPCR()">
+              <button onclick="dashSetManualPCR()"
+                style="background:#1565c0;color:#fff;border:none;padding:2px 6px;border-radius:5px;font-size:9px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">Set</button>
+            </div>
+          </div>
+          <!-- Bank Nifty PCR -->
+          <div style="min-width:90px;">
+            <div style="font-size:8px;color:#8a9bbf;font-weight:700;margin-bottom:1px;">Bank Nifty</div>
+            <div id="dbBankNiftyPCR" style="font-size:18px;font-weight:900;color:#9e9e9e;">—</div>
+            <div id="dbBankPCRSignal" style="font-size:9px;color:#6b7498;">—</div>
+            <div style="margin-top:4px;display:flex;align-items:center;justify-content:center;gap:3px;">
+              <input id="bankPcrManualInput" type="number" step="0.01" min="0" max="5" placeholder="0.00"
+                style="width:55px;padding:2px 5px;border:1px solid #3a4a6b;border-radius:5px;font-size:11px;font-weight:700;font-family:'Poppins',sans-serif;background:#0d1117;color:#8bc34a;outline:none;text-align:center;"
+                onkeydown="if(event.key==='Enter')dashSetManualBankPCR()">
+              <button onclick="dashSetManualBankPCR()"
+                style="background:#2e7d32;color:#fff;border:none;padding:2px 6px;border-radius:5px;font-size:9px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">Set</button>
+            </div>
+          </div>
+        </div>
+        <!-- Date for PCR entry -->
         <div style="margin-top:5px;display:flex;align-items:center;justify-content:center;gap:4px;">
-          <input id="pcrManualInput" type="number" step="0.01" min="0" max="5" placeholder="e.g. 0.70"
-            style="width:70px;padding:3px 6px;border:1px solid #3a4a6b;border-radius:5px;font-size:11px;font-weight:700;font-family:'Poppins',sans-serif;background:#0d1117;color:#ffab40;outline:none;text-align:center;"
-            onkeydown="if(event.key==='Enter')dashSetManualPCR()">
-          <button onclick="dashSetManualPCR()"
-            style="background:#1565c0;color:#fff;border:none;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">Set</button>
+          <span style="font-size:8px;color:#ffab40;font-weight:700;">For date:</span>
+          <input id="pcrDateInput" type="date"
+            style="padding:3px 7px;border:2px solid #1565c0;border-radius:5px;font-size:9px;font-weight:700;font-family:'Poppins',sans-serif;background:#fff3e0;color:#1a237e;outline:none;cursor:pointer;">
+        </div>
+        <!-- Log button -->
+        <div style="margin-top:4px;display:flex;gap:5px;justify-content:center;">
+          <button onclick="dashLogPCREntry()"
+            style="background:linear-gradient(135deg,#6a1b9a,#9c27b0);color:#fff;border:none;padding:3px 10px;border-radius:5px;font-size:9px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">📅 Log</button>
+          <button onclick="dashShowPCRHistory()"
+            style="background:#263238;color:#90caf9;border:1px solid #3a4a6b;padding:3px 8px;border-radius:5px;font-size:9px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">📋 History</button>
         </div>
         <div style="font-size:8px;color:#6b7498;margin-top:2px;">Sensibull / NSE</div>
       </div>
@@ -2051,9 +2084,14 @@ document.addEventListener('copy', e=>{
     <div style="background:#f3e5f5;border:1px solid #ce93d8;border-radius:10px;padding:14px;margin-bottom:14px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
         <div style="font-size:12px;font-weight:800;color:#6a1b9a;">🏦 Paste Bulk/Block Deal CSV (Tag companies)</div>
-        <a href="https://www.nseindia.com/reports/bulk-deals" target="_blank"
-          style="font-size:10px;font-weight:700;color:#1976d2;text-decoration:none;">↗ NSE Bulk Deals Page → Download CSV</a>
-        <span style="font-size:9px;color:#6b7498;">Paste NSE bulk/block deal CSV — matching companies get tagged in the dashboard table</span>
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <a href="https://www.nseindia.com/reports/bulk-deals" target="_blank"
+            style="font-size:10px;font-weight:700;color:#1976d2;text-decoration:none;background:#e3f2fd;padding:3px 8px;border-radius:5px;border:1px solid #90caf9;">↗ NSE Bulk Deals CSV</a>
+          <a href="https://www.nseindia.com/reports/block-deals" target="_blank"
+            style="font-size:10px;font-weight:700;color:#6a1b9a;text-decoration:none;background:#f3e5f5;padding:3px 8px;border-radius:5px;border:1px solid #ce93d8;">↗ NSE Block Deals CSV</a>
+          <span style="font-size:9px;color:#6b7498;">On NSE page → select date → Download CSV → paste below</span>
+        </div>
+        <div style="font-size:8px;color:#ff7c00;font-weight:700;margin-top:2px;">💡 Bulk Deal = large single trade (NSE reported) &nbsp;|&nbsp; Block Deal = negotiated trade ≥ ₹10Cr on block window (9:15–9:50 AM)</div>
       </div>
       <textarea id="dashBulkPaste" rows="3"
         placeholder="Paste NSE Bulk Deal CSV here&#10;Format: Symbol,Security Name,Client Name,Deal Type,Quantity,Trade Price,Remarks&#10;RELIANCE,Reliance Industries Ltd,ABC Fund,BUY,500000,2850.00,Block Deal&#10;(Download from NSE → Reports → Bulk Deals → select date → Download)"
@@ -2135,18 +2173,29 @@ document.addEventListener('copy', e=>{
 
     <!-- NSE DATA LEADERBOARDS (toggles) -->
     <div id="nseLeaderboards" style="margin-bottom:16px;margin-top:20px;padding-top:16px;border-top:2px dashed #e0e7ef;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;justify-content:space-between;">
         <div style="font-size:12px;font-weight:800;color:#1565c0;text-transform:uppercase;letter-spacing:0.5px;">📊 NSE Data Leaderboards</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;" id="leaderboardBtns">
-          <button onclick="showLeaderboard('vol')" class="lb-btn lb-active" id="lb-vol">🔥 Top Volume</button>
-          <button onclick="showLeaderboard('del')" class="lb-btn" id="lb-del">📦 Top Delivery %</button>
-          <button onclick="showLeaderboard('turn')" class="lb-btn" id="lb-turn">💰 Top Turnover</button>
-          <button onclick="showLeaderboard('gain')" class="lb-btn" id="lb-gain">📈 Top Gainers</button>
-          <button onclick="showLeaderboard('loss')" class="lb-btn" id="lb-loss">📉 Top Losers</button>
-          <button onclick="showLeaderboard('vscore')" class="lb-btn" id="lb-vscore">⭐ Vol Score Top</button>
-          <button onclick="showLeaderboard('sscore')" class="lb-btn" id="lb-sscore">😊 Sent Score Top</button>
-          <button onclick="showLeaderboard('ourlist')" class="lb-btn" id="lb-ourlist">🎯 Our 765 Companies</button>
+        <!-- Date-wise lookup -->
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+          <span style="font-size:9px;font-weight:700;color:#6b7498;text-transform:uppercase;">View date:</span>
+          <input id="lbDatePicker" type="date"
+            style="padding:3px 8px;border:2px solid #1565c0;border-radius:6px;font-size:10px;font-weight:700;font-family:'Poppins',sans-serif;background:#fff3e0;color:#1a237e;outline:none;cursor:pointer;">
+          <button onclick="lbLoadDate()"
+            style="background:#1565c0;color:#fff;border:none;padding:4px 10px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;">📅 Load</button>
+          <button onclick="lbLoadToday()"
+            style="background:#e8f5e9;color:#1b5e20;border:1px solid #4caf50;padding:4px 10px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer;font-family:'Poppins',sans-serif;">↺ Today</button>
+          <span id="lbDateLabel" style="font-size:9px;font-weight:700;color:#ff7c00;"></span>
         </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;" id="leaderboardBtns">
+        <button onclick="showLeaderboard('vol')" class="lb-btn lb-active" id="lb-vol">🔥 Top Volume</button>
+        <button onclick="showLeaderboard('del')" class="lb-btn" id="lb-del">📦 Top Delivery %</button>
+        <button onclick="showLeaderboard('turn')" class="lb-btn" id="lb-turn">💰 Top Turnover</button>
+        <button onclick="showLeaderboard('gain')" class="lb-btn" id="lb-gain">📈 Top Gainers</button>
+        <button onclick="showLeaderboard('loss')" class="lb-btn" id="lb-loss">📉 Top Losers</button>
+        <button onclick="showLeaderboard('vscore')" class="lb-btn" id="lb-vscore">⭐ Vol Score Top</button>
+        <button onclick="showLeaderboard('sscore')" class="lb-btn" id="lb-sscore">😊 Sent Score Top</button>
+        <button onclick="showLeaderboard('ourlist')" class="lb-btn" id="lb-ourlist">🎯 Our 765 Companies</button>
       </div>
       <div id="leaderboardPanel" style="background:#f8f9fe;border:1px solid #c5d4f0;border-radius:10px;overflow:hidden;">
         <div id="leaderboardContent" style="max-height:340px;overflow-y:auto;"></div>
@@ -2161,6 +2210,21 @@ document.addEventListener('copy', e=>{
           <option value="">Select a date to review…</option>
         </select>
         <button onclick="dashBuildHistoryDropdown();dashShowHistory();" style="background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;padding:4px 10px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">🔄 Refresh</button>
+        <!-- History filters -->
+        <label style="font-size:9px;font-weight:700;color:#7b1fa2;display:flex;align-items:center;gap:4px;">
+          <input type="checkbox" id="histFilterOur765" onchange="dashShowHistory()" checked>
+          Our 765 only
+        </label>
+        <label style="font-size:9px;font-weight:700;color:#7b1fa2;display:flex;align-items:center;gap:4px;">
+          <input type="checkbox" id="histFilterMinVol" onchange="dashShowHistory()" checked>
+          Vol ≥
+          <input id="histMinVolInput" type="number" value="50000" min="0" step="10000" onchange="dashShowHistory()"
+            style="width:70px;padding:2px 4px;border:1px solid #ce93d8;border-radius:4px;font-size:9px;font-weight:700;font-family:'Poppins',sans-serif;background:#fff;color:#1a1e2e;outline:none;">
+        </label>
+        <label style="font-size:9px;font-weight:700;color:#7b1fa2;display:flex;align-items:center;gap:4px;">
+          <input type="checkbox" id="histFilterMinTurnover" onchange="dashShowHistory()">
+          Turnover ≥ ₹1Cr
+        </label>
         <span id="dashHistoryCount" style="font-size:10px;color:#6b7498;font-weight:700;"></span>
         <span id="dashHistoryDebug" style="font-size:9px;color:#9e9e9e;"></span>
       </div>
@@ -8488,7 +8552,7 @@ var DASH_FII_KEY     = 'cbf26_fii_today';
 
 // ── IN-MEMORY STATE ───────────────────────────────────────────────────
 var DASH_TODAY = {};        // symbol → {close, prevClose, vol, del, turnover, fiiNet, diiNet, pcr, callOI, putOI, bulkDeals, volScore, sentScore, fetchTime}
-var DASH_FII_GLOBAL = { fiiNet: null, diiNet: null, niftyPCR: null, fetched: false };
+var DASH_FII_GLOBAL = { fiiNet: null, diiNet: null, niftyPCR: null, bankNiftyPCR: null, fetched: false };
 var DASH_FETCH_ABORT = false;
 var DASH_TREND_CHART_OBJ = null;
 
@@ -8510,6 +8574,7 @@ function dashInit() {
   populateLiveDataLists();
   dashRenderTable();
   renderLeaderboard();  // show leaderboards on load
+  lbPopulateDatePicker(); // pre-fill date picker with available dates
   // Show FII banner if we have data
   var fiiSaved = dashLoadFIICache();
   if (fiiSaved) { DASH_FII_GLOBAL = fiiSaved; dashUpdateFIIBanner(); }
@@ -8517,6 +8582,7 @@ function dashInit() {
   var savedFII = localStorage.getItem('cbf_manual_fii');
   var savedDII = localStorage.getItem('cbf_manual_dii');
   var savedPCR = localStorage.getItem('cbf_manual_pcr');
+  var savedBankPCR = localStorage.getItem('cbf_manual_bank_pcr');
   if (savedFII !== null) {
     DASH_FII_GLOBAL.fiiNet = parseFloat(savedFII);
     var fiiInp = document.getElementById('fiiManualInput');
@@ -8532,7 +8598,12 @@ function dashInit() {
     var pcrInp = document.getElementById('pcrManualInput');
     if (pcrInp) pcrInp.value = savedPCR;
   }
-  if (savedFII !== null || savedDII !== null || savedPCR) {
+  if (savedBankPCR) {
+    DASH_FII_GLOBAL.bankNiftyPCR = savedBankPCR;
+    var bpcrInp = document.getElementById('bankPcrManualInput');
+    if (bpcrInp) bpcrInp.value = savedBankPCR;
+  }
+  if (savedFII !== null || savedDII !== null || savedPCR || savedBankPCR) {
     DASH_FII_GLOBAL.fetched = true;
     dashUpdateFIIBanner();
   }
@@ -8621,7 +8692,18 @@ function dashUpdateFIIBanner() {
     pcrSig.textContent = p > 1.2 ? 'Bullish' : p < 0.8 ? 'Bearish' : 'Neutral';
     pcrSig.style.color = p > 1.2 ? '#00a854' : p < 0.8 ? '#e53935' : '#f59e0b';
   }
+  var bankPcrEl = document.getElementById('dbBankNiftyPCR');
+  var bankPcrSig = document.getElementById('dbBankPCRSignal');
+  if (bankPcrEl) bankPcrEl.textContent = DASH_FII_GLOBAL.bankNiftyPCR || '—';
+  if (bankPcrSig && DASH_FII_GLOBAL.bankNiftyPCR) {
+    var bp = parseFloat(DASH_FII_GLOBAL.bankNiftyPCR);
+    bankPcrSig.textContent = bp > 1.2 ? 'Bullish' : bp < 0.8 ? 'Bearish' : 'Neutral';
+    bankPcrSig.style.color = bp > 1.2 ? '#00a854' : bp < 0.8 ? '#e53935' : '#f59e0b';
+  }
   if (dateEl) dateEl.textContent = dashTodayKey();
+  // Set default date in PCR date input to today if empty
+  var pcrDateInp = document.getElementById('pcrDateInput');
+  if (pcrDateInp && !pcrDateInp.value) pcrDateInp.value = dashTodayKey();
 }
 
 // ── FETCH: Single symbol quote ────────────────────────────────────────
@@ -8838,7 +8920,9 @@ function dashComputeScores(r) {
 
   var swSum = 0, swTot = 0;
   sentComps.forEach(function(c){ swSum += c.s * c.w; swTot += c.w; });
-  var sentScore = swTot > 0 ? Math.min(5, Math.max(1, Math.round(swSum / swTot))) : 3;
+  var rawSentScore = swTot > 0 ? Math.min(5, Math.max(1, Math.round(swSum / swTot))) : 3;
+  // Confidence cap: if fewer than 3 signals fired, cap score at 4 to avoid false extremes
+  var sentScore = (sentComps.length < 3 && rawSentScore === 5) ? 4 : rawSentScore;
 
   r.sentScore      = sentScore;
   r.sentRationale  = sentRationale.join(' · ');
@@ -9432,12 +9516,12 @@ function dashSetManualFIIDII() {
   }
 }
 
-// ── MANUAL PCR INPUT ─────────────────────────────────────────────────
+// ── MANUAL PCR INPUT (Nifty 50) ────────────────────────────────────────────────────
 function dashSetManualPCR() {
   var inp = document.getElementById('pcrManualInput');
   if (!inp || !inp.value) return;
   var val = parseFloat(inp.value);
-  if (isNaN(val) || val <= 0) { alert('Enter a valid PCR value e.g. 0.70'); return; }
+  if (isNaN(val) || val <= 0) { alert('Enter a valid Nifty 50 PCR value e.g. 0.70'); return; }
   var str = val.toFixed(2);
   DASH_FII_GLOBAL.niftyPCR = str;
   localStorage.setItem('cbf_manual_pcr', str);
@@ -9446,17 +9530,144 @@ function dashSetManualPCR() {
   setTimeout(function(){ inp.style.border = '1px solid #3a4a6b'; }, 1500);
 }
 
-// ── CLEAR ALL MANUAL INPUTS ──────────────────────────────────────────
+// ── MANUAL PCR INPUT (Bank Nifty) ───────────────────────────────────────────────
+function dashSetManualBankPCR() {
+  var inp = document.getElementById('bankPcrManualInput');
+  if (!inp || !inp.value) return;
+  var val = parseFloat(inp.value);
+  if (isNaN(val) || val <= 0) { alert('Enter a valid Bank Nifty PCR value e.g. 0.85'); return; }
+  var str = val.toFixed(2);
+  DASH_FII_GLOBAL.bankNiftyPCR = str;
+  localStorage.setItem('cbf_manual_bank_pcr', str);
+  dashUpdateFIIBanner();
+  inp.style.border = '2px solid #8bc34a';
+  setTimeout(function(){ inp.style.border = '1px solid #3a4a6b'; }, 1500);
+}
+
+// ── PCR HISTORY LOG ──────────────────────────────────────────────────────────────
+function dashLogPCREntry() {
+  var dateInp = document.getElementById('pcrDateInput');
+  var niftyInp = document.getElementById('pcrManualInput');
+  var bankInp = document.getElementById('bankPcrManualInput');
+  var date = dateInp ? dateInp.value : dashTodayKey();
+  if (!date) { alert('Please select a date for the PCR log entry.'); return; }
+  var niftyVal = niftyInp && niftyInp.value ? parseFloat(niftyInp.value) : null;
+  var bankVal  = bankInp && bankInp.value ? parseFloat(bankInp.value) : null;
+  if (!niftyVal && !bankVal) { alert('Enter at least one PCR value (Nifty 50 or Bank Nifty) before logging.'); return; }
+  var history = [];
+  try { history = JSON.parse(localStorage.getItem('cbf_pcr_history') || '[]'); } catch(e){}
+  history = history.filter(function(e){ return e.date !== date; });
+  history.push({ date: date, nifty: niftyVal ? niftyVal.toFixed(2) : null, bank: bankVal ? bankVal.toFixed(2) : null });
+  history.sort(function(a,b){ return b.date.localeCompare(a.date); });
+  if (history.length > 90) history = history.slice(0, 90);
+  localStorage.setItem('cbf_pcr_history', JSON.stringify(history));
+  alert('\u2705 PCR logged for ' + date + (niftyVal ? '  |  Nifty 50: ' + niftyVal.toFixed(2) : '') + (bankVal ? '  |  Bank Nifty: ' + bankVal.toFixed(2) : ''));
+}
+
+function dashShowPCRHistory() {
+  var history = [];
+  try { history = JSON.parse(localStorage.getItem('cbf_pcr_history') || '[]'); } catch(e){}
+  if (!history.length) { alert('No PCR history logged yet. Enter PCR values and click Log.'); return; }
+  var existing = document.getElementById('pcrHistoryModal');
+  if (existing) existing.remove();
+
+  // Build modal via DOM (no string-quote escaping issues)
+  var overlay = document.createElement('div');
+  overlay.id = 'pcrHistoryModal';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;';
+
+  var box = document.createElement('div');
+  box.style.cssText = 'background:#0d1117;border:1.5px solid #3a4a6b;border-radius:12px;padding:20px;max-width:640px;width:95%;max-height:80vh;overflow-y:auto;font-family:Poppins,sans-serif;';
+
+  // Header
+  var hdr = document.createElement('div');
+  hdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;';
+  var title = document.createElement('div');
+  title.style.cssText = 'font-size:14px;font-weight:900;color:#c8d0e8;';
+  title.textContent = '\uD83D\uDCC5 PCR History Log';
+  var closeBtn = document.createElement('button');
+  closeBtn.textContent = '\u00d7 Close';
+  closeBtn.style.cssText = 'background:#1e2a3a;color:#c8d0e8;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:700;';
+  closeBtn.onclick = function(){ overlay.remove(); };
+  hdr.appendChild(title); hdr.appendChild(closeBtn);
+  box.appendChild(hdr);
+
+  // Table
+  var tbl = document.createElement('table');
+  tbl.style.cssText = 'width:100%;border-collapse:collapse;font-size:11px;';
+  var thead = tbl.createTHead();
+  var hr = thead.insertRow();
+  hr.style.background = '#1e2a3a';
+  [['Date','#8a9bbf','left'],['Nifty 50 PCR','#ffab40','center'],['Signal','#ffab40','center'],
+   ['Bank Nifty PCR','#8bc34a','center'],['Signal','#8bc34a','center'],['×','#6b7498','center']].forEach(function(c){
+    var th = document.createElement('th');
+    th.textContent = c[0]; th.style.cssText = 'padding:6px 10px;color:'+c[1]+';text-align:'+c[2]+';font-weight:700;';
+    hr.appendChild(th);
+  });
+  var tbody = tbl.createTBody();
+  history.forEach(function(e){
+    var ns = e.nifty ? parseFloat(e.nifty) : null;
+    var bs = e.bank  ? parseFloat(e.bank)  : null;
+    var nSig = ns ? (ns>1.2?'Bullish':ns<0.8?'Bearish':'Neutral') : '';
+    var bSig = bs ? (bs>1.2?'Bullish':bs<0.8?'Bearish':'Neutral') : '';
+    var nCol = ns ? (ns>1.2?'#00a854':ns<0.8?'#e53935':'#f59e0b') : '#6b7498';
+    var bCol = bs ? (bs>1.2?'#8bc34a':bs<0.8?'#e53935':'#f59e0b') : '#6b7498';
+    var row = tbody.insertRow();
+    row.style.borderBottom = '1px solid #1e2a3a';
+    function td(txt, color, align, bold){
+      var c = document.createElement('td');
+      c.textContent = txt || '\u2014';
+      c.style.cssText = 'padding:6px 10px;color:'+color+';text-align:'+(align||'left')+';'+(bold?'font-weight:900;':'');
+      row.appendChild(c); return c;
+    }
+    td(e.date, '#c8d0e8', 'left', true);
+    td(e.nifty, nCol, 'center', true);
+    td(nSig, nCol, 'center', false);
+    td(e.bank, bCol, 'center', true);
+    td(bSig, bCol, 'center', false);
+    // Delete button cell
+    var dc = document.createElement('td');
+    dc.style.cssText = 'padding:6px 8px;text-align:center;';
+    var del = document.createElement('button');
+    del.textContent = 'Del';
+    del.style.cssText = 'background:#b71c1c;color:#fff;border:none;padding:2px 7px;border-radius:4px;font-size:9px;cursor:pointer;';
+    (function(d){ del.onclick = function(){ dashDeletePCREntry(d); }; })(e.date);
+    dc.appendChild(del); row.appendChild(dc);
+  });
+  box.appendChild(tbl);
+
+  var note = document.createElement('div');
+  note.style.cssText = 'margin-top:10px;font-size:9px;color:#6b7498;';
+  note.textContent = 'Last 90 entries  |  PCR > 1.2 = Bullish  |  PCR < 0.8 = Bearish  |  0.8\u20131.2 = Neutral';
+  box.appendChild(note);
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(ev){ if(ev.target===overlay) overlay.remove(); });
+}
+
+function dashDeletePCREntry(date) {
+  if (!confirm('Delete PCR entry for ' + date + '?')) return;
+  var history = [];
+  try { history = JSON.parse(localStorage.getItem('cbf_pcr_history') || '[]'); } catch(e){}
+  history = history.filter(function(e){ return e.date !== date; });
+  localStorage.setItem('cbf_pcr_history', JSON.stringify(history));
+  dashShowPCRHistory();
+}
+
+// ── CLEAR ALL MANUAL INPUTS ──────────────────────────────────────────────────
 function dashClearManualInputs() {
-  if (!confirm('Clear all manually entered FII, DII and PCR values?')) return;
+  if (!confirm('Clear all manually entered FII, DII and PCR values? (PCR history log is preserved)')) return;
   localStorage.removeItem('cbf_manual_fii');
   localStorage.removeItem('cbf_manual_dii');
   localStorage.removeItem('cbf_manual_pcr');
+  localStorage.removeItem('cbf_manual_bank_pcr');
   DASH_FII_GLOBAL.fiiNet = null;
   DASH_FII_GLOBAL.diiNet = null;
   DASH_FII_GLOBAL.niftyPCR = null;
+  DASH_FII_GLOBAL.bankNiftyPCR = null;
   DASH_FII_GLOBAL.fetched = false;
-  ['fiiManualInput','diiManualInput','pcrManualInput'].forEach(function(id){
+  ['fiiManualInput','diiManualInput','pcrManualInput','bankPcrManualInput'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.value = '';
   });
@@ -9468,52 +9679,58 @@ function dashClearManualInputs() {
 // Symbol,Security Name,Client Name,Deal Type (BUY/SELL),Quantity Traded,Trade Price / Wt. Avg. Price,Remarks
 function dashParseBulkDeals() {
   var raw = (document.getElementById('dashBulkPaste') || {}).value || '';
-  var status = document.getElementById('dashBulkStatus');
+  var status  = document.getElementById('dashBulkStatus');
   var summary = document.getElementById('dashBulkSummary');
-  if (!raw.trim()) { if(status) status.textContent = '⚠ Paste bulk deal CSV first'; return; }
+  if (!raw.trim()) { if(status) status.textContent = '\u26a0 Paste bulk/block deal data first'; return; }
 
   var lines = raw.trim().split('\n').map(function(l){ return l.trim(); }).filter(Boolean);
-  if (lines.length < 2) { if(status) status.textContent = '⚠ Too few rows — check CSV format'; return; }
+  if (lines.length < 1) { if(status) status.textContent = '\u26a0 Too few rows \u2014 check format'; return; }
 
-  // Auto-detect header row
+  // Detect delimiter: tab (NSE website copy-paste) or comma (CSV download)
+  var sampleLine = lines[0];
+  var delim = sampleLine.split('\t').length >= 4 ? '\t' : ',';
+
+  // Skip header row
   var startRow = 0;
-  var header = lines[0].toUpperCase();
-  if (header.indexOf('SYMBOL') !== -1 || header.indexOf('CLIENT') !== -1 || header.indexOf('DEAL TYPE') !== -1) {
+  var hdr = lines[0].toUpperCase();
+  if (hdr.indexOf('SYMBOL') !== -1 || hdr.indexOf('CLIENT') !== -1 ||
+      hdr.indexOf('DEAL') !== -1 || hdr.indexOf('DATE') !== -1 || hdr.indexOf('TRADE') !== -1) {
     startRow = 1;
   }
 
-  // Parse: handle both comma and tab delimiters
-  var delim = lines[startRow] && lines[startRow].split('	').length > 3 ? '	' : ',';
+  // Leading date pattern: 05-Jun-26 | 05/06/2026 | 2026-06-05
+  var dateRx = /^(\d{1,2}[-\/]\w{3}[-\/]\d{2,4}|\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}|\d{4}-\d{2}-\d{2})$/;
 
-  var bySymbol = {};  // symbol → [{client, type, qty, price}]
+  var bySymbol = {};
   var parsed = 0, skipped = 0;
 
   for (var i = startRow; i < lines.length; i++) {
-    var cols = lines[i].split(delim).map(function(c){ return c.replace(/^"|"$/g,'').trim(); });
+    var raw_cols = lines[i].split(delim).map(function(c){ return c.replace(/^"|"$/g,'').trim(); });
+    if (raw_cols.length < 4) { skipped++; continue; }
+
+    // Strip leading date column if present (NSE sometimes prepends Trade Date)
+    var cols = raw_cols;
+    if (dateRx.test(cols[0])) cols = cols.slice(1);
     if (cols.length < 4) { skipped++; continue; }
 
-    // NSE format: Symbol, Security Name, Client Name, Deal Type, Quantity, Price, Remarks
-    // Also handle: Symbol, Client Name, Deal Type, Quantity, Price (5-col short format)
-    var sym, client, dealType, qty, price;
-    if (cols.length >= 6) {
-      sym      = (cols[0] || '').toUpperCase().trim();
-      client   = cols[2] || '';
-      dealType = (cols[3] || '').toUpperCase().trim();
-      qty      = parseFloat((cols[4] || '').replace(/,/g,'')) || 0;
-      price    = parseFloat((cols[5] || '').replace(/,/g,'')) || 0;
-    } else if (cols.length >= 5) {
-      sym      = (cols[0] || '').toUpperCase().trim();
-      client   = cols[1] || '';
-      dealType = (cols[2] || '').toUpperCase().trim();
-      qty      = parseFloat((cols[3] || '').replace(/,/g,'')) || 0;
-      price    = parseFloat((cols[4] || '').replace(/,/g,'')) || 0;
-    } else { skipped++; continue; }
-
-    if (!sym || (dealType !== 'BUY' && dealType !== 'SELL' && dealType !== 'S' && dealType !== 'B')) {
-      skipped++; continue;
+    // Find deal-type column dynamically — scan for BUY/SELL/B/S
+    var dtIdx = -1;
+    for (var ci = 0; ci < Math.min(cols.length, 7); ci++) {
+      var v = (cols[ci] || '').toUpperCase().trim();
+      if (v === 'BUY' || v === 'SELL' || v === 'B' || v === 'S') { dtIdx = ci; break; }
     }
+    if (dtIdx < 0) { skipped++; continue; }
+
+    var sym      = (cols[0] || '').toUpperCase().replace(/[^A-Z0-9&\-]/g,'').trim();
+    var dealType = (cols[dtIdx] || '').toUpperCase().trim();
+    var qty      = parseFloat((cols[dtIdx + 1] || '').replace(/,/g,'')) || 0;
+    var price    = parseFloat((cols[dtIdx + 2] || '').replace(/,/g,'')) || 0;
+    var client   = dtIdx >= 2 ? (cols[dtIdx - 1] || '') : (cols[1] || '');
+
+    if (!sym || sym.length > 20) { skipped++; continue; }
     if (dealType === 'B') dealType = 'BUY';
     if (dealType === 'S') dealType = 'SELL';
+    if (dealType !== 'BUY' && dealType !== 'SELL') { skipped++; continue; }
 
     if (!bySymbol[sym]) bySymbol[sym] = [];
     bySymbol[sym].push({ client: client, type: dealType, qty: qty, price: price });
@@ -9521,11 +9738,12 @@ function dashParseBulkDeals() {
   }
 
   if (parsed === 0) {
-    if(status) status.textContent = '⚠ No valid bulk deal rows found — check format';
+    if(status) status.textContent = '\u26a0 No valid rows found \u2014 check format (see console for debug)';
+    console.warn('dashParseBulkDeals: skipped all', skipped, 'rows. First data line:', lines[startRow]);
     return;
   }
 
-  // Save to localStorage (keyed by today's date)
+  // Save to localStorage
   localStorage.setItem('cbf_bulk_deals', JSON.stringify(bySymbol));
   localStorage.setItem('cbf_bulk_date', dashTodayKey());
 
@@ -9543,7 +9761,7 @@ function dashParseBulkDeals() {
   renderLeaderboard();
   window.scrollTo(0, _sy);
 
-  if(status) status.textContent = '✔ ' + parsed + ' deals parsed · ' + matched + ' companies tagged';
+  if(status) status.textContent = '\u2714 ' + parsed + ' deals parsed \u00b7 ' + matched + ' companies tagged (' + skipped + ' rows skipped)';
 
   // Build summary panel
   if (summary) {
@@ -9554,26 +9772,26 @@ function dashParseBulkDeals() {
       return '<tr>' +
         '<td style="font-weight:800;color:#1a1e2e;padding:5px 10px;">' + sym + '</td>' +
         '<td style="padding:5px 10px;color:#6b7498;font-size:10px;">' + (NSE_REVERSE_MAP[sym] || '') + '</td>' +
-        '<td style="padding:5px 10px;">' + (buys.length ? '<span style="color:#006b30;font-weight:800;">▲ ' + buys.length + ' BUY</span>' : '—') + '</td>' +
-        '<td style="padding:5px 10px;">' + (sells.length ? '<span style="color:#e53935;font-weight:800;">▼ ' + sells.length + ' SELL</span>' : '—') + '</td>' +
+        '<td style="padding:5px 10px;">' + (buys.length  ? '<span style="color:#006b30;font-weight:800;">\u25b2 ' + buys.length  + ' BUY</span>'  : '\u2014') + '</td>' +
+        '<td style="padding:5px 10px;">' + (sells.length ? '<span style="color:#e53935;font-weight:800;">\u25bc ' + sells.length + ' SELL</span>' : '\u2014') + '</td>' +
         '<td style="padding:5px 10px;font-size:10px;color:#5a6080;">' +
-          deals.slice(0,2).map(function(d){ return d.client.substring(0,20); }).join(', ') +
+          deals.slice(0,2).map(function(d){ return d.client.substring(0,25); }).join(' | ') +
         '</td>' +
       '</tr>';
     }).join('');
 
     summary.style.display = 'block';
     summary.innerHTML =
-      '<div style="font-size:11px;font-weight:800;color:#6a1b9a;margin-bottom:8px;">🏦 Bulk Deal Summary — ' + Object.keys(bySymbol).length + ' companies · ' + parsed + ' deals</div>' +
-      '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;">' +
-        '<thead><tr style="background:#f3e5f5;">' +
-          '<th style="padding:5px 10px;text-align:left;font-size:10px;color:#6a1b9a;">Symbol</th>' +
-          '<th style="padding:5px 10px;text-align:left;font-size:10px;color:#6a1b9a;">Company</th>' +
-          '<th style="padding:5px 10px;text-align:left;font-size:10px;color:#006b30;">Buys</th>' +
-          '<th style="padding:5px 10px;text-align:left;font-size:10px;color:#e53935;">Sells</th>' +
-          '<th style="padding:5px 10px;text-align:left;font-size:10px;color:#6a1b9a;">Clients</th>' +
-        '</tr></thead>' +
-        '<tbody>' + rows + '</tbody>' +
+      '<div style="font-size:11px;font-weight:800;color:#6a1b9a;margin-bottom:8px;">\ud83c\udfe6 Bulk/Block Deal Summary \u2014 ' + Object.keys(bySymbol).length + ' companies \u00b7 ' + parsed + ' deals</div>' +
+      '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-family:Poppins,sans-serif;font-size:11px;">' +
+      '<thead><tr style="background:#f3e5f5;">' +
+      '<th style="padding:5px 10px;text-align:left;color:#6a1b9a;">Symbol</th>' +
+      '<th style="padding:5px 10px;text-align:left;color:#6a1b9a;">Company</th>' +
+      '<th style="padding:5px 10px;color:#006b30;">Buy</th>' +
+      '<th style="padding:5px 10px;color:#e53935;">Sell</th>' +
+      '<th style="padding:5px 10px;text-align:left;color:#6b7498;">Clients (sample)</th>' +
+      '</tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
       '</table></div>';
   }
 }
@@ -9596,7 +9814,7 @@ function dashClearHistory() {
   localStorage.removeItem(DASH_STORAGE_KEY);
   localStorage.removeItem(DASH_FII_KEY);
   DASH_TODAY = {};
-  DASH_FII_GLOBAL = { fiiNet:null, diiNet:null, niftyPCR:null, fetched:false };
+  DASH_FII_GLOBAL = { fiiNet:null, diiNet:null, niftyPCR:null, bankNiftyPCR:null, fetched:false };
   dashBuildHistoryDropdown();
   dashRenderTable();
   alert('History cleared.');
@@ -9685,25 +9903,46 @@ function dashShowHistory() {
     return;
   }
 
-  var rows = Object.values(day).filter(function(r) {
+  var allRows = Object.values(day).filter(function(r) {
     return r && typeof r === 'object' && (r.symbol || r.company);
   });
 
-  if (rows.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:#9e9e9e;padding:16px;">No valid stock data for ' + dateKey + '</td></tr>';
-    wrap.style.display = 'block';
-    return;
-  }
-
-  // ── Load this day's data into DASH_TODAY so leaderboard buttons work ──
+  // ── Load ALL this day's data into DASH_TODAY so leaderboard buttons work ──
   DASH_TODAY = {};
-  rows.forEach(function(r){ if (r.symbol) DASH_TODAY[r.symbol] = r; });
+  allRows.forEach(function(r){ if (r.symbol) DASH_TODAY[r.symbol] = r; });
   var _sy3 = window.scrollY;
   dashRenderTable();
   renderLeaderboard();
   window.scrollTo(0, _sy3);
+
+  // ── Build our765 set ──
+  var our765 = new Set();
+  getAllCompaniesFlat().forEach(function(co){
+    var sym = NSE_SYMBOL_MAP[co.name];
+    if (sym) our765.add(sym);
+  });
+
+  // ── Read filter settings ──
+  var filterOur765    = document.getElementById('histFilterOur765')    ? document.getElementById('histFilterOur765').checked    : true;
+  var filterMinVol    = document.getElementById('histFilterMinVol')     ? document.getElementById('histFilterMinVol').checked     : true;
+  var filterTurnover  = document.getElementById('histFilterMinTurnover')? document.getElementById('histFilterMinTurnover').checked : false;
+  var minVolVal       = document.getElementById('histMinVolInput')      ? (parseFloat(document.getElementById('histMinVolInput').value)||0) : 50000;
+
+  var rows = allRows.filter(function(r) {
+    if (filterOur765 && !our765.has(r.symbol)) return false;
+    if (filterMinVol && (parseFloat(r.vol)||0) < minVolVal) return false;
+    if (filterTurnover && (parseFloat(r.turnover)||0) < 1) return false;
+    return true;
+  });
+
   var lastEl = document.getElementById('dashLastUpdate');
-  if (lastEl) lastEl.textContent = 'Viewing history: ' + dateKey + ' (' + rows.length + ' stocks)';
+  if (lastEl) lastEl.textContent = 'Viewing history: ' + dateKey + ' — ' + rows.length + ' of ' + allRows.length + ' stocks shown';
+
+  if (rows.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="13" style="text-align:center;color:#9e9e9e;padding:16px;">No stocks match current filters for ' + dateKey + ' (total in storage: ' + allRows.length + ')</td></tr>';
+    wrap.style.display = 'block';
+    return;
+  }
 
   // Sort by sentiment + volume score descending
   rows.sort(function(a,b) {
@@ -9849,6 +10088,67 @@ function showLeaderboard(type) {
   }
 }
 
+// ── LEADERBOARD DATE-WISE LOOKUP ─────────────────────────────────────
+function lbGetStoredDates() {
+  var allKeys = ['cbf26_daily_dash_v2','cbf26_daily_dash_v1','cbf26_daily_dash','cbf26_dash'];
+  var combined = {};
+  allKeys.forEach(function(k){
+    try { Object.assign(combined, JSON.parse(localStorage.getItem(k)||'{}')); } catch(e){}
+  });
+  return { combined: combined, dates: Object.keys(combined).filter(function(d){ return /^\d{4}-\d{2}-\d{2}$/.test(d); }).sort().reverse() };
+}
+
+function lbLoadDate() {
+  var picker = document.getElementById('lbDatePicker');
+  var label  = document.getElementById('lbDateLabel');
+  var date   = picker ? picker.value : '';
+  if (!date) { alert('Please select a date to load.'); return; }
+  var store = lbGetStoredDates();
+  // Check if we have data for this date
+  if (!store.dates.includes(date)) {
+    var avail = store.dates.length ? '\n\nDates available: ' + store.dates.slice(0,5).join(', ') + (store.dates.length>5?' …':'') : '\n\nNo history stored yet.';
+    alert('No stored data for ' + date + '.' + avail + '\n\nTo build history: paste Bhavcopy CSV for that date and click Parse & Load — data auto-saves.');
+    return;
+  }
+  var day = store.combined[date];
+  var rows = Object.values(day||{}).filter(function(r){ return r && (r.symbol||r.company); });
+  if (!rows.length) { alert('No stock data found for ' + date); return; }
+  DASH_TODAY = {};
+  rows.forEach(function(r){ if (r.symbol) DASH_TODAY[r.symbol] = r; });
+  renderLeaderboard();
+  if (label) label.textContent = '📅 Showing: ' + date + ' (' + rows.length + ' stocks)';
+}
+
+function lbLoadToday() {
+  // Reload from live DASH_TODAY (current session data)
+  var label  = document.getElementById('lbDateLabel');
+  var picker = document.getElementById('lbDatePicker');
+  if (picker) picker.value = '';
+  // Try to restore today's data from storage
+  var today = dashTodayKey();
+  var store = lbGetStoredDates();
+  if (store.dates.includes(today)) {
+    var day = store.combined[today];
+    var rows = Object.values(day||{}).filter(function(r){ return r && (r.symbol||r.company); });
+    rows.forEach(function(r){ if (r.symbol) DASH_TODAY[r.symbol] = r; });
+    if (label) label.textContent = '✅ Today: ' + today + ' (' + rows.length + ' stocks)';
+  } else {
+    if (label) label.textContent = Object.keys(DASH_TODAY).length ? '✅ Live session data' : '⚠ No data loaded';
+  }
+  renderLeaderboard();
+}
+
+// Populate lbDatePicker with available stored dates on load
+function lbPopulateDatePicker() {
+  var picker = document.getElementById('lbDatePicker');
+  if (!picker) return;
+  var store = lbGetStoredDates();
+  // Set max to today
+  picker.max = dashTodayKey();
+  // Set default to most recent available date if any
+  if (store.dates.length) picker.value = store.dates[0];
+}
+
 function renderLeaderboard() {
   var panel = document.getElementById('leaderboardContent');
   if (!panel) return;
@@ -9864,13 +10164,22 @@ function renderLeaderboard() {
     var sym = NSE_SYMBOL_MAP[co.name];
     if (sym) ourSymbols.add(sym);
   });
+  // ETF/index/G-sec exclusion: symbols containing digits, known suffixes, or no mapped company
+  var etfRx = /\d|NIFTY|SENSEX|GSEC|LIQUID|GOLD|SILVER|CPSE|BHARAT|QQIND|MONQ|MASP|ENIFT|GRADIENTE|SETFNIF|SETFNN|NETFIT|BBNIFTY|ICICIB22|EBANK|LOWVOL|ALPHA|MIDCAP|SMALLCAP|CONSUMPTION/i;
+  var isEquity = function(r){
+    var sym = r.symbol || '';
+    if (ourSymbols.has(sym)) return true;              // always allow our 765
+    if (etfRx.test(sym)) return false;                 // known ETF patterns
+    if (!r.sector && !NSE_REVERSE_MAP[sym]) return false; // no mapping = likely ETF/index
+    return true;
+  };
   var rows, title, cols;
 
   switch (LB_ACTIVE) {
 
     case 'vol':
       title = '\ud83d\udd25 Top 25 by Traded Volume';
-      rows = data.filter(function(r){ return safeNum(r.vol)!==null; })
+      rows = data.filter(function(r){ return safeNum(r.vol)!==null && isEquity(r); })
                .sort(function(a,b){ return safeNum0(b.vol)-safeNum0(a.vol); }).slice(0,25);
       cols = ['#','Company','Symbol','Sector','Volume','Del %','Turnover \u20b9Cr','Chg %'];
       panel.innerHTML = buildLBTable(title, cols, rows.map(function(r,i){
@@ -9883,9 +10192,11 @@ function renderLeaderboard() {
       break;
 
     case 'del':
-      title = '\ud83d\udce6 Top 25 by Delivery % (Conviction)';
-      rows = data.filter(function(r){ return safeNum(r.del)!==null && safeNum0(r.vol)>10000; })
-               .sort(function(a,b){ return safeNum0(b.del)-safeNum0(a.del); }).slice(0,25);
+      title = '\ud83d\udce6 Top 25 by Delivery % — Our 765 Companies Only';
+      rows = data.filter(function(r){
+        // Only stocks in our 765 list — filters out ETFs, index funds, G-sec instruments
+        return safeNum(r.del)!==null && safeNum0(r.vol)>5000 && ourSymbols.has(r.symbol);
+      }).sort(function(a,b){ return safeNum0(b.del)-safeNum0(a.del); }).slice(0,25);
       cols = ['#','Company','Symbol','Del %','Volume','Chg %','Vol \u2b50'];
       panel.innerHTML = buildLBTable(title, cols, rows.map(function(r,i){
         return [i+1, r.company||r.symbol||'\u2014', r.symbol||'\u2014',
@@ -9896,7 +10207,7 @@ function renderLeaderboard() {
 
     case 'turn':
       title = '\ud83d\udcb0 Top 25 by Turnover (\u20b9 Crore)';
-      rows = data.filter(function(r){ return safeNum(r.turnover)!==null; })
+      rows = data.filter(function(r){ return safeNum(r.turnover)!==null && isEquity(r); })
                .sort(function(a,b){ return safeNum0(b.turnover)-safeNum0(a.turnover); }).slice(0,25);
       cols = ['#','Company','Symbol','Turnover \u20b9Cr','Volume','Del %','Chg %'];
       panel.innerHTML = buildLBTable(title, cols, rows.map(function(r,i){
@@ -9910,7 +10221,7 @@ function renderLeaderboard() {
 
     case 'gain':
       title = '\ud83d\udcc8 Top 25 Gainers Today';
-      rows = data.filter(function(r){ return safeNum(r.pctChg)!==null; })
+      rows = data.filter(function(r){ return safeNum(r.pctChg)!==null && isEquity(r); })
                .sort(function(a,b){ return safeNum0(b.pctChg)-safeNum0(a.pctChg); }).slice(0,25);
       cols = ['#','Company','Symbol','Chg %','Close \u20b9','Del %','Volume','Sent \u2b50'];
       panel.innerHTML = buildLBTable(title, cols, rows.map(function(r,i){
@@ -9925,7 +10236,7 @@ function renderLeaderboard() {
 
     case 'loss':
       title = '\ud83d\udcc9 Top 25 Losers Today';
-      rows = data.filter(function(r){ return safeNum(r.pctChg)!==null; })
+      rows = data.filter(function(r){ return safeNum(r.pctChg)!==null && isEquity(r); })
                .sort(function(a,b){ return safeNum0(a.pctChg)-safeNum0(b.pctChg); }).slice(0,25);
       cols = ['#','Company','Symbol','Chg %','Close \u20b9','Del %','Volume','Signal'];
       panel.innerHTML = buildLBTable(title, cols, rows.map(function(r,i){
@@ -9944,9 +10255,10 @@ function renderLeaderboard() {
       break;
 
     case 'vscore':
-      title = '\u2b50 Top 25 by Volume Score';
-      rows = data.filter(function(r){ return r.volScore && parseInt(r.volScore)>0; })
-               .sort(function(a,b){
+      title = '\u2b50 Top 25 Vol Score — Our 765 | Vol ≥ 50K';
+      rows = data.filter(function(r){
+        return ourSymbols.has(r.symbol) && r.volScore && parseInt(r.volScore)>0 && safeNum0(r.vol)>=50000;
+      }).sort(function(a,b){
                  return parseInt(b.volScore||0)-parseInt(a.volScore||0) || safeNum0(b.del)-safeNum0(a.del);
                }).slice(0,25);
       cols = ['#','Company','Symbol','Vol \u2b50','Del %','Volume','Rationale'];
@@ -9960,18 +10272,31 @@ function renderLeaderboard() {
       break;
 
     case 'sscore':
-      title = '\ud83d\ude0a Top 25 by Sentiment Score';
-      rows = data.filter(function(r){ return r.sentScore && parseInt(r.sentScore)>0; })
-               .sort(function(a,b){
-                 return parseInt(b.sentScore||0)-parseInt(a.sentScore||0) || safeNum0(b.pctChg)-safeNum0(a.pctChg);
-               }).slice(0,25);
-      cols = ['#','Company','Symbol','Sent \u2b50','Vol \u2b50','Del %','Chg %','Signals'];
+      title = '\ud83d\ude0a Top 25 Sentiment Score — Our 765 | Vol ≥ 50K | ≥3 Signals';
+      rows = data.filter(function(r){
+        if (!ourSymbols.has(r.symbol)) return false;              // our 765 only
+        if (!r.sentScore || parseInt(r.sentScore) < 1) return false;
+        if (safeNum0(r.vol) < 50000) return false;               // min 50K volume gate
+        var sigCount = r.sentComponents ? r.sentComponents.length : 0;
+        if (sigCount < 3) return false;                           // need ≥3 signals to rank
+        return true;
+      }).sort(function(a,b){
+        // Primary: sentScore, Secondary: signal count (more signals = more reliable), Tertiary: volume
+        var sc = parseInt(b.sentScore||0) - parseInt(a.sentScore||0);
+        if (sc !== 0) return sc;
+        var bc = (b.sentComponents||[]).length - (a.sentComponents||[]).length;
+        if (bc !== 0) return bc;
+        return safeNum0(b.vol) - safeNum0(a.vol);
+      }).slice(0,25);
+      cols = ['#','Company','Symbol','Sent \u2b50','Vol \u2b50','Del %','Chg %','# Sigs','Signals'];
       panel.innerHTML = buildLBTable(title, cols, rows.map(function(r,i){
+        var sigCount = r.sentComponents ? r.sentComponents.length : 0;
         return [i+1, r.company||r.symbol||'\u2014', r.symbol||'\u2014',
           '<span class="lb-score-'+r.sentScore+'">'+r.sentScore+'/5</span>',
           r.volScore ? '<span class="lb-score-'+r.volScore+'">'+r.volScore+'/5</span>' : '\u2014',
           safeNum(r.del)!==null ? fmtDel(safeNum(r.del)) : '\u2014',
           fmtPct(r.pctChg),
+          '<span style="font-size:9px;font-weight:700;color:#5a6080;">'+sigCount+'/7</span>',
           '<span style="font-size:9px;color:#5a6080;">'+(r.sentRationale||'\u2014')+'</span>'];
       }), ourSymbols, rows);
       break;
