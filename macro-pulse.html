@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CB Finance26™ — Macro Pulse</title>
+<meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root{
+  --bg:#f5f7fa;--card:#ffffff;--input:#f8f9fc;
+  --border:#dde3ef;--border-hi:#b0bcd8;
+  --text:#1a1e2e;--soft:#3a3f5c;--muted:#5a6080;
+  --orange:#ff7c00;--amber:#ffab40;--gold:#ffc107;
+  --green:#00a854;--green-dk:#007a3d;
+  --red:#e53935;--red-dk:#b71c1c;
+  --yellow:#f59e0b;--blue:#1976d2;--purple:#8e24aa;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ACCESS GATE */
+#accessGate{position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:99999;
+  background:linear-gradient(135deg,#fff8f2,#fff3e8,#fef9f0);
+  display:flex;align-items:center;justify-content:center;}
+.gate-card{background:#fff;border:1.5px solid #ffe0c0;border-radius:24px;padding:44px 48px;
+  max-width:420px;width:90%;text-align:center;box-shadow:0 12px 48px #ff7c0018;}
+.gate-logo{font-size:26px;font-weight:900;color:#c45000;margin-bottom:4px;}
+.gate-logo span{color:#ff7c00;}
+.gate-sub{font-size:10px;font-weight:700;color:#9a7060;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:22px;}
+.gate-divider{width:40px;height:2px;background:linear-gradient(90deg,#ff7c00,#ffc107);border-radius:2px;margin:0 auto 22px;}
+.gate-icon{width:52px;height:52px;background:linear-gradient(135deg,#ff7c00,#ffab40);border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 14px;}
+.gate-title{font-size:17px;font-weight:800;color:#1a1e2e;margin-bottom:5px;}
+.gate-desc{font-size:12px;color:#5a4a40;margin-bottom:24px;line-height:1.7;}
+.gate-input{width:100%;background:#fff8f4;border:1.5px solid #e8c8b0;border-radius:12px;
+  padding:12px 18px;font-size:15px;font-weight:700;text-align:center;outline:none;
+  margin-bottom:10px;color:#1a1e2e;letter-spacing:3px;transition:border-color 0.2s;
+  font-family:'Segoe UI',system-ui,sans-serif;}
+.gate-input:focus{border-color:#ff7c00;}
+.gate-btn{width:100%;background:linear-gradient(135deg,#ff7c00,#ff9a00);color:#fff;border:none;
+  padding:14px;border-radius:12px;font-size:14px;font-weight:800;cursor:pointer;
+  margin-bottom:16px;font-family:'Segoe UI',system-ui,sans-serif;}
+.gate-error{font-size:11px;font-weight:700;color:#c0392b;margin-bottom:8px;min-height:16px;}
+.gate-legal{font-size:10px;color:#7a6858;line-height:1.8;border-top:1px solid #f0d8c8;padding-top:14px;text-align:left;}
+
+/* WATERMARK */
+#wm{position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9998;opacity:0.03;}
+#wm div{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);
+  font-size:42px;font-weight:900;color:#1a1e2e;white-space:nowrap;letter-spacing:4px;user-select:none;}
+
+/* NAV */
+.nav{background:#fff;border-bottom:2px solid var(--border-hi);position:sticky;top:0;z-index:100;box-shadow:0 2px 12px #0000001a;}
+.nav-inner{display:flex;align-items:center;padding:0 16px;gap:0;overflow-x:auto;}
+.nav-logo{font-size:13px;font-weight:900;color:#c45000;padding:12px 0;margin-right:16px;white-space:nowrap;flex-shrink:0;}
+.nav-logo span{color:#ff7c00;}
+.nav-tab{padding:12px 14px;font-size:11px;font-weight:700;color:#4a5070;cursor:pointer;white-space:nowrap;
+  border-bottom:3px solid transparent;margin-bottom:-2px;background:transparent;
+  border-top:none;border-left:none;border-right:none;font-family:'Segoe UI',system-ui,sans-serif;transition:all 0.2s;}
+.nav-tab:hover{color:var(--amber);}
+.nav-tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+.hub-link{margin-left:auto;font-size:11px;font-weight:700;color:var(--blue);text-decoration:none;
+  padding:5px 12px;border:1px solid #90caf9;border-radius:14px;white-space:nowrap;background:#e3f2fd;flex-shrink:0;}
+
+/* PAGES */
+.page{display:none;padding:18px;animation:pgIn 0.25s ease;}
+.page.active{display:block;}
+@keyframes pgIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:none;}}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#1a1e2e,#2a3050);padding:18px 24px;border-radius:12px;margin-bottom:16px;}
+.hdr h1{font-size:19px;font-weight:900;color:#ffab40;}
+.hdr p{color:#c8d0e8;font-size:11px;margin-top:4px;}
+.hdr-meta{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.badge{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);
+  padding:3px 11px;border-radius:18px;font-size:11px;font-weight:600;color:#c8d0e8;}
+.badge span{color:#ffc107;font-weight:800;}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px;margin-bottom:14px;}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-bottom:14px;}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:14px;}
+.full{margin-bottom:14px;}
+
+/* CARD */
+.card{background:var(--card);padding:16px;border-radius:12px;border:1px solid var(--border);}
+.card:hover{border-color:var(--border-hi);box-shadow:0 3px 16px #ff7c0015;}
+.card h2{font-size:12px;font-weight:800;color:#c45000;margin-bottom:10px;display:flex;align-items:center;gap:7px;text-transform:uppercase;letter-spacing:0.5px;}
+.card h2 .ico{width:24px;height:24px;border-radius:6px;background:#f0f2f8;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.card h3{font-size:10px;font-weight:700;color:#c45000;margin:10px 0 6px;text-transform:uppercase;letter-spacing:0.5px;}
+.sec{font-size:10px;font-weight:700;color:#6b7498;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 13px;position:relative;overflow:hidden;}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi.k-or::after{background:linear-gradient(90deg,#e65100,var(--amber));}
+.kpi.k-gr::after{background:linear-gradient(90deg,var(--green-dk),var(--green));}
+.kpi.k-bl::after{background:linear-gradient(90deg,#0277bd,var(--blue));}
+.kpi.k-re::after{background:linear-gradient(90deg,var(--red-dk),var(--red));}
+.kpi.k-pu::after{background:linear-gradient(90deg,#7b1fa2,var(--purple));}
+.kpi.k-go::after{background:linear-gradient(90deg,#b8860b,var(--gold));}
+.kpi-l{font-size:9px;font-weight:700;color:#6b7498;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:4px;}
+.kpi-v{font-size:20px;font-weight:900;line-height:1;}
+.kpi-s{font-size:10px;font-weight:600;color:#6b7498;margin-top:2px;}
+
+/* ENTRY FIELDS */
+.entry-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px;}
+.entry-item{display:flex;flex-direction:column;gap:4px;}
+.entry-item label{font-size:10px;font-weight:700;color:#5a6080;text-transform:uppercase;letter-spacing:0.5px;}
+.entry-item input{background:var(--input);border:1.5px solid var(--border);border-radius:8px;
+  padding:8px 11px;font-size:14px;font-weight:700;color:var(--text);outline:none;
+  font-family:'Segoe UI',system-ui,sans-serif;transition:border-color 0.2s;width:100%;}
+.entry-item input:focus{border-color:var(--orange);}
+.entry-item .sig{font-size:10px;font-weight:700;margin-top:2px;min-height:14px;}
+
+/* LINK BUTTONS */
+.link-grid{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+.link-btn{display:inline-flex;align-items:center;gap:6px;background:#f0f4ff;border:1px solid #c5cae9;
+  color:#1565c0;padding:7px 13px;border-radius:20px;font-size:11px;font-weight:700;
+  text-decoration:none;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.link-btn:hover{background:#1565c0;color:#fff;border-color:#1565c0;}
+.link-btn.nse{background:#fff3e0;border-color:#ffcc80;color:#e65100;}
+.link-btn.nse:hover{background:#e65100;color:#fff;}
+.link-btn.sebi{background:#e8f5e9;border-color:#a5d6a7;color:#1b5e20;}
+.link-btn.sebi:hover{background:#1b5e20;color:#fff;}
+
+/* SAVE BTN */
+.save-btn{background:linear-gradient(135deg,#ff7c00,#ff9a00);color:#fff;border:none;
+  padding:9px 22px;border-radius:20px;font-size:12px;font-weight:800;cursor:pointer;
+  font-family:'Segoe UI',system-ui,sans-serif;transition:opacity 0.2s;}
+.save-btn:hover{opacity:0.9;}
+.save-flash{position:fixed;bottom:24px;right:24px;background:#006b30;color:#fff;
+  padding:7px 16px;border-radius:18px;font-size:12px;font-weight:700;z-index:9000;
+  animation:fadeOut 2.2s forwards;}
+@keyframes fadeOut{0%{opacity:1;}70%{opacity:1;}100%{opacity:0;}}
+
+/* SIGNAL PILL */
+.sig-bull{color:#006b30;font-weight:800;}
+.sig-bear{color:#b71c1c;font-weight:800;}
+.sig-neu{color:#b35c00;font-weight:800;}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;}
+th{padding:7px 10px;text-align:left;font-size:10px;font-weight:800;color:#b35c00;
+  text-transform:uppercase;letter-spacing:0.7px;border-bottom:2px solid var(--border-hi);background:#f8f9fc;}
+td{padding:7px 10px;font-size:11px;font-weight:600;color:var(--text);border-bottom:1px solid #f0f2f8;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+.tbl-scroll{overflow-x:auto;}
+
+/* MACRO ROWS */
+.mrow{display:flex;align-items:center;gap:7px;padding:8px 0;border-bottom:1px solid #f5f7fa;}
+.mrow:last-child{border-bottom:none;}
+.mlabel{flex:1;font-size:11px;font-weight:600;color:#2a2f4a;}
+.msel{background:var(--input);border:1.5px solid var(--border);color:var(--text);padding:5px 7px;
+  border-radius:7px;font-size:11px;font-weight:600;font-family:'Segoe UI',system-ui,sans-serif;outline:none;cursor:pointer;max-width:260px;}
+.mbadge{min-width:34px;text-align:center;padding:3px 5px;border-radius:5px;font-size:11px;font-weight:800;}
+.mbadge.pos{background:#e6f4ef;color:#006b30;}
+.mbadge.neu{background:#fff8e1;color:#b35c00;}
+.mbadge.neg{background:#fce8e8;color:#b71c1c;}
+
+/* SCORE */
+.score-box{text-align:center;padding:16px;border-top:1px solid var(--border);margin-top:10px;}
+.score-num{font-size:44px;font-weight:900;line-height:1;}
+.score-lbl{font-size:10px;color:var(--muted);font-weight:600;margin:4px 0 12px;}
+.stance-box{border:1.5px solid;border-radius:9px;padding:10px 14px;display:inline-block;min-width:200px;}
+.stance-name{font-size:14px;font-weight:800;}
+.stance-desc{font-size:10px;font-weight:600;color:var(--muted);margin-top:2px;}
+
+/* CYCLE */
+.cycle-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px;}
+.cycle-card{background:#f8f9fc;border:1.5px solid var(--border);border-radius:9px;padding:9px 10px;text-align:center;}
+.cycle-card.active{background:#fff3e0;border-color:#ff7c00;box-shadow:0 2px 8px #ff7c0022;}
+.cycle-name{font-size:11px;font-weight:800;margin-bottom:2px;}
+.cycle-act{font-size:9px;color:var(--muted);font-weight:600;}
+
+/* CHART */
+.chart-wrap{height:190px;position:relative;}
+
+/* ALLOC ROW */
+.arow{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #f5f7fa;}
+.arow:last-child{border-bottom:none;}
+.arow-name{flex:1;font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;}
+.arow-pct{font-size:15px;font-weight:900;min-width:34px;text-align:right;}
+.arow-amt{font-size:10px;font-weight:700;color:var(--muted);min-width:70px;text-align:right;}
+
+/* PROG */
+.prog{height:4px;background:#e8ecf5;border-radius:3px;overflow:hidden;}
+.prog div{height:100%;border-radius:3px;}
+
+/* HIGHLIGHT */
+.hl{background:#fff8f0;border-left:3px solid var(--orange);padding:9px 12px;border-radius:0 7px 7px 0;font-size:11px;color:var(--soft);}
+.info{background:#e3f2fd;border-left:3px solid var(--blue);padding:9px 12px;border-radius:0 7px 7px 0;font-size:11px;color:#0d47a1;font-weight:600;}
+
+/* SCENARIO */
+.sc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:12px;}
+.sc-card{background:#fff;border-radius:10px;padding:13px;cursor:pointer;border:2px solid transparent;transition:all 0.2s;}
+.sc-card:hover{transform:translateY(-2px);box-shadow:0 4px 14px #00000012;}
+.sc-alloc{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:8px;}
+.sc-alloc-i{border-radius:6px;padding:6px;text-align:center;}
+#scenarioDetail{display:none;background:#f8f9fc;border:1px solid var(--border);border-radius:10px;padding:16px;margin-top:4px;}
+
+/* RISK CARDS */
+.risk-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;}
+.risk-card{border-radius:10px;padding:13px;border:1px solid transparent;transition:all 0.2s;cursor:help;}
+.risk-card:hover{transform:translateY(-1px);box-shadow:0 3px 14px #0000001a;}
+
+/* HISTORY TABLE */
+.hist-row-pos td:nth-child(4){color:#006b30;font-weight:800;}
+.hist-row-neg td:nth-child(4){color:#b71c1c;font-weight:800;}
+
+/* FOOTER */
+.footer{text-align:center;padding:18px;font-size:10px;color:#9a9a9a;border-top:1px solid var(--border);margin-top:8px;}
+
+/* PCR SIGNAL */
+.pcr-bull{background:#e6f4ef;color:#006b30;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:800;}
+.pcr-bear{background:#fce8e8;color:#b71c1c;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:800;}
+.pcr-neu{background:#fff8e1;color:#b35c00;padding:2px 8px;border-radius:5px;font-size:10px;font-weight:800;}
+
+@media(max-width:600px){
+  .g2,.g3,.g4{grid-template-columns:1fr;}
+  .entry-grid{grid-template-columns:1fr 1fr;}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .msel{max-width:100%;width:100%;}
+  .mrow{flex-wrap:wrap;}
+  .gate-card{padding:32px 24px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ACCESS GATE -->
+<div id="accessGate">
+  <div class="gate-card">
+    <div class="gate-logo">★ CB <span>Finance26</span></div>
+    <div class="gate-sub">Capital Research Framework</div>
+    <div class="gate-divider"></div>
+    <div class="gate-icon">📊</div>
+    <div class="gate-title">Macro Pulse</div>
+    <div class="gate-desc">For authorised CB Finance26 members only.<br>Enter your access code to continue.</div>
+    <input type="password" id="accessCodeInput" class="gate-input" placeholder="Access code"
+      onkeydown="if(event.key==='Enter')checkAccess()">
+    <div id="accessError" class="gate-error"></div>
+    <button onclick="checkAccess()" class="gate-btn">Enter →</button>
+    <div class="gate-legal">By entering you confirm this tool is for personal research only. Not financial advice. Redistribution prohibited. All scores are analytical frameworks, not investment recommendations. © 2025 CB Finance26™ · Proprietary &amp; Confidential</div>
+  </div>
+</div>
+
+<!-- WATERMARK -->
+<div id="wm"><div>CB FINANCE26™ · CONFIDENTIAL</div></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">★ CB <span>Finance26</span></div>
+    <button class="nav-tab active" onclick="showPage('dash',this)">📊 Dashboard</button>
+    <button class="nav-tab" onclick="showPage('market',this)">📈 Market Data</button>
+    <button class="nav-tab" onclick="showPage('fiidii',this)">🌍 FII / DII</button>
+    <button class="nav-tab" onclick="showPage('indicators',this)">🎛 13 Indicators</button>
+    <button class="nav-tab" onclick="showPage('scenarios',this)">🎭 Scenarios</button>
+    <button class="nav-tab" onclick="showPage('risks',this)">⚠️ Risk Map</button>
+    <a class="hub-link" href="index.html">⬡ Hub</a>
+  </div>
+</nav>
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="page active" id="page-dash">
+  <div class="hdr">
+    <h1>📊 Macro Pulse — India Market Signal Engine</h1>
+    <p>Enter real market numbers → get macro score → allocation stance → sector direction</p>
+    <div class="hdr-meta">
+      <span class="badge">Score: <span id="hdr-score">—</span></span>
+      <span class="badge">Stance: <span id="hdr-stance">—</span></span>
+      <span class="badge">Cycle: <span id="hdr-cycle">—</span></span>
+      <span class="badge">Last Entry: <span id="hdr-date">—</span></span>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi k-or">
+      <div class="kpi-l">Macro Score</div>
+      <div class="kpi-v" id="kpi-score" style="color:var(--orange);">—</div>
+      <div class="kpi-s">Range −12 to +22</div>
+    </div>
+    <div class="kpi k-bl">
+      <div class="kpi-l">Nifty 50</div>
+      <div class="kpi-v" id="kpi-nifty" style="color:var(--blue);">—</div>
+      <div class="kpi-s" id="kpi-nifty-chg">Enter in Market Data</div>
+    </div>
+    <div class="kpi k-go">
+      <div class="kpi-l">Nifty PE</div>
+      <div class="kpi-v" id="kpi-pe" style="color:var(--gold);">—</div>
+      <div class="kpi-s" id="kpi-pe-sig">—</div>
+    </div>
+    <div class="kpi k-re">
+      <div class="kpi-l">India VIX</div>
+      <div class="kpi-v" id="kpi-vix" style="color:var(--red);">—</div>
+      <div class="kpi-s" id="kpi-vix-sig">—</div>
+    </div>
+    <div class="kpi k-gr">
+      <div class="kpi-l">FII Net (₹Cr)</div>
+      <div class="kpi-v" id="kpi-fii" style="color:var(--green);">—</div>
+      <div class="kpi-s" id="kpi-fii-sig">Enter in FII/DII tab</div>
+    </div>
+    <div class="kpi k-pu">
+      <div class="kpi-l">Nifty PCR</div>
+      <div class="kpi-v" id="kpi-pcr" style="color:var(--purple);">—</div>
+      <div class="kpi-s" id="kpi-pcr-sig">—</div>
+    </div>
+  </div>
+
+  <!-- PORTFOLIO BAR -->
+  <div style="background:var(--card);border:1px solid var(--border-hi);padding:12px 18px;border-radius:10px;margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+    <label style="font-size:12px;font-weight:700;color:#3a3f5c;">Portfolio:</label>
+    <span style="color:#ff7c00;font-weight:800;">₹</span>
+    <input type="number" id="portAmt" value="100" min="1" max="999999"
+      style="background:var(--input);border:2px solid var(--border-hi);color:var(--text);padding:7px 11px;border-radius:7px;font-size:15px;font-weight:800;width:120px;outline:none;font-family:'Segoe UI',system-ui,sans-serif;"
+      oninput="updateAll()" onfocus="this.style.borderColor='#ff7c00'" onblur="this.style.borderColor='var(--border-hi)'">
+    <span style="color:#ff7c00;font-weight:800;">Lakhs</span>
+    <span style="font-size:11px;color:var(--muted);font-weight:600;">= ₹<span id="crore-disp" style="color:var(--orange);font-weight:900;">1.00</span> Cr</span>
+    <div style="margin-left:auto;text-align:right;">
+      <div style="font-size:17px;font-weight:900;color:#006b30;">₹<span id="eq-disp">60</span>L suggested in Equity</div>
+      <div style="font-size:10px;color:var(--muted);">Based on current macro score</div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <h2><span class="ico">🎛</span>Market Signal Score</h2>
+      <div class="sec">Based on 13 indicators — set them in the Indicators tab</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap;">
+        <div class="score-box" style="padding:10px;border-top:none;margin-top:0;flex:1;min-width:140px;">
+          <div class="score-num" id="scoreNum" style="color:var(--orange);">—</div>
+          <div class="score-lbl">Market Signal Score</div>
+          <div class="stance-box" id="stanceBox">
+            <div class="stance-name" id="stanceName">—</div>
+            <div class="stance-desc" id="stanceDesc">Set indicators to compute</div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:160px;">
+          <div class="cycle-grid">
+            <div class="cycle-card" id="cy-earlyBull"><div class="cycle-name" style="color:var(--green);">Early Bull</div><div class="cycle-act">Deploy aggressively</div></div>
+            <div class="cycle-card" id="cy-midBull"><div class="cycle-name" style="color:var(--orange);">Mid Bull</div><div class="cycle-act">Quality focus</div></div>
+            <div class="cycle-card" id="cy-lateBull"><div class="cycle-name" style="color:var(--yellow);">Late Bull</div><div class="cycle-act">Selective, trim</div></div>
+            <div class="cycle-card" id="cy-bear"><div class="cycle-name" style="color:var(--red);">Bear</div><div class="cycle-act">Cash &amp; safety</div></div>
+          </div>
+          <div style="margin-top:8px;">
+            <button onclick="showPage('indicators',document.querySelector('.nav-tab:nth-child(5)'))"
+              style="width:100%;background:#fff3e0;color:#b35c00;border:1.5px solid #ffcc80;padding:7px;border-radius:18px;font-size:11px;font-weight:800;cursor:pointer;font-family:'Segoe UI',system-ui,sans-serif;">
+              Edit 13 Indicators →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ico">🍰</span>Allocation at Current Score</h2>
+      <div class="sec">Updates live with score</div>
+      <div class="chart-wrap"><canvas id="allocChart"></canvas></div>
+      <div id="allocRows" style="margin-top:10px;"></div>
+      <div class="hl" style="margin-top:10px;"><strong>Strategy:</strong> <span id="stratText">Set indicators to see strategy</span></div>
+    </div>
+  </div>
+
+  <!-- MARKET SIGNALS SUMMARY -->
+  <div class="card full">
+    <h2><span class="ico">🔍</span>Today's Market Snapshot</h2>
+    <div class="sec">From your latest Market Data + FII/DII entries</div>
+    <div id="marketSnapshot">
+      <div style="color:var(--muted);font-size:12px;padding:12px 0;">Enter data in Market Data and FII/DII tabs to see the snapshot here.</div>
+    </div>
+  </div>
+
+  <div class="footer">CB Finance26™ — Macro Pulse v2.0 · Analytical Framework Only · Not SEBI-Registered Research · Not Financial Advice · Authorised Members Only</div>
+</div>
+
+<!-- ═══ MARKET DATA ═══ -->
+<div class="page" id="page-market">
+  <div class="hdr">
+    <h1>📈 Market Data — Daily Entry</h1>
+    <p>Enter today's real market numbers from NSE — links open the source in a new tab</p>
+    <div class="hdr-meta">
+      <span class="badge">Source: <span>NSE India</span></span>
+      <span class="badge">Frequency: <span>Daily (EOD)</span></span>
+    </div>
+  </div>
+
+  <!-- SOURCE LINKS -->
+  <div class="card full">
+    <h2><span class="ico">🔗</span>Open Data Sources — Copy Numbers From Here</h2>
+    <div class="sec">Click to open in new tab → copy the number → paste below</div>
+    <div class="link-grid">
+      <a class="link-btn nse" href="https://www.nseindia.com/reports-indices-yield" target="_blank">📊 NSE Index PE / PB / Yield</a>
+      <a class="link-btn nse" href="https://www.nseindia.com/market-data/live-market-indices" target="_blank">📈 Nifty 50 Live Index</a>
+      <a class="link-btn nse" href="https://www.nseindia.com/market-data/india-vix" target="_blank">⚡ India VIX</a>
+      <a class="link-btn nse" href="https://www.nseindia.com/market-data/exchange-traded-funds-etf" target="_blank">📉 Advance / Decline</a>
+      <a class="link-btn nse" href="https://www.nseindia.com/market-data/equity-market-cap-weighted-indices" target="_blank">🏦 Market Breadth</a>
+      <a class="link-btn sebi" href="https://www.sebi.gov.in/statistics/1329759196488.html" target="_blank">🌍 SEBI FPI Monthly Data</a>
+      <a class="link-btn" href="https://nifty-pe-ratio.com/" target="_blank">📐 Nifty PE History Chart</a>
+      <a class="link-btn" href="https://www.niftytrader.in/nifty-put-call-ratio" target="_blank">📋 PCR Live Chart</a>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <h2><span class="ico">📊</span>Index & Valuation</h2>
+      <div class="sec">From NSE Index PE/PB page</div>
+      <div class="entry-grid">
+        <div class="entry-item">
+          <label>Entry Date</label>
+          <input type="date" id="md-date">
+        </div>
+        <div class="entry-item">
+          <label>Nifty 50 Level</label>
+          <input type="number" id="md-nifty" placeholder="e.g. 24500" step="1">
+          <div class="sig" id="sig-nifty"></div>
+        </div>
+        <div class="entry-item">
+          <label>Nifty % Change</label>
+          <input type="number" id="md-nifty-chg" placeholder="e.g. +0.85" step="0.01">
+          <div class="sig" id="sig-nifty-chg"></div>
+        </div>
+        <div class="entry-item">
+          <label>Nifty PE Ratio</label>
+          <input type="number" id="md-pe" placeholder="e.g. 21.5" step="0.01">
+          <div class="sig" id="sig-pe"></div>
+        </div>
+        <div class="entry-item">
+          <label>Nifty PB Ratio</label>
+          <input type="number" id="md-pb" placeholder="e.g. 3.8" step="0.01">
+          <div class="sig" id="sig-pb"></div>
+        </div>
+        <div class="entry-item">
+          <label>Dividend Yield %</label>
+          <input type="number" id="md-divy" placeholder="e.g. 1.2" step="0.01">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ico">⚡</span>Volatility & Breadth</h2>
+      <div class="sec">From NSE VIX page and market data</div>
+      <div class="entry-grid">
+        <div class="entry-item">
+          <label>India VIX</label>
+          <input type="number" id="md-vix" placeholder="e.g. 14.5" step="0.01">
+          <div class="sig" id="sig-vix"></div>
+        </div>
+        <div class="entry-item">
+          <label>VIX % Change</label>
+          <input type="number" id="md-vix-chg" placeholder="e.g. -2.3" step="0.01">
+        </div>
+        <div class="entry-item">
+          <label>Advances (stocks)</label>
+          <input type="number" id="md-adv" placeholder="e.g. 1450" step="1">
+        </div>
+        <div class="entry-item">
+          <label>Declines (stocks)</label>
+          <input type="number" id="md-dec" placeholder="e.g. 870" step="1">
+          <div class="sig" id="sig-adec"></div>
+        </div>
+        <div class="entry-item">
+          <label>Nifty 50 PCR</label>
+          <input type="number" id="md-pcr" placeholder="e.g. 1.12" step="0.01">
+          <div class="sig" id="sig-pcr"></div>
+        </div>
+        <div class="entry-item">
+          <label>Bank Nifty PCR</label>
+          <input type="number" id="md-bnpcr" placeholder="e.g. 0.95" step="0.01">
+          <div class="sig" id="sig-bnpcr"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <h2><span class="ico">💱</span>Macro Numbers</h2>
+      <div class="sec">Crude, INR, CPI — from financial news / RBI</div>
+      <div class="entry-grid">
+        <div class="entry-item">
+          <label>Brent Crude ($/bbl)</label>
+          <input type="number" id="md-crude" placeholder="e.g. 78.5" step="0.1">
+          <div class="sig" id="sig-crude"></div>
+        </div>
+        <div class="entry-item">
+          <label>INR / USD</label>
+          <input type="number" id="md-inr" placeholder="e.g. 84.2" step="0.01">
+          <div class="sig" id="sig-inr"></div>
+        </div>
+        <div class="entry-item">
+          <label>CPI Inflation %</label>
+          <input type="number" id="md-cpi" placeholder="e.g. 4.2" step="0.01">
+          <div class="sig" id="sig-cpi"></div>
+        </div>
+        <div class="entry-item">
+          <label>RBI Repo Rate %</label>
+          <input type="number" id="md-repo" placeholder="e.g. 6.25" step="0.25">
+          <div class="sig" id="sig-repo"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="ico">📋</span>Signal Interpretation</h2>
+      <div class="sec">Auto-computed from your entries above</div>
+      <div id="signalPanel">
+        <div style="color:var(--muted);font-size:11px;">Enter numbers above to see signals.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+    <button class="save-btn" onclick="saveMarketData()">💾 Save Today's Entry</button>
+    <button onclick="clearMarketForm()" style="background:#f5f7fa;color:var(--muted);border:1px solid var(--border);padding:9px 18px;border-radius:18px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Segoe UI',system-ui,sans-serif;">Clear Form</button>
+    <span style="font-size:11px;color:var(--muted);">Saves to local storage · Max 90 days history</span>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="card full">
+    <h2><span class="ico">📅</span>Market Data History — Last 30 Entries</h2>
+    <div class="tbl-scroll">
+      <table id="mdHistTable">
+        <tr><th>Date</th><th>Nifty</th><th>Chg%</th><th>PE</th><th>VIX</th><th>PCR</th><th>Crude</th><th>INR</th><th>A/D</th></tr>
+        <tbody id="mdHistBody"><tr><td colspan="9" style="text-align:center;color:var(--muted);padding:16px;">No history yet. Save today's entry above.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="footer">CB Finance26™ · Market Data · Not Financial Advice · Sources: NSE India, SEBI</div>
+</div>
+
+<!-- ═══ FII / DII ═══ -->
+<div class="page" id="page-fiidii">
+  <div class="hdr">
+    <h1>🌍 FII / DII — Foreign &amp; Domestic Flow Tracker</h1>
+    <p>Track institutional money flows daily — who is buying, who is selling, what the signal is</p>
+    <div class="hdr-meta">
+      <span class="badge">FII Hold: <span>~14.2% of NSE mkt cap</span></span>
+      <span class="badge">DII Hold: <span>~18% of NSE mkt cap</span></span>
+      <span class="badge">SIP Monthly: <span>₹26,000Cr+</span></span>
+    </div>
+  </div>
+
+  <!-- DATA SOURCE LINKS -->
+  <div class="card full">
+    <h2><span class="ico">🔗</span>Open NSE / SEBI Sources — Copy Numbers From Here</h2>
+    <div class="link-grid">
+      <a class="link-btn nse" href="https://www.nseindia.com/reports/fii-dii" target="_blank">📊 NSE FII/DII Daily Report</a>
+      <a class="link-btn nse" href="https://www.nseindia.com/static/all-reports/historical-equities-fii-fpi-dii-trading-activity" target="_blank">📁 NSE FII Historical Data</a>
+      <a class="link-btn sebi" href="https://www.sebi.gov.in/statistics/1329759196488.html" target="_blank">🌍 SEBI FPI Statistics</a>
+      <a class="link-btn" href="https://www.amfiindia.com/research-information/amfi-statistics" target="_blank">🏠 AMFI SIP Data</a>
+      <a class="link-btn nse" href="https://www.nseindia.com/market-data/fii-fpi-trading-activity" target="_blank">📈 NSE FII/FPI Activity Live</a>
+      <a class="link-btn" href="https://www.niftytrader.in/fii-dii-data" target="_blank">📋 FII DII Analysis Chart</a>
+    </div>
+    <div class="info" style="margin-top:10px;">
+      <strong>Workflow:</strong> Open NSE FII/DII report → note today's FII Net and DII Net figures → paste below → Save. Do this daily after 6 PM for EOD data.
+    </div>
+  </div>
+
+  <!-- KPI SUMMARY -->
+  <div class="kpi-row" id="fiidii-kpi-row">
+    <div class="kpi k-or">
+      <div class="kpi-l">FII Net Today (₹Cr)</div>
+      <div class="kpi-v" id="fii-kpi-net" style="color:var(--orange);">—</div>
+      <div class="kpi-s" id="fii-kpi-sig">No data</div>
+    </div>
+    <div class="kpi k-bl">
+      <div class="kpi-l">DII Net Today (₹Cr)</div>
+      <div class="kpi-v" id="dii-kpi-net" style="color:var(--blue);">—</div>
+      <div class="kpi-s" id="dii-kpi-sig">No data</div>
+    </div>
+    <div class="kpi k-gr">
+      <div class="kpi-l">FII Monthly Net (₹Cr)</div>
+      <div class="kpi-v" id="fii-kpi-month" style="color:var(--green);">—</div>
+      <div class="kpi-s">Current month cumulative</div>
+    </div>
+    <div class="kpi k-pu">
+      <div class="kpi-l">Combined Signal</div>
+      <div class="kpi-v" id="combined-sig" style="font-size:13px;font-weight:900;padding-top:3px;">—</div>
+      <div class="kpi-s" id="combined-sig-sub">—</div>
+    </div>
+    <div class="kpi k-go">
+      <div class="kpi-l">Nifty PCR</div>
+      <div class="kpi-v" id="fii-pcr-kpi" style="color:var(--gold);">—</div>
+      <div class="kpi-s" id="fii-pcr-sig">—</div>
+    </div>
+    <div class="kpi k-re">
+      <div class="kpi-l">BankNifty PCR</div>
+      <div class="kpi-v" id="fii-bnpcr-kpi" style="color:var(--red);">—</div>
+      <div class="kpi-s" id="fii-bnpcr-sig">—</div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <!-- ENTRY FORM -->
+    <div class="card">
+      <h2><span class="ico">✏️</span>Daily FII / DII Entry</h2>
+      <div class="sec">Enter figures from NSE FII/DII report (EOD)</div>
+      <div class="entry-grid">
+        <div class="entry-item">
+          <label>Date</label>
+          <input type="date" id="fd-date">
+        </div>
+        <div class="entry-item">
+          <label>FII Buy Value (₹Cr)</label>
+          <input type="number" id="fd-fii-buy" placeholder="e.g. 12500" step="1">
+        </div>
+        <div class="entry-item">
+          <label>FII Sell Value (₹Cr)</label>
+          <input type="number" id="fd-fii-sell" placeholder="e.g. 10200" step="1">
+        </div>
+        <div class="entry-item">
+          <label>FII Net (₹Cr)</label>
+          <input type="number" id="fd-fii-net" placeholder="Auto or override" step="1">
+          <div class="sig" id="sig-fii-net"></div>
+        </div>
+        <div class="entry-item">
+          <label>DII Buy Value (₹Cr)</label>
+          <input type="number" id="fd-dii-buy" placeholder="e.g. 9800" step="1">
+        </div>
+        <div class="entry-item">
+          <label>DII Sell Value (₹Cr)</label>
+          <input type="number" id="fd-dii-sell" placeholder="e.g. 7600" step="1">
+        </div>
+        <div class="entry-item">
+          <label>DII Net (₹Cr)</label>
+          <input type="number" id="fd-dii-net" placeholder="Auto or override" step="1">
+          <div class="sig" id="sig-dii-net"></div>
+        </div>
+        <div class="entry-item">
+          <label>Nifty 50 PCR</label>
+          <input type="number" id="fd-pcr" placeholder="e.g. 1.12" step="0.01">
+          <div class="sig" id="sig-fd-pcr"></div>
+        </div>
+        <div class="entry-item">
+          <label>Bank Nifty PCR</label>
+          <input type="number" id="fd-bnpcr" placeholder="e.g. 0.95" step="0.01">
+          <div class="sig" id="sig-fd-bnpcr"></div>
+        </div>
+        <div class="entry-item">
+          <label>Notes (optional)</label>
+          <input type="text" id="fd-notes" placeholder="e.g. Budget day, expiry week">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px;align-items:center;flex-wrap:wrap;">
+        <button class="save-btn" onclick="saveFIIDII()">💾 Save Entry</button>
+        <button onclick="autoCalcFIIDII()" style="background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;padding:8px 16px;border-radius:16px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Segoe UI',system-ui,sans-serif;">
+          ⚡ Auto-calc Net from Buy/Sell
+        </button>
+      </div>
+    </div>
+
+    <!-- SIGNAL PANEL -->
+    <div class="card">
+      <h2><span class="ico">🔊</span>Signal Interpretation</h2>
+      <div class="sec">What today's FII/DII data means</div>
+      <div id="fiiSignalPanel">
+        <div style="color:var(--muted);font-size:11px;">Enter and save FII/DII data to see signals.</div>
+      </div>
+
+      <h3 style="margin-top:14px;">PCR Signal Guide</h3>
+      <table>
+        <tr><th>PCR Range</th><th>Signal</th><th>Interpretation</th></tr>
+        <tr><td class="sig-bull">Above 1.3</td><td><span class="pcr-bull">Very Bullish</span></td><td style="font-size:10px;">Heavy put writing — smart money selling protection = confidence</td></tr>
+        <tr><td class="sig-bull">1.1 – 1.3</td><td><span class="pcr-bull">Bullish</span></td><td style="font-size:10px;">More puts than calls — mild bullish tilt</td></tr>
+        <tr><td class="sig-neu">0.8 – 1.1</td><td><span class="pcr-neu">Neutral</span></td><td style="font-size:10px;">Balanced call/put activity — no strong signal</td></tr>
+        <tr><td class="sig-bear">0.6 – 0.8</td><td><span class="pcr-bear">Bearish</span></td><td style="font-size:10px;">More calls than puts — caution signal</td></tr>
+        <tr><td class="sig-bear">Below 0.6</td><td><span class="pcr-bear">Very Bearish</span></td><td style="font-size:10px;">Heavy call writing — strong fear / hedge in market</td></tr>
+      </table>
+
+      <h3 style="margin-top:14px;">FII + DII Combined Signal</h3>
+      <table>
+        <tr><th>FII</th><th>DII</th><th>Signal</th></tr>
+        <tr><td class="sig-bull">Buying</td><td class="sig-bull">Buying</td><td><span class="pcr-bull">🟢 Strong Bull</span> — Both buying together</td></tr>
+        <tr><td class="sig-bear">Selling</td><td class="sig-bull">Buying</td><td><span class="pcr-neu">🟡 Resilient</span> — DII absorbing FII sales</td></tr>
+        <tr><td class="sig-bull">Buying</td><td class="sig-bear">Selling</td><td><span class="pcr-neu">🟡 Mixed</span> — FII buying, DII cautious</td></tr>
+        <tr><td class="sig-bear">Selling</td><td class="sig-bear">Selling</td><td><span class="pcr-bear">🔴 Danger</span> — Both selling = rare extreme signal</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="card full">
+    <h2><span class="ico">📅</span>FII / DII History — Last 30 Entries</h2>
+    <div class="tbl-scroll">
+      <table>
+        <tr><th>Date</th><th>FII Buy</th><th>FII Sell</th><th>FII Net</th><th>DII Buy</th><th>DII Sell</th><th>DII Net</th><th>Nifty PCR</th><th>BNF PCR</th><th>Signal</th><th>Notes</th></tr>
+        <tbody id="fiiHistBody"><tr><td colspan="11" style="text-align:center;color:var(--muted);padding:16px;">No history yet. Save entries above.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 30-DAY FLOW CHART -->
+  <div class="card full">
+    <h2><span class="ico">📉</span>30-Day FII / DII Flow Chart</h2>
+    <div style="height:220px;position:relative;"><canvas id="flowChart"></canvas></div>
+  </div>
+
+  <div class="footer">CB Finance26™ · FII/DII Tracker · Data Sources: NSE India, SEBI · Not Financial Advice</div>
+</div>
+
+<!-- ═══ 13 INDICATORS ═══ -->
+<div class="page" id="page-indicators">
+  <div class="hdr">
+    <h1>🎛 13 Macro Indicators</h1>
+    <p>Set each to match today's conditions — score and allocation update live</p>
+    <div class="hdr-meta">
+      <span class="badge">Score: <span id="ind-score">—</span></span>
+      <span class="badge">Stance: <span id="ind-stance">—</span></span>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <h2><span class="ico">📋</span>All 13 Indicators</h2>
+      <div class="sec">Click any indicator name to read the explanation</div>
+      <div id="allIndicators"></div>
+      <div class="score-box">
+        <div class="score-num" id="allScoreNum" style="color:var(--orange);">—</div>
+        <div class="score-lbl">Total Market Signal Score</div>
+        <div class="stance-box" id="allStanceBox">
+          <div class="stance-name" id="allStanceName">—</div>
+          <div class="stance-desc" id="allStanceDesc">Set indicators above</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2><span class="ico">📖</span>Indicator Detail</h2>
+      <div class="sec">Click any indicator name on the left</div>
+      <div id="indExplainer" style="background:#f8f9fc;border-radius:9px;padding:14px;min-height:110px;">
+        <div style="color:var(--muted);font-size:11px;">👈 Click any indicator name to read why it matters for Indian markets.</div>
+      </div>
+      <div class="card" style="margin-top:12px;padding:12px;border:1.5px solid #ff7c0028;">
+        <h3 style="margin-top:0;">Score → Stance Reference</h3>
+        <table>
+          <tr><th>Score</th><th>Stance</th><th>Equity</th></tr>
+          <tr><td class="sig-bull">+12 and above</td><td class="sig-bull">Aggressively Bullish</td><td style="font-weight:800;">70%</td></tr>
+          <tr><td class="sig-bull">+8 to +11</td><td class="sig-bull">Bullish</td><td style="font-weight:800;">65%</td></tr>
+          <tr><td style="color:var(--amber);font-weight:700;">+5 to +7</td><td style="color:var(--amber);font-weight:700;">Moderately Aggressive</td><td style="font-weight:800;">60%</td></tr>
+          <tr><td class="sig-neu">+2 to +4</td><td class="sig-neu">Selective / Neutral</td><td style="font-weight:800;">50%</td></tr>
+          <tr><td style="color:var(--orange);font-weight:700;">−1 to +1</td><td style="color:var(--orange);font-weight:700;">Cautious</td><td style="font-weight:800;">40%</td></tr>
+          <tr><td class="sig-bear">−4 to −2</td><td class="sig-bear">Defensive — Bear Watch</td><td style="font-weight:800;">30%</td></tr>
+          <tr><td class="sig-bear">−5 and below</td><td class="sig-bear">Fully Defensive</td><td style="font-weight:800;">15%</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="footer">CB Finance26™ · 13 Indicator Framework · Not Financial Advice</div>
+</div>
+
+<!-- ═══ SCENARIOS ═══ -->
+<div class="page" id="page-scenarios">
+  <div class="hdr">
+    <h1>🎭 Scenario Analysis — 5 Market Situations</h1>
+    <p>How should your portfolio look under each macro scenario? Click any card to expand.</p>
+    <div class="hdr-meta"><span class="badge">Portfolio: <span>₹<span id="sc-port">100</span>L</span></span></div>
+  </div>
+  <div class="sc-grid" id="scenarioCards"></div>
+  <div id="scenarioDetail"></div>
+  <div class="footer">CB Finance26™ · Scenario Analysis · Educational Framework · Not Financial Advice</div>
+</div>
+
+<!-- ═══ RISK MAP ═══ -->
+<div class="page" id="page-risks">
+  <div class="hdr">
+    <h1>⚠️ Risk Indicator Map</h1>
+    <p>7 risk lenses — status updates live with your macro settings and market data entries</p>
+    <div class="hdr-meta"><span class="badge">Overall Risk: <span id="risk-hdr">🟡 Moderate</span></span></div>
+  </div>
+  <div style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+    <div id="overallRiskBadge" style="font-size:14px;font-weight:900;padding:9px 18px;border-radius:10px;background:#fff3e0;color:#b35c00;">🟡 Moderate Risk</div>
+  </div>
+  <div class="risk-grid" id="riskCards"></div>
+  <div class="footer">CB Finance26™ · Risk Map · Not Financial Advice</div>
+</div>
+
+<script>
+// ── COPY PROTECTION ──────────────────────────────────────────────────────
+document.addEventListener('contextmenu',e=>{e.preventDefault();return false;});
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&['s','p','u'].includes(e.key.toLowerCase())){e.preventDefault();return false;}
+  if(e.key==='F12'){e.preventDefault();return false;}
+});
+
+// ── AUTH ─────────────────────────────────────────────────────────────────
+(function(){
+  if(sessionStorage.getItem('cbf26_auth')==='granted') document.getElementById('accessGate').style.display='none';
+  setTimeout(()=>document.getElementById('accessCodeInput')?.focus(),300);
+})();
+function checkAccess(){
+  const input=document.getElementById('accessCodeInput');
+  const err=document.getElementById('accessError');
+  const val=(input?.value||'').trim().toUpperCase();
+  if(['CBF26','MEMBER2025','RESEARCH26','CBFINANCE','ALPHA2025'].includes(val)){
+    sessionStorage.setItem('cbf26_auth','granted');
+    const g=document.getElementById('accessGate');
+    g.style.transition='opacity 0.5s'; g.style.opacity='0';
+    setTimeout(()=>{g.style.display='none'; initApp();},500);
+  } else {
+    err.textContent='Incorrect code. Contact CB Finance26 for access.';
+    input.value=''; input.style.borderColor='#e53935';
+    setTimeout(()=>input.style.borderColor='#e8c8b0',2000);
+  }
+}
+
+// ── PAGE NAV ──────────────────────────────────────────────────────────────
+function showPage(id,tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  if(tab) tab.classList.add('active');
+}
+
+// ── MACRO INDICATORS DATA ─────────────────────────────────────────────────
+const MACRO_INDICATORS=[
+  {name:"RBI Interest Rates",icon:"🏦",
+   tooltip:"When RBI cuts rates, loans get cheaper, companies invest more, stock markets rise. India is in a cut cycle — 50+ bps expected in FY26. Small-cap, real estate and banking benefit most from rate cuts.",
+   options:[{label:"Aggressive Cutting (>100 bps cut cycle)",score:3,cls:"pos"},{label:"Cutting (25–100 bps cuts expected)",score:2,cls:"pos"},{label:"Stable / Pause",score:0,cls:"neu"},{label:"Hiking (25–100 bps hikes expected)",score:-2,cls:"neg"},{label:"Aggressive Hiking (>100 bps hike cycle)",score:-3,cls:"neg"}],default:1},
+  {name:"Inflation (CPI)",icon:"🌡",
+   tooltip:"High inflation forces RBI to hike rates. Below 4% = ideal. Above 6% = RBI forced to act. Food inflation hits rural consumption hard — FMCG, 2W, agri-NBFCs all impacted. A 10% monsoon deficit adds 1.5–2% to food inflation.",
+   options:[{label:"Very Low — Below 2% (deflationary risk)",score:1,cls:"pos"},{label:"Comfortable — 2–4% (ideal range)",score:2,cls:"pos"},{label:"Moderate — 4–5% (within RBI tolerance)",score:0,cls:"neu"},{label:"Elevated — 5–6.5% (RBI watching)",score:-1,cls:"neg"},{label:"High — Above 6.5% (RBI forced to act)",score:-2,cls:"neg"}],default:2},
+  {name:"Crude Oil (Brent $/bbl)",icon:"🛢",
+   tooltip:"India imports 85% of crude. Every $10 rise adds ~0.5% to inflation and widens CAD. Hurts INR, aviation, paints, tyres, chemicals. Low crude = windfall — lower inflation, better CAD, room for RBI rate cuts.",
+   options:[{label:"Very Low — Below $60 (windfall for India)",score:2,cls:"pos"},{label:"Low — $60–75 (comfortable)",score:1,cls:"pos"},{label:"Moderate — $75–90 (manageable)",score:0,cls:"neu"},{label:"High — $90–105 (pressure building)",score:-1,cls:"neg"},{label:"Very High — Above $105 (crisis level)",score:-2,cls:"neg"}],default:2},
+  {name:"RBI Liquidity (Money Supply)",icon:"💧",
+   tooltip:"Surplus liquidity = banks have excess cash → rates fall → credit grows → markets get boost. Deficit = tight money → higher short rates → slowdown risk. RBI controls via OMOs, CRR cuts, repo rate. Surplus + rate cuts = double tailwind.",
+   options:[{label:"Very Surplus — Large OMO purchases, SLR cuts",score:3,cls:"pos"},{label:"Surplus — Comfortable banking liquidity",score:2,cls:"pos"},{label:"Neutral — Balanced, no stress",score:0,cls:"neu"},{label:"Deficit — Banks borrowing from RBI",score:-1,cls:"neg"},{label:"Severe Deficit — Tight money, credit crunch risk",score:-2,cls:"neg"}],default:1},
+  {name:"Government Capex / Spending",icon:"🏗",
+   tooltip:"Govt capex on roads, rail, defence, power directly benefits capital goods, cement, steel, infra. FY26 budget: ₹11L Cr capex. Front-loading is the key signal. Q1 capex data tells you if govt is on track.",
+   options:[{label:"Surge — Front-loaded, budget beats target",score:3,cls:"pos"},{label:"Strong — On-track, beats last year",score:2,cls:"pos"},{label:"Moderate — In-line with budget",score:1,cls:"neu"},{label:"Slowing — Below target, fiscal constraint",score:-1,cls:"neg"},{label:"Austerity — Sharp cuts; fiscal crisis mode",score:-2,cls:"neg"}],default:1},
+  {name:"Rupee (INR/USD)",icon:"💱",
+   tooltip:"Weak rupee hurts importers (crude, electronics) but helps exporters (IT, pharma, textiles). Sharp fall triggers RBI intervention and imported inflation. Moderate depreciation = neutral for equity. Pharma and IT benefit via USD revenues.",
+   options:[{label:"Strong Appreciation — INR strengthening vs USD",score:2,cls:"pos"},{label:"Stable Strong — INR 80–83/USD",score:1,cls:"pos"},{label:"Mild Weakness — INR 83–86/USD",score:0,cls:"neu"},{label:"Depreciating — INR 86–90/USD",score:-1,cls:"neg"},{label:"Sharp Fall — INR >90/USD (crisis signal)",score:-2,cls:"neg"}],default:2},
+  {name:"Global Risk / US Economy",icon:"🌐",
+   tooltip:"FII flows heavily influenced by US Fed policy and global risk. Risk-off events pull FII money out of EMs. India better insulated than most EMs but a global crisis still hurts via FII outflows and INR depreciation.",
+   options:[{label:"Risk-On — US soft landing, FII buying EMs",score:2,cls:"pos"},{label:"Stable — No major global stress",score:1,cls:"pos"},{label:"Cautious — Mixed global signals",score:-1,cls:"neu"},{label:"Risk-Off — FII selling, USD strengthening",score:-2,cls:"neg"},{label:"Crisis — Recession / War / Banking collapse",score:-3,cls:"neg"}],default:1},
+  {name:"Corporate Earnings Momentum",icon:"📊",
+   tooltip:"Nifty EPS growth is the single biggest long-term driver. Earnings upgrades drive rallies; downgrades drive corrections. When 60%+ of Nifty companies beat estimates for 2+ quarters = genuine upgrade cycle. Current FY26E Nifty EPS ~₹1,080.",
+   options:[{label:"Acceleration — Earnings upgrades across sectors",score:2,cls:"pos"},{label:"Growth — EPS growing 15%+ YoY",score:1,cls:"pos"},{label:"Stable — EPS growing 8–15% YoY",score:0,cls:"neu"},{label:"Slowing — EPS growth below 8%",score:-1,cls:"neg"},{label:"Contraction — Earnings downgrades / miss",score:-2,cls:"neg"}],default:1},
+  {name:"Market Valuations (Nifty PE)",icon:"📐",
+   tooltip:"Nifty PE above 25x = expensive. Below 18x = cheap. Above 28x = euphoric danger zone. Note: from April 2021 NSE switched to consolidated earnings — current 20–22x is not directly comparable to pre-2021 data. Long-term average on consolidated basis ~22–23x.",
+   options:[{label:"Very Cheap — Nifty PE below 16x (rare opportunity)",score:3,cls:"pos"},{label:"Reasonable — PE 16–20x (fair value)",score:1,cls:"pos"},{label:"Fair — PE 20–23x (neutral)",score:0,cls:"neu"},{label:"Expensive — PE 23–28x (caution)",score:-1,cls:"neg"},{label:"Euphoric — PE above 28x (high risk)",score:-2,cls:"neg"}],default:3},
+  {name:"FII / FPI Flow Trend",icon:"🌍",
+   tooltip:"FIIs hold ~14.2% of NSE mkt cap (↓ from 21% in 2021). Despite lower holding, FII flows still set daily price direction. Sustained FII outflow = headwind even with strong domestic flows. IT and banking see maximum FII impact.",
+   options:[{label:"Heavy Inflow — FII net >₹15,000Cr/month (rising)",score:2,cls:"pos"},{label:"Inflow — FII net positive (holding stable)",score:1,cls:"pos"},{label:"Neutral — FII flows balanced (DII absorbing)",score:0,cls:"neu"},{label:"Outflow — FII net sellers (holding declining)",score:-1,cls:"neg"},{label:"Heavy Outflow — FII dumping >₹15,000Cr/month",score:-2,cls:"neg"}],default:2},
+  {name:"SIP / Domestic Retail Flows",icon:"🏠",
+   tooltip:"SIP flows at ₹26,000Cr+/month (2025) = India's single most important market floor. 8Cr+ active SIP accounts. Even during FII exits, strong SIP flows absorb supply. Rising SIP stoppage rate = retail fear signal. AMC sector directly benefits.",
+   options:[{label:"Surge — SIP >₹25,000Cr/month, accelerating",score:3,cls:"pos"},{label:"Strong — SIP ₹20,000–25,000Cr/month, stable",score:2,cls:"pos"},{label:"Healthy — SIP ₹15,000–20,000Cr/month, growing",score:1,cls:"pos"},{label:"Slowing — SIP growth stagnant, stoppage rising",score:-1,cls:"neg"},{label:"Weak — SIP cancellations rising, retail fear",score:-2,cls:"neg"}],default:1},
+  {name:"DII (Domestic Institutions) Activity",icon:"🏛",
+   tooltip:"DIIs (MFs, LIC, Banks) hold ~18% of Nifty vs FII 14.2%. When FIIs sell, DIIs absorb — fundamental change in India market structure since 2021. Strong DII inflows = market resilience. DANGER only when BOTH FII + DII sell together (extremely rare).",
+   options:[{label:"Aggressive Deployment — DIIs net >₹20,000Cr/month",score:3,cls:"pos"},{label:"Strong — DIIs net positive, absorbing FII sales",score:2,cls:"pos"},{label:"Moderate — DIIs buying selectively",score:1,cls:"pos"},{label:"Cautious — DIIs slowing deployment, cash building",score:-1,cls:"neg"},{label:"Selling — DIIs also net sellers (extreme rare signal)",score:-3,cls:"neg"}],default:1},
+  {name:"Monsoon (June–September)",icon:"🌧",
+   tooltip:"India's most unique macro variable. 60% of agriculture depends on it. Below-normal → food inflation rises → rural income falls → FMCG, NBFC, 2W shrink → RBI cannot cut rates aggressively. 10% deficit = +1.5–2% food inflation.",
+   options:[{label:"Excess — >110% LPA (flooding risk in some regions)",score:-1,cls:"neg"},{label:"Above Normal — 105–110% LPA (ideal for agriculture)",score:2,cls:"pos"},{label:"Normal — 96–105% LPA (comfortable)",score:1,cls:"pos"},{label:"Below Normal — 90–96% LPA (food inflation risk)",score:-1,cls:"neg"},{label:"Deficient — Below 90% LPA (drought, rural stress)",score:-3,cls:"neg"}],default:3}
+];
+
+const ALLOC_MATRIX=[
+  {minScore:12,eq:70,debt:10,gold:10,cash:10,stance:"Aggressively Bullish",desc:"Early bull — deploy capital aggressively across all quality sectors",cycle:"earlyBull",color:"#00a854"},
+  {minScore:8, eq:65,debt:12,gold:10,cash:13,stance:"Bullish",            desc:"Bull market well underway — stay invested, tilt to growth",cycle:"earlyBull",color:"#00a854"},
+  {minScore:5, eq:60,debt:15,gold:10,cash:15,stance:"Moderately Aggressive",desc:"More stocks than normal, pick sectors carefully",cycle:"midBull",color:"#ff7c00"},
+  {minScore:2, eq:50,debt:20,gold:15,cash:15,stance:"Selective / Neutral", desc:"Be selective — quality large caps, avoid speculative bets",cycle:"lateBull",color:"#f59e0b"},
+  {minScore:-1,eq:40,debt:25,gold:15,cash:20,stance:"Cautious — Defensive",desc:"Reduce stocks gradually, build cash and debt",cycle:"lateBull",color:"#e65100"},
+  {minScore:-4,eq:30,debt:30,gold:20,cash:20,stance:"Defensive — Bear Watch",desc:"Significant risk-off — heavy debt, gold, cash",cycle:"bear",color:"#e53935"},
+  {minScore:-99,eq:15,debt:35,gold:25,cash:25,stance:"Fully Defensive",   desc:"Preserve capital — cash, gold, short-term debt only",cycle:"bear",color:"#b71c1c"}
+];
+
+const SCENARIOS=[
+  {name:"Base Case — Soft Landing",icon:"📊",desc:"RBI cuts 50bps, GDP 6.8%, earnings grow 14%, no global shock",
+   eq:60,debt:15,gold:10,cash:15,color:"#7b1fa2",
+   green:["Power","Defence","Capital Goods","AMC","Hospitals","Pharma"],red:["IT Services","Textiles"],
+   action:"Stay invested in quality names. Equity at 60%. Avoid speculative small-caps."},
+  {name:"Bull Case — Everything Works",icon:"🚀",desc:"Rate cuts accelerate, global risk-on, FII buying, earnings upgrade cycle",
+   eq:70,debt:8,gold:8,cash:14,color:"#006b30",
+   green:["Power","Defence","Capital Goods","Banking","AMC","Brokers/Wealth","Hospitals","Hotels/Tourism"],red:["IT Services"],
+   action:"Deploy aggressively. All core sectors fire together. Equity at 70%. Reduce cash/gold to minimum."},
+  {name:"10% Correction",icon:"📉",desc:"Markets fall 10% from peak — valuation reset, no fundamental change",
+   eq:50,debt:20,gold:15,cash:15,color:"#e65100",
+   green:["FMCG","Pharma","Hospitals","Power"],red:["New Age Tech","Paints","SFB/MicroFin"],
+   action:"Add to quality names on dips. Nifty at 20x PE after 10% fall = add, not sell."},
+  {name:"20% Correction",icon:"🔻",desc:"Global recession fears, FII selling, earnings cuts expected",
+   eq:35,debt:25,gold:20,cash:20,color:"#b71c1c",
+   green:["FMCG","Pharma","Gold/Jewellery"],red:["Capital Goods","New Age Tech","Retail","SFB/MicroFin"],
+   action:"Move to safety. Only buy panic-stricken quality (HDFC Bank, NTPC). Build cash for 30%+ correction."},
+  {name:"Black Swan — Crisis",icon:"💀",desc:"Global financial crisis / war / pandemic-scale event. Nifty −35%+",
+   eq:15,debt:30,gold:30,cash:25,color:"#880000",
+   green:["Gold/Jewellery","Pharma"],red:["Banking","Capital Goods","Hotels/Tourism","SFB/MicroFin","New Age Tech"],
+   action:"Capital preservation only. SGBs/Gold ETF. Liquid funds. Best opportunities come 6–12 months after panic."}
+];
+
+// ── STATE ─────────────────────────────────────────────────────────────────
+let sel=MACRO_INDICATORS.map(i=>i.default);
+let allocChart=null, flowChart=null;
+
+// ── STORAGE ───────────────────────────────────────────────────────────────
+const SK='cbf26_macro_v1';
+function saveSel(){ try{localStorage.setItem(SK,JSON.stringify({sel,ts:Date.now()}));}catch(e){} }
+function loadSel(){
+  try{
+    const d=localStorage.getItem(SK);
+    if(d){ const p=JSON.parse(d); if(p.sel&&Array.isArray(p.sel)&&p.sel.length===MACRO_INDICATORS.length) sel.splice(0,sel.length,...p.sel); }
+  }catch(e){}
+}
+// Market data storage
+const MD_KEY='cbf26_mktdata_v1';
+const FD_KEY='cbf26_fiidii_v1';
+function getMDHistory(){ try{return JSON.parse(localStorage.getItem(MD_KEY)||'[]');}catch(e){return[];} }
+function saveMDHistory(arr){ try{localStorage.setItem(MD_KEY,JSON.stringify(arr.slice(-90)));}catch(e){} }
+function getFDHistory(){ try{return JSON.parse(localStorage.getItem(FD_KEY)||'[]');}catch(e){return[];} }
+function saveFDHistory(arr){ try{localStorage.setItem(FD_KEY,JSON.stringify(arr.slice(-90)));}catch(e){} }
+
+// ── SCORE / ALLOC HELPERS ─────────────────────────────────────────────────
+const mscore=()=>sel.reduce((s,idx,i)=>s+MACRO_INDICATORS[i].options[idx].score,0);
+function alloc(score){ for(const a of ALLOC_MATRIX) if(score>=a.minScore) return a; return ALLOC_MATRIX[ALLOC_MATRIX.length-1]; }
+const port=()=>parseFloat(document.getElementById('portAmt')?.value)||100;
+const fmt=L=>L>=100?`₹${(L/100).toFixed(2)}Cr`:`₹${L.toFixed(1)}L`;
+function getRisk(){
+  const s=mscore();
+  if(s>=12) return {label:"Low Risk",color:"#006b30",bg:"#e6f4ef",icon:"🟢"};
+  if(s>=5)  return {label:"Moderate Risk",color:"#b35c00",bg:"#fff3e0",icon:"🟡"};
+  if(s>=0)  return {label:"Caution Zone",color:"#e65100",bg:"#fff3e0",icon:"🟠"};
+  return        {label:"High Risk",color:"#b71c1c",bg:"#fce8e8",icon:"🔴"};
+}
+function pcrSignal(v){ if(!v) return '—'; if(v>1.3) return '🟢 Very Bullish'; if(v>1.1) return '🟢 Bullish'; if(v>=0.8) return '🟡 Neutral'; if(v>=0.6) return '🔴 Bearish'; return '🔴 Very Bearish'; }
+function fmtNum(v,dec=0){ if(v===null||v===undefined||v==='') return '—'; const n=parseFloat(v); if(isNaN(n)) return '—'; return n>=0?`+${n.toFixed(dec)}`:`${n.toFixed(dec)}`; }
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+function initApp(){
+  loadSel();
+  // Set default dates
+  const today=new Date().toISOString().split('T')[0];
+  ['md-date','fd-date'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=today; });
+  initChart();
+  renderAllIndicators();
+  renderScenarioCards();
+  renderRiskCards();
+  updateAll();
+  renderMDHistory();
+  renderFDHistory();
+  renderFlowChart();
+  updateFIIKPIs();
+}
+
+// ── ALLOC CHART ───────────────────────────────────────────────────────────
+function initChart(){
+  const ctx=document.getElementById('allocChart');
+  if(!ctx) return;
+  allocChart=new Chart(ctx,{
+    type:'doughnut',
+    data:{labels:['Equity','Debt','Gold','Cash'],
+      datasets:[{data:[60,15,10,15],backgroundColor:['#ff7c00','#00a854','#ffc107','#a04800'],borderColor:'#fff',borderWidth:3,hoverOffset:7}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{legend:{position:'right',labels:{color:'#3a3f5c',font:{size:10,family:'Segoe UI,system-ui,sans-serif',weight:'600'},padding:8}},
+        tooltip:{callbacks:{label:c=>`${c.label}: ${c.parsed}% (₹${(port()*c.parsed/100).toFixed(1)}L)`}}}}
+  });
+}
+
+// ── FLOW CHART ────────────────────────────────────────────────────────────
+function renderFlowChart(){
+  const ctx=document.getElementById('flowChart'); if(!ctx) return;
+  const hist=getFDHistory().slice(-30);
+  if(flowChart) flowChart.destroy();
+  if(!hist.length){
+    flowChart=new Chart(ctx,{type:'bar',data:{labels:['No data'],datasets:[{label:'FII Net',data:[0],backgroundColor:'#e0e0e0'}]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}}}});
+    return;
+  }
+  const labels=hist.map(h=>h.date.slice(5));
+  const fiiData=hist.map(h=>h.fiiNet||0);
+  const diiData=hist.map(h=>h.diiNet||0);
+  flowChart=new Chart(ctx,{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'FII Net ₹Cr',data:fiiData,backgroundColor:fiiData.map(v=>v>=0?'#00a85480':'#e5393580'),borderColor:fiiData.map(v=>v>=0?'#00a854':'#e53935'),borderWidth:1},
+      {label:'DII Net ₹Cr',data:diiData,backgroundColor:diiData.map(v=>v>=0?'#1976d260':'#ff7c0060'),borderColor:diiData.map(v=>v>=0?'#1976d2':'#ff7c00'),borderWidth:1}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',labels:{font:{size:10,family:'Segoe UI,system-ui,sans-serif'}}}},
+      scales:{y:{grid:{color:'#f0f2f8'},ticks:{font:{size:9}}},x:{grid:{display:false},ticks:{font:{size:9}}}}}
+  });
+}
+
+// ── MAIN UPDATE ───────────────────────────────────────────────────────────
+function updateAll(){
+  const score=mscore(), A=alloc(score), total=port();
+  const scoreStr=(score>=0?'+':'')+score;
+  const risk=getRisk();
+  const cn={earlyBull:'Early Bull',midBull:'Mid Bull',lateBull:'Late Bull',bear:'Bear Market'};
+
+  // KPIs
+  ['kpi-score'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=scoreStr;el.style.color=A.color;}});
+  ['hdr-score','ind-score'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=scoreStr;});
+  ['hdr-stance','ind-stance'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=A.stance;});
+  ['hdr-cycle'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=cn[A.cycle]||A.cycle;});
+
+  // Score boxes
+  ['scoreNum','allScoreNum'].forEach(id=>{const el=document.getElementById(id);if(el){el.textContent=scoreStr;el.style.color=A.color;}});
+  ['stanceBox','allStanceBox'].forEach(id=>{const b=document.getElementById(id);if(b){b.style.color=A.color;b.style.borderColor=A.color+'55';b.style.background=A.color+'10';}});
+  ['stanceName','allStanceName'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=A.stance;});
+  ['stanceDesc','allStanceDesc'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=A.desc;});
+  const st=document.getElementById('stratText');if(st)st.textContent=A.desc;
+
+  // Portfolio
+  const c=document.getElementById('crore-disp');if(c)c.textContent=(total/100).toFixed(2);
+  const e=document.getElementById('eq-disp');if(e)e.textContent=(total*A.eq/100).toFixed(1);
+  const sp=document.getElementById('sc-port');if(sp)sp.textContent=total;
+
+  // Cycle cards
+  ['earlyBull','midBull','lateBull','bear'].forEach(c=>{
+    const el=document.getElementById('cy-'+c);
+    if(el){
+      el.classList.toggle('active',c===A.cycle);
+      const nm=el.querySelector('.cycle-name');
+      if(nm) nm.textContent={earlyBull:'Early Bull',midBull:'Mid Bull',lateBull:'Late Bull',bear:'Bear'}[c]+(c===A.cycle?' ✓':'');
+    }
+  });
+
+  // Alloc chart + rows
+  if(allocChart){allocChart.data.datasets[0].data=[A.eq,A.debt,A.gold,A.cash];allocChart.update('none');}
+  const ar=document.getElementById('allocRows');
+  if(ar) ar.innerHTML=[{n:'Equity',p:A.eq,c:'#ff7c00'},{n:'Debt',p:A.debt,c:'#00a854'},{n:'Gold',p:A.gold,c:'#ffc107'},{n:'Cash',p:A.cash,c:'#a04800'}]
+    .map(it=>`<div class="arow"><div class="arow-name"><span style="width:8px;height:8px;border-radius:50%;background:${it.c};display:inline-block;"></span>${it.n}</div><div class="arow-pct" style="color:${it.c};">${it.p}%</div><div class="arow-amt">${fmt(total*it.p/100)}</div></div>`).join('');
+
+  // Risk
+  renderRiskCards();
+  const orb=document.getElementById('overallRiskBadge');
+  if(orb){orb.textContent=risk.icon+' '+risk.label;orb.style.background=risk.bg;orb.style.color=risk.color;}
+  const rh=document.getElementById('risk-hdr');if(rh)rh.textContent=risk.icon+' '+risk.label;
+
+  // Market snapshot
+  renderMarketSnapshot();
+  saveSel();
+}
+
+// ── MARKET SNAPSHOT ───────────────────────────────────────────────────────
+function renderMarketSnapshot(){
+  const mdHist=getMDHistory();
+  const fdHist=getFDHistory();
+  const latest=mdHist[mdHist.length-1];
+  const latestFD=fdHist[fdHist.length-1];
+  const el=document.getElementById('marketSnapshot');if(!el)return;
+  if(!latest&&!latestFD){el.innerHTML='<div style="color:var(--muted);font-size:11px;padding:8px 0;">No data yet. Enter data in Market Data and FII/DII tabs.</div>';return;}
+  let html='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;">';
+  if(latest){
+    const items=[
+      {l:'Nifty 50',v:latest.nifty?Number(latest.nifty).toLocaleString('en-IN'):'—',s:latest.niftyChg?`${latest.niftyChg>0?'+':''}${latest.niftyChg}%`:'',sc:latest.niftyChg>0?'#006b30':latest.niftyChg<0?'#b71c1c':'#6b7498'},
+      {l:'Nifty PE',v:latest.pe||'—',s:latest.pe?peSig(latest.pe):'',sc:latest.pe>25?'#b71c1c':latest.pe<18?'#006b30':'#b35c00'},
+      {l:'India VIX',v:latest.vix||'—',s:latest.vix?vixSig(latest.vix):'',sc:latest.vix>20?'#b71c1c':latest.vix<14?'#006b30':'#b35c00'},
+      {l:'Nifty PCR',v:latest.pcr||'—',s:latest.pcr?pcrSignal(latest.pcr):'',sc:'#5a6080'},
+      {l:'Crude $/bbl',v:latest.crude||'—',s:'',sc:'#5a6080'},
+      {l:'INR/USD',v:latest.inr||'—',s:'',sc:'#5a6080'},
+    ];
+    items.forEach(it=>{ html+=`<div style="background:#f8f9fc;border-radius:8px;padding:9px 11px;border:1px solid var(--border);">
+      <div style="font-size:9px;font-weight:700;color:#6b7498;text-transform:uppercase;letter-spacing:0.5px;">${it.l}</div>
+      <div style="font-size:16px;font-weight:900;color:var(--text);margin:2px 0;">${it.v}</div>
+      <div style="font-size:10px;font-weight:700;color:${it.sc};">${it.s}</div>
+    </div>`; });
+    html+=`<div style="background:#f8f9fc;border-radius:8px;padding:9px 11px;border:1px solid var(--border);">
+      <div style="font-size:9px;font-weight:700;color:#6b7498;text-transform:uppercase;">Date</div>
+      <div style="font-size:13px;font-weight:800;color:var(--text);margin:2px 0;">${latest.date}</div>
+    </div>`;
+  }
+  if(latestFD){
+    const fiiNet=parseFloat(latestFD.fiiNet)||0;
+    const diiNet=parseFloat(latestFD.diiNet)||0;
+    html+=`<div style="background:${fiiNet>=0?'#e6f4ef':'#fce8e8'};border-radius:8px;padding:9px 11px;border:1px solid ${fiiNet>=0?'#a5d6a7':'#ef9a9a'};">
+      <div style="font-size:9px;font-weight:700;color:#6b7498;text-transform:uppercase;">FII Net ₹Cr</div>
+      <div style="font-size:16px;font-weight:900;color:${fiiNet>=0?'#006b30':'#b71c1c'};">${fiiNet>=0?'+':''}${fiiNet.toLocaleString('en-IN')}</div>
+      <div style="font-size:10px;font-weight:700;color:${fiiNet>=0?'#006b30':'#b71c1c'};">${fiiNet>=0?'Buying':'Selling'}</div>
+    </div>
+    <div style="background:${diiNet>=0?'#e3f2fd':'#fff3e0'};border-radius:8px;padding:9px 11px;border:1px solid ${diiNet>=0?'#90caf9':'#ffcc80'};">
+      <div style="font-size:9px;font-weight:700;color:#6b7498;text-transform:uppercase;">DII Net ₹Cr</div>
+      <div style="font-size:16px;font-weight:900;color:${diiNet>=0?'#1565c0':'#e65100'};">${diiNet>=0?'+':''}${diiNet.toLocaleString('en-IN')}</div>
+      <div style="font-size:10px;font-weight:700;color:${diiNet>=0?'#1565c0':'#e65100'};">${diiNet>=0?'Buying':'Selling'}</div>
+    </div>`;
+  }
+  html+='</div>';
+  el.innerHTML=html;
+  // Update KPIs
+  if(latest){
+    const kn=document.getElementById('kpi-nifty');if(kn)kn.textContent=latest.nifty?Number(latest.nifty).toLocaleString('en-IN'):'—';
+    const kc=document.getElementById('kpi-nifty-chg');if(kc&&latest.niftyChg)kc.textContent=`${latest.niftyChg>0?'+':''}${latest.niftyChg}% today`;
+    const kpe=document.getElementById('kpi-pe');if(kpe)kpe.textContent=latest.pe||'—';
+    const kpes=document.getElementById('kpi-pe-sig');if(kpes&&latest.pe)kpes.textContent=peSig(latest.pe);
+    const kv=document.getElementById('kpi-vix');if(kv)kv.textContent=latest.vix||'—';
+    const kvs=document.getElementById('kpi-vix-sig');if(kvs&&latest.vix)kvs.textContent=vixSig(latest.vix);
+    const kpcr=document.getElementById('kpi-pcr');if(kpcr)kpcr.textContent=latest.pcr||'—';
+    const kpcrs=document.getElementById('kpi-pcr-sig');if(kpcrs&&latest.pcr)kpcrs.textContent=pcrSignal(latest.pcr);
+    // Set last date
+    const hd=document.getElementById('hdr-date');if(hd)hd.textContent=latest.date;
+  }
+  if(latestFD){
+    const kf=document.getElementById('kpi-fii');if(kf)kf.textContent=latestFD.fiiNet?`${latestFD.fiiNet>0?'+':''}${Number(latestFD.fiiNet).toLocaleString('en-IN')}`:'—';
+    const kfs=document.getElementById('kpi-fii-sig');if(kfs&&latestFD.fiiNet)kfs.textContent=latestFD.fiiNet>0?'FII Buying ✅':'FII Selling ⚠️';
+  }
+}
+
+function peSig(pe){ if(pe<16) return 'Very Cheap 🟢'; if(pe<20) return 'Reasonable 🟢'; if(pe<23) return 'Fair 🟡'; if(pe<28) return 'Expensive 🔴'; return 'Euphoric ⚠️'; }
+function vixSig(v){ if(v<12) return 'Very Low — Complacency'; if(v<16) return 'Low — Calm Market 🟢'; if(v<20) return 'Normal 🟡'; if(v<25) return 'Elevated — Caution 🔴'; return 'High Fear — Extreme ⚠️'; }
+
+// ── MARKET DATA ENTRY ──────────────────────────────────────────────────────
+function saveMarketData(){
+  const entry={
+    date: document.getElementById('md-date')?.value||new Date().toISOString().split('T')[0],
+    nifty: parseFloat(document.getElementById('md-nifty')?.value)||null,
+    niftyChg: parseFloat(document.getElementById('md-nifty-chg')?.value)||null,
+    pe: parseFloat(document.getElementById('md-pe')?.value)||null,
+    pb: parseFloat(document.getElementById('md-pb')?.value)||null,
+    divY: parseFloat(document.getElementById('md-divy')?.value)||null,
+    vix: parseFloat(document.getElementById('md-vix')?.value)||null,
+    vixChg: parseFloat(document.getElementById('md-vix-chg')?.value)||null,
+    adv: parseFloat(document.getElementById('md-adv')?.value)||null,
+    dec: parseFloat(document.getElementById('md-dec')?.value)||null,
+    pcr: parseFloat(document.getElementById('md-pcr')?.value)||null,
+    bnpcr: parseFloat(document.getElementById('md-bnpcr')?.value)||null,
+    crude: parseFloat(document.getElementById('md-crude')?.value)||null,
+    inr: parseFloat(document.getElementById('md-inr')?.value)||null,
+    cpi: parseFloat(document.getElementById('md-cpi')?.value)||null,
+    repo: parseFloat(document.getElementById('md-repo')?.value)||null,
+  };
+  if(!entry.nifty&&!entry.pe&&!entry.vix){alert('Please enter at least one data point.');return;}
+  const hist=getMDHistory();
+  const existing=hist.findIndex(h=>h.date===entry.date);
+  if(existing>=0) hist[existing]=entry; else hist.push(entry);
+  hist.sort((a,b)=>a.date.localeCompare(b.date));
+  saveMDHistory(hist);
+  renderMDHistory();
+  updateSignalPanel();
+  renderMarketSnapshot();
+  showSave();
+}
+function clearMarketForm(){
+  ['md-nifty','md-nifty-chg','md-pe','md-pb','md-divy','md-vix','md-vix-chg','md-adv','md-dec','md-pcr','md-bnpcr','md-crude','md-inr','md-cpi','md-repo'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  ['sig-nifty','sig-pe','sig-vix','sig-adec','sig-pcr','sig-bnpcr','sig-crude','sig-inr','sig-cpi'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.textContent='';
+  });
+}
+function renderMDHistory(){
+  const hist=getMDHistory().slice().reverse().slice(0,30);
+  const tbody=document.getElementById('mdHistBody');if(!tbody)return;
+  if(!hist.length){tbody.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:16px;">No history yet.</td></tr>';return;}
+  tbody.innerHTML=hist.map(h=>`<tr>
+    <td style="font-weight:700;">${h.date}</td>
+    <td>${h.nifty?Number(h.nifty).toLocaleString('en-IN'):'—'}</td>
+    <td style="color:${h.niftyChg>0?'#006b30':h.niftyChg<0?'#b71c1c':'#5a6080'};font-weight:700;">${h.niftyChg!=null?`${h.niftyChg>0?'+':''}${h.niftyChg}%`:'—'}</td>
+    <td style="color:${h.pe>25?'#b71c1c':h.pe<18?'#006b30':'#b35c00'};font-weight:700;">${h.pe||'—'}</td>
+    <td style="color:${h.vix>20?'#b71c1c':h.vix<14?'#006b30':'#b35c00'};font-weight:700;">${h.vix||'—'}</td>
+    <td>${h.pcr||'—'}</td>
+    <td>${h.crude?`$${h.crude}`:'—'}</td>
+    <td>${h.inr||'—'}</td>
+    <td>${h.adv&&h.dec?`${h.adv}/${h.dec}`:'—'}</td>
+  </tr>`).join('');
+}
+function updateSignalPanel(){
+  const el=document.getElementById('signalPanel');if(!el)return;
+  const pe=parseFloat(document.getElementById('md-pe')?.value);
+  const vix=parseFloat(document.getElementById('md-vix')?.value);
+  const pcr=parseFloat(document.getElementById('md-pcr')?.value);
+  const crude=parseFloat(document.getElementById('md-crude')?.value);
+  const inr=parseFloat(document.getElementById('md-inr')?.value);
+  const adv=parseFloat(document.getElementById('md-adv')?.value);
+  const dec=parseFloat(document.getElementById('md-dec')?.value);
+  let rows=[];
+  if(!isNaN(pe)) rows.push({l:'Nifty PE',v:pe,s:peSig(pe),c:pe>25?'#b71c1c':pe<18?'#006b30':'#b35c00'});
+  if(!isNaN(vix)) rows.push({l:'India VIX',v:vix,s:vixSig(vix),c:vix>20?'#b71c1c':vix<14?'#006b30':'#b35c00'});
+  if(!isNaN(pcr)) rows.push({l:'Nifty PCR',v:pcr,s:pcrSignal(pcr),c:pcr>1.1?'#006b30':pcr<0.8?'#b71c1c':'#b35c00'});
+  if(!isNaN(crude)) rows.push({l:'Crude $/bbl',v:`$${crude}`,s:crude<60?'🟢 Very Low':crude<75?'🟢 Comfortable':crude<90?'🟡 Manageable':crude<105?'🔴 Pressure':'🔴 Crisis',c:crude>90?'#b71c1c':crude<75?'#006b30':'#b35c00'});
+  if(!isNaN(inr)) rows.push({l:'INR/USD',v:`₹${inr}`,s:inr<83?'🟢 Strong':inr<86?'🟡 Mild Weakness':inr<90?'🔴 Depreciating':'🔴 Sharp Fall',c:inr>86?'#b71c1c':inr<83?'#006b30':'#b35c00'});
+  if(!isNaN(adv)&&!isNaN(dec)){const ratio=(adv/dec).toFixed(2);rows.push({l:'Adv/Dec Ratio',v:ratio,s:adv>dec*1.5?'🟢 Strong Breadth':adv>dec?'🟡 Moderate':dec>adv*1.5?'🔴 Weak Breadth':'🔴 Declining',c:adv>dec*1.5?'#006b30':dec>adv*1.5?'#b71c1c':'#b35c00'});}
+  if(!rows.length){el.innerHTML='<div style="color:var(--muted);font-size:11px;">Enter numbers to see signals.</div>';return;}
+  el.innerHTML=rows.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f5f7fa;">
+    <span style="font-size:11px;font-weight:600;color:var(--soft);">${r.l}</span>
+    <span style="font-size:12px;font-weight:900;color:${r.c};">${r.v}</span>
+    <span style="font-size:10px;font-weight:700;color:${r.c};">${r.s}</span>
+  </div>`).join('');
+  // Update input signals
+  if(!isNaN(pe)){const s=document.getElementById('sig-pe');if(s){s.textContent=peSig(pe);s.style.color=pe>25?'#b71c1c':pe<18?'#006b30':'#b35c00';}}
+  if(!isNaN(vix)){const s=document.getElementById('sig-vix');if(s){s.textContent=vixSig(vix);s.style.color=vix>20?'#b71c1c':vix<14?'#006b30':'#b35c00';}}
+  if(!isNaN(pcr)){const s=document.getElementById('sig-pcr');if(s){s.textContent=pcrSignal(pcr);s.style.color=pcr>1.1?'#006b30':pcr<0.8?'#b71c1c':'#b35c00';}}
+}
+
+// ── FII/DII ────────────────────────────────────────────────────────────────
+function autoCalcFIIDII(){
+  const buy=parseFloat(document.getElementById('fd-fii-buy')?.value);
+  const sell=parseFloat(document.getElementById('fd-fii-sell')?.value);
+  if(!isNaN(buy)&&!isNaN(sell)){ const net=document.getElementById('fd-fii-net'); if(net) net.value=(buy-sell).toFixed(0); }
+  const dbuy=parseFloat(document.getElementById('fd-dii-buy')?.value);
+  const dsell=parseFloat(document.getElementById('fd-dii-sell')?.value);
+  if(!isNaN(dbuy)&&!isNaN(dsell)){ const dnet=document.getElementById('fd-dii-net'); if(dnet) dnet.value=(dbuy-dsell).toFixed(0); }
+  updateFIISignal();
+}
+function saveFIIDII(){
+  const fiiNet=parseFloat(document.getElementById('fd-fii-net')?.value);
+  const diiNet=parseFloat(document.getElementById('fd-dii-net')?.value);
+  if(isNaN(fiiNet)&&isNaN(diiNet)){alert('Please enter at least FII Net or DII Net value.');return;}
+  const entry={
+    date:document.getElementById('fd-date')?.value||new Date().toISOString().split('T')[0],
+    fiiBuy:parseFloat(document.getElementById('fd-fii-buy')?.value)||null,
+    fiiSell:parseFloat(document.getElementById('fd-fii-sell')?.value)||null,
+    fiiNet:isNaN(fiiNet)?null:fiiNet,
+    diiBuy:parseFloat(document.getElementById('fd-dii-buy')?.value)||null,
+    diiSell:parseFloat(document.getElementById('fd-dii-sell')?.value)||null,
+    diiNet:isNaN(diiNet)?null:diiNet,
+    pcr:parseFloat(document.getElementById('fd-pcr')?.value)||null,
+    bnpcr:parseFloat(document.getElementById('fd-bnpcr')?.value)||null,
+    notes:document.getElementById('fd-notes')?.value||''
+  };
+  const hist=getFDHistory();
+  const existing=hist.findIndex(h=>h.date===entry.date);
+  if(existing>=0) hist[existing]=entry; else hist.push(entry);
+  hist.sort((a,b)=>a.date.localeCompare(b.date));
+  saveFDHistory(hist);
+  renderFDHistory();
+  updateFIIKPIs();
+  renderFlowChart();
+  renderMarketSnapshot();
+  showSave();
+}
+function updateFIIKPIs(){
+  const hist=getFDHistory();
+  if(!hist.length) return;
+  const latest=hist[hist.length-1];
+  const fiiNet=parseFloat(latest.fiiNet)||0;
+  const diiNet=parseFloat(latest.diiNet)||0;
+  // Monthly sum (current month)
+  const now=new Date(); const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const monthFII=hist.filter(h=>h.date.startsWith(ym)).reduce((s,h)=>s+(parseFloat(h.fiiNet)||0),0);
+  // Update KPIs
+  const kfn=document.getElementById('fii-kpi-net');if(kfn){kfn.textContent=fiiNet>=0?`+${fiiNet.toLocaleString('en-IN')}`:`${fiiNet.toLocaleString('en-IN')}`;kfn.style.color=fiiNet>=0?'#006b30':'#b71c1c';}
+  const kfs=document.getElementById('fii-kpi-sig');if(kfs)kfs.textContent=fiiNet>=0?'Net Buying 🟢':'Net Selling 🔴';
+  const kdn=document.getElementById('dii-kpi-net');if(kdn){kdn.textContent=diiNet>=0?`+${diiNet.toLocaleString('en-IN')}`:`${diiNet.toLocaleString('en-IN')}`;kdn.style.color=diiNet>=0?'#1565c0':'#e65100';}
+  const kds=document.getElementById('dii-kpi-sig');if(kds)kds.textContent=diiNet>=0?'Net Buying 🔵':'Net Selling 🟠';
+  const kmf=document.getElementById('fii-kpi-month');if(kmf){kmf.textContent=monthFII>=0?`+${Math.round(monthFII).toLocaleString('en-IN')}`:`${Math.round(monthFII).toLocaleString('en-IN')}`;kmf.style.color=monthFII>=0?'#006b30':'#b71c1c';}
+  // PCR KPIs
+  const pcr=latest.pcr; const bnpcr=latest.bnpcr;
+  const kpcr=document.getElementById('fii-pcr-kpi');if(kpcr&&pcr)kpcr.textContent=pcr;
+  const kpcrs=document.getElementById('fii-pcr-sig');if(kpcrs&&pcr)kpcrs.textContent=pcrSignal(pcr);
+  const kbn=document.getElementById('fii-bnpcr-kpi');if(kbn&&bnpcr)kbn.textContent=bnpcr;
+  const kbns=document.getElementById('fii-bnpcr-sig');if(kbns&&bnpcr)kbns.textContent=pcrSignal(bnpcr);
+  // Combined signal
+  const comb=document.getElementById('combined-sig');
+  const combs=document.getElementById('combined-sig-sub');
+  if(comb){
+    if(fiiNet>0&&diiNet>0){comb.textContent='🟢 Strong Bull';comb.style.color='#006b30';if(combs)combs.textContent='Both FII+DII buying';}
+    else if(fiiNet<0&&diiNet>0){comb.textContent='🟡 Resilient';comb.style.color='#b35c00';if(combs)combs.textContent='DII absorbing FII sales';}
+    else if(fiiNet>0&&diiNet<0){comb.textContent='🟡 Mixed';comb.style.color='#b35c00';if(combs)combs.textContent='FII buying, DII cautious';}
+    else if(fiiNet<0&&diiNet<0){comb.textContent='🔴 Danger';comb.style.color='#b71c1c';if(combs)combs.textContent='Both FII+DII selling!';}
+    else{comb.textContent='—';if(combs)combs.textContent='Enter data';}
+  }
+  updateFIISignal();
+}
+function updateFIISignal(){
+  const el=document.getElementById('fiiSignalPanel');if(!el)return;
+  const hist=getFDHistory();if(!hist.length)return;
+  const latest=hist[hist.length-1];
+  const fiiNet=parseFloat(latest.fiiNet)||0;
+  const diiNet=parseFloat(latest.diiNet)||0;
+  const pcr=latest.pcr;
+  const rows=[
+    {l:'FII Net',v:`₹${Math.abs(fiiNet).toLocaleString('en-IN')} Cr`,s:fiiNet>0?'Buying (Bullish)':'Selling (Bearish)',c:fiiNet>0?'#006b30':'#b71c1c'},
+    {l:'DII Net',v:`₹${Math.abs(diiNet).toLocaleString('en-IN')} Cr`,s:diiNet>0?'Buying (Support)':'Reducing (Caution)',c:diiNet>0?'#1565c0':'#e65100'},
+    {l:'FII+DII Signal',v:'Combined',s:fiiNet>0&&diiNet>0?'🟢 Strong Bull Signal':fiiNet<0&&diiNet<0?'🔴 DANGER — Both Selling':fiiNet<0&&diiNet>0?'🟡 DII Buffer Active':'🟡 Mixed Signal',c:fiiNet>0&&diiNet>0?'#006b30':fiiNet<0&&diiNet<0?'#b71c1c':'#b35c00'},
+  ];
+  if(pcr) rows.push({l:'Nifty PCR',v:pcr,s:pcrSignal(pcr),c:pcr>1.1?'#006b30':pcr<0.8?'#b71c1c':'#b35c00'});
+  el.innerHTML=rows.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f5f7fa;">
+    <span style="font-size:11px;font-weight:600;color:var(--soft);">${r.l}</span>
+    <span style="font-size:12px;font-weight:900;color:${r.c};">${r.v}</span>
+    <span style="font-size:10px;font-weight:700;color:${r.c};">${r.s}</span>
+  </div>`).join('');
+}
+function renderFDHistory(){
+  const hist=getFDHistory().slice().reverse().slice(0,30);
+  const tbody=document.getElementById('fiiHistBody');if(!tbody)return;
+  if(!hist.length){tbody.innerHTML='<tr><td colspan="11" style="text-align:center;color:var(--muted);padding:16px;">No history yet.</td></tr>';return;}
+  tbody.innerHTML=hist.map(h=>{
+    const fn=parseFloat(h.fiiNet)||0, dn=parseFloat(h.diiNet)||0;
+    const sig=fn>0&&dn>0?'🟢 Bull':fn<0&&dn<0?'🔴 Danger':fn<0&&dn>0?'🟡 Resilient':'🟡 Mixed';
+    return `<tr>
+      <td style="font-weight:700;">${h.date}</td>
+      <td>${h.fiiBuy?Number(h.fiiBuy).toLocaleString('en-IN'):'—'}</td>
+      <td>${h.fiiSell?Number(h.fiiSell).toLocaleString('en-IN'):'—'}</td>
+      <td style="font-weight:800;color:${fn>=0?'#006b30':'#b71c1c'};">${fn>=0?'+':''}${fn.toLocaleString('en-IN')}</td>
+      <td>${h.diiBuy?Number(h.diiBuy).toLocaleString('en-IN'):'—'}</td>
+      <td>${h.diiSell?Number(h.diiSell).toLocaleString('en-IN'):'—'}</td>
+      <td style="font-weight:800;color:${dn>=0?'#1565c0':'#e65100'};">${dn>=0?'+':''}${dn.toLocaleString('en-IN')}</td>
+      <td>${h.pcr||'—'}</td>
+      <td>${h.bnpcr||'—'}</td>
+      <td>${sig}</td>
+      <td style="font-size:10px;color:var(--muted);">${h.notes||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── INDICATORS ────────────────────────────────────────────────────────────
+function renderAllIndicators(){
+  document.getElementById('allIndicators').innerHTML=MACRO_INDICATORS.map((ind,i)=>{
+    const opt=ind.options[sel[i]];
+    return `<div class="mrow">
+      <div class="mlabel" style="cursor:pointer;text-decoration:underline dotted;" onclick="showIndExplainer(${i})">${ind.icon} ${ind.name}</div>
+      <select class="msel" onchange="changeMacro(${i},this.value)">
+        ${ind.options.map((o,j)=>`<option value="${j}"${j===sel[i]?' selected':''}>${o.label}</option>`).join('')}
+      </select>
+      <div class="mbadge ${opt.cls}" id="badge-${i}">${opt.score>=0?'+':''}${opt.score}</div>
+    </div>`;
+  }).join('');
+}
+function showIndExplainer(i){
+  const ind=MACRO_INDICATORS[i];
+  const el=document.getElementById('indExplainer');if(!el)return;
+  el.innerHTML=`<div style="font-size:18px;margin-bottom:6px;">${ind.icon}</div>
+    <div style="font-size:13px;font-weight:800;color:#1a1e2e;margin-bottom:7px;">${ind.name}</div>
+    <div style="font-size:11px;color:#3a3f5c;line-height:1.7;margin-bottom:10px;">${ind.tooltip}</div>
+    <div style="font-size:10px;font-weight:700;color:#b35c00;text-transform:uppercase;margin-bottom:5px;">Score Options:</div>
+    ${ind.options.map((o,j)=>`<div style="display:flex;align-items:center;gap:7px;padding:3px 0;${j===sel[i]?'background:#fff3e0;border-radius:5px;padding:4px 7px;margin:-1px 0;':''}">
+      <span style="min-width:26px;text-align:center;padding:2px 4px;border-radius:4px;font-size:10px;font-weight:800;background:${o.cls==='pos'?'#e6f4ef':o.cls==='neg'?'#fce8e8':'#fff8e1'};color:${o.cls==='pos'?'#006b30':o.cls==='neg'?'#b71c1c':'#b35c00'};">${o.score>=0?'+':''}${o.score}</span>
+      <span style="font-size:10px;font-weight:${j===sel[i]?'800':'600'};color:${j===sel[i]?'#1a1e2e':'#5a6080'};">${o.label}</span>
+      ${j===sel[i]?'<span style="font-size:9px;color:#ff7c00;font-weight:700;margin-left:auto;">← current</span>':''}
+    </div>`).join('')}`;
+  el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function changeMacro(i,v){
+  sel[i]=parseInt(v);
+  const opt=MACRO_INDICATORS[i].options[parseInt(v)];
+  const b=document.getElementById('badge-'+i);
+  if(b){b.className='mbadge '+opt.cls;b.textContent=(opt.score>=0?'+':'')+opt.score;}
+  updateAll();
+  showSave();
+}
+
+// ── SCENARIOS ─────────────────────────────────────────────────────────────
+function renderScenarioCards(){
+  document.getElementById('scenarioCards').innerHTML=SCENARIOS.map((sc,i)=>`
+    <div class="sc-card" onclick="showScenario(${i})" style="border-top:4px solid ${sc.color};border-color:${sc.color}22;"
+      onmouseover="this.style.boxShadow='0 4px 14px ${sc.color}25'" onmouseout="this.style.boxShadow='none'">
+      <div style="font-size:18px;margin-bottom:6px;">${sc.icon}</div>
+      <div style="font-size:12px;font-weight:800;color:${sc.color};margin-bottom:4px;">${sc.name}</div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:8px;line-height:1.5;">${sc.desc}</div>
+      <div class="sc-alloc">
+        <div class="sc-alloc-i" style="background:#e8f5e9;"><div style="font-size:16px;font-weight:900;color:#006b30;">${sc.eq}%</div><div style="font-size:9px;font-weight:700;color:#006b30;">Stocks</div></div>
+        <div class="sc-alloc-i" style="background:#fff3e0;"><div style="font-size:16px;font-weight:900;color:#b35c00;">${sc.debt}%</div><div style="font-size:9px;font-weight:700;color:#b35c00;">Debt</div></div>
+        <div class="sc-alloc-i" style="background:#fff9c4;"><div style="font-size:16px;font-weight:900;color:#856404;">${sc.gold}%</div><div style="font-size:9px;font-weight:700;color:#856404;">Gold</div></div>
+        <div class="sc-alloc-i" style="background:#f3e5f5;"><div style="font-size:16px;font-weight:900;color:#6a1b9a;">${sc.cash}%</div><div style="font-size:9px;font-weight:700;color:#6a1b9a;">Cash</div></div>
+      </div>
+    </div>`).join('');
+}
+function showScenario(i){
+  const sc=SCENARIOS[i],total=port();
+  const d=document.getElementById('scenarioDetail');if(!d)return;
+  d.style.display='block';
+  const gl=(sc.green||[]).map(s=>`<span style="background:#e6f4ef;color:#006b30;padding:2px 8px;border-radius:7px;font-size:11px;font-weight:700;margin:2px;display:inline-block;">🟢 ${s}</span>`).join('');
+  const rl=(sc.red||[]).map(s=>`<span style="background:#fce8e8;color:#b71c1c;padding:2px 8px;border-radius:7px;font-size:11px;font-weight:700;margin:2px;display:inline-block;">🔴 ${s}</span>`).join('');
+  d.innerHTML=`<div style="font-size:14px;font-weight:800;color:${sc.color};margin-bottom:7px;">${sc.icon} ${sc.name}</div>
+    <div style="font-size:11px;color:#4a5070;margin-bottom:12px;line-height:1.6;">${sc.desc}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+      <div><div style="font-size:10px;font-weight:800;color:#006b30;margin-bottom:5px;">🟢 Stronger in this scenario:</div><div>${gl}</div></div>
+      <div><div style="font-size:10px;font-weight:800;color:#b71c1c;margin-bottom:5px;">🔴 Reduce / avoid:</div><div>${rl}</div></div>
+    </div>
+    <div class="info" style="margin-bottom:12px;"><strong>Guidance:</strong> ${sc.action}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      ${[['Stocks','#e8f5e9','#006b30',sc.eq],['Debt','#fff3e0','#b35c00',sc.debt],['Gold','#fff9c4','#856404',sc.gold],['Cash','#f3e5f5','#6a1b9a',sc.cash]].map(([l,bg,tc,p])=>`
+        <div style="background:${bg};border-radius:9px;padding:9px 14px;text-align:center;min-width:70px;">
+          <div style="font-size:18px;font-weight:900;color:${tc};">${p}%</div>
+          <div style="font-size:10px;font-weight:700;color:${tc};">${l}</div>
+          <div style="font-size:9px;color:#6b7498;">₹${(total*p/100).toFixed(1)}L</div>
+        </div>`).join('')}
+    </div>`;
+  d.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ── RISK CARDS ─────────────────────────────────────────────────────────────
+const RISK_DEFS=[
+  {label:"Market Valuation",icon:"📐",explain:"Nifty PE above 25x = expensive. Above 28x = euphoric danger zone. Below 18x = buying opportunity. After Apr 2021 NSE uses consolidated earnings — long-term avg is now ~22–23x not 20x. Always compare PE to its own historical range, not absolute numbers.",sectorNote:"Banks: P/Book, Insurance: P/EV, Hospitals: EV/EBITDA. Single PE misleading across sectors.",
+   calc:()=>{const s=mscore();return s>8?{d:'🟢',l:'Low Risk',c:'#006b30',bg:'#e6f4ef'}:s>2?{d:'🟡',l:'Medium',c:'#b35c00',bg:'#fff3e0'}:{d:'🔴',l:'High — Expensive',c:'#b71c1c',bg:'#fce8e8'};}},
+  {label:"Price Momentum",icon:"📈",explain:"20%+ rally in 6 months often means good news is priced in. Momentum works in bull markets; in bear markets it accelerates losses. Best entry points come when valuation is low AND momentum is just starting.",sectorNote:"Sector RSI. If a sector doubled in 12 months, upside may be limited even if thesis intact.",
+   calc:()=>{const s=mscore();return s>5?{d:'🟢',l:'Strong Momentum',c:'#006b30',bg:'#e6f4ef'}:s>0?{d:'🟡',l:'Moderate',c:'#b35c00',bg:'#fff3e0'}:{d:'🔴',l:'Weak / Reversal Risk',c:'#b71c1c',bg:'#fce8e8'};}},
+  {label:"FII Activity",icon:"🌍",explain:"FIIs hold 14.2% of NSE mkt cap. When FIIs sell, markets fall regardless of domestic fundamentals. Sustained FII buying (3+ months) = strong bull signal. DIIs now act as buffer but large FII outflows still hurt. Check FII/DII tab for live data.",sectorNote:"IT and Banking see maximum FII impact. FMCG, hospitals, power are more insulated.",
+   calc:()=>{const s=mscore();return s>6?{d:'🟢',l:'FII Inflow',c:'#006b30',bg:'#e6f4ef'}:s>1?{d:'🟡',l:'Neutral',c:'#b35c00',bg:'#fff3e0'}:{d:'🔴',l:'FII Outflow',c:'#b71c1c',bg:'#fce8e8'};}},
+  {label:"Credit Growth",icon:"🏦",explain:"Bank credit growth above 14% = strong economy. Below 8% = stress. Tightening cycles hit real estate, autos, NBFCs first. RBI rate cuts fuel credit expansion — AMC, NBFC, housing benefit. Watch MSME credit for small-cap signal.",sectorNote:"MSME credit = small-cap indicator. Retail loans = consumer confidence. Corporate credit = capex revival.",
+   calc:()=>{const idx=MACRO_INDICATORS.findIndex(i=>i.name.includes('Liquidity')||i.name.includes('Money'));return idx>=0?(sel[idx]<=1?{d:'🟢',l:'Strong',c:'#006b30',bg:'#e6f4ef'}:sel[idx]===2?{d:'🟡',l:'Normal',c:'#b35c00',bg:'#fff3e0'}:{d:'🔴',l:'Tight',c:'#b71c1c',bg:'#fce8e8'}):{d:'🟡',l:'Normal',c:'#b35c00',bg:'#fff3e0'};}},
+  {label:"Earnings Cycle",icon:"💰",explain:"Nifty EPS is the ultimate long-term driver. When 60%+ of Nifty companies beat estimates for 2+ quarters = genuine upgrade cycle. FY26E Nifty EPS ~₹1,080. Banking NPA cycle, IT deal wins, FMCG volumes are sector-specific leading indicators.",sectorNote:"Watch margin expansion vs volume growth. Each sector has its own earnings indicator.",
+   calc:()=>{const idx=MACRO_INDICATORS.findIndex(i=>i.name.includes('Earnings'));return idx>=0?(sel[idx]<=1?{d:'🟢',l:'Upgrades',c:'#006b30',bg:'#e6f4ef'}:sel[idx]===2?{d:'🟢',l:'Stable Growth',c:'#006b30',bg:'#e6f4ef'}:{d:'🔴',l:'Downgrade Risk',c:'#b71c1c',bg:'#fce8e8'}):{d:'🟡',l:'Stable',c:'#b35c00',bg:'#fff3e0'};}},
+  {label:"Investor Sentiment",icon:"😊",explain:"Extreme fear = buy opportunity. Extreme euphoria = sell signal. Euphoria signs: every IPO subscribed 100x+, F&O volumes at records, social media full of stock tips, auto-drivers giving recommendations. Buffett's rule: be fearful when others are greedy.",sectorNote:"SME IPO oversubscription = bubble indicator. F&O OI = speculation level. Search trends for 'multibagger' = retail frenzy.",
+   calc:()=>{const s=mscore();return s>8?{d:'🚨',l:'Euphoric — Danger!',c:'#880000',bg:'#fce8e8'}:s>4?{d:'🟢',l:'Optimistic',c:'#006b30',bg:'#e6f4ef'}:s>0?{d:'🟡',l:'Neutral',c:'#b35c00',bg:'#fff3e0'}:{d:'🟢',l:'Fear = Opportunity',c:'#006b30',bg:'#e6f4ef'};}},
+  {label:"Global Macro Risk",icon:"🌐",explain:"US Fed policy, China slowdown, Middle East conflict, European banking crisis can all trigger FII outflows from India regardless of domestic conditions. India is better insulated than most EMs but not immune. Domestic sectors more protected than export-linked.",sectorNote:"Export-linked: IT, pharma, textiles. Domestic: FMCG, hospitals, power, NBFCs, capital goods.",
+   calc:()=>{const idx=MACRO_INDICATORS.findIndex(i=>i.name.includes('Global'));return idx>=0?(sel[idx]<=1?{d:'🟢',l:'Low Global Risk',c:'#006b30',bg:'#e6f4ef'}:sel[idx]===2?{d:'🟡',l:'Moderate',c:'#b35c00',bg:'#fff3e0'}:{d:'🔴',l:'High Risk',c:'#b71c1c',bg:'#fce8e8'}):{d:'🟡',l:'Moderate',c:'#b35c00',bg:'#fff3e0'};}}
+];
+function renderRiskCards(){
+  const el=document.getElementById('riskCards');if(!el)return;
+  el.innerHTML=RISK_DEFS.map(ri=>{
+    const lv=ri.calc();
+    return `<div class="risk-card" style="background:${lv.bg};border-color:${lv.c}30;" title="${ri.explain}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;">
+        <span style="font-size:18px;">${ri.icon}</span>
+        <span style="font-size:11px;font-weight:800;color:#1a1e2e;flex:1;">${ri.label}</span>
+        <span style="font-size:16px;">${lv.d}</span>
+      </div>
+      <div style="font-size:12px;font-weight:900;color:${lv.c};margin-bottom:5px;">${lv.l}</div>
+      <div style="font-size:10px;color:#4a5070;line-height:1.6;">${ri.explain.substring(0,110)}… <em>(hover for full)</em></div>
+      <div style="margin-top:6px;font-size:9px;font-weight:700;color:${lv.c};background:${lv.bg};padding:3px 8px;border-radius:4px;border:1px solid ${lv.c}33;">📍 ${ri.sectorNote.substring(0,80)}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── FLASH ─────────────────────────────────────────────────────────────────
+function showSave(){
+  document.querySelectorAll('.save-flash').forEach(e=>e.remove());
+  const el=document.createElement('div');el.className='save-flash';el.textContent='✓ Saved';
+  document.body.appendChild(el);setTimeout(()=>el.remove(),2400);
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────
+if(sessionStorage.getItem('cbf26_auth')==='granted'){
+  document.getElementById('accessGate').style.display='none';
+}
+document.addEventListener('DOMContentLoaded',()=>{
+  if(sessionStorage.getItem('cbf26_auth')==='granted') initApp();
+  else document.getElementById('accessCodeInput')?.focus();
+});
+if(document.readyState==='complete'&&sessionStorage.getItem('cbf26_auth')==='granted') initApp();
+</script>
+</body>
+</html>
