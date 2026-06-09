@@ -1,0 +1,2461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CB Trade Feed — NSE Daily Data</title>
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f5f7fa;color:#1a1e2e;font-size:13px;min-height:100vh;}
+button{cursor:pointer;font-family:inherit;}
+input,select,textarea{font-family:inherit;}
+
+/* ── ACCESS GATE ─────────────────────────────────────────────────── */
+#accessGate{position:fixed;inset:0;background:#f5f7fa;z-index:9999;display:flex;align-items:center;justify-content:center;}
+.gate-box{background:#ffffff;border:1.5px solid #c8d0e8;border-radius:16px;padding:40px;max-width:380px;width:90%;text-align:center;}
+.gate-logo{font-size:28px;font-weight:900;color:#ff7c00;letter-spacing:-1px;margin-bottom:4px;}
+.gate-sub{font-size:10px;color:#7a829a;letter-spacing:3px;text-transform:uppercase;margin-bottom:28px;}
+.gate-label{font-size:11px;color:#5a6080;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;text-align:left;}
+.gate-input{width:100%;padding:12px 16px;background:#f8f9fc;border:1.5px solid #c8d0e8;border-radius:8px;color:#1a1e2e;font-size:15px;font-weight:700;letter-spacing:3px;text-align:center;outline:none;transition:border-color .2s;}
+.gate-input:focus{border-color:#ff7c00;}
+.gate-btn{width:100%;margin-top:14px;padding:12px;background:#ff7c00;border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:800;letter-spacing:1px;}
+.gate-btn:hover{background:#e56b00;}
+.gate-err{margin-top:10px;font-size:11px;color:#e53935;min-height:18px;}
+.gate-note{margin-top:20px;font-size:10px;color:#9098b0;}
+
+/* ── TOP BAR ─────────────────────────────────────────────────────── */
+#topbar{background:#ffffff;border-bottom:1.5px solid #dde3ef;padding:10px 18px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:100;}
+.tb-logo{font-size:15px;font-weight:900;color:#ff7c00;white-space:nowrap;}
+.tb-badge{font-size:9px;background:#eef1f8;color:#5a6080;padding:2px 8px;border-radius:20px;font-weight:700;letter-spacing:1px;}
+.tb-date{font-size:11px;color:#7a829a;margin-left:auto;}
+#lastUpdateBadge{font-size:10px;color:#00a854;font-weight:700;padding:3px 10px;background:#e8f5ee;border-radius:20px;display:none;}
+.hub-link{font-size:11px;color:#5a6080;text-decoration:none;margin-left:8px;}
+.hub-link:hover{color:#1a1e2e;}
+
+/* ── TABS ────────────────────────────────────────────────────────── */
+.tabs{display:flex;gap:2px;padding:12px 18px 0;background:#f8f9fc;border-bottom:2px solid #dde3ef;flex-wrap:wrap;}
+.tab{padding:8px 18px;border:none;background:transparent;color:#7a829a;font-weight:700;font-size:12px;border-bottom:3px solid transparent;transition:all .15s;letter-spacing:.5px;}
+.tab:hover{color:#1a1e2e;}
+.tab.active{color:#ff7c00;border-bottom-color:#ff7c00;background:rgba(255,124,0,.08);}
+
+/* ── PANEL WRAPPER ───────────────────────────────────────────────── */
+.panel{display:none;padding:18px;}
+.panel.active{display:block;}
+
+/* ── SECTION CARD ────────────────────────────────────────────────── */
+.card{background:#ffffff;border:1px solid #dde3ef;border-radius:12px;padding:16px;margin-bottom:14px;}
+.card-title{font-size:11px;font-weight:800;color:#5a6080;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.card-title span{color:#ff7c00;}
+
+/* ── FII / PCR BANNER ────────────────────────────────────────────── */
+#fiiBanner{display:none;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px;}
+.fii-tile{background:#ffffff;border:1px solid #dde3ef;border-radius:10px;padding:12px 14px;text-align:center;}
+.fii-label{font-size:9px;font-weight:800;color:#7a829a;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.fii-val{font-size:20px;font-weight:900;color:#6b7498;}
+.fii-sig{font-size:9px;color:#7a829a;margin-top:2px;}
+
+/* ── INPUT ROWS ──────────────────────────────────────────────────── */
+.input-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px;}
+.inp{padding:7px 12px;background:#f8f9fc;border:1.5px solid #c8d0e8;border-radius:7px;color:#1a1e2e;font-size:12px;outline:none;transition:border-color .2s;}
+.inp:focus{border-color:#ff7c00;}
+.inp-sm{width:120px;}
+.inp-wide{flex:1;min-width:200px;}
+.btn{padding:7px 14px;border:none;border-radius:7px;font-size:11px;font-weight:800;letter-spacing:.5px;transition:opacity .15s;}
+.btn:hover{opacity:.85;}
+.btn-orange{background:#ff7c00;color:#fff;}
+.btn-blue{background:#1565c0;color:#fff;}
+.btn-green{background:#006b30;color:#fff;}
+.btn-red{background:#c62828;color:#fff;}
+.btn-grey{background:#eef1f8;color:#3a4a6b;border:1px solid #c8d0e8;}
+.btn-sm{padding:4px 10px;font-size:10px;}
+.status-txt{font-size:11px;font-weight:700;margin-top:6px;min-height:18px;}
+
+/* ── TEXTAREA ────────────────────────────────────────────────────── */
+.paste-area{width:100%;min-height:80px;padding:10px 12px;background:#f8f9fc;border:1.5px dashed #2a3a5a;border-radius:8px;color:#1a1e2e;font-size:11px;font-family:'Consolas','Courier New',monospace;resize:vertical;outline:none;transition:border-color .2s;}
+.paste-area:focus{border-color:#ff7c00;border-style:solid;}
+
+/* ── PROGRESS BAR ────────────────────────────────────────────────── */
+.prog-wrap{background:#e8ecf5;border-radius:4px;height:6px;overflow:hidden;margin:8px 0;}
+.prog-bar{height:100%;background:#ff7c00;border-radius:4px;width:0%;transition:width .3s;}
+.prog-info{display:flex;justify-content:space-between;font-size:10px;color:#7a829a;}
+
+/* ── MAIN TABLE ──────────────────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto;border-radius:10px;border:1px solid #dde3ef;}
+.data-tbl{width:100%;border-collapse:collapse;font-size:11px;}
+.data-tbl thead th{background:#f8f9fc;color:#5a6080;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:8px 10px;text-align:left;white-space:nowrap;border-bottom:1.5px solid #dde3ef;position:sticky;top:0;z-index:10;}
+.data-tbl tbody tr{border-bottom:1px solid #f0f2f8;transition:background .1s;}
+.data-tbl tbody tr:hover{background:#f5f7fa;}
+.data-tbl td{padding:6px 10px;white-space:nowrap;vertical-align:middle;}
+.score-1{color:#e53935;font-weight:900;}
+.score-2{color:#ff7c00;font-weight:900;}
+.score-3{color:#f59e0b;font-weight:900;}
+.score-4{color:#00a854;font-weight:900;}
+.score-5{color:#1565c0;font-weight:900;}
+.tag-sector{font-size:8px;font-weight:700;background:#eef1f8;color:#5a6080;padding:2px 6px;border-radius:4px;white-space:nowrap;}
+.symtag{font-size:8px;color:#7a829a;display:block;margin-top:1px;}
+
+/* ── LEADERBOARD ─────────────────────────────────────────────────── */
+.lb-btns{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px;}
+.lb-btn{padding:5px 14px;border:1.5px solid #c8d0e8;border-radius:20px;background:transparent;color:#5a6080;font-size:11px;font-weight:700;}
+.lb-btn:hover{border-color:#ff7c00;color:#ff7c00;}
+.lb-btn.lb-active{background:#ff7c00;border-color:#ff7c00;color:#fff;}
+.lb-table{width:100%;border-collapse:collapse;font-size:11px;}
+.lb-table th{background:#f8f9fc;color:#5a6080;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:7px 10px;text-align:left;border-bottom:1.5px solid #dde3ef;}
+.lb-table td{padding:5px 10px;border-bottom:1px solid #f0f2f8;}
+.lb-table tr:hover td{background:#f5f7fa;}
+.lb-rank{color:#7a829a;font-size:10px;font-weight:700;text-align:center!important;width:28px;}
+.lb-name{font-weight:700;color:#1a1e2e;}
+.lb-inlist td{background:rgba(0,107,48,.06)!important;}
+.lb-inlist:hover td{background:rgba(0,107,48,.12)!important;}
+.lb-up{color:#00a854;font-weight:800;}
+.lb-dn{color:#e53935;font-weight:800;}
+.lb-empty{text-align:center;padding:32px;color:#9098b0;font-size:12px;font-weight:600;}
+.lb-score-1{color:#e53935;font-weight:900;}
+.lb-score-2{color:#ff7c00;font-weight:900;}
+.lb-score-3{color:#f59e0b;font-weight:900;}
+.lb-score-4{color:#00a854;font-weight:900;}
+.lb-score-5{color:#1565c0;font-weight:900;}
+
+/* ── DELETE SECTION ──────────────────────────────────────────────── */
+.delete-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:600px){.delete-grid{grid-template-columns:1fr;}}
+.del-card{background:#f8f9fc;border:1.5px solid #c8d0e8;border-radius:10px;padding:14px;}
+.del-card h4{font-size:11px;font-weight:800;color:#5a6080;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+
+/* ── BULK SUMMARY ────────────────────────────────────────────────── */
+#bulkSummary{display:none;background:#f8f9fc;border:1px solid #4a1580;border-radius:8px;padding:12px;margin-top:10px;font-size:11px;overflow-x:auto;}
+
+/* ── HISTORY ROW ─────────────────────────────────────────────────── */
+.hist-sel{padding:7px 12px;background:#f8f9fc;border:1.5px solid #c8d0e8;border-radius:7px;color:#1a1e2e;font-size:12px;outline:none;min-width:160px;}
+.hist-count{font-size:10px;color:#7a829a;font-style:italic;}
+
+/* ── ACTIVE DATE BADGE ───────────────────────────────────────────── */
+.active-badge{display:inline-block;background:#e3eeff;color:#1565c0;font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;margin-left:8px;}
+
+/* ── DISCLAIMER ──────────────────────────────────────────────────── */
+.disclaimer{background:#f8f9fc;border-top:2px solid #dde3ef;padding:16px 18px;text-align:center;font-size:10px;color:#9098b0;line-height:1.8;}
+.disclaimer strong{color:#ffab40;}
+
+/* ── FILTER ROW ──────────────────────────────────────────────────── */
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+.filter-row select,.filter-row input[type=text]{padding:6px 10px;background:#f8f9fc;border:1.5px solid #c8d0e8;border-radius:7px;color:#1a1e2e;font-size:11px;outline:none;}
+.filter-row label{font-size:11px;color:#5a6080;display:flex;align-items:center;gap:4px;}
+.row-count-badge{font-size:10px;color:#7a829a;font-weight:700;margin-left:auto;}
+
+/* ── SCROLLABLE TABLE WRAPPER ────────────────────────────────────── */
+.tbl-scroll{max-height:520px;overflow-y:auto;}
+
+/* ── TREND PANEL ─────────────────────────────────────────────────── */
+#trendPanel{display:none;background:#ffffff;border:1px solid #c8d0e8;border-radius:12px;padding:16px;margin-top:12px;}
+#trendTitle{font-size:12px;font-weight:800;color:#1a1e2e;margin-bottom:10px;}
+
+/* ── PCR HISTORY TABLE ───────────────────────────────────────────── */
+.pcr-hist-tbl{width:100%;border-collapse:collapse;font-size:11px;margin-top:8px;}
+.pcr-hist-tbl th{background:#f8f9fc;color:#5a6080;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:6px 10px;border-bottom:1px solid #eef0f6;text-align:left;}
+.pcr-hist-tbl td{padding:5px 10px;border-bottom:1px solid #f0f2f8;}
+</style>
+</head>
+<body>
+
+<!-- ── ACCESS GATE ────────────────────────────────────────────────── -->
+<div id="accessGate">
+  <div class="gate-box">
+    <div class="gate-logo">CB Trade Feed</div>
+    <div class="gate-sub">NSE Daily Intelligence · CB Finance26</div>
+    <div class="gate-label">Member Access Code</div>
+    <input type="password" id="accessCodeInput" class="gate-input" placeholder="Enter code"
+           onkeydown="if(event.key==='Enter')checkAccess()">
+    <button class="gate-btn" onclick="checkAccess()">Enter →</button>
+    <div class="gate-err" id="accessErr"></div>
+    <div class="gate-note">CB Finance26 · For Authorised Members Only<br>All data stored locally on your device</div>
+  </div>
+</div>
+
+<!-- ── TOP BAR ────────────────────────────────────────────────────── -->
+<div id="topbar">
+  <div class="tb-logo">⚡ CB Trade Feed</div>
+  <div class="tb-badge">v1.0</div>
+  <div class="tb-badge" id="companiesCount">765 companies</div>
+  <div id="lastUpdateBadge"></div>
+  <div class="tb-date" id="todayDisplay"></div>
+  <a href="https://elangocauvery.github.io/CB-Finance" class="hub-link" target="_blank">← Hub</a>
+</div>
+
+<!-- ── TABS ──────────────────────────────────────────────────────── -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('bhavcopy',this)">📂 Bhavcopy</button>
+  <button class="tab" onclick="switchTab('bulk',this)">🏦 Bulk Deals</button>
+  <button class="tab" onclick="switchTab('fii',this)">📊 FII / PCR</button>
+  <button class="tab" onclick="switchTab('leaderboard',this)">🏆 Leaderboard</button>
+  <button class="tab" onclick="switchTab('companies',this)">📋 All Companies</button>
+  <button class="tab" onclick="switchTab('history',this)">🗂 History</button>
+  <button class="tab" onclick="switchTab('manage',this)">⚙ Manage</button>
+</div>
+
+<script>
+// ── COMPANY DATABASE (765 companies · 33+ sectors) ────────────────
+const COMPANIES={
+  "Power":[
+    {name:"NTPC",g:4,m:4,d:4,v:4,t:5,r:4,note:"India's largest; 72GW; RE pivot"},
+    {name:"Power Grid Corp",g:3,m:4,d:4,v:4,t:5,r:4,note:"Monopoly T&D; 15.5% regulated ROE"},
+    {name:"NHPC",g:3,m:4,d:4,v:4,t:5,r:3,note:"Hydro PSU; stable returns"},
+    {name:"SJVN",g:3,m:3,d:4,v:4,t:5,r:3,note:"Expanding solar + hydro"},
+    {name:"CESC",g:2,m:3,d:3,v:3,t:4,r:3,note:"Kolkata distribution utility"},
+    {name:"Tata Power",g:4,m:3,d:3,v:3,t:5,r:3,note:"Solar + distribution; diversified"},
+    {name:"Adani Green",g:5,m:3,d:2,v:2,t:5,r:3,note:"Largest solar IPP; high debt"},
+    {name:"Adani Energy Solutions",g:4,m:3,d:3,v:3,t:5,r:3,note:"Transmission + smart metering"},
+    {name:"Torrent Power",g:3,m:3,d:3,v:3,t:4,r:3,note:"Regulated + merchant + RE"},
+    {name:"JSW Energy",g:4,m:3,d:3,v:3,t:4,r:3,note:"Merchant + long-term PPA"},
+    {name:"Waaree Energies",g:5,m:3,d:4,v:3,t:5,r:4,note:"Largest module maker; US export"},
+    {name:"Premier Energies",g:4,m:3,d:4,v:3,t:5,r:3,note:"Solar cells + modules; PLI"},
+    {name:"KPI Green Energy",g:5,m:3,d:3,v:3,t:5,r:3,note:"EPC + IPP hybrid; Gujarat"},
+    {name:"KEC International",g:4,m:3,d:3,v:3,t:5,r:4,note:"T&D EPC; global order book"},
+    {name:"Genus Power",g:5,m:3,d:4,v:3,t:5,r:4,note:"Smart meters; 250Mn unit rollout"},
+    {name:"Hitachi Energy India",g:4,m:4,d:5,v:2,t:5,r:4,note:"HVDC transformers; niche leader"},
+    {name:"Voltamp Transformers",g:4,m:4,d:5,v:3,t:5,r:5,note:"Small-cap; high ROCE transformer"},
+    {name:"Transformers & Rectifiers",g:4,m:3,d:4,v:3,t:5,r:4,note:"Ultra HV specialist"},
+    {name:"Sterling & Wilson",g:4,m:2,d:3,v:3,t:4,r:2,note:"Solar EPC; large projects"},
+    {name:"Websol Energy",g:4,m:3,d:3,v:3,t:4,r:3,note:"Solar cell manufacturing"},
+    {name:"Emmvee Solar Systems",g:4,m:3,d:4,v:3,t:5,r:3,note:"Solar modules + EPC; Bangalore"},
+    {name:"Vikram Solar",g:4,m:3,d:3,v:3,t:5,r:3,note:"Modules + EPC; global exports"},
+    {name:"Cleanmax Solar",g:4,m:3,d:3,v:3,t:5,r:3,note:"C&I solar + wind; asset-light"},
+    {name:"Fujama Power (Fujama)",g:4,m:3,d:3,v:3,t:4,r:3,note:"Solar EPC + IPP; emerging"},
+    {name:"Azure Power",g:4,m:3,d:2,v:3,t:4,r:3,note:"Solar IPP; listed on NYSE"},
+    {name:"Avaada Energy",g:4,m:3,d:3,v:3,t:5,r:3,note:"Rajasthan solar + green H2"},
+    {name:"Acme Solar Holdings",g:4,m:3,d:3,v:3,t:5,r:3,note:"Solar IPP; recently listed"},
+    {name:"O2 Power",g:4,m:3,d:3,v:3,t:5,r:3,note:"Renewable IPP; EQT backed"},
+    {name:"Sprng Energy",g:3,m:3,d:3,v:3,t:4,r:3,note:"Shell acquired; hybrid IPP"},
+    {name:"Torrent Power",g:3,m:3,d:3,v:3,t:4,r:3,note:"Gujarat integrated utility"},
+    {name:"NTPC Green Energy",g:4,m:3,d:4,v:4,t:5,r:4,note:"NTPC renewable subsidiary; listed"},
+    {name:"Adani Total Gas",g:4,m:4,d:3,v:2,t:4,r:4,note:"City gas distribution + CNG"},
+    {name:"IGL (Indraprastha Gas)",g:3,m:4,d:5,v:3,t:4,r:5,note:"Delhi CNG/PNG; regulated ROE"},
+    {name:"MGL (Mahanagar Gas)",g:3,m:4,d:5,v:3,t:4,r:5,note:"Mumbai CNG/PNG; high dividend"},
+    {name:"Gujarat Gas",g:4,m:4,d:5,v:3,t:4,r:4,note:"Largest CGD; industrial gas"},
+    {name:"GAIL India",g:3,m:3,d:3,v:3,t:4,r:3,note:"Gas transmission + LNG trading"},
+    {name:"Petronet LNG",g:3,m:4,d:5,v:3,t:4,r:4,note:"LNG import terminal; Dahej"},
+    {name:"Solar Energy Corp of India",g:4,m:3,d:4,v:4,t:5,r:3,note:"Govt solar PSU; SECI tenders"},
+    {name:"IREDA",g:4,m:3,d:3,v:3,t:5,r:3,note:"Renewable energy financing PSU"},
+    {name:"PTC India",g:3,m:3,d:3,v:3,t:4,r:3,note:"Power trading + financial services"},
+    {name:"Sterlite Power",g:4,m:3,d:3,v:3,t:5,r:3,note:"Transmission infra; Indigrid InvIT"},
+    {name:"IndiGrid InvIT",g:3,m:4,d:3,v:3,t:5,r:4,note:"Power transmission InvIT; 8%+ yield"},
+    {name:"Powergrid InvIT",g:3,m:4,d:4,v:4,t:5,r:4,note:"PGCIL InvIT; stable cash flows"},
+    {name:"Borosil Renewables",g:4,m:3,d:3,v:3,t:5,r:3,note:"Solar glass; monopoly in India"},
+    {name:"Ishan International",g:3,m:3,d:4,v:3,t:4,r:3,note:"EV charging + solar distribution"},
+    {name:"Servotech Power Systems",g:4,m:3,d:4,v:3,t:4,r:3,note:"EV chargers + solar PCUs"},
+    {name:"Goldi Solar",g:4,m:3,d:4,v:3,t:5,r:3,note:"Solar modules; Surat-based"},
+    {name:"Solex Energy",g:4,m:3,d:4,v:3,t:5,r:3,note:"Solar panels; Surat manufacturer"},
+    {name:"Saatvik Green Energy",g:4,m:3,d:4,v:3,t:5,r:3,note:"Solar module mfg; PLI player"},
+    {name:"Waaree Renewable Tech",g:5,m:3,d:4,v:3,t:5,r:4,note:"Waaree EPC arm; project dev"},
+    {name:"Surana Solar",g:3,m:3,d:3,v:3,t:4,r:3,note:"Solar EPC + modules; Hyderabad"}
+  ],
+  "Defence":[
+    {name:"HAL",g:4,m:5,d:5,v:3,t:5,r:5,note:"Monopoly fighter + helicopter OEM"},
+    {name:"BEL",g:4,m:4,d:5,v:4,t:5,r:5,note:"Radar + EW; Rs.70,000Cr backlog"},
+    {name:"Mazagon Dock",g:4,m:4,d:5,v:3,t:5,r:4,note:"Submarine + destroyer monopoly"},
+    {name:"Garden Reach",g:4,m:3,d:5,v:3,t:5,r:4,note:"Frigates + patrol vessels"},
+    {name:"Cochin Shipyard",g:4,m:3,d:5,v:3,t:5,r:3,note:"Aircraft carrier + commercial"},
+    {name:"Bharat Dynamics",g:4,m:4,d:5,v:3,t:5,r:4,note:"Missile systems; DRDO partner"},
+    {name:"Data Patterns",g:4,m:4,d:5,v:2,t:5,r:4,note:"Defence electronics; niche"},
+    {name:"Paras Defence",g:4,m:3,d:5,v:2,t:5,r:3,note:"Optics + EMP; drone focus"},
+    {name:"Astra Microwave",g:4,m:3,d:5,v:3,t:5,r:3,note:"Microwave for radar"},
+    {name:"Zen Technologies",g:4,m:3,d:5,v:2,t:4,r:3,note:"Simulators + counter-drone"},
+    {name:"MTAR Technologies",g:4,m:4,d:5,v:2,t:5,r:4,note:"Precision parts HAL + ISRO"},
+    {name:"ideaForge Technology",g:4,m:3,d:5,v:2,t:5,r:3,note:"Military UAV leader"},
+    {name:"Solar Industries",g:4,m:4,d:4,v:3,t:4,r:4,note:"Explosives + defence ammo"},
+    {name:"Premier Explosives",g:3,m:3,d:4,v:3,t:4,r:3,note:"Micro-cap; DRDO partnerships"},
+    {name:"Dynamatic Technologies",g:3,m:3,d:3,v:3,t:4,r:3,note:"Aerospace structures; Airbus"},
+    {name:"Mishra Dhatu Nigam",g:3,m:3,d:5,v:3,t:4,r:3,note:"PSU special alloys; defence"},
+    {name:"Bharat Forge",g:3,m:3,d:3,v:3,t:4,r:3,note:"Defence + auto forging"},
+    {name:"Titagarh Rail Systems",g:4,m:3,d:4,v:3,t:4,r:3,note:"Rail wagons + defence vehicles"},
+    {name:"Centum Electronics",g:3,m:3,d:4,v:3,t:4,r:3,note:"Electronic systems for defence + space"},
+    {name:"Apollo Micro Systems",g:3,m:3,d:4,v:2,t:4,r:3,note:"Mission-critical electronics"},
+    {name:"DCX Systems",g:4,m:3,d:4,v:2,t:4,r:3,note:"Cable harness; defence + aerospace"},
+    {name:"Sika Interplant",g:3,m:3,d:5,v:3,t:4,r:3,note:"Aerospace fasteners; niche"}
+  ],
+  "Capital Goods":[
+    {name:"L&T",g:4,m:4,d:3,v:3,t:5,r:4,note:"Largest EPC; record order book"},
+    {name:"BHEL",g:3,m:2,d:3,v:3,t:4,r:2,note:"PSU heavy electrical; revival"},
+    {name:"Shakti Pumps",g:4,m:3,d:4,v:3,t:4,r:3,note:"Solar & agri pumps; PM-KUSUM tailwind"},
+    {name:"Shaily Engineering",g:3,m:3,d:4,v:3,t:4,r:3,note:"Precision plastics; pharma + consumer packaging"},
+    {name:"Siemens India",g:4,m:4,d:5,v:2,t:5,r:5,note:"Grid tech + factory automation"},
+    {name:"ABB India",g:4,m:4,d:5,v:2,t:5,r:5,note:"Switchgear + transformer leader"},
+    {name:"Thermax",g:3,m:3,d:5,v:3,t:4,r:4,note:"Industrial energy; clean pivot"},
+    {name:"Cummins India",g:3,m:4,d:5,v:3,t:4,r:5,note:"DG sets + clean power"},
+    {name:"Voltas",g:3,m:3,d:5,v:3,t:4,r:3,note:"AC + MEP projects; Tata"},
+    {name:"Blue Star",g:4,m:3,d:5,v:3,t:4,r:3,note:"Commercial AC; residential growing"},
+    {name:"Polycab India",g:4,m:4,d:5,v:3,t:5,r:5,note:"Cables + FMEG; market leader"},
+    {name:"KEI Industries",g:4,m:4,d:5,v:3,t:5,r:5,note:"EHV cables; data centre"},
+    {name:"Havells India",g:4,m:4,d:5,v:3,t:5,r:5,note:"Consumer + industrial electrical"},
+    {name:"Finolex Cables",g:3,m:3,d:5,v:3,t:4,r:4,note:"Copper cable; value play"},
+    {name:"RR Kabel",g:4,m:3,d:5,v:3,t:4,r:3,note:"Listed recently; growing fast"},
+    {name:"Kalpataru Projects",g:4,m:3,d:3,v:3,t:4,r:3,note:"T&D + railways + pipeline EPC"},
+    {name:"RVNL",g:4,m:3,d:4,v:3,t:5,r:3,note:"Rail infra PSU; massive orders"},
+    {name:"Dixon Technologies",g:5,m:3,d:4,v:3,t:5,r:4,note:"Electronics EMS; PLI beneficiary"},
+    {name:"Kaynes Technology",g:5,m:3,d:4,v:2,t:5,r:4,note:"Defence + EV + medtech EMS"},
+    {name:"Jupiter Wagons",g:4,m:3,d:4,v:3,t:4,r:3,note:"Rail wagons + containers"},
+    {name:"Suzlon Energy",g:4,m:3,d:3,v:3,t:5,r:3,note:"Wind turbine OEM; debt reduced"},
+    {name:"CG Power",g:5,m:4,d:5,v:3,t:5,r:4,note:"Motors+switchgear+railways; Muthoot-Murugappa re-rated"},
+    {name:"Hitachi Energy India",g:4,m:3,d:4,v:2,t:5,r:4,note:"Grid automation+HVDC; MNC premium; power infra"},
+    {name:"Siemens India",g:4,m:4,d:5,v:2,t:4,r:4,note:"Industrial automation+energy; MNC; 40% ROCE"},
+    {name:"VA Tech Wabag",g:4,m:3,d:4,v:3,t:5,r:3,note:"Water treatment EPC; global+domestic; strong order book"},
+    {name:"Bajel Projects",g:4,m:3,d:4,v:3,t:4,r:3,note:"Bajaj Electricals infra spin-off; transmission line EPC"}
+  ],
+  "Pharma":[
+    {name:"Sun Pharma",g:5,m:4,d:5,v:3,t:5,r:4,note:"Specialty + GLP-1 + branded; acquired Concert Pharma (derma); Taro rationalized; US specialty grew 18% FY25; Ilumya + Cequa blockbuster pipeline"},
+    {name:"Dr Reddy's",g:3,m:4,d:5,v:3,t:4,r:4,note:"US generics + biosimilars"},
+    {name:"Cipla",g:3,m:3,d:5,v:3,t:4,r:3,note:"Respiratory + branded generics"},
+    {name:"Divi's Laboratories",g:3,m:4,d:5,v:3,t:4,r:5,note:"Global API; GLP-1 supply"},
+    {name:"Mankind Pharma",g:4,m:4,d:5,v:3,t:4,r:4,note:"Mass-market branded generics"},
+    {name:"Natco Pharma",g:4,m:4,d:5,v:4,t:4,r:4,note:"Para-IV; GLP-1 opportunity"},
+    {name:"Gland Pharma",g:3,m:4,d:5,v:3,t:4,r:4,note:"Injectables; CDMO play"},
+    {name:"Laurus Labs",g:3,m:3,d:4,v:3,t:4,r:3,note:"ARV + CDMO; margin recovery"},
+    {name:"Biocon",g:4,m:2,d:3,v:3,t:4,r:2,note:"Biosimilars; Biologics sub scale"},
+    {name:"Ajanta Pharma",g:3,m:4,d:5,v:3,t:4,r:5,note:"Ophthalmology + cardio niche"},
+    {name:"Torrent Pharma",g:3,m:4,d:3,v:3,t:4,r:4,note:"Cardiac + CNS branded"},
+    {name:"Abbott India",g:3,m:4,d:5,v:2,t:4,r:5,note:"MNC subsidiary; premium brand"},
+    {name:"Pfizer India",g:2,m:4,d:5,v:3,t:3,r:5,note:"MNC; mature portfolio"},
+    {name:"Sanofi India",g:2,m:4,d:5,v:3,t:3,r:5,note:"MNC; diabetes + vaccines"},
+    {name:"Lupin",g:3,m:3,d:4,v:3,t:4,r:3,note:"US + India branded generics"},
+    {name:"Alkem Laboratories",g:3,m:3,d:5,v:3,t:4,r:3,note:"Domestic branded; anti-infective"},
+    {name:"Hikal",g:3,m:3,d:3,v:3,t:4,r:3,note:"Pharma + agro API crossover"},
+    {name:"Cohance Lifesciences (ex-Suven)",g:4,m:4,d:5,v:3,t:4,r:4,note:"CDMO; niche CNS APIs"},
+    {name:"Piramal Pharma",g:3,m:3,d:3,v:3,t:4,r:3,note:"CDMO + India consumer health"},
+    {name:"Sai Life Sciences",g:5,m:4,d:4,v:3,t:5,r:4,note:"CDMO pure-play; CRO+CRAMS; US/EU clients; IPO 2024; fast-growing"},
+    {name:"Anthem Biosciences",g:5,m:4,d:4,v:3,t:5,r:4,note:"CRDMO; biologics + small molecule; Bengaluru; listed 2025"},
+    {name:"Neuland Laboratories",g:4,m:4,d:4,v:3,t:4,r:4,note:"API CDMO; complex molecules; regulated market focus; Hyderabad"},
+    {name:"Supriya Lifescience",g:4,m:4,d:5,v:3,t:4,r:4,note:"API manufacturer; 40+ APIs; antihistamine + vitamins niche; Raigad"},
+    {name:"Emcure Pharmaceuticals",g:4,m:3,d:3,v:3,t:4,r:3,note:"Domestic branded generics; gynaecology + cardio; IPO 2024; Pune"},
+    {name:"Eris Lifesciences",g:4,m:4,d:5,v:3,t:4,r:4,note:"Chronic branded domestic; diabetes + cardio; acquisitions-led growth"},
+    {name:"Sequent Scientific",g:3,m:3,d:4,v:3,t:4,r:3,note:"Animal health + human API; vet CDMO; global niche"},
+    {name:"Solara Active Pharma",g:3,m:3,d:3,v:3,t:3,r:3,note:"Ibuprofen + API CDMO; restructuring; turnaround watch"}
+  ],
+  "Banking":[
+    {name:"HDFC Bank",g:4,m:4,d:5,v:3,t:5,r:4,q:4,note:"#1 private; NIM 3.5-4%; NPA 1.2%"},
+    {name:"ICICI Bank",g:4,m:4,d:5,v:3,t:5,r:5,q:4,note:"Best RoA 2%+; NIM 4%+"},
+    {name:"Kotak Mahindra Bank",g:3,m:5,d:5,v:2,t:4,r:4,q:5,note:"Highest NIM 5%+; premium val."},
+    {name:"Axis Bank",g:3,m:3,d:4,v:3,t:4,r:3,q:4,note:"Improving RoA 1.6%; NPA 1.8%"},
+    {name:"Yes Bank",g:3,m:2,d:2,v:4,t:2,r:1,q:3,note:"Recovery; NPA 1.7% but risks"},
+    {name:"IndusInd Bank",g:3,m:3,d:3,v:3,t:3,r:3,q:3,note:"MFI + vehicle; NPA concern"},
+    {name:"IDFC First Bank",g:4,m:2,d:4,v:3,t:3,r:2,q:4,note:"Building franchise; NIM 6%+"},
+    {name:"RBL Bank",g:3,m:2,d:3,v:3,t:2,r:2,q:3,note:"Credit card + MFI stress"},
+    {name:"Bandhan Bank",g:3,m:4,d:3,v:3,t:3,r:3,q:3,note:"High NIM 7.5% but MFI risk"},
+    {name:"AU Small Finance Bank",g:4,m:3,d:4,v:3,t:4,r:3,q:4,note:"Universal bank aspirant"},
+    {name:"SBI",g:3,m:3,d:4,v:4,t:5,r:3,q:4,note:"PSU giant; RoA 0.9%; cheap val"},
+    {name:"Bank of Baroda",g:3,m:3,d:4,v:4,t:4,r:3,q:4,note:"2nd best PSU; NPA 2.9%"},
+    {name:"Canara Bank",g:3,m:3,d:3,v:4,t:3,r:3,q:3,note:"Large PSU; NPA 3.7%"},
+    {name:"Punjab National Bank",g:2,m:2,d:3,v:4,t:3,r:2,q:3,note:"PSU; NPA 4.5% elevated"},
+    {name:"Bank of India",g:2,m:3,d:3,v:4,t:3,r:2,q:3,note:"PSU mid-size; RoA 0.7%"},
+    {name:"Union Bank",g:3,m:3,d:3,v:4,t:3,r:3,q:3,note:"Merged entity; improving"},
+    {name:"Indian Bank",g:3,m:3,d:4,v:4,t:3,r:3,q:4,note:"South India PSU; decent"},
+    {name:"Federal Bank",g:3,m:3,d:4,v:3,t:3,r:3,q:4,note:"Kerala base; RoA 1.2%"},
+    {name:"South Indian Bank",g:2,m:2,d:3,v:3,t:2,r:2,q:3,note:"Kerala niche; thin margins"},
+    {name:"City Union Bank",g:3,m:3,d:4,v:3,t:3,r:3,q:4,note:"MSME focus; South India"},
+    {name:"Karur Vysya Bank",g:3,m:3,d:4,v:3,t:3,r:3,q:4,note:"Tamil Nadu; recovery"},
+    {name:"DCB Bank",g:3,m:3,d:3,v:3,t:3,r:2,q:3,note:"Small private; MSME + housing"},
+    {name:"J&K Bank",g:3,m:3,d:3,v:3,t:3,r:3,q:3,note:"J&K franchise; recovery"},
+    {name:"Bank of Maharashtra",g:3,m:3,d:3,v:4,t:3,r:3,q:3,note:"PSU; Maharashtra-base; improving NPA"},
+    {name:"Central Bank of India",g:2,m:2,d:3,v:4,t:2,r:2,q:3,note:"PSU; stressed; turnaround slow"},
+    {name:"IDBI Bank",g:3,m:3,d:3,v:3,t:3,r:3,q:3,note:"LIC-backed; privatisation watch"},
+    {name:"UCO Bank",g:2,m:2,d:3,v:4,t:2,r:2,q:3,note:"PSU; low quality; speculative"},
+    {name:"Punjab & Sind Bank",g:2,m:2,d:3,v:4,t:2,r:2,q:2,note:"Small PSU; Punjab franchise"},
+    {name:"IOB (Indian Overseas Bank)",g:2,m:2,d:3,v:4,t:2,r:2,q:3,note:"PSU; recovery stage"},
+    {name:"Nainital Bank",g:2,m:3,d:4,v:3,t:2,r:3,q:3,note:"Regional bank; Uttarakhand"},
+    {name:"Tamilnad Mercantile Bank",g:3,m:3,d:4,v:3,t:3,r:3,q:3,note:"Tamil Nadu MSME franchise"},
+    {name:"Catholic Syrian Bank",g:2,m:2,d:3,v:3,t:2,r:2,q:3,note:"Kerala; small; FairFax backed"},
+    {name:"DBS Bank India (ex-LVB)",g:3,m:3,d:4,v:3,t:3,r:3,q:4,note:"LVB merged into DBS India 2020; Singapore parent; growing retail"},
+    {name:"Dhanlaxmi Bank",g:2,m:2,d:3,v:3,t:2,r:2,q:3,note:"Kerala; very small"},
+    {name:"Jana Small Finance Bank",g:3,m:3,d:3,v:3,t:2,r:2,q:3,note:"Mass market SFB"}
+  ],
+  "Infra/Cement":[
+    {name:"L&T (Infra)",g:4,m:4,d:3,v:3,t:5,r:4,note:"Roads + metro + water EPC"},
+    {name:"IRB Infra",g:4,m:3,d:2,v:4,t:4,r:3,note:"Road EPC + BOT; high debt"},
+    {name:"G R Infraprojects",g:4,m:4,d:4,v:3,t:4,r:4,note:"Road + railway EPC; lean"},
+    {name:"PNC Infratech",g:4,m:3,d:4,v:3,t:4,r:3,note:"Roads + water EPC"},
+    {name:"HG Infra Engineering",g:4,m:4,d:4,v:3,t:4,r:4,note:"Roads + railways; fast growth"},
+    {name:"Ashoka Buildcon",g:3,m:3,d:3,v:3,t:4,r:3,note:"BOT road portfolio + EPC"},
+    {name:"RITES",g:3,m:4,d:5,v:3,t:4,r:4,note:"Rail PSU; consulting + export"},
+    {name:"IRCON International",g:3,m:3,d:5,v:3,t:4,r:3,note:"Rail + highway PSU EPC"},
+    {name:"UltraTech Cement",g:3,m:4,d:4,v:3,t:4,r:4,note:"India's largest; consolidation"},
+    {name:"Shree Cement",g:3,m:4,d:5,v:2,t:4,r:5,note:"Lowest cost producer"},
+    {name:"Ambuja Cements",g:3,m:3,d:4,v:3,t:4,r:3,note:"Adani group; distribution"},
+    {name:"ACC",g:3,m:3,d:4,v:3,t:4,r:3,note:"Adani group; pan-India"},
+    {name:"Dalmia Bharat",g:3,m:3,d:3,v:3,t:3,r:3,note:"East India; expanding South"},
+    {name:"JK Cement",g:3,m:3,d:3,v:3,t:3,r:3,note:"White + grey cement; niche"},
+    {name:"Ramco Cement",g:3,m:3,d:4,v:3,t:3,r:3,note:"South India focused"}
+  ],
+  "NBFC":[
+    {name:"Bajaj Finance",g:4,m:4,d:4,v:2,t:5,r:5,q:4,note:"Consumer credit; RoE 22%"},
+    {name:"Bajaj Finserv",g:4,m:4,d:4,v:2,t:5,r:5,q:4,note:"Holding co; Finance + insurance"},
+    {name:"Chola Finance",g:4,m:4,d:4,v:3,t:4,r:4,q:4,note:"Vehicle + home; NPA 3.5%"},
+    {name:"Muthoot Finance",g:3,m:5,d:4,v:3,t:4,r:4,q:4,note:"Gold loan; 12% spread; NPA<2%"},
+    {name:"Manappuram Finance",g:3,m:4,d:3,v:4,t:3,r:3,q:3,note:"Gold + MFI; diversifying"},
+    {name:"Poonawalla Fincorp",g:4,m:4,d:5,v:3,t:4,r:4,q:5,note:"Clean book; NPA 0.4%"},
+    {name:"L&T Finance",g:3,m:3,d:3,v:3,t:3,r:3,q:3,note:"Retail pivot; farm + home"},
+    {name:"Mahindra Finance",g:3,m:4,d:3,v:3,t:3,r:3,q:3,note:"Rural CV + tractor; NPA 4%"},
+    {name:"IIFL Finance",g:4,m:4,d:3,v:3,t:4,r:4,q:3,note:"Gold + home + SME; NPA 2.5%"},
+    {name:"Aditya Birla Capital",g:3,m:3,d:3,v:3,t:4,r:3,q:3,note:"Diversified fin services"},
+    {name:"Shriram Finance",g:3,m:5,d:3,v:3,t:4,r:4,q:3,note:"CV + used vehicle; 9% spread"},
+    {name:"Sundaram Finance",g:3,m:4,d:4,v:3,t:3,r:4,q:4,note:"South India CV; disciplined"},
+    {name:"Five-Star Business Finance",g:4,m:5,d:5,v:3,t:4,r:5,q:4,note:"Small biz; 13% spread"},
+    {name:"Aptus Value Housing",g:4,m:5,d:5,v:3,t:4,r:5,q:4,note:"Affordable housing; 10%"},
+    {name:"Home First Finance",g:4,m:4,d:5,v:3,t:4,r:4,q:4,note:"Tier 2/3 affordable housing"},
+    {name:"Repco Home Finance",g:3,m:4,d:4,v:3,t:3,r:3,q:3,note:"South India housing; NPA 4%"},
+    {name:"Aavas Financiers",g:4,m:4,d:5,v:3,t:4,r:4,q:4,note:"Affordable housing; Rajasthan"},
+    {name:"PNB Housing Finance",g:3,m:3,d:3,v:3,t:3,r:3,q:3,note:"PSU-backed; NPA 1.5%"},
+    {name:"Can Fin Homes",g:3,m:4,d:4,v:3,t:3,r:4,q:3,note:"Canara Bank sub; housing"},
+    {name:"Cholamandalam Investment",g:5,m:4,d:3,v:3,t:5,r:4,q:4,note:"Murugappa; vehicle+home+LAP; 20%+ growth; top-tier NBFC"},
+    {name:"L&T Finance",g:4,m:3,d:3,v:3,t:4,r:3,q:3,note:"Retailisation strategy; rural+2W+agri; turnaround underway"},
+    {name:"Tata Capital",g:4,m:3,d:3,v:3,t:4,r:3,q:3,note:"Tata group NBFC; diversified lending; pre-IPO watch"},
+    {name:"LIC Housing Finance",g:3,m:4,d:3,v:3,t:3,r:3,q:3,note:"Largest HFC by book; PSU parentage; stable"},
+    {name:"PNB Housing Finance",g:4,m:3,d:3,v:3,t:4,r:3,q:3,note:"Retail housing focus; turnaround; Carlyle backed"},
+    {name:"Aavas Financiers",g:4,m:4,d:4,v:3,t:4,r:4,q:4,note:"Affordable housing; rural salaried; strong asset quality"},
+    {name:"Home First Finance",g:5,m:4,d:4,v:3,t:5,r:4,q:4,note:"Tech-driven affordable HFC; 30%+ growth"},
+    {name:"Aptus Value Housing",g:5,m:4,d:5,v:3,t:5,r:4,q:5,note:"South India affordable housing; near-zero NPA"}
+  ],
+  "SFB/MicroFin":[
+    {name:"AU Small Finance Bank",g:4,m:4,d:4,v:3,t:4,r:3,q:4,note:"Universal bank path; RoA 1.6%"},
+    {name:"Equitas SFB",g:3,m:4,d:4,v:3,t:3,r:3,q:4,note:"Micro + SME; NIM 8%+"},
+    {name:"Ujjivan SFB",g:3,m:3,d:4,v:3,t:3,r:2,q:3,note:"MFI-to-SFB; NPA rising"},
+    {name:"ESAF SFB",g:3,m:3,d:3,v:3,t:2,r:2,q:3,note:"Kerala MFI; stress elevated"},
+    {name:"Jana SFB",g:3,m:3,d:3,v:3,t:2,r:2,q:3,note:"Mass market SFB"},
+    {name:"Suryoday SFB",g:3,m:3,d:3,v:3,t:2,r:2,q:3,note:"Urban MFI focus"},
+    {name:"Utkarsh SFB",g:3,m:3,d:4,v:3,t:3,r:2,q:3,note:"Varanasi; rural UP"},
+    {name:"CreditAccess Grameen",g:3,m:4,d:3,v:3,t:3,r:3,q:3,note:"Karnataka MFI; expanding North"},
+    {name:"Spandana Sphoorty",g:2,m:3,d:3,v:4,t:2,r:2,q:3,note:"Andhra MFI; slowly easing"},
+    {name:"Fusion Finance",g:3,m:3,d:3,v:3,t:2,r:2,q:3,note:"North India MFI"},
+    {name:"Asirvad Micro Finance",g:3,m:3,d:3,v:3,t:2,r:2,q:3,note:"South India; Manappuram sub"},
+    {name:"Muthoot Microfin",g:3,m:3,d:4,v:3,t:3,r:3,q:3,note:"Muthoot group MFI arm"}
+  ],
+  "Insurance":[
+    {name:"HDFC Life",g:4,m:4,d:5,v:3,t:5,r:4,note:"VNB 26%; solvency 188%"},
+    {name:"SBI Life",g:4,m:3,d:5,v:3,t:5,r:4,note:"VNB 18%; SBI bancassurance moat"},
+    {name:"ICICI Prudential Life",g:3,m:3,d:5,v:3,t:4,r:3,note:"VNB 28%; protection pivot"},
+    {name:"Max Life (Max Financial)",g:4,m:4,d:5,v:3,t:4,r:4,note:"VNB 25%; protection leader"},
+    {name:"Bajaj Allianz Life",g:3,m:3,d:5,v:3,t:4,r:3,note:"Diversified product; bancassurance"},
+    {name:"Tata AIA Life",g:4,m:3,d:5,v:3,t:4,r:3,note:"Fast growing; protection focus"},
+    {name:"LIC of India",g:2,m:1,d:5,v:4,t:5,r:2,note:"PSU giant; VNB<10%; low margins"},
+    {name:"Star Health",g:4,m:2,d:4,v:3,t:4,r:2,note:"Health; combined ratio 95-100%"},
+    {name:"Niva Bupa",g:4,m:2,d:4,v:3,t:3,r:2,note:"Growing retail health franchise"},
+    {name:"Care Health",g:3,m:2,d:4,v:3,t:3,r:2,note:"Mid-size health insurer"},
+    {name:"New India Assurance",g:2,m:2,d:4,v:3,t:4,r:2,note:"PSU general; weak margins"},
+    {name:"United India Insurance",g:2,m:1,d:3,v:3,t:3,r:1,note:"PSU GI; challenges remain"},
+    {name:"ICICI Lombard",g:4,m:3,d:5,v:3,t:4,r:3,note:"Best private general insurer"},
+    {name:"HDFC Ergo",g:4,m:3,d:5,v:3,t:4,r:3,note:"HDFC general insurance"},
+    {name:"Go Digit Insurance",g:4,m:2,d:4,v:3,t:3,r:2,note:"Insurtech; fast but burn"},
+    {name:"PB Fintech (PolicyBazaar)",g:4,m:2,d:5,v:2,t:5,r:3,note:"Insurance marketplace"}
+  ],
+  "Brokers/Wealth":[
+    {name:"360 One WAM",g:5,m:5,d:5,v:3,t:5,r:4,note:"Ultra-HNI wealth leader"},
+    {name:"BSE Ltd",g:4,m:4,d:5,v:3,t:5,r:4,note:"Stock exchange; high operating leverage"},
+    {name:"CDSL",g:4,m:4,d:5,v:3,t:5,r:4,note:"Depository; duopoly with NSDL; demat growth"},
+    {name:"NSDL",g:3,m:4,d:5,v:3,t:5,r:4,note:"Depository; institutional-heavy demat book"},
+    {name:"Angel One",g:4,m:4,d:5,v:3,t:5,r:4,note:"Discount broker + wealth + AMC"},
+    {name:"ICICI Securities",g:3,m:4,d:5,v:3,t:4,r:4,note:"Full-service + digital platform"},
+    {name:"Nuvama Wealth",g:4,m:4,d:5,v:3,t:5,r:4,note:"Edelweiss wealth arm"},
+    {name:"Anand Rathi Wealth",g:4,m:5,d:5,v:3,t:5,r:5,note:"Mass affluent + NRI focus"},
+    {name:"Motilal Oswal",g:3,m:3,d:4,v:3,t:4,r:3,note:"Broking + AMC + housing"},
+    {name:"5Paisa Capital",g:4,m:2,d:4,v:3,t:4,r:2,note:"Discount broker; loss-making"},
+    {name:"Geojit Financial",g:2,m:3,d:5,v:3,t:3,r:3,note:"South India full-service"},
+    {name:"Edelweiss Financial",g:3,m:3,d:3,v:3,t:4,r:3,note:"Diversified: ARC + AMC"},
+    {name:"IIFL Securities",g:3,m:3,d:4,v:3,t:4,r:3,note:"Full-service + wealth arm"}
+  ],
+  "AMC":[
+    {name:"HDFC AMC",g:4,m:5,d:5,v:2,t:5,r:5,note:"#1 AMC by AUM; dominant brand"},
+    {name:"Nippon India AMC",g:4,m:5,d:5,v:3,t:5,r:5,note:"ETF + direct plan specialist"},
+    {name:"Aditya Birla AMC",g:3,m:4,d:5,v:3,t:5,r:4,note:"Balanced fund house"},
+    {name:"UTI AMC",g:3,m:3,d:5,v:3,t:4,r:3,note:"PSU AMC; re-rating potential"},
+    {name:"Mirae Asset AMC",g:4,m:4,d:5,v:3,t:5,r:4,note:"Aggressive SIP growth"},
+    {name:"Sundaram AMC",g:3,m:4,d:5,v:3,t:4,r:4,note:"South India; quality funds"},
+    {name:"Quantum AMC",g:2,m:3,d:5,v:4,t:3,r:3,note:"Small; value + passive focus"}
+  ],
+  "New Age Tech":[
+    {name:"Zomato",g:5,m:2,d:5,v:2,t:4,r:4,note:"Food + Blinkit; profitable now"},
+    {name:"Swiggy",g:4,m:1,d:4,v:2,t:3,r:2,note:"Food delivery; long profitability path"},
+    {name:"Nykaa",g:4,m:2,d:5,v:2,t:4,r:3,note:"Beauty ecommerce + omnichannel"},
+    {name:"Paytm",g:2,m:1,d:4,v:3,t:3,r:1,note:"Fintech; recovering from RBI hit"},
+    {name:"PB Fintech",g:4,m:2,d:5,v:2,t:5,r:3,note:"Insurance + credit marketplace"},
+    {name:"Delhivery",g:3,m:1,d:4,v:3,t:3,r:2,note:"Logistics infrastructure"},
+    {name:"Nazara Technologies",g:4,m:2,d:4,v:3,t:4,r:3,note:"Mobile gaming; India + Africa"},
+    {name:"Info Edge (Naukri)",g:3,m:4,d:5,v:2,t:4,r:5,note:"Job portal monopoly + Zomato stake"},
+    {name:"EaseMyTrip",g:3,m:2,d:5,v:3,t:4,r:3,note:"Online travel; growing"},
+    {name:"Indiamart Intermesh",g:3,m:4,d:5,v:3,t:4,r:5,note:"B2B marketplace; cash-rich"},
+    {name:"CarTrade Tech",g:3,m:2,d:5,v:3,t:3,r:2,note:"Auto marketplace; profitability"}
+  ],
+  "Retail":[
+    {name:"Avenue Supermarts",g:4,m:4,d:5,v:2,t:4,r:5,q:3,note:"EDLP grocery; 18% ROE"},
+    {name:"Trent",g:5,m:4,d:5,v:2,t:5,r:4,q:5,note:"Zudio mass fashion; fastest"},
+    {name:"Vedant Fashions",g:3,m:4,d:5,v:3,t:4,r:4,q:4,note:"Manyavar ethnic wear monopoly"},
+    {name:"Aditya Birla Fashion",g:3,m:2,d:2,v:3,t:3,r:1,q:3,note:"Pantaloons + brands; debt"},
+    {name:"V-Mart",g:2,m:2,d:4,v:4,t:3,r:2,q:2,note:"Value retail; recovery"},
+    {name:"Shoppers Stop",g:3,m:2,d:4,v:3,t:3,r:2,q:3,note:"Dept store; premiumisation"},
+    {name:"Cantabil Retail",g:3,m:3,d:5,v:3,t:3,r:3,q:2,note:"Value fashion North India"},
+    {name:"Titan Company",g:4,m:4,d:5,v:2,t:4,r:4,q:4,note:"Watches + jewellery + eyewear"},
+    {name:"Reliance Retail",g:4,m:3,d:3,v:3,t:5,r:3,q:4,note:"India's largest retailer"},
+    {name:"Spencer's Retail",g:2,m:1,d:3,v:3,t:2,r:1,q:1,note:"Legacy format; limited growth"}
+  ],
+  "FMCG":[
+    {name:"Hindustan Unilever",g:2,m:5,d:5,v:2,t:3,r:4,q:3,note:"#1 FMCG; expensive but quality"},
+    {name:"ITC",g:3,m:5,d:5,v:4,t:3,r:4,q:4,note:"Cigarettes + FMCG; re-rating"},
+    {name:"Nestle India",g:3,m:5,d:5,v:1,t:3,r:5,q:3,note:"Premium food; very expensive"},
+    {name:"Britannia",g:2,m:4,d:5,v:3,t:3,r:4,q:3,note:"Bakery leader; margin expansion"},
+    {name:"Tata Consumer",g:3,m:3,d:5,v:3,t:4,r:3,q:4,note:"Starbucks + Tata Salt + brands"},
+    {name:"Godrej Consumer",g:3,m:3,d:5,v:3,t:3,r:3,q:3,note:"Household + personal care"},
+    {name:"Marico",g:2,m:4,d:5,v:3,t:3,r:4,q:3,note:"Parachute + Saffola; rural"},
+    {name:"Dabur India",g:2,m:3,d:5,v:3,t:3,r:3,q:3,note:"Ayurvedic + health + juices"},
+    {name:"Colgate-Palmolive",g:2,m:4,d:5,v:2,t:3,r:5,q:3,note:"Oral care monopoly; premium"},
+    {name:"Jyothy Labs",g:3,m:4,d:5,v:3,t:3,r:4,q:3,note:"Ujala + Margo; mid-cap"},
+    {name:"Emami",g:2,m:4,d:5,v:3,t:3,r:4,q:3,note:"Male grooming + Zandu Balm"},
+    {name:"P&G India",g:2,m:4,d:5,v:3,t:3,r:4,q:3,note:"MNC; personal care + healthcare"},
+    {name:"Varun Beverages",g:4,m:4,d:3,v:3,t:4,r:4,q:4,note:"PepsiCo bottler; India + Africa"},
+    {name:"Radico Khaitan",g:3,m:3,d:4,v:3,t:3,r:3,q:3,note:"Indian spirits; premium pivot"},
+    {name:"United Breweries",g:3,m:3,d:4,v:2,t:3,r:3,q:3,note:"Kingfisher beer; UB group"},
+    {name:"Patanjali Foods",g:3,m:3,d:4,v:3,t:3,r:3,q:3,note:"Edible oil + foods; Patanjali brand"}
+  ],
+  "Cement":[
+    {name:"UltraTech Cement",g:3,m:4,d:4,v:3,t:4,r:4,note:"India's largest; acquisition"},
+    {name:"Shree Cement",g:3,m:4,d:5,v:2,t:4,r:5,note:"Lowest cost; premium valuation"},
+    {name:"Ambuja Cements",g:3,m:3,d:4,v:3,t:4,r:3,note:"Adani group; distribution push"},
+    {name:"ACC",g:3,m:3,d:4,v:3,t:4,r:3,note:"Adani group; pan-India network"},
+    {name:"Dalmia Bharat",g:3,m:3,d:3,v:3,t:3,r:3,note:"East India; expanding South"},
+    {name:"JK Cement",g:3,m:3,d:3,v:3,t:3,r:3,note:"White + grey cement; niche"},
+    {name:"Orient Cement",g:3,m:3,d:3,v:3,t:3,r:3,note:"South + West India"},
+    {name:"Ramco Cement",g:3,m:3,d:4,v:3,t:3,r:3,note:"South India focused"},
+    {name:"Heidelberg India",g:2,m:3,d:4,v:3,t:3,r:3,note:"MNC sub; Central India"},
+    {name:"Birla Corp",g:3,m:3,d:3,v:3,t:3,r:3,note:"MP + East India base"},
+    {name:"NCL Industries",g:3,m:3,d:4,v:3,t:3,r:3,note:"South India; small cap"}
+  ],
+  "Gold/Jewellery":[
+    {name:"Titan Company",g:4,m:4,d:5,v:2,t:4,r:4,note:"Tanishq + watches + eyewear"},
+    {name:"Kalyan Jewellers",g:4,m:3,d:4,v:3,t:4,r:3,note:"Pan-India franchise model"},
+    {name:"Senco Gold",g:4,m:3,d:4,v:3,t:4,r:3,note:"East India dominant; expanding"},
+    {name:"PC Jeweller",g:2,m:2,d:2,v:4,t:3,r:2,note:"Turnaround; high debt risk"},
+    {name:"Rajesh Exports",g:2,m:2,d:3,v:4,t:3,r:2,note:"Gold refining + jewellery export"},
+    {name:"Thangamayil Jewellery",g:3,m:3,d:4,v:3,t:4,r:3,note:"Tamil Nadu dominant"},
+    {name:"P N Gadgil & Sons",g:4,m:3,d:4,v:3,t:4,r:3,note:"Maharashtra; recently listed"},
+    {name:"TBZ (Tribhovandas)",g:3,m:3,d:4,v:3,t:4,r:3,note:"Mumbai retail; premium"}
+  ],
+  "Hotels/Tourism":[
+    {name:"Indian Hotels (Taj)",g:4,m:4,d:4,v:2,t:5,r:5,note:"Taj + Vivanta + Ginger; largest"},
+    {name:"EIH (Oberoi)",g:4,m:4,d:5,v:2,t:5,r:5,note:"Ultra-luxury; highest ARPOB"},
+    {name:"Lemon Tree Hotels",g:4,m:3,d:3,v:3,t:5,r:4,note:"Mid-market; asset-light pivot"},
+    {name:"Chalet Hotels",g:4,m:3,d:3,v:3,t:4,r:3,note:"Business hotels in metros"},
+    {name:"Mahindra Holidays",g:3,m:3,d:3,v:3,t:4,r:3,note:"Club Mahindra timeshare"},
+    {name:"ITDC",g:2,m:2,d:4,v:3,t:3,r:2,note:"PSU hotels; Ashok group"},
+    {name:"Royal Orchid Hotels",g:3,m:3,d:4,v:3,t:4,r:3,note:"Mid + leisure; South India"},
+    {name:"Thomas Cook India",g:3,m:3,d:4,v:3,t:4,r:3,note:"Travel + forex + hotels"},
+    {name:"IRCTC",g:4,m:5,d:5,v:2,t:4,r:5,note:"Rail booking monopoly; high margin"},
+    {name:"Devyani International",g:4,m:2,d:3,v:2,t:3,r:3,note:"KFC + Pizza Hut India"},
+    {name:"Sapphire Foods",g:4,m:2,d:3,v:3,t:3,r:2,note:"KFC + Pizza Hut South+West"},
+    {name:"Jubilant Foodworks",g:3,m:3,d:4,v:3,t:3,r:3,note:"Domino's India; expanding"}
+  ],
+  "Hospitals":[
+    {name:"Apollo Hospitals",g:4,m:4,d:4,v:2,t:5,r:4,note:"Apollo 24/7 + pharmacy + hospitals"},
+    {name:"Max Healthcare",g:4,m:4,d:5,v:2,t:5,r:4,note:"North India dominant; expanding"},
+    {name:"Narayana Hrudayalaya",g:4,m:4,d:5,v:3,t:5,r:4,note:"Cardiac specialist; global"},
+    {name:"Fortis Healthcare",g:3,m:3,d:4,v:3,t:4,r:3,note:"Pan-India; IHH backing"},
+    {name:"Global Health (Medanta)",g:4,m:3,d:4,v:3,t:4,r:3,note:"North India super-specialty"},
+    {name:"Aster DM Healthcare",g:4,m:3,d:3,v:3,t:4,r:3,note:"GCC + India hospitals"},
+    {name:"Yatharth Hospital",g:4,m:4,d:4,v:3,t:4,r:4,note:"NCR focus; growing fast"},
+    {name:"Rainbow Children's",g:4,m:4,d:5,v:3,t:5,r:4,note:"Paediatrics niche; South India"},
+    {name:"Shalby Hospitals",g:3,m:3,d:4,v:3,t:4,r:3,note:"Gujarat orthopaedic focus"},
+    {name:"Metropolis Healthcare",g:3,m:3,d:5,v:3,t:4,r:4,note:"Pathology; West + South India"},
+    {name:"Dr Lal PathLabs",g:3,m:4,d:5,v:3,t:4,r:4,note:"Diagnostics North India leader"},
+    {name:"Thyrocare",g:2,m:3,d:5,v:3,t:3,r:3,note:"Wellness + preventive testing"},
+    {name:"Krsnaa Diagnostics",g:3,m:3,d:4,v:3,t:4,r:3,note:"PPP diagnostics; Tier 2/3"},
+    {name:"Healthium Medtech",g:3,m:3,d:4,v:3,t:4,r:3,note:"Surgical devices; exports"}
+  ],
+  "Paints":[
+    {name:"Asian Paints",g:2,m:5,d:5,v:2,t:3,r:5,note:"#1 paint; 60yr distribution moat"},
+    {name:"Berger Paints",g:2,m:4,d:5,v:2,t:3,r:4,note:"#2; competitive pressure rising"},
+    {name:"Kansai Nerolac",g:2,m:3,d:5,v:3,t:3,r:4,note:"Industrial + auto OEM paints"},
+    {name:"Indigo Paints",g:3,m:3,d:5,v:3,t:3,r:3,note:"Challenger brand; niche"},
+    {name:"Grasim (Birla Opus)",g:3,m:3,d:3,v:3,t:3,r:3,note:"New entrant; Rs.10,000Cr invest"},
+    {name:"Shalimar Paints",g:2,m:2,d:3,v:3,t:2,r:2,note:"Heritage brand; turnaround"},
+    {name:"Akzo Nobel India",g:2,m:3,d:5,v:3,t:3,r:3,note:"MNC sub; Dulux brand"},
+    {name:"Nippon Paint India",g:3,m:3,d:5,v:3,t:3,r:3,note:"Japanese MNC; auto OEM"}
+  ],
+  "Textiles":[
+    {name:"Page Industries",g:2,m:5,d:5,v:2,t:2,r:5,note:"Jockey licensee; premium moat"},
+    {name:"KPR Mill",g:3,m:4,d:4,v:3,t:3,r:4,note:"Integrated textile; exports"},
+    {name:"Vardhman Textiles",g:2,m:3,d:3,v:3,t:2,r:3,note:"Yarn + fabric + garment"},
+    {name:"Welspun Living",g:2,m:3,d:3,v:3,t:2,r:3,note:"Home textiles exports USA/EU"},
+    {name:"Himatsingka Seide",g:1,m:2,d:2,v:4,t:2,r:2,note:"Bed linen; stressed balance"},
+    {name:"Trident",g:2,m:3,d:3,v:3,t:3,r:3,note:"Terry towels + paper; exports"},
+    {name:"Filatex India",g:3,m:3,d:3,v:3,t:3,r:3,note:"Polyester yarn; synthetic"},
+    {name:"Indo Count Industries",g:3,m:3,d:4,v:3,t:3,r:3,note:"Bed linen exports; US"},
+    {name:"Gokaldas Exports",g:3,m:3,d:4,v:3,t:3,r:3,note:"Garment export; global brands"},
+    {name:"Raymond",g:3,m:3,d:3,v:3,t:3,r:3,note:"Suiting + real estate + tools"},
+    {name:"Arvind",g:2,m:3,d:3,v:3,t:3,r:3,note:"Denim + brands + engineering"},
+    {name:"SP Apparels",g:4,m:4,d:4,v:3,t:4,r:4,note:"Children's knitwear export; UK/EU focused; margin expansion"},
+    {name:"Trident",g:3,m:4,d:3,v:3,t:3,r:4,note:"Terry towel + paper + yarn; US export dominant"},
+    {name:"Raymond",g:3,m:3,d:3,v:3,t:3,r:3,note:"Branded suiting + realty; demerger value unlock"}
+  ],
+  "Recycling/ESG":[
+    {name:"Gravita India",g:4,m:4,d:4,v:3,t:4,r:4,note:"Lead + aluminium recycling; global"},
+    {name:"Eco Recycling",g:3,m:3,d:4,v:3,t:4,r:3,note:"E-waste; compliance-driven"},
+    {name:"Zinc India (Vedanta)",g:3,m:4,d:3,v:3,t:3,r:4,note:"Zinc + lead recycling"},
+    {name:"Minda Corporation",g:3,m:3,d:4,v:3,t:4,r:3,note:"Auto + EV parts recycling"}
+  ],
+  "Diversified":[
+    {name:"Varun Beverages",g:4,m:4,d:3,v:3,t:4,r:4,note:"PepsiCo bottler; India + Africa"},
+    {name:"IEX",g:3,m:5,d:5,v:2,t:5,r:5,note:"Power exchange; near-monopoly"},
+    {name:"Azad Engineering",g:5,m:4,d:4,v:3,t:4,r:4,note:"Precision aerospace + energy"},
+    {name:"Westlife Foodworld",g:3,m:3,d:4,v:3,t:3,r:3,note:"McDonald's W+S India"},
+    {name:"G R Infraprojects",g:4,m:4,d:4,v:3,t:4,r:4,note:"Road + railway EPC"},
+    {name:"Barbeque Nation",g:3,m:2,d:3,v:3,t:3,r:2,note:"Casual dining; SaaS-like"},
+    {name:"CAMS",g:4,m:5,d:5,v:3,t:5,r:5,note:"MF transaction processor; monopoly"},
+    {name:"CMS Info Systems",g:4,m:4,d:5,v:3,t:4,r:4,note:"Cash management + ATM ops; monopoly-ish"},
+    {name:"Tata Communications",g:3,m:3,d:3,v:3,t:4,r:3,note:"Enterprise connectivity + cloud services"},
+    {name:"Netweb Technologies",g:5,m:4,d:5,v:2,t:5,r:4,note:"HPC + AI servers; data centre hardware"},
+    {name:"Indus Towers",g:3,m:4,d:3,v:3,t:4,r:4,note:"Tower infra; Vodafone recovery key risk"},
+    {name:"Sterlite Technologies",g:3,m:3,d:3,v:3,t:4,r:3,note:"Optical fibre + network solutions"},
+    {name:"HFCL",g:4,m:3,d:3,v:3,t:4,r:3,note:"Optical fibre + defence comms"},
+    {name:"Route Mobile",g:4,m:4,d:5,v:3,t:4,r:4,note:"Cloud communication platform"},
+    {name:"Tanla Platforms",g:3,m:4,d:5,v:3,t:4,r:4,note:"CPaaS + messaging platform"}
+  ],
+  "Sugar":[
+    {name:"Balrampur Chini",g:4,m:4,d:5,v:3,t:4,r:4,note:"India #2 sugar; ethanol play; integrated"},
+    {name:"EID Parry",g:4,m:4,d:4,v:3,t:4,r:3,note:"Murugappa; sugar+nutraceuticals+ethanol"},
+    {name:"Triveni Engineering",g:4,m:4,d:4,v:3,t:4,r:4,note:"UP sugar+engineering; ethanol capex strong"},
+    {name:"Shree Renuka Sugars",g:3,m:3,d:3,v:3,t:4,r:3,note:"Wilmar JV; large capacity; turnaround"},
+    {name:"Dalmia Bharat Sugar",g:4,m:4,d:4,v:3,t:4,r:4,note:"Mid-size; ethanol+power co-gen; clean B/S"},
+    {name:"Dwarikesh Sugar",g:3,m:3,d:4,v:3,t:3,r:3,note:"UP sugar; consistent dividend; small cap"}
+  ],
+  "IT Services":[
+    {name:"TCS",g:2,m:5,d:5,v:3,t:2,r:3,q:4,note:"EBIT 25%; AI disruption headwind"},
+    {name:"Infosys",g:2,m:4,d:5,v:3,t:3,r:3,q:3,note:"EBIT 21%; large deal recovery"},
+    {name:"HCL Technologies",g:2,m:4,d:5,v:3,t:3,r:3,q:4,note:"Products+services; EBIT 19%"},
+    {name:"Wipro",g:1,m:3,d:5,v:4,t:2,r:2,q:4,note:"EBIT 16%; structural issues"},
+    {name:"Tech Mahindra",g:2,m:3,d:5,v:3,t:2,r:2,q:3,note:"Telecom IT; restructuring"},
+    {name:"LTIMindtree",g:3,m:4,d:5,v:3,t:3,r:3,q:3,note:"L&T IT; EBIT 17%; quality"},
+    {name:"Mphasis",g:3,m:4,d:5,v:3,t:3,r:3,q:4,note:"BFSI focus; EBIT 16%"},
+    {name:"Persistent Systems",g:4,m:4,d:5,v:2,t:4,r:4,q:3,note:"Digital engineering; 35% growth"},
+    {name:"Coforge",g:4,m:3,d:5,v:3,t:3,r:3,q:3,note:"BFSI + travel; 25% growth"},
+    {name:"Birlasoft",g:3,m:3,d:5,v:3,t:3,r:3,q:4,note:"SAP + cloud; mid-size"},
+    {name:"Hexaware",g:3,m:4,d:5,v:3,t:3,r:3,q:4,note:"AI + automation; PE-backed"},
+    {name:"KPIT Technologies",g:4,m:4,d:5,v:2,t:5,r:4,q:3,note:"Auto software; ADAS + EV"},
+    {name:"Tata Elxsi",g:3,m:5,d:5,v:2,t:4,r:4,q:3,note:"Embedded design; auto + media"},
+    {name:"Cyient",g:3,m:3,d:5,v:3,t:3,r:3,q:4,note:"Engineering R&D + digital"},
+    {name:"Intellect Design",g:3,m:3,d:5,v:3,t:3,r:3,q:3,note:"Fintech product; SaaS"},
+    {name:"Newgen Software",g:4,m:4,d:5,v:3,t:4,r:4,q:3,note:"Document automation; cloud"},
+    {name:"Happiest Minds",g:4,m:4,d:5,v:3,t:4,r:4,q:3,note:"Digital born; small cap quality"},
+    {name:"Mastek",g:3,m:3,d:5,v:3,t:3,r:3,q:4,note:"UK govt + BFSI IT"}
+  ],
+  "Telecom":[
+    {name:"Bharti Airtel",g:4,m:4,d:3,v:3,t:4,r:4,note:"#1 telecom; ARPU rising; Africa ops strong"},
+    {name:"Reliance Jio",g:4,m:3,d:3,v:3,t:4,r:3,note:"Jio dominates data; 5G leader; JioFinance spinoff"},
+    {name:"Vodafone Idea (Vi)",g:2,m:1,d:1,v:3,t:2,r:1,note:"Survival mode; debt crisis; AGR dues; high risk"},
+    {name:"Indus Towers",g:3,m:4,d:3,v:3,t:4,r:4,note:"Tower infra monopoly; Vi recovery key risk"},
+    {name:"MTNL",g:1,m:1,d:2,v:3,t:2,r:1,note:"PSU; loss-making; Delhi+Mumbai only"},
+    {name:"Tata Communications",g:3,m:3,d:3,v:3,t:4,r:3,note:"Enterprise connectivity + cloud + media"},
+    {name:"HFCL",g:4,m:3,d:3,v:3,t:4,r:3,note:"Optical fibre + defence comms; 5G infra"},
+    {name:"Sterlite Technologies",g:3,m:3,d:3,v:3,t:4,r:3,note:"Optical fibre cables + network solutions"},
+    {name:"ITI Limited",g:3,m:2,d:3,v:3,t:3,r:2,note:"PSU telecom equipment; defence overlap"}
+  ],
+  "Auto 4W":[
+    {name:"Maruti Suzuki",g:3,m:4,d:5,v:3,t:4,r:5,note:"#1 passenger car; SUV + CNG + hybrid push"},
+    {name:"Tata Motors",g:4,m:3,d:3,v:3,t:4,r:3,note:"JLR turnaround + India EVs; diversified"},
+    {name:"Hyundai Motor India",g:3,m:4,d:5,v:3,t:4,r:4,note:"#2 PV; premium mix improving; recently listed"},
+    {name:"Mahindra & Mahindra",g:4,m:4,d:4,v:3,t:4,r:4,note:"SUV dominance + tractors + EV pipeline"},
+    {name:"Ashok Leyland",g:3,m:3,d:4,v:3,t:3,r:3,note:"CV leader; Hinduja group"},
+    {name:"Force Motors",g:3,m:3,d:5,v:3,t:3,r:3,note:"LCV + SUV niche; BMW engine assembly"},
+    {name:"Olectra Greentech",g:4,m:2,d:3,v:2,t:4,r:2,note:"Electric buses; growing order book"}
+  ],
+  "Auto 2W":[
+    {name:"Bajaj Auto",g:3,m:5,d:5,v:3,t:4,r:5,note:"Premium 2W + exports + EV (Chetak)"},
+    {name:"Hero MotoCorp",g:2,m:4,d:5,v:3,t:3,r:4,note:"Mass 2W; rural dependent; EV pivot slow"},
+    {name:"TVS Motor Company",g:4,m:4,d:4,v:3,t:4,r:4,note:"Premium 2W + EV + international"},
+    {name:"Eicher Motors (RE)",g:3,m:5,d:5,v:3,t:4,r:5,note:"Royal Enfield premium niche; VECV trucks"},
+    {name:"Ola Electric",g:4,m:1,d:3,v:2,t:4,r:2,note:"EV 2W leader; profitability path long"},
+    {name:"Ather Energy",g:4,m:2,d:4,v:3,t:4,r:3,note:"Premium EV scooter; tech-first brand"},
+    {name:"Ampere (Greaves Cotton)",g:3,m:2,d:4,v:3,t:3,r:2,note:"Mass EV scooter; affordable segment"}
+  ],
+  "Auto Spares":[
+    {name:"Motherson Sumi Systems",g:3,m:3,d:3,v:3,t:3,r:3,note:"Global auto components; wiring harness"},
+    {name:"Sona BLW (Sona Comstar)",g:4,m:4,d:5,v:3,t:4,r:4,note:"EV drivetrain + starter motors"},
+    {name:"Minda Industries (Uno Minda)",g:4,m:3,d:4,v:3,t:4,r:3,note:"Auto components + EV tech; switches/sensors"},
+    {name:"Bharat Forge",g:3,m:3,d:3,v:3,t:3,r:3,note:"Forging + defence + EV axles; exports"},
+    {name:"Exide Industries",g:3,m:3,d:4,v:3,t:3,r:3,note:"Lead-acid + Li-ion battery JV; EVs"},
+    {name:"Amara Raja Energy",g:3,m:3,d:4,v:3,t:3,r:3,note:"Batteries + EV charging infra"},
+    {name:"KPIT Technologies",g:4,m:4,d:5,v:2,t:5,r:4,note:"Auto software; ADAS + EV niche"},
+    {name:"Belrise Industries",g:3,m:3,d:4,v:3,t:3,r:3,note:"2W/3W structural components; Bajaj/TVS supplier"},
+    {name:"JBM Auto",g:4,m:3,d:4,v:3,t:4,r:3,note:"Bus body + EV buses; defence components"},
+    {name:"Samvardhana Motherson",g:3,m:3,d:3,v:3,t:3,r:3,note:"Global wiring harness + mirrors + plastics"},
+    {name:"Bosch India",g:3,m:4,d:5,v:3,t:4,r:4,note:"MNC auto tech; fuel injection + EV components"},
+    {name:"Lumax Industries",g:3,m:3,d:4,v:3,t:3,r:3,note:"Auto lighting; LED pivot + EV adoption"},
+    {name:"Suprajit Engineering",g:3,m:4,d:5,v:3,t:3,r:4,note:"Control cables; Wescon acquisition"},
+    {name:"Endurance Technologies",g:3,m:4,d:5,v:3,t:4,r:4,note:"Die casting + brakes + suspension for 2W"},
+    {name:"Minda Corp",g:3,m:3,d:4,v:3,t:3,r:3,note:"Auto parts; EV locks + sensors"},
+    {name:"Craftsman Automation",g:3,m:4,d:4,v:3,t:4,r:4,note:"Precision machined auto parts + agri"}
+  ],
+  "Reliance Group":[
+    {name:"Reliance Industries",g:4,m:4,d:3,v:3,t:5,r:4,note:"India's largest co.; oil + retail + Jio"},
+    {name:"Jio Financial Services",g:4,m:2,d:5,v:2,t:5,r:3,note:"NBFC + insurance + AMC; building franchise"},
+    {name:"Network18 Media",g:3,m:2,d:3,v:3,t:3,r:2,note:"News18 + CNN-News18 + OTT; RIL subsidiary"},
+    {name:"Hathway Cable (RIL stake)",g:2,m:2,d:3,v:3,t:2,r:2,note:"Cable TV + broadband; declining cable"},
+    {name:"Den Networks (RIL stake)",g:2,m:2,d:3,v:3,t:2,r:2,note:"Cable distribution; transition to fiber"}
+  ],
+  "Adani Group":[
+    {name:"Adani Enterprises",g:4,m:3,d:3,v:2,t:5,r:3,note:"Group flagship; airports + solar + roads"},
+    {name:"Adani Ports & SEZ",g:4,m:4,d:3,v:3,t:5,r:4,note:"India's largest port operator; 13 ports"},
+    {name:"Adani Green Energy",g:4,m:3,d:2,v:2,t:5,r:3,note:"Largest solar IPP; 20GW+ pipeline"},
+    {name:"Adani Total Gas",g:4,m:3,d:3,v:2,t:4,r:3,note:"City gas distribution; TOTAL JV"},
+    {name:"Adani Energy Solutions",g:4,m:3,d:3,v:3,t:4,r:3,note:"Power transmission + smart metering"},
+    {name:"Adani Power",g:3,m:4,d:3,v:3,t:3,r:3,note:"Largest private thermal power; 15GW"},
+    {name:"Adani Wilmar",g:3,m:3,d:3,v:3,t:3,r:3,note:"Fortune oil brand; agri + FMCG"},
+    {name:"Ambuja Cements",g:3,m:3,d:4,v:3,t:4,r:3,note:"Adani group; distribution push"},
+    {name:"ACC",g:3,m:3,d:4,v:3,t:4,r:3,note:"Adani group; pan-India network"},
+    {name:"NDTV (Adani stake)",g:2,m:2,d:3,v:3,t:2,r:2,note:"News media; Adani acquisition 2022"}
+  ],
+  "Metals":[
+    {name:"Tata Steel",g:3,m:3,d:3,v:3,t:3,r:3,note:"India #1 + Europe ops; cyclical"},
+    {name:"JSW Steel",g:3,m:3,d:3,v:3,t:3,r:3,note:"India #2; capacity expansion; Sajjan Jindal"},
+    {name:"SAIL",g:2,m:2,d:3,v:4,t:2,r:2,note:"PSU steel; low margins; capex heavy"},
+    {name:"Hindalco Industries",g:3,m:3,d:3,v:3,t:3,r:3,note:"Aluminium + Novelis (US auto sheet)"},
+    {name:"Vedanta",g:3,m:4,d:2,v:3,t:3,r:3,note:"Zinc + oil + aluminium; high debt; dividend"},
+    {name:"Hindustan Zinc",g:3,m:5,d:5,v:3,t:3,r:5,note:"World's 2nd largest Zn producer; Vedanta sub"},
+    {name:"NALCO",g:3,m:3,d:5,v:3,t:3,r:3,note:"PSU aluminium; dividend player"},
+    {name:"NMDC",g:3,m:4,d:5,v:3,t:3,r:4,note:"India's largest iron ore miner; PSU"},
+    {name:"Coal India",g:2,m:4,d:5,v:3,t:2,r:4,note:"PSU coal monopoly; dividend; ESG risk"},
+    {name:"Jindal Steel & Power",g:3,m:3,d:3,v:3,t:3,r:3,note:"Steel + power; Naveen Jindal group"},
+    {name:"APL Apollo Tubes",g:4,m:4,d:4,v:3,t:4,r:4,note:"Structural steel tubes; construction boom"},
+    {name:"Ratnamani Metals",g:3,m:4,d:5,v:3,t:3,r:4,note:"SS + CS pipes; oil + gas + chemical"},
+    {name:"Hindustan Copper",g:3,m:3,d:4,v:3,t:3,r:3,note:"PSU copper mining + smelting"},
+    {name:"Lloyds Metals",g:4,m:4,d:4,v:3,t:3,r:4,note:"Iron ore + sponge iron; growing"},
+    {name:"Welspun Corp",g:3,m:3,d:4,v:3,t:3,r:3,note:"Steel pipes; oil + gas infra"},
+    {name:"JSW Energy (Metal div.)",g:4,m:3,d:3,v:3,t:4,r:3,note:"Merchant + long-term PPA; RE pivot"}
+  ]
+}
+
+// ── NSE SYMBOL MAP ────────────────────────────────────────────────
+const NSE_SYMBOL_MAP = {
+  // Banking PSU & Large Private
+  "HDFC Bank":"HDFCBANK","ICICI Bank":"ICICIBANK","SBI":"SBIN","Kotak Mahindra Bank":"KOTAKBANK",
+  "Axis Bank":"AXISBANK","Bank of Baroda":"BANKBARODA","Punjab National Bank":"PNB",
+  "Canara Bank":"CANBK","Union Bank":"UNIONBANK","IndusInd Bank":"INDUSINDBK",
+  "Federal Bank":"FEDERALBNK","IDFC First Bank":"IDFCFIRSTB","Yes Bank":"YESBANK",
+  "Bandhan Bank":"BANDHANBNK","RBL Bank":"RBLBANK","South Indian Bank":"SOUTHBANK",
+  "Karur Vysya Bank":"KARURVYSYA","City Union Bank":"CUB","DCB Bank":"DCBBANK",
+  "Karnataka Bank":"KTKBANK","Jammu & Kashmir Bank":"J&KBANK","CSB Bank":"CSBBANK",
+  "Ujjivan Small Finance Bank":"UJJIVANSFB","AU Small Finance Bank":"AUBANK",
+  "Equitas Small Finance Bank":"EQUITASBNK","Suryoday Small Finance Bank":"SURYODAY",
+  "ESAF Small Finance Bank":"ESAFSFB","Utkarsh Small Finance Bank":"UTKARSHBNK",
+  // NBFC
+  "Bajaj Finance":"BAJFINANCE","Bajaj Finserv":"BAJAJFINSV","Muthoot Finance":"MUTHOOTFIN",
+  "Shriram Finance":"SHRIRAMFIN","Chola Finance":"CHOLAFIN","L&T Finance":"LTF",
+  "Mahindra Finance":"M&MFIN","Sundaram Finance":"SUNDARMFIN","LIC Housing Finance":"LICHSGFIN",
+  "PNB Housing":"PNBHOUSING","Can Fin Homes":"CANFINHOME","Home First Finance":"HOMEFIRST",
+  "Aptus Value Housing":"APTUS","Aavas Financiers":"AAVAS","India Shelter Finance":"INDIASHLTR",
+  "Manappuram Finance":"MANAPPURAM","IIFL Finance":"IIFL","Five Star Finance":"FIVESTAR",
+  "Credit Access Grameen":"CREDITACC","Spandana Sphoorty":"SPANDANA",
+  // Insurance
+  "SBI Life":"SBILIFE","HDFC Life":"HDFCLIFE","ICICI Prudential Life":"ICICIPRULI",
+  "Max Life Insurance":"MAXLIFE","Star Health Insurance":"STARHEALTH","Niva Bupa":"NIVABUPA",
+  "Go Digit Insurance":"GODIGIT","ICICI Lombard":"ICICIGI","New India Assurance":"NIACL",
+  "General Insurance Corp":"GICRE",
+  // IT Services
+  "TCS":"TCS","Infosys":"INFY","Wipro":"WIPRO","HCL Technologies":"HCLTECH",
+  "Tech Mahindra":"TECHM","LTIMindtree":"LTIM","Mphasis":"MPHASIS",
+  "Persistent Systems":"PERSISTENT","Coforge":"COFORGE","Hexaware":"HEXAWARE",
+  "KPIT Technologies":"KPITTECH","Cyient":"CYIENT","Mastek":"MASTEK",
+  "Birlasoft":"BSOFT","Zensar Technologies":"ZENSARTECH","Sonata Software":"SONATSOFTW",
+  // Power & Energy
+  "NTPC":"NTPC","Power Grid Corp":"POWERGRID","NHPC":"NHPC","SJVN":"SJVN",
+  "PFC":"PFC","REC Ltd":"RECLTD","IREDA":"IREDA",
+  "CESC":"CESC","Tata Power":"TATAPOWER","Adani Green":"ADANIGREEN",
+  "Adani Energy Solutions":"ADANIENSOL","Torrent Power":"TORNTPOWER","JSW Energy":"JSWENERGY",
+  "Waaree Energies":"WAAREEENER","Premier Energies":"PREMIERENE","KPI Green Energy":"KPIGREEN",
+  "KEC International":"KEC","Genus Power":"GENUSPOWER","Hitachi Energy India":"POWERINDIA",
+  "Voltamp Transformers":"VOLTAMP","Transformers & Rectifiers":"TRIL",
+  "Sterling & Wilson":"STLTECH","Websol Energy":"WEBSOL",
+  // Auto
+  "Maruti Suzuki":"MARUTI","Tata Motors":"TATAMOTORS","Mahindra & Mahindra":"M&M",
+  "Hyundai Motor India":"HYUNDAI","Bajaj Auto":"BAJAJ-AUTO","Hero MotoCorp":"HEROMOTOCO",
+  "TVS Motor":"TVSMOTOR","Eicher Motors":"EICHERMOT","Ashok Leyland":"ASHOKLEY",
+  "Force Motors":"FORCEMOT","Escorts Kubota":"ESCORTS","Ola Electric":"OLAELEC",
+  // Pharma
+  "Sun Pharma":"SUNPHARMA","Dr Reddy's":"DRREDDY","Cipla":"CIPLA","Divi's Lab":"DIVISLAB",
+  "Lupin":"LUPIN","Aurobindo Pharma":"AUROPHARMA","Mankind Pharma":"MANKIND",
+  "Zydus Lifesciences":"ZYDUSLIFE","Abbott India":"ABBOTINDIA","Pfizer India":"PFIZER",
+  "Sanofi India":"SANOFI","Gland Pharma":"GLAND","Biocon":"BIOCON",
+  "Laurus Labs":"LAURUSLABS","Ipca Laboratories":"IPCALAB","Alkem Laboratories":"ALKEM",
+  // Metals & Mining
+  "Tata Steel":"TATASTEEL","JSW Steel":"JSWSTEEL","Hindalco":"HINDALCO",
+  "SAIL":"SAIL","NMDC":"NMDC","Vedanta":"VEDL","Coal India":"COALINDIA",
+  "NALCO":"NATIONALUM","Hindustan Zinc":"HINDZINC","Hindustan Copper":"HINDCOPPER",
+  "MOIL":"MOIL","Godawari Power":"GPIL","Welspun Corp":"WELCORP",
+  "APL Apollo Tubes":"APLAPOLLO","Ratnamani Metals":"RATNAMANI",
+  // Conglomerates / large
+  "Reliance Industries":"RELIANCE","Adani Ports":"ADANIPORTS","Adani Enterprises":"ADANIENT",
+  "Adani Total Gas":"ATGL","Adani Wilmar":"AWL","Adani Power":"ADANIPOWER",
+  "Ambuja Cements":"AMBUJACEM","ACC":"ACC","ONGC":"ONGC","IOC":"IOC",
+  "BPCL":"BPCL","HPCL":"HPCL","GAIL":"GAIL","IGL":"IGL","MGL":"MGL",
+  "Petronet LNG":"PETRONET","Larsen & Toubro":"LT","Siemens India":"SIEMENS",
+  "ABB India":"ABB","Havells India":"HAVELLS","Bharat Electronics":"BEL",
+  "HAL":"HAL","BDL":"BDL","BEML":"BEML","Mazagon Dock":"MAZDOCK",
+  "Cochin Shipyard":"COCHINSHIP","GRSE":"GRSE","Data Patterns":"DATAPATTNS",
+  "Paras Defence":"PARAS","MTAR Tech":"MTAR","Bharat Forge":"BHARATFORG",
+  "Titagarh Rail":"TITAGARH",
+  // New Age Tech
+  "Zomato":"ZOMATO","Swiggy":"SWIGGY","Nykaa":"NYKAA","PayTM":"PAYTM",
+  "Policy Bazaar":"POLICYBZR","Nazara Technologies":"NAZARA","CarTrade Tech":"CARTRADE",
+  "EaseMyTrip":"EASEMYTRIP","Indiamart":"INDIAMART","Info Edge":"NAUKRI",
+  "Delhivery":"DELHIVERY",
+  // Telecom
+  "Airtel":"BHARTIARTL","Vodafone Idea":"IDEA","Indus Towers":"INDUSTOWER",
+  "Railtel":"RAILTEL","Tata Teleservices":"TTML",
+  // Cement
+  "UltraTech Cement":"ULTRACEMCO","Shree Cement":"SHREECEM","Dalmia Bharat":"DALBHARAT",
+  "JK Cement":"JKCEMENT","Ramco Cement":"RAMCOCEM","Nuvoco Vistas":"NUVOCO",
+  "Birla Corporation":"BIRLACORPN",
+  // FMCG
+  "HUL":"HINDUNILVR","ITC":"ITC","Nestle India":"NESTLEIND","Britannia":"BRITANNIA",
+  "Dabur":"DABUR","Marico":"MARICO","Godrej Consumer":"GODREJCP","Emami":"EMAMILTD",
+  "Colgate":"COLPAL","Varun Beverages":"VBL","Tata Consumer":"TATACONSUM",
+  // Real Estate
+  "DLF":"DLF","Godrej Properties":"GODREJPROP","Prestige Estates":"PRESTIGE",
+  "Macrotech":"LODHA","Oberoi Realty":"OBEROIRLTY","Brigade Enterprises":"BRIGADE",
+  "Sobha":"SOBHA","Puravankara":"PURVA","Signature Global":"SIGNATURE",
+  // Capital Goods
+  "Shakti Pumps":"SHAKTIPUMP","Shaily Engineering":"SHAILYENG",
+  "Thermax":"THERMAX","Bharat Heavy Electricals":"BHEL","Cummins India":"CUMMINSIND",
+  "Voltas":"VOLTAS","Blue Star":"BLUESTAR","Polycab":"POLYCAB",
+  "Finolex Cables":"FINCABLES","KEI Industries":"KEI","V-Guard":"VGUARD",
+  "Astral":"ASTRAL","Supreme Industries":"SUPREMEIND",
+  // Brokers / Wealth / AMC
+  "BSE Ltd":"BSE","CDSL":"CDSL","NSDL":"NSDL",
+  "Angel One":"ANGELONE","ICICI Securities":"ISEC","Motilal Oswal":"MOTILALOFS",
+  "360 One WAM":"360ONE","Nuvama Wealth":"NUVAMA","Nippon India AMC":"NAM-INDIA",
+  "HDFC AMC":"HDFCAMC","UTI AMC":"UTIAMC","Aditya Birla Sun Life":"ABSLAMC",
+  "Edelweiss":"EDELWEISS","Anand Rathi":"ANANDRATHI","JM Financial":"JMFINANCL",
+  // Hospitals
+  "Apollo Hospitals":"APOLLOHOSP","Fortis Healthcare":"FORTIS","Max Healthcare":"MAXHEALTH",
+  "Narayana Health":"NH","HCG Oncology":"HCG","Aster DM Healthcare":"ASTERDM",
+  "Global Health":"MEDANTA","Yatharth Hospital":"YATHARTH",
+  // Retail / Consumer
+  "Avenue Supermarts":"DMART","Trent":"TRENT","V-Mart Retail":"VMART",
+  "Shoppers Stop":"SHOPERSTOP","Titan Company":"TITAN","Kalyan Jewellers":"KALYANKJIL",
+  "Senco Gold":"SENCO","PC Jeweller":"PCJEWELLER","Rajesh Exports":"RAJESHEXPO",
+  // Hotels
+  "Indian Hotels":"INDHOTEL","EIH":"EIHOTEL","Lemon Tree Hotels":"LEMONTREE",
+  "Chalet Hotels":"CHALET","Mahindra Holidays":"MHRIL","Club Mahindra":"CLUBMAHINDRA",
+  // Paints
+  "Asian Paints":"ASIANPAINT","Berger Paints":"BERGEPAINT","Kansai Nerolac":"KANSAINER",
+  "Indigo Paints":"INDIGOPNTS","Grasim Industries":"GRASIM","Akzo Nobel":"AKZOINDIA",
+  // Textiles
+  "Page Industries":"PAGEIND","KPR Mill":"KPRMILL","Welspun India":"WELSPUNIND",
+  "Vardhman Textiles":"VTL","Raymond":"RAYMOND","Trident":"TRIDENT",
+  // Chemicals
+  "SRF":"SRF","PI Industries":"PIIND","Aarti Industries":"AARTIIND",
+  "Navin Fluorine":"NAVINFLUOR","Clean Science":"CLEAN","Galaxy Surfactants":"GALAXYSURF",
+  // Gold / Jewellery
+  "Muthoot Finance":"MUTHOOTFIN","Manappuram Finance":"MANAPPURAM",
+  "Senco Gold":"SENCO","MMTC":"MMTC",
+  // Infra
+  "IRB Infrastructure":"IRB","KNR Constructions":"KNRCON","PNC Infratech":"PNCINFRA",
+  "H.G. Infra":"HGINFRA","Ahluwalia Contracts":"AHLUCONT","NCC":"NCC",
+  "Kalpataru Projects":"KPIL","J Kumar Infra":"JKIL",
+}
+
+// ── REVERSE MAP ───────────────────────────────────────────────────
+const NSE_REVERSE_MAP = {};
+Object.entries(NSE_SYMBOL_MAP).forEach(function(kv){ NSE_REVERSE_MAP[kv[1]] = kv[0]; });
+</script>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- TAB 1: BHAVCOPY                                                    -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="panel-bhavcopy" class="panel active">
+
+  <!-- FII / PCR banner -->
+  <div id="fiiBanner" style="display:none;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px;">
+    <div class="fii-tile">
+      <div class="fii-label">FII Net</div>
+      <div class="fii-val" id="dbFII">—</div>
+      <div class="fii-sig" id="dbFIISig">—</div>
+    </div>
+    <div class="fii-tile">
+      <div class="fii-label">DII Net</div>
+      <div class="fii-val" id="dbDII">—</div>
+    </div>
+    <div class="fii-tile">
+      <div class="fii-label">Nifty PCR</div>
+      <div class="fii-val" id="dbNPCR">—</div>
+      <div class="fii-sig" id="dbNPCRSig">—</div>
+    </div>
+    <div class="fii-tile">
+      <div class="fii-label">Bank Nifty PCR</div>
+      <div class="fii-val" id="dbBPCR">—</div>
+      <div class="fii-sig" id="dbBPCRSig">—</div>
+    </div>
+    <div class="fii-tile">
+      <div class="fii-label">Trade Date</div>
+      <div class="fii-val" id="dbTradeDate" style="font-size:13px;">—</div>
+    </div>
+  </div>
+
+  <!-- Step 1: Bhavcopy paste -->
+  <div class="card">
+    <div class="card-title">📥 Step 1 — Paste Bhavcopy CSV <span>(NSE All Reports → Capital Market → Bhavcopy)</span></div>
+    <textarea id="bhavPaste" class="paste-area" rows="5"
+      placeholder="Paste NSE Bhavcopy CSV here (old CM format or new UDiFF format — both supported)&#10;Supports comma-separated and tab-separated (Excel copy) formats"></textarea>
+    <div class="input-row" style="margin-top:8px;">
+      <button class="btn btn-orange" onclick="parseBhavcopy()">⚡ Parse &amp; Load</button>
+      <button class="btn btn-grey btn-sm" onclick="document.getElementById('bhavPaste').value=''">Clear</button>
+    </div>
+    <div class="status-txt" id="bhavStatus"></div>
+  </div>
+
+  <!-- Step 2: Delivery paste (UDiFF only) -->
+  <div class="card">
+    <div class="card-title">📦 Step 2 — Paste MTO Delivery File <span>(UDiFF only — skip for old CM format)</span></div>
+    <textarea id="delivPaste" class="paste-area" rows="4"
+      placeholder="Paste Security-wise Delivery Data here (NSE All Reports → Capital Market → Security-wise Delivery Data)&#10;Rows start with '20,' — symbol in col 3, delivery% in col 7"></textarea>
+    <div class="input-row" style="margin-top:8px;">
+      <button class="btn btn-blue" onclick="parseDelivery()">🔗 Merge Delivery %</button>
+      <button class="btn btn-grey btn-sm" onclick="document.getElementById('delivPaste').value=''">Clear</button>
+    </div>
+    <div class="status-txt" id="delivStatus"></div>
+  </div>
+
+  <!-- Progress -->
+  <div class="card" id="progressCard" style="display:none;">
+    <div class="prog-info"><span id="progressLabel">—</span><span id="progressCount">—</span></div>
+    <div class="prog-wrap"><div class="prog-bar" id="progressBar"></div></div>
+  </div>
+
+  <!-- Filters + table -->
+  <div class="card">
+    <div class="filter-row">
+      <select id="sectorFilter" onchange="renderTable()">
+        <option value="all">All Sectors</option>
+      </select>
+      <input type="text" id="companySearch" placeholder="Search company / symbol…"
+             oninput="renderTable()" style="min-width:160px;padding:6px 10px;background:#f8f9fc;border:1.5px solid #c8d0e8;border-radius:7px;color:#1a1e2e;font-size:11px;outline:none;">
+      <select id="sortKey" onchange="renderTable()">
+        <option value="sector">Sort: Sector</option>
+        <option value="volScore_d">Sort: Vol Score ↓</option>
+        <option value="sentScore_d">Sort: Sent Score ↓</option>
+        <option value="del_d">Sort: Delivery % ↓</option>
+        <option value="pct_d">Sort: Change % ↓</option>
+        <option value="vol_d">Sort: Volume ↓</option>
+      </select>
+      <label><input type="checkbox" id="onlyFetched" onchange="renderTable()"> Only loaded</label>
+      <span class="row-count-badge"><span id="rowCount">0</span> rows · <span id="loadedCount">0</span> loaded</span>
+    </div>
+    <div class="tbl-wrap"><div class="tbl-scroll">
+    <table class="data-tbl" id="mainTable">
+      <thead><tr>
+        <th>#</th>
+        <th>Sector</th>
+        <th>Company</th>
+        <th>Symbol</th>
+        <th>CB Est.</th>
+        <th>Close ₹</th>
+        <th>Chg %</th>
+        <th>Volume</th>
+        <th>Del %</th>
+        <th>₹Cr</th>
+        <th>Vol ⭐</th>
+        <th>Sent ⭐</th>
+        <th>Bulk</th>
+        <th>Trend</th>
+      </tr></thead>
+      <tbody id="mainBody">
+        <tr><td colspan="14" style="text-align:center;padding:32px;color:#9098b0;font-size:12px;">
+          Paste Bhavcopy CSV above and click Parse &amp; Load
+        </td></tr>
+      </tbody>
+    </table>
+    </div></div>
+    <div style="font-size:10px;color:#9098b0;margin-top:8px;" id="mainFooter"></div>
+
+    <!-- Trend panel -->
+    <div id="trendPanel">
+      <div id="trendTitle">—</div>
+      <canvas id="trendChart" height="120"></canvas>
+    </div>
+  </div>
+
+  <!-- Exports -->
+  <div class="card">
+    <div class="card-title">💾 Export</div>
+    <div class="input-row">
+      <button class="btn btn-blue btn-sm" onclick="exportToday()">📊 Export Today CSV</button>
+      <button class="btn btn-grey btn-sm" onclick="exportHistory()">📁 Export All History CSV</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- TAB 2: BULK DEALS                                                  -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="panel-bulk" class="panel">
+  <div class="card">
+    <div class="card-title">🏦 Bulk / Block Deal CSV <span>(<a href="https://www.nseindia.com/reports/bulk-deals" target="_blank" style="color:#5a6080;">NSE Bulk Deals</a>)</span></div>
+    <textarea id="bulkPaste" class="paste-area" rows="6"
+      placeholder="Paste NSE Bulk/Block Deal CSV here&#10;Format: Date,Symbol,Security Name,Client Name,Deal Type,Qty,Price&#10;Tab-separated (web copy) or comma-separated (CSV download) both supported"></textarea>
+    <div class="input-row" style="margin-top:8px;">
+      <button class="btn btn-orange" onclick="parseBulkDeals()">📊 Parse &amp; Tag Deals</button>
+      <button class="btn btn-grey btn-sm" onclick="clearBulkDeals()">Clear All Deals</button>
+      <button class="btn btn-grey btn-sm" onclick="document.getElementById('bulkPaste').value=''">Clear Paste</button>
+    </div>
+    <div class="status-txt" id="bulkStatus"></div>
+    <div id="bulkSummary"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- TAB 3: FII / PCR                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="panel-fii" class="panel">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;flex-wrap:wrap;">
+
+    <!-- FII / DII -->
+    <div class="card">
+      <div class="card-title">📈 FII / DII Net Flow (₹ Crore)</div>
+      <div class="input-row">
+        <input type="number" id="fiiInput" class="inp inp-sm" placeholder="FII Net ₹Cr"
+               onkeydown="if(event.key==='Enter')setManualFII()">
+        <button class="btn btn-blue btn-sm" onclick="setManualFII()">Set FII</button>
+      </div>
+      <div class="input-row">
+        <input type="number" id="diiInput" class="inp inp-sm" placeholder="DII Net ₹Cr"
+               onkeydown="if(event.key==='Enter')setManualDII()">
+        <button class="btn btn-green btn-sm" onclick="setManualDII()">Set DII</button>
+      </div>
+      <div class="status-txt" id="fiiStatus"></div>
+      <div style="margin-top:8px;font-size:11px;color:#5a6080;">Signal: <span id="fiiSignalText" style="font-weight:700;">—</span></div>
+      <button class="btn btn-grey btn-sm" style="margin-top:10px;" onclick="clearManualFII()">Clear FII/DII</button>
+    </div>
+
+    <!-- PCR -->
+    <div class="card">
+      <div class="card-title">📉 PCR — Put / Call Ratio</div>
+      <div class="input-row">
+        <input type="number" step="0.01" id="niftyPCRInput" class="inp inp-sm" placeholder="Nifty 50 PCR"
+               onkeydown="if(event.key==='Enter')setManualPCR()">
+        <button class="btn btn-blue btn-sm" onclick="setManualPCR()">Set Nifty PCR</button>
+      </div>
+      <div class="input-row">
+        <input type="number" step="0.01" id="bankPCRInput" class="inp inp-sm" placeholder="Bank Nifty PCR"
+               onkeydown="if(event.key==='Enter')setManualBankPCR()">
+        <button class="btn btn-blue btn-sm" onclick="setManualBankPCR()">Set Bank PCR</button>
+      </div>
+      <div class="input-row" style="margin-top:4px;">
+        <input type="date" id="pcrDate" class="inp inp-sm">
+        <button class="btn btn-green btn-sm" onclick="logPCR()">📋 Log PCR</button>
+        <button class="btn btn-grey btn-sm" onclick="showPCRHistory()">📜 History</button>
+      </div>
+      <button class="btn btn-grey btn-sm" style="margin-top:8px;" onclick="clearManualPCR()">Clear PCR</button>
+      <div style="margin-top:10px;font-size:9px;color:#7a829a;">PCR &gt; 1.2 = Bullish · &lt; 0.8 = Bearish · 0.8–1.2 = Neutral</div>
+    </div>
+  </div>
+
+  <!-- PCR History -->
+  <div class="card" id="pcrHistCard" style="display:none;">
+    <div class="card-title">📅 PCR History Log <button class="btn btn-grey btn-sm" onclick="document.getElementById('pcrHistCard').style.display='none'" style="margin-left:auto;">Close</button></div>
+    <div id="pcrHistContent"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- TAB 4: LEADERBOARD                                                 -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="panel-leaderboard" class="panel">
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+      <div class="card-title" style="margin-bottom:0;">🏆 NSE Leaderboards</div>
+      <span class="active-badge" id="lbActiveBadge" style="display:none;"></span>
+      <select id="lbDatePicker" class="hist-sel" onchange="lbLoadDate()" style="margin-left:auto;">
+        <option value="">— select date —</option>
+      </select>
+    </div>
+    <div class="lb-btns">
+      <button class="lb-btn lb-active" id="lb-vol" onclick="showLeaderboard('vol')">🔥 Volume</button>
+      <button class="lb-btn" id="lb-del" onclick="showLeaderboard('del')">📦 Delivery</button>
+      <button class="lb-btn" id="lb-turn" onclick="showLeaderboard('turn')">💰 Turnover</button>
+      <button class="lb-btn" id="lb-gain" onclick="showLeaderboard('gain')">📈 Gainers</button>
+      <button class="lb-btn" id="lb-loss" onclick="showLeaderboard('loss')">📉 Losers</button>
+      <button class="lb-btn" id="lb-vscore" onclick="showLeaderboard('vscore')">⭐ Vol Score</button>
+      <button class="lb-btn" id="lb-sscore" onclick="showLeaderboard('sscore')">😊 Sent Score</button>
+      <button class="lb-btn" id="lb-ourlist" onclick="showLeaderboard('ourlist')">🎯 Our 765</button>
+    </div>
+    <div style="overflow-x:auto;border-radius:8px;border:1px solid #dde3ef;">
+      <div id="lbContent"><div class="lb-empty">No data loaded — paste Bhavcopy first</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- TAB 5: ALL COMPANIES                                               -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="panel-companies" class="panel">
+  <div class="card">
+    <div class="card-title">📋 All Companies — 765 NSE Listed</div>
+    <div class="filter-row">
+      <select id="coSectorFilter" onchange="renderCompaniesTab()">
+        <option value="all">All Sectors</option>
+      </select>
+      <input type="text" id="coSearch" placeholder="Search company / symbol…"
+             oninput="renderCompaniesTab()" style="min-width:160px;padding:6px 10px;background:#f8f9fc;border:1.5px solid #c8d0e8;border-radius:7px;color:#1a1e2e;font-size:11px;outline:none;">
+      <span class="row-count-badge"><span id="coRowCount">0</span> companies</span>
+    </div>
+    <div class="tbl-wrap"><div class="tbl-scroll">
+    <table class="data-tbl">
+      <thead><tr>
+        <th>#</th><th>Sector</th><th>Company</th><th>Symbol</th>
+        <th>Close ₹</th><th>Chg %</th><th>Del %</th><th>Volume</th>
+        <th>Vol ⭐</th><th>Sent ⭐</th><th>Bulk</th>
+      </tr></thead>
+      <tbody id="coBody">
+        <tr><td colspan="11" style="text-align:center;padding:32px;color:#9098b0;">Load Bhavcopy to see live data</td></tr>
+      </tbody>
+    </table>
+    </div></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- TAB 6: HISTORY                                                     -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="panel-history" class="panel">
+  <div class="card">
+    <div class="card-title">🗂 History Viewer</div>
+    <div class="input-row">
+      <select id="histDate" class="hist-sel" onchange="showHistory()">
+        <option value="">Select a date…</option>
+      </select>
+      <span class="hist-count" id="histCount">No history yet</span>
+    </div>
+    <div style="font-size:10px;color:#9098b0;margin-bottom:8px;" id="histDebug"></div>
+    <div id="histWrap" style="display:none;">
+      <div class="filter-row">
+        <label><input type="checkbox" id="histOur765" checked onchange="showHistory()"> Our 765 only</label>
+        <label><input type="checkbox" id="histMinVol" checked onchange="showHistory()"> Min vol</label>
+        <input type="number" id="histMinVolVal" value="50000" class="inp" style="width:100px;" oninput="showHistory()">
+      </div>
+      <div class="tbl-wrap"><div class="tbl-scroll">
+      <table class="data-tbl">
+        <thead><tr>
+          <th>Company</th><th>Symbol</th><th>Sector</th>
+          <th>Close ₹</th><th>Chg %</th><th>Volume</th>
+          <th>Del %</th><th>₹Cr</th><th>FII Net</th>
+          <th>PCR</th><th>Bulk</th><th>Vol ⭐</th><th>Sent ⭐</th>
+        </tr></thead>
+        <tbody id="histBody"></tbody>
+      </table>
+      </div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<!-- TAB 7: MANAGE                                                      -->
+<!-- ═══════════════════════════════════════════════════════════════════ -->
+<div id="panel-manage" class="panel">
+  <div class="card">
+    <div class="card-title" style="color:#e53935;">⚙ Data Management</div>
+    <div class="delete-grid">
+
+      <div class="del-card">
+        <h4>Delete a Single Date</h4>
+        <div class="input-row">
+          <select id="delDateSel" class="hist-sel" style="min-width:140px;">
+            <option value="">Select date…</option>
+          </select>
+          <button class="btn btn-red btn-sm" onclick="deleteOneDate()">Delete</button>
+        </div>
+        <div class="status-txt" id="delDateStatus"></div>
+      </div>
+
+      <div class="del-card">
+        <h4>Clear All Manual Inputs</h4>
+        <p style="font-size:10px;color:#7a829a;margin-bottom:8px;">Clears manually entered FII, DII, PCR values. PCR log history is preserved.</p>
+        <button class="btn btn-grey btn-sm" onclick="clearManualAll()">Clear FII / DII / PCR inputs</button>
+      </div>
+
+      <div class="del-card">
+        <h4>Clear Today's Bhavcopy</h4>
+        <p style="font-size:10px;color:#7a829a;margin-bottom:8px;">Wipes the in-memory data for the current session without touching saved history.</p>
+        <button class="btn btn-grey btn-sm" onclick="clearTodayMemory()">Clear In-Memory Data</button>
+      </div>
+
+      <div class="del-card" style="border-color:#c62828;">
+        <h4 style="color:#e53935;">☢ Nuclear — Delete ALL NSE Data</h4>
+        <p style="font-size:10px;color:#7a829a;margin-bottom:8px;">Permanently erases all stored history, FII/DII, PCR, bulk deals across all storage keys. Cannot be undone.</p>
+        <button class="btn btn-red" onclick="nuclearDelete()">☢ Delete ALL Data</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Storage inspector -->
+  <div class="card">
+    <div class="card-title">🔍 Storage Inspector</div>
+    <button class="btn btn-grey btn-sm" onclick="inspectStorage()">Inspect localStorage</button>
+    <div id="storageReport" style="margin-top:10px;font-size:10px;color:#5a6080;font-family:monospace;white-space:pre-wrap;max-height:200px;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- ── DISCLAIMER ─────────────────────────────────────────────────── -->
+<div class="disclaimer">
+  <strong>Important:</strong> CB Trade Feed is a proprietary analytical framework for educational and research purposes.
+  It does <strong>NOT</strong> constitute financial advice or investment recommendations.
+  Not SEBI-registered research. Consult a SEBI-registered advisor before making investment decisions.<br>
+  © 2025–26 CB Finance26™ · All Rights Reserved · Proprietary &amp; Confidential · All data processed locally on your device
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════
+// CB TRADE FEED — v1.0 — JavaScript Core
+// ═══════════════════════════════════════════════════════════════════
+
+// ── COPY PROTECTION ──────────────────────────────────────────────
+document.addEventListener('contextmenu', e => e.preventDefault());
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey||e.metaKey) && ['s','p','u'].includes(e.key.toLowerCase())) { e.preventDefault(); return false; }
+  if (e.key === 'F12') { e.preventDefault(); return false; }
+});
+
+// ── AUTH ─────────────────────────────────────────────────────────
+(function(){
+  if (sessionStorage.getItem('cbf26_auth')==='granted') {
+    document.getElementById('accessGate').style.display='none';
+    return;
+  }
+  setTimeout(()=>document.getElementById('accessCodeInput')?.focus(), 300);
+})();
+
+function checkAccess() {
+  const val = (document.getElementById('accessCodeInput')?.value||'').trim().toUpperCase();
+  const VALID = ['CBF26','MEMBER2025','RESEARCH26','CBFINANCE','ALPHA2025'];
+  if (VALID.includes(val)) {
+    sessionStorage.setItem('cbf26_auth','granted');
+    const gate = document.getElementById('accessGate');
+    gate.style.transition='opacity 0.5s'; gate.style.opacity='0';
+    setTimeout(()=>gate.style.display='none',500);
+  } else {
+    document.getElementById('accessErr').textContent='Incorrect code. Please contact CB Finance26 for access.';
+    document.getElementById('accessCodeInput').value='';
+    setTimeout(()=>document.getElementById('accessErr').textContent='',3000);
+  }
+}
+
+// ── STORAGE ──────────────────────────────────────────────────────
+var STORAGE_KEY   = 'cbf26_daily_dash_v2';
+var FII_KEY       = 'cbf26_fii_today';
+var PCR_HIST_KEY  = 'cbf_pcr_history';
+var BULK_KEY      = 'cbf_bulk_deals';
+var LEGACY_KEYS   = ['cbf26_daily_dash_v2','cbf26_daily_dash_v1','cbf26_daily_dash','cbf26_dash'];
+
+// ── IN-MEMORY STATE ───────────────────────────────────────────────
+var TODAY         = {};          // symbol → data
+var BHAVCOPY_DATE = null;        // trade date of loaded bhavcopy (YYYY-MM-DD)
+var FII_STATE     = { fiiNet:null, diiNet:null, niftyPCR:null, bankNiftyPCR:null };
+var HIST_CACHE    = {};          // symbol → {days,avgVol5,avgVol10,avgVol30,avgDel5,...}
+var LB_ACTIVE     = 'vol';
+var TREND_CHART   = null;
+var LB_POPULATING = false;
+
+// ── DATE UTILS ────────────────────────────────────────────────────
+function todayKey() {
+  var d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
+// ── STORAGE HELPERS ───────────────────────────────────────────────
+function saveToStorage(dateOverride) {
+  try {
+    var dk = dateOverride || BHAVCOPY_DATE || todayKey();
+    var hist = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+    hist[dk] = TODAY;
+    var dates = Object.keys(hist).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).sort();
+    if (dates.length > 90) dates.slice(0,dates.length-90).forEach(d=>delete hist[d]);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(hist));
+    return dk;
+  } catch(e) { console.warn('Save error:', e); return dateOverride||BHAVCOPY_DATE||todayKey(); }
+}
+
+function loadFromStorage() {
+  try {
+    var combined = {};
+    LEGACY_KEYS.forEach(k=>{
+      try {
+        var d = JSON.parse(localStorage.getItem(k)||'{}');
+        Object.keys(d).forEach(dk=>{ if(/^\d{4}-\d{2}-\d{2}$/.test(dk)) combined[dk]=d[dk]; });
+      } catch(e){}
+    });
+    var dates = Object.keys(combined).sort();
+    if (!dates.length) return;
+    var best = dates[dates.length-1];
+    var data = combined[best];
+    if (!data) return;
+    var keys = Object.keys(data);
+    var dateKeyCount = keys.filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).length;
+    if (dateKeyCount > keys.length * 0.1) {
+      console.log('CBF26 TradeFeed: discarding stale date-keyed data'); return;
+    }
+    TODAY = data;
+    BHAVCOPY_DATE = best;
+  } catch(e) { TODAY = {}; }
+}
+
+function getAllStoredDates() {
+  var combined = {};
+  LEGACY_KEYS.forEach(k=>{
+    try { Object.assign(combined, JSON.parse(localStorage.getItem(k)||'{}')); } catch(e){}
+  });
+  return Object.keys(combined).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)).sort().reverse();
+}
+
+// Migrate old storage keys on startup
+(function migrate(){
+  var oldKeys = ['cbf26_daily_dash','cbf26_daily_dash_v1','cbf26_dash','cb_finance26_dash'];
+  oldKeys.forEach(ok=>{
+    try {
+      var old = localStorage.getItem(ok); if(!old) return;
+      var oldP = JSON.parse(old);
+      var cur = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+      Object.entries(oldP).forEach(([k,v])=>{ if(!cur[k]) cur[k]=v; });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(cur));
+      localStorage.removeItem(ok);
+    } catch(e){}
+  });
+})();
+
+// ── HIST CACHE ────────────────────────────────────────────────────
+function buildHistCache() {
+  HIST_CACHE = {};
+  try {
+    var hist = JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+    var today = todayKey();
+    var pastDates = Object.keys(hist).filter(d=>d<today).sort();
+    if (!pastDates.length) return;
+    var symHist = {};
+    pastDates.forEach(date=>{
+      var day = hist[date]||{};
+      Object.entries(day).forEach(([sym,r])=>{
+        if (!symHist[sym]) symHist[sym]=[];
+        symHist[sym].push({date,vol:r.vol?+r.vol:null,del:r.del?+r.del:null,
+          pctChg:r.pctChg?+r.pctChg:null,close:r.close?+r.close:null});
+      });
+    });
+    var avg=(arr,f,n)=>{
+      var sl=arr.slice(-n).map(r=>r[f]).filter(v=>v!==null&&!isNaN(v));
+      return sl.length?sl.reduce((a,b)=>a+b,0)/sl.length:null;
+    };
+    Object.entries(symHist).forEach(([sym,rows])=>{
+      rows.sort((a,b)=>a.date.localeCompare(b.date));
+      HIST_CACHE[sym]={days:rows.length,
+        avgVol5:avg(rows,'vol',5),avgVol10:avg(rows,'vol',10),avgVol30:avg(rows,'vol',30),
+        avgDel5:avg(rows,'del',5),avgDel10:avg(rows,'del',10),
+        avgPct5:avg(rows,'pctChg',5),
+        lastDel:rows.length?rows[rows.length-1].del:null,
+        lastVol:rows.length?rows[rows.length-1].vol:null,
+        closes:rows.slice(-3).map(r=>r.close).filter(Boolean)};
+    });
+  } catch(e){ console.warn('HistCache error:',e); }
+}
+
+// ── SCORE ENGINE ─────────────────────────────────────────────────
+function computeScores(r) {
+  var sym=r.symbol, hist=HIST_CACHE[sym]||null, days=hist?hist.days:0;
+  var volScore=3,volRationale=[],volComponents=[];
+  var todayVol=r.vol?+r.vol:null, delPct=r.del?+r.del:null;
+
+  if (todayVol&&hist) {
+    var avgVol=hist.avgVol10||hist.avgVol5||hist.avgVol30;
+    var avgLabel=hist.avgVol10?'10d':hist.avgVol5?'5d':'30d';
+    if (avgVol&&avgVol>0) {
+      var ratio=todayVol/avgVol;
+      var rs=ratio>=2.5?5:ratio>=1.5?4:ratio>=0.8?3:ratio>=0.5?2:1;
+      volComponents.push({score:rs,weight:50,label:'Vol '+ratio.toFixed(2)+'× vs '+avgLabel});
+      volRationale.push('Vol '+ratio.toFixed(2)+'× ('+avgLabel+')');
+    }
+  } else if (todayVol) { volRationale.push(fmtNum(todayVol)+' (no history)'); }
+
+  if (delPct!==null) {
+    var ds=delPct>=65?5:delPct>=50?4:delPct>=35?3:delPct>=20?2:1;
+    volComponents.push({score:ds,weight:35,label:'Del '+delPct.toFixed(1)+'%'});
+    volRationale.push('Del '+delPct.toFixed(1)+'%');
+  }
+  if (delPct!==null&&hist&&hist.avgDel5!==null) {
+    var dt=delPct-hist.avgDel5;
+    var dts=dt>10?5:dt>3?4:dt>-3?3:dt>-10?2:1;
+    volComponents.push({score:dts,weight:15,label:'DelTrend '+(dt>=0?'+':'')+dt.toFixed(1)+'%'});
+    volRationale.push('DelTrend '+(dt>=0?'+':'')+dt.toFixed(1)+'%');
+  }
+  if (volComponents.length>0) {
+    var vwS=0,vwT=0;
+    volComponents.forEach(c=>{vwS+=c.score*c.weight;vwT+=c.weight;});
+    volScore=Math.min(5,Math.max(1,Math.round(vwS/vwT)));
+  } else if (delPct!==null) {
+    volScore=delPct>=65?5:delPct>=50?4:delPct>=35?3:delPct>=20?2:1;
+  }
+  r.volScore=volScore; r.volRationale=volRationale.join(' · '); r.histDays=days;
+
+  var sentComps=[],sentRationale=[];
+  if (delPct!==null) {
+    var s1=delPct>=60?5:delPct>=48?4:delPct>=34?3:delPct>=20?2:1;
+    sentComps.push({s:s1,w:20}); sentRationale.push('Del:'+s1);
+  }
+  if (r.fiiNet!=null) {
+    var fs=r.fiiNet>3000?5:r.fiiNet>500?4:r.fiiNet>-500?3:r.fiiNet>-3000?2:1;
+    if (r.diiNet!=null&&r.diiNet>500) fs=Math.min(5,fs+0.5);
+    sentComps.push({s:Math.round(fs),w:18}); sentRationale.push('FII:'+Math.round(fs));
+  }
+  if (r.pcr!=null) {
+    var pcr=+r.pcr, ps=pcr>1.5?5:pcr>1.2?4:pcr>0.8?3:pcr>0.5?2:1;
+    sentComps.push({s:ps,w:10}); sentRationale.push('PCR:'+ps);
+  }
+  if (r.pctChg!=null) {
+    var pc=+r.pctChg, pcs=pc>4?5:pc>1.5?4:pc>-1.5?3:pc>-4?2:1;
+    sentComps.push({s:pcs,w:15}); sentRationale.push('Px:'+pcs);
+  }
+  if (hist&&hist.avgPct5!=null) {
+    var mom=hist.avgPct5, ms=mom>1.5?5:mom>0.3?4:mom>-0.3?3:mom>-1.5?2:1;
+    sentComps.push({s:ms,w:15}); sentRationale.push('Mom:'+ms);
+  }
+  if (todayVol&&hist&&hist.lastVol&&hist.lastVol>0) {
+    var va=todayVol/hist.lastVol, vas=va>2?5:va>1.3?4:va>0.7?3:va>0.4?2:1;
+    sentComps.push({s:vas,w:12}); sentRationale.push('VolAcc:'+vas);
+  }
+  if (delPct!==null&&hist&&hist.avgDel5!=null) {
+    var dt2=delPct-hist.avgDel5, dts2=dt2>12?5:dt2>4?4:dt2>-4?3:dt2>-12?2:1;
+    sentComps.push({s:dts2,w:10}); sentRationale.push('DelTr:'+dts2);
+  }
+  var swS=0,swT=0;
+  sentComps.forEach(c=>{swS+=c.s*c.w;swT+=c.w;});
+  var rawSent=swT>0?Math.min(5,Math.max(1,Math.round(swS/swT))):3;
+  r.sentScore=(sentComps.length<3&&rawSent===5)?4:rawSent;
+  r.sentRationale=sentRationale.join(' · ');
+  r.sentComponents=sentComps;
+  return r;
+}
+
+// ── FORMAT HELPERS ────────────────────────────────────────────────
+function fmtNum(n) {
+  if (n===null||n===undefined||isNaN(n)) return '—';
+  var a=Math.abs(n);
+  if (a>=1e7) return (n/1e7).toFixed(1)+'Cr';
+  if (a>=1e5) return (n/1e5).toFixed(1)+'L';
+  return (+n).toLocaleString('en-IN',{maximumFractionDigits:0});
+}
+function fmtDel(d) {
+  var col=d>=60?'#00a854':d>=45?'#1565c0':d>=30?'#f59e0b':'#e53935';
+  return '<span style="color:'+col+';font-weight:800;">'+d.toFixed(1)+'%</span>';
+}
+function fmtPct(p) {
+  if (p===null||p===undefined) return '—';
+  var pf=+p; var cls=pf>=2?'lb-up':pf<=-2?'lb-dn':'';
+  return '<span class="'+cls+'">'+(pf>=0?'+':'')+pf.toFixed(2)+'%</span>';
+}
+function scoreSpan(s) {
+  if (!s) return '—';
+  return '<span class="score-'+s+'">'+s+'/5</span>';
+}
+function estCBScore(l) {
+  if (!l) return '—';
+  var base=60;
+  if (l.volScore) base+=(l.volScore-3)*4;
+  if (l.sentScore) base+=(l.sentScore-3)*3.5;
+  return Math.min(100,Math.max(0,Math.round(base)));
+}
+function getSparkData(symbol) {
+  if (!symbol) return null;
+  try {
+    var hist=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+    var dates=Object.keys(hist).sort().slice(-7);
+    var vals=dates.map(d=>hist[d]&&hist[d][symbol]?hist[d][symbol].volScore:null);
+    return vals.filter(Boolean).length>=2?vals:null;
+  } catch(e){return null;}
+}
+
+// ── BHAVCOPY PARSER ───────────────────────────────────────────────
+function parseBhavcopy() {
+  var raw=(document.getElementById('bhavPaste').value||'').trim();
+  if (!raw) return;
+  var lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  if (!lines.length) { showStatus('bhavStatus','No data found'); return; }
+
+  var firstLineRaw=lines[0];
+  var delimiter=(firstLineRaw.split('\t').length>firstLineRaw.split(',').length)?'\t':',';
+  var delimLabel=delimiter==='\t'?'tab-separated':'comma-separated';
+  var firstLine=firstLineRaw.split(delimiter).map(s=>s.trim());
+  var firstCol=firstLine[0];
+
+  var hasNewHeader=lines[0].indexOf('TckrSymb')!==-1||lines[0].indexOf('TtlTradgVol')!==-1||lines[0].indexOf('TradDt')!==-1;
+  var isDateCol0=/^\d{4}-\d{2}-\d{2}$/.test(firstCol);
+  var hasOldHeader=lines[0].indexOf('SYMBOL')!==-1&&lines[0].indexOf('SERIES')!==-1;
+  var isNewFormat=hasNewHeader||isDateCol0;
+
+  var col={}, dataLines;
+  if (hasNewHeader) {
+    firstLine.forEach((h,i)=>col[h]=i);
+    dataLines=lines.slice(1);
+  } else if (isDateCol0) {
+    col['TradDt']=0;col['TckrSymb']=7;col['SctySrs']=8;col['ClsPric']=17;
+    col['PrvsClsgPric']=19;col['TtlTradgVol']=24;col['TtlTrfVal']=25;col['FinInstrmTp']=4;
+    dataLines=lines;
+  } else if (hasOldHeader) {
+    firstLine.forEach((h,i)=>col[h]=i);
+    dataLines=lines.slice(1);
+  } else { dataLines=lines; }
+
+  var loaded=0, skipped=0;
+  TODAY={}; buildHistCache();
+
+  dataLines.forEach(line=>{
+    if (!line) return;
+    var p=line.split(delimiter).map(s=>s.trim());
+    var symbol,series,close,prevClose,vol,turnoverR,delivPer;
+    if (isNewFormat) {
+      symbol=col['TckrSymb']!==undefined?(p[col['TckrSymb']]||'').trim().toUpperCase():null;
+      series=col['SctySrs']!==undefined?(p[col['SctySrs']]||'').trim().toUpperCase():'EQ';
+      close=col['ClsPric']!==undefined?+p[col['ClsPric']]||null:null;
+      prevClose=col['PrvsClsgPric']!==undefined?+p[col['PrvsClsgPric']]||null:null;
+      vol=col['TtlTradgVol']!==undefined?+p[col['TtlTradgVol']]||null:null;
+      turnoverR=col['TtlTrfVal']!==undefined?+p[col['TtlTrfVal']]||null:null;
+      delivPer=null;
+    } else {
+      symbol=col['SYMBOL']!==undefined?(p[col['SYMBOL']]||'').trim().toUpperCase():(p[0]||'').trim().toUpperCase();
+      series=col['SERIES']!==undefined?(p[col['SERIES']]||'').trim().toUpperCase():(p[1]||'').trim().toUpperCase();
+      close=col['CLOSE']!==undefined?+p[col['CLOSE']]||null:+p[5]||null;
+      prevClose=col['PREVCLOSE']!==undefined?+p[col['PREVCLOSE']]||null:+p[7]||null;
+      vol=col['TOTTRDQTY']!==undefined?+p[col['TOTTRDQTY']]||null:+p[8]||null;
+      turnoverR=col['TOTTRDVAL']!==undefined?+p[col['TOTTRDVAL']]||null:+p[9]||null;
+      delivPer=col['DELIV_PER']!==undefined?+p[col['DELIV_PER']]||null:+p[14]||null;
+    }
+    if (!symbol){skipped++;return;}
+    if (series&&series!=='EQ'){skipped++;return;}
+    if (isNewFormat&&col['FinInstrmTp']!==undefined) {
+      var it=(p[col['FinInstrmTp']]||'').trim();
+      if (it&&it!=='STK'){skipped++;return;}
+    }
+    var pctChg=(close&&prevClose)?(((close-prevClose)/prevClose)*100).toFixed(2):null;
+    var existing=TODAY[symbol]||{};
+    var result={symbol,company:NSE_REVERSE_MAP[symbol]||existing.company||symbol,
+      close,prevClose,pctChg,vol,
+      del:delivPer!==null?delivPer:(existing.del||null),
+      turnover:turnoverR?(turnoverR/1e7).toFixed(2):null,
+      fiiNet:FII_STATE.fiiNet, diiNet:FII_STATE.diiNet, pcr:FII_STATE.niftyPCR,
+      bulkDeals:[], fetchTime:new Date().toISOString(),
+      format:isNewFormat?'UDiFF_2024':'CM_legacy'};
+    result=computeScores(result);
+    TODAY[symbol]=result;
+    loaded++;
+  });
+
+  // Extract trade date
+  var bhavDate=null;
+  if (dataLines.length>0) {
+    var sample=dataLines[0].split(delimiter).map(s=>s.trim());
+    if (isNewFormat) {
+      var tdIdx=col['TradDt']!==undefined?col['TradDt']:0;
+      var rawD=sample[tdIdx]||'';
+      if (/^\d{4}-\d{2}-\d{2}$/.test(rawD)) bhavDate=rawD;
+    } else {
+      var tsIdx=col['TIMESTAMP']!==undefined?col['TIMESTAMP']:10;
+      var rawTs=sample[tsIdx]||'';
+      var months={JAN:'01',FEB:'02',MAR:'03',APR:'04',MAY:'05',JUN:'06',JUL:'07',AUG:'08',SEP:'09',OCT:'10',NOV:'11',DEC:'12'};
+      var m=rawTs.match(/^(\d{2})-([A-Z]{3})-(\d{4})$/);
+      if (m) bhavDate=m[3]+'-'+(months[m[2]]||'01')+'-'+m[1];
+    }
+  }
+  BHAVCOPY_DATE=bhavDate||todayKey();
+  saveToStorage(BHAVCOPY_DATE);
+
+  // Restore bulk deals
+  restoreBulkDeals();
+
+  // Update UI
+  buildHistoryDropdown();
+  lbPopulateDatePicker();
+  renderTable();
+  renderLeaderboard();
+  updateFIIBanner();
+  updateLastUpdateBadge(loaded+' stocks loaded');
+
+  var fmt=isNewFormat
+    ?(hasNewHeader?'UDiFF with header':'UDiFF without header')+' · '+delimLabel
+    :(hasOldHeader?'Old CM with header':'Old CM without header')+' · '+delimLabel;
+  var dateLabel=bhavDate?' [trade date: '+bhavDate+']':'';
+  showStatus('bhavStatus','✔ '+loaded+' companies loaded ['+fmt+']'+(skipped>0?' · '+skipped+' skipped':'')+dateLabel+(isNewFormat?' — now paste MTO Delivery file below':''),'#006b30');
+
+  // update active badge
+  var badge=document.getElementById('lbActiveBadge');
+  if (badge&&BHAVCOPY_DATE){badge.textContent='📅 '+BHAVCOPY_DATE;badge.style.display='inline';}
+}
+
+// ── DELIVERY (MTO) PARSER ─────────────────────────────────────────
+function parseDelivery() {
+  var raw=(document.getElementById('delivPaste').value||'').trim();
+  if (!raw) return;
+  var lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
+  if (lines.length<2) return;
+  var merged=0,notFound=0;
+  lines.forEach(line=>{
+    if (!line.startsWith('20,')) return;
+    var p=line.split(',');
+    if (p.length<7) return;
+    var sym=(p[2]||'').trim().toUpperCase();
+    var ser=(p[3]||'').trim().toUpperCase();
+    var del=+p[6];
+    if (!sym||ser!=='EQ'||isNaN(del)||del<0||del>100) return;
+    if (TODAY[sym]) { TODAY[sym].del=del; TODAY[sym]=computeScores(TODAY[sym]); merged++; }
+    else notFound++;
+  });
+  buildHistCache(); saveToStorage();
+  renderTable(); renderLeaderboard();
+  var inMem=Object.keys(TODAY).length;
+  if (inMem===0) showStatus('delivStatus','⚠ Bhavcopy not in memory — paste Bhavcopy first','#e53935');
+  else if (merged===0) showStatus('delivStatus','⚠ 0 merged ('+inMem+' in memory) — check symbol format','#e53935');
+  else showStatus('delivStatus','✔ Delivery % merged for '+merged+' of '+inMem+' companies'+(notFound>0?' · '+notFound+' in MTO not matched':''),'#006b30');
+}
+
+// ── BULK DEALS PARSER ─────────────────────────────────────────────
+function parseBulkDeals() {
+  var raw=(document.getElementById('bulkPaste').value||'').trim();
+  if (!raw) { showStatus('bulkStatus','⚠ Paste bulk/block deal data first','#e53935'); return; }
+  var lines=raw.trim().split('\n').map(l=>l.trim()).filter(Boolean);
+  if (!lines.length) { showStatus('bulkStatus','⚠ Too few rows','#e53935'); return; }
+  var sampleLine=lines[0];
+  var delim=sampleLine.split('\t').length>=4?'\t':',';
+  var startRow=0;
+  var hdr=lines[0].toUpperCase();
+  if (hdr.indexOf('SYMBOL')!==-1||hdr.indexOf('CLIENT')!==-1||hdr.indexOf('DEAL')!==-1||hdr.indexOf('DATE')!==-1) startRow=1;
+  var dateRx=/^(\d{1,2}[-\/]\w{3}[-\/]\d{2,4}|\d{1,2}[-\/]\d{1,2}[-\/]\d{2,4}|\d{4}-\d{2}-\d{2})$/;
+  var bySymbol={},parsed=0,skipped=0;
+  for (var i=startRow;i<lines.length;i++) {
+    var rawCols=lines[i].split(delim).map(c=>c.replace(/^"|"$/g,'').trim());
+    if (rawCols.length<4){skipped++;continue;}
+    var cols=rawCols;
+    if (dateRx.test(cols[0])) cols=cols.slice(1);
+    if (cols.length<4){skipped++;continue;}
+    var dtIdx=-1;
+    for (var ci=0;ci<Math.min(cols.length,7);ci++) {
+      var v=(cols[ci]||'').toUpperCase().trim();
+      if (v==='BUY'||v==='SELL'||v==='B'||v==='S'){dtIdx=ci;break;}
+    }
+    if (dtIdx<0){skipped++;continue;}
+    var sym=(cols[0]||'').toUpperCase().replace(/[^A-Z0-9&\-]/g,'').trim();
+    var dealType=(cols[dtIdx]||'').toUpperCase().trim();
+    var qty=+(cols[dtIdx+1]||'').replace(/,/g,'')||0;
+    var price=+(cols[dtIdx+2]||'').replace(/,/g,'')||0;
+    var client=dtIdx>=2?(cols[dtIdx-1]||''):(cols[1]||'');
+    if (!sym||sym.length>20){skipped++;continue;}
+    if (dealType==='B') dealType='BUY';
+    if (dealType==='S') dealType='SELL';
+    if (dealType!=='BUY'&&dealType!=='SELL'){skipped++;continue;}
+    if (!bySymbol[sym]) bySymbol[sym]=[];
+    bySymbol[sym].push({client,type:dealType,qty,price});
+    parsed++;
+  }
+  if (!parsed) { showStatus('bulkStatus','⚠ No valid rows found — check format','#e53935'); return; }
+  localStorage.setItem(BULK_KEY, JSON.stringify(bySymbol));
+  var matched=0;
+  Object.keys(bySymbol).forEach(sym=>{
+    if (!TODAY[sym]) TODAY[sym]={symbol:sym};
+    TODAY[sym].bulkDeals=bySymbol[sym]; matched++;
+  });
+  saveToStorage(); renderTable(); renderLeaderboard();
+  showStatus('bulkStatus','✔ '+parsed+' deals · '+matched+' companies tagged'+(skipped>0?' · '+skipped+' skipped':''),'#006b30');
+
+  // Summary
+  var summary=document.getElementById('bulkSummary');
+  if (summary) {
+    var rows=Object.keys(bySymbol).map(sym=>{
+      var deals=bySymbol[sym];
+      var buys=deals.filter(d=>d.type==='BUY'), sells=deals.filter(d=>d.type==='SELL');
+      return '<tr>'+
+        '<td style="font-weight:800;color:#1a1e2e;">'+sym+'</td>'+
+        '<td style="color:#7a829a;font-size:10px;">'+(NSE_REVERSE_MAP[sym]||'')+'</td>'+
+        '<td>'+(buys.length?'<span style="color:#00a854;font-weight:800;">▲ '+buys.length+' BUY</span>':'—')+'</td>'+
+        '<td>'+(sells.length?'<span style="color:#e53935;font-weight:800;">▼ '+sells.length+' SELL</span>':'—')+'</td>'+
+        '<td style="font-size:10px;color:#5a6080;">'+deals.slice(0,2).map(d=>d.client.substring(0,20)).join(' | ')+'</td>'+
+        '</tr>';
+    }).join('');
+    summary.style.display='block';
+    summary.innerHTML='<div style="font-size:11px;font-weight:800;color:#ba68c8;margin-bottom:8px;">🏦 Bulk/Block Summary — '+Object.keys(bySymbol).length+' companies · '+parsed+' deals</div>'+
+      '<table style="width:100%;border-collapse:collapse;font-size:11px;">'+
+      '<thead><tr style="background:#f8f0ff;"><th style="padding:5px 10px;color:#ba68c8;text-align:left;">Symbol</th>'+
+      '<th style="padding:5px 10px;color:#ba68c8;text-align:left;">Company</th>'+
+      '<th style="padding:5px 10px;color:#00a854;">Buy</th>'+
+      '<th style="padding:5px 10px;color:#e53935;">Sell</th>'+
+      '<th style="padding:5px 10px;color:#7a829a;text-align:left;">Clients</th></tr></thead>'+
+      '<tbody>'+rows+'</tbody></table>';
+  }
+}
+
+function clearBulkDeals() {
+  localStorage.removeItem(BULK_KEY); localStorage.removeItem('cbf_bulk_date');
+  Object.keys(TODAY).forEach(sym=>{ if(TODAY[sym]) delete TODAY[sym].bulkDeals; });
+  showStatus('bulkStatus','Bulk deals cleared');
+  var s=document.getElementById('bulkSummary'); if(s){s.style.display='none';s.innerHTML='';}
+  renderTable();
+}
+
+function restoreBulkDeals() {
+  var saved=localStorage.getItem(BULK_KEY);
+  if (!saved) return;
+  try {
+    var bd=JSON.parse(saved);
+    Object.keys(bd).forEach(sym=>{
+      if (!TODAY[sym]) TODAY[sym]={symbol:sym};
+      TODAY[sym].bulkDeals=bd[sym];
+    });
+  } catch(e){}
+}
+
+// ── FII / PCR ─────────────────────────────────────────────────────
+function setManualFII() {
+  var val=+(document.getElementById('fiiInput').value||'');
+  if (isNaN(val)) return;
+  FII_STATE.fiiNet=val; localStorage.setItem('cbf_manual_fii',val.toString());
+  flashInput('fiiInput'); updateFIIBanner();
+}
+function setManualDII() {
+  var val=+(document.getElementById('diiInput').value||'');
+  if (isNaN(val)) return;
+  FII_STATE.diiNet=val; localStorage.setItem('cbf_manual_dii',val.toString());
+  flashInput('diiInput'); updateFIIBanner();
+}
+function setManualPCR() {
+  var val=+(document.getElementById('niftyPCRInput').value||'');
+  if (isNaN(val)||val<=0) return;
+  FII_STATE.niftyPCR=val.toFixed(2); localStorage.setItem('cbf_manual_pcr',FII_STATE.niftyPCR);
+  flashInput('niftyPCRInput'); updateFIIBanner();
+}
+function setManualBankPCR() {
+  var val=+(document.getElementById('bankPCRInput').value||'');
+  if (isNaN(val)||val<=0) return;
+  FII_STATE.bankNiftyPCR=val.toFixed(2); localStorage.setItem('cbf_manual_bank_pcr',FII_STATE.bankNiftyPCR);
+  flashInput('bankPCRInput'); updateFIIBanner();
+}
+function clearManualFII() {
+  ['cbf_manual_fii','cbf_manual_dii'].forEach(k=>localStorage.removeItem(k));
+  FII_STATE.fiiNet=null; FII_STATE.diiNet=null;
+  ['fiiInput','diiInput'].forEach(id=>{var e=document.getElementById(id);if(e)e.value='';});
+  updateFIIBanner();
+}
+function clearManualPCR() {
+  ['cbf_manual_pcr','cbf_manual_bank_pcr'].forEach(k=>localStorage.removeItem(k));
+  FII_STATE.niftyPCR=null; FII_STATE.bankNiftyPCR=null;
+  ['niftyPCRInput','bankPCRInput'].forEach(id=>{var e=document.getElementById(id);if(e)e.value='';});
+  updateFIIBanner();
+}
+function clearManualAll() {
+  clearManualFII(); clearManualPCR();
+}
+
+function updateFIIBanner() {
+  var banner=document.getElementById('fiiBanner');
+  var hasFII=FII_STATE.fiiNet!==null||FII_STATE.diiNet!==null||FII_STATE.niftyPCR!==null;
+  if (banner) banner.style.display=hasFII?'grid':'none';
+
+  var fii=FII_STATE.fiiNet, dii=FII_STATE.diiNet;
+  var fiiEl=document.getElementById('dbFII'), diiEl=document.getElementById('dbDII');
+  if (fiiEl) { fiiEl.textContent=fii!==null?(fii>=0?'+':'')+fmtNum(fii):'—'; fiiEl.style.color=fii>=0?'#00a854':'#e53935'; }
+  if (diiEl) { diiEl.textContent=dii!==null?(dii>=0?'+':'')+fmtNum(dii):'—'; diiEl.style.color=dii>=0?'#00a854':'#e53935'; }
+
+  var sig='—';
+  if (fii!==null&&dii!==null) {
+    if(fii>0&&dii>0) sig='✅ Both buying — Bullish';
+    else if(fii<0&&dii<0) sig='🔴 Both selling — Danger';
+    else if(fii>0) sig='🟡 FII buying, DII selling';
+    else sig='🟡 DII absorbing FII sell';
+  } else if (fii!==null) { sig=fii>0?'FII Net Buyer':'FII Net Seller'; }
+  var sigEl=document.getElementById('dbFIISig'); if(sigEl) sigEl.textContent=sig;
+  var sigTab=document.getElementById('fiiSignalText'); if(sigTab) sigTab.textContent=sig;
+
+  var npcr=FII_STATE.niftyPCR, bpcr=FII_STATE.bankNiftyPCR;
+  var npcrEl=document.getElementById('dbNPCR');
+  var npcrSig=document.getElementById('dbNPCRSig');
+  if (npcrEl) npcrEl.textContent=npcr||'—';
+  if (npcrSig&&npcr) { var p=+npcr; npcrSig.textContent=p>1.2?'Bullish':p<0.8?'Bearish':'Neutral'; npcrSig.style.color=p>1.2?'#00a854':p<0.8?'#e53935':'#f59e0b'; }
+  var bpcrEl=document.getElementById('dbBPCR'); if(bpcrEl) bpcrEl.textContent=bpcr||'—';
+  var bpcrSig=document.getElementById('dbBPCRSig');
+  if (bpcrSig&&bpcr) { var bp=+bpcr; bpcrSig.textContent=bp>1.2?'Bullish':bp<0.8?'Bearish':'Neutral'; bpcrSig.style.color=bp>1.2?'#00a854':bp<0.8?'#e53935':'#f59e0b'; }
+  var tdEl=document.getElementById('dbTradeDate'); if(tdEl) tdEl.textContent=BHAVCOPY_DATE||todayKey();
+}
+
+// ── PCR LOG ───────────────────────────────────────────────────────
+function logPCR() {
+  var dateInp=document.getElementById('pcrDate');
+  var date=dateInp?dateInp.value:todayKey();
+  if (!date) { alert('Please select a date'); return; }
+  var n=+document.getElementById('niftyPCRInput').value||null;
+  var b=+document.getElementById('bankPCRInput').value||null;
+  if (!n&&!b) { alert('Enter at least one PCR value'); return; }
+  var hist=[];
+  try { hist=JSON.parse(localStorage.getItem(PCR_HIST_KEY)||'[]'); } catch(e){}
+  hist=hist.filter(e=>e.date!==date);
+  hist.push({date,nifty:n?n.toFixed(2):null,bank:b?b.toFixed(2):null});
+  hist.sort((a,b)=>b.date.localeCompare(a.date));
+  if (hist.length>90) hist=hist.slice(0,90);
+  localStorage.setItem(PCR_HIST_KEY, JSON.stringify(hist));
+  alert('✅ PCR logged for '+date+(n?' | Nifty: '+n.toFixed(2):'')+(b?' | Bank Nifty: '+b.toFixed(2):''));
+}
+
+function showPCRHistory() {
+  var hist=[];
+  try { hist=JSON.parse(localStorage.getItem(PCR_HIST_KEY)||'[]'); } catch(e){}
+  var card=document.getElementById('pcrHistCard');
+  var content=document.getElementById('pcrHistContent');
+  if (!card||!content) return;
+  if (!hist.length) { alert('No PCR history yet.'); return; }
+  var rows=hist.map(e=>{
+    var ns=e.nifty?+e.nifty:null, bs=e.bank?+e.bank:null;
+    var nCol=ns?(ns>1.2?'#00a854':ns<0.8?'#e53935':'#f59e0b'):'#6b7498';
+    var bCol=bs?(bs>1.2?'#00a854':bs<0.8?'#e53935':'#f59e0b'):'#6b7498';
+    return '<tr>'+
+      '<td style="padding:5px 10px;color:#1a1e2e;font-weight:700;">'+e.date+'</td>'+
+      '<td style="padding:5px 10px;color:'+nCol+';font-weight:900;text-align:center;">'+(e.nifty||'—')+'</td>'+
+      '<td style="padding:5px 10px;color:'+nCol+';text-align:center;">'+(ns?(ns>1.2?'Bullish':ns<0.8?'Bearish':'Neutral'):'—')+'</td>'+
+      '<td style="padding:5px 10px;color:'+bCol+';font-weight:900;text-align:center;">'+(e.bank||'—')+'</td>'+
+      '<td style="padding:5px 10px;color:'+bCol+';text-align:center;">'+(bs?(bs>1.2?'Bullish':bs<0.8?'Bearish':'Neutral'):'—')+'</td>'+
+      '<td style="padding:5px 8px;text-align:center;">'+
+        '<button class="btn btn-red btn-sm" onclick="deletePCR(\''+e.date+'\')">Del</button></td>'+
+      '</tr>';
+  }).join('');
+  content.innerHTML='<table class="pcr-hist-tbl"><thead><tr>'+
+    '<th>Date</th><th>Nifty PCR</th><th>Signal</th><th>Bank PCR</th><th>Signal</th><th>×</th>'+
+    '</tr></thead><tbody>'+rows+'</tbody></table>'+
+    '<div style="font-size:9px;color:#9098b0;margin-top:8px;">Last 90 entries | PCR > 1.2 = Bullish | < 0.8 = Bearish</div>';
+  card.style.display='block';
+}
+
+function deletePCR(date) {
+  if (!confirm('Delete PCR entry for '+date+'?')) return;
+  var hist=[]; try { hist=JSON.parse(localStorage.getItem(PCR_HIST_KEY)||'[]'); } catch(e){}
+  hist=hist.filter(e=>e.date!==date);
+  localStorage.setItem(PCR_HIST_KEY,JSON.stringify(hist));
+  showPCRHistory();
+}
+
+// ── RENDER MAIN TABLE ─────────────────────────────────────────────
+function renderTable() {
+  var body=document.getElementById('mainBody'); if(!body) return;
+  var sector=(document.getElementById('sectorFilter')||{}).value||'all';
+  var search=((document.getElementById('companySearch')||{}).value||'').toLowerCase().trim();
+  var sortKey=(document.getElementById('sortKey')||{}).value||'sector';
+  var onlyFetched=(document.getElementById('onlyFetched')||{}).checked;
+
+  var rows=[];
+  Object.entries(COMPANIES).forEach(([sec,cos])=>{
+    if (sector!=='all'&&sec!==sector) return;
+    cos.forEach(c=>{
+      var sym=NSE_SYMBOL_MAP[c.name]||null;
+      var live=sym?(TODAY[sym]||null):null;
+      if (onlyFetched&&!live) return;
+      if (search&&!c.name.toLowerCase().includes(search)&&!(sym||'').toLowerCase().includes(search)) return;
+      rows.push({sector:sec,company:c.name,symbol:sym,live,cbBase:c});
+    });
+  });
+
+  rows.sort((a,b)=>{
+    if (sortKey==='sector') return a.sector.localeCompare(b.sector)||a.company.localeCompare(b.company);
+    var la=a.live, lb=b.live;
+    if (sortKey==='volScore_d')  return ((lb&&lb.volScore)||0)-((la&&la.volScore)||0);
+    if (sortKey==='sentScore_d') return ((lb&&lb.sentScore)||0)-((la&&la.sentScore)||0);
+    if (sortKey==='del_d')       return ((lb&&+lb.del)||0)-((la&&+la.del)||0);
+    if (sortKey==='pct_d')       return ((lb&&+lb.pctChg)||0)-((la&&+la.pctChg)||0);
+    if (sortKey==='vol_d')       return ((lb&&+lb.vol)||0)-((la&&+la.vol)||0);
+    return 0;
+  });
+
+  var loaded=rows.filter(r=>r.live).length;
+  document.getElementById('rowCount').textContent=rows.length;
+  document.getElementById('loadedCount').textContent=loaded;
+
+  if (!rows.length) {
+    body.innerHTML='<tr><td colspan="14" style="text-align:center;padding:24px;color:#9098b0;">No companies match filters</td></tr>';
+    return;
+  }
+
+  var SCOLS={'1':'#e53935','2':'#ff7c00','3':'#f59e0b','4':'#00a854','5':'#1565c0'};
+  var html='';
+  rows.forEach((r,i)=>{
+    var l=r.live, hasData=!!l&&!l.error;
+    var pctChg=hasData&&l.pctChg!==null?+l.pctChg:null;
+    var pctCol=pctChg===null?'#6b7498':pctChg>=2?'#006b30':pctChg>=0?'#00a854':pctChg>=-2?'#e53935':'#b71c1c';
+    var spark=getSparkData(r.symbol);
+    var rowDate=BHAVCOPY_DATE||(l&&l.fetchTime?l.fetchTime.substring(0,10):'');
+    html+='<tr style="'+(hasData?'':'opacity:.55;')+'">'
+      +'<td style="font-size:10px;color:#7a829a;text-align:center;">'+(i+1)
+        +(rowDate?'<div style="font-size:7px;font-weight:700;color:#1565c0;background:#e3eeff;border-radius:3px;padding:1px 3px;margin-top:2px;">'+rowDate+'</div>':'')+'</td>'
+      +'<td><span class="tag-sector">'+r.sector+'</span></td>'
+      +'<td style="font-weight:800;font-size:11px;color:#1a1e2e;">'+r.company
+        +(r.symbol?'<div class="symtag">'+r.symbol+'</div>':'')+'</td>'
+      +'<td style="font-weight:800;font-size:11px;color:#ff7c00;">'+(r.symbol||'—')+'</td>'
+      +'<td style="font-weight:900;font-size:13px;color:'+(hasData?'#1565c0':'#4a5070')+';">'+(hasData?estCBScore(l):'—')+'</td>'
+      +'<td style="font-weight:700;">'+(hasData&&l.close?'₹'+(+l.close).toLocaleString('en-IN'):'—')+'</td>'
+      +'<td style="font-weight:800;color:'+pctCol+';">'+(pctChg!==null?(pctChg>=0?'+':'')+pctChg+'%':'—')+'</td>'
+      +'<td>'+(hasData&&l.vol?fmtNum(l.vol):'—')+'</td>'
+      +'<td style="font-weight:800;color:'+(hasData&&l.del?(+l.del>=55?'#00a854':+l.del>=35?'#f59e0b':'#e53935'):'#6b7498')+';">'
+        +(hasData&&l.del?(+l.del).toFixed(1)+'%':'—')+'</td>'
+      +'<td>'+(hasData&&l.turnover?'₹'+l.turnover:'—')+'</td>'
+      +'<td style="font-weight:900;font-size:14px;color:'+(SCOLS[l&&l.volScore]||'#6b7498')+';cursor:pointer;" title="'+(hasData&&l.volRationale?l.volRationale:'')+'">'
+        +(hasData&&l.volScore?l.volScore+'/5'+(l.histDays>0?'<sup style="font-size:8px;color:#7a829a;">'+l.histDays+'d</sup>':''):'—')+'</td>'
+      +'<td style="font-weight:900;font-size:14px;color:'+(SCOLS[l&&l.sentScore]||'#6b7498')+';cursor:pointer;" title="'+(hasData&&l.sentRationale?l.sentRationale:'')+'">'
+        +(hasData&&l.sentScore?l.sentScore+'/5':'—')+'</td>'
+      +'<td style="font-size:9px;">'+(function(){
+        var bd=l&&l.bulkDeals&&l.bulkDeals.length?l.bulkDeals:[];
+        if (!bd.length) return '<span style="color:#9098b0;">—</span>';
+        return bd.slice(0,2).map(d=>'<span style="color:'+(d.type==='BUY'?'#00a854':'#e53935')+';font-weight:800;">'+d.type+'</span><span style="color:#7a829a;"> '+d.client.substring(0,12)+(d.client.length>12?'…':'')+'</span>').join('<br>');
+      })()+'</td>'
+      +'<td>'+(spark?'<canvas id="sp_'+r.symbol+'" width="80" height="26" style="cursor:pointer;" onclick="showTrend(\''+r.symbol+'\',\''+r.company+'\')"></canvas>':'<span style="font-size:9px;color:#9098b0;">—</span>')+'</td>'
+      +'</tr>';
+  });
+  body.innerHTML=html;
+  // Draw sparklines
+  rows.forEach(r=>{
+    if (r.symbol) { var d=getSparkData(r.symbol); if(d) drawSparkline('sp_'+r.symbol,d); }
+  });
+}
+
+// ── SPARKLINES ────────────────────────────────────────────────────
+function drawSparkline(id,data) {
+  setTimeout(()=>{
+    var c=document.getElementById(id); if(!c) return;
+    var ctx=c.getContext('2d'),W=c.width,H=c.height;
+    ctx.clearRect(0,0,W,H);
+    var valid=data.filter(v=>v!==null);
+    if (valid.length<2) return;
+    var min=Math.min(...valid),max=Math.max(...valid);
+    if (max===min){min=Math.max(1,min-1);max=Math.min(5,max+1);}
+    var pts=[],step=W/(data.length-1);
+    data.forEach((v,i)=>{if(v===null)return;pts.push({x:i*step,y:H-((v-min)/(max-min))*(H-4)-2,v});});
+    if (pts.length<2) return;
+    var COLS=['','#e53935','#ff7c00','#f59e0b','#00a854','#1565c0'];
+    ctx.beginPath(); ctx.strokeStyle=COLS[pts[pts.length-1].v]||'#6b7498'; ctx.lineWidth=2;
+    ctx.moveTo(pts[0].x,pts[0].y);
+    for(var i=1;i<pts.length;i++) ctx.lineTo(pts[i].x,pts[i].y);
+    ctx.stroke();
+    var last=pts[pts.length-1];
+    ctx.beginPath(); ctx.arc(last.x,last.y,3,0,Math.PI*2);
+    ctx.fillStyle=COLS[last.v]||'#6b7498'; ctx.fill();
+  },50);
+}
+
+// ── TREND CHART ───────────────────────────────────────────────────
+function showTrend(symbol,company) {
+  var panel=document.getElementById('trendPanel'),title=document.getElementById('trendTitle');
+  if (!panel||!title) return;
+  try {
+    var hist=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}');
+    var dates=Object.keys(hist).sort().slice(-14);
+    var volScores=dates.map(d=>hist[d]&&hist[d][symbol]?hist[d][symbol].volScore:null);
+    var sentScores=dates.map(d=>hist[d]&&hist[d][symbol]?hist[d][symbol].sentScore:null);
+    var closes=dates.map(d=>hist[d]&&hist[d][symbol]?hist[d][symbol].close:null);
+    title.textContent='14-Day Trend — '+company+' ('+symbol+')';
+    panel.style.display='block';
+    if (TREND_CHART) { TREND_CHART.destroy(); }
+    if (typeof Chart==='undefined') return;
+    TREND_CHART=new Chart(document.getElementById('trendChart').getContext('2d'),{
+      type:'line',
+      data:{labels:dates,datasets:[
+        {label:'Vol Score',data:volScores,borderColor:'#1976d2',backgroundColor:'#1976d211',tension:.3,yAxisID:'y1',spanGaps:true},
+        {label:'Sent Score',data:sentScores,borderColor:'#7b1fa2',backgroundColor:'#7b1fa211',tension:.3,yAxisID:'y1',spanGaps:true},
+        {label:'Close ₹',data:closes,borderColor:'#ff7c00',backgroundColor:'#ff7c0011',tension:.3,yAxisID:'y2',spanGaps:true}
+      ]},
+      options:{responsive:true,maintainAspectRatio:true,
+        plugins:{legend:{position:'top'},tooltip:{mode:'index'}},
+        scales:{
+          y1:{type:'linear',position:'left',min:1,max:5,title:{display:true,text:'Score (1–5)'},ticks:{color:'#5a6080'},grid:{color:'#eef1f8'}},
+          y2:{type:'linear',position:'right',title:{display:true,text:'Price ₹'},ticks:{color:'#5a6080'},grid:{drawOnChartArea:false}}
+        }}
+    });
+  } catch(e){}
+}
+
+// ── LEADERBOARD ───────────────────────────────────────────────────
+var LB_POPULATING=false;
+
+function showLeaderboard(type) {
+  LB_ACTIVE=type;
+  document.querySelectorAll('.lb-btn').forEach(b=>b.classList.remove('lb-active'));
+  var btn=document.getElementById('lb-'+type); if(btn) btn.classList.add('lb-active');
+  renderLeaderboard();
+}
+
+function renderLeaderboard() {
+  var panel=document.getElementById('lbContent'); if(!panel) return;
+  var badge=document.getElementById('lbActiveBadge');
+  if (badge) {
+    if (BHAVCOPY_DATE){badge.textContent='📅 '+BHAVCOPY_DATE;badge.style.display='inline';}
+    else badge.style.display='none';
+  }
+  var data=Object.values(TODAY);
+  if (!data.length) { panel.innerHTML='<div class="lb-empty">No data loaded — paste Bhavcopy first</div>'; return; }
+
+  var safeN=v=>{var f=+v;return(isNaN(f)||v===null||v===undefined)?null:f;};
+  var safeN0=v=>{var f=safeN(v);return f!==null?f:0;};
+  var ourSymbols=new Set();
+  getAllFlat().forEach(co=>{var s=NSE_SYMBOL_MAP[co.name];if(s)ourSymbols.add(s);});
+  var etfRx=/\d|NIFTY|SENSEX|GSEC|LIQUID|GOLD|SILVER|CPSE|BHARAT|QQIND|BBNIFTY|SETFNIF|LOWVOL|MIDCAP|SMALLCAP/i;
+  var isEq=r=>{
+    var s=r.symbol||'';
+    if(ourSymbols.has(s)) return true;
+    if(etfRx.test(s)) return false;
+    if(!r.sector&&!NSE_REVERSE_MAP[s]) return false;
+    return true;
+  };
+
+  var rows,cols,title;
+  switch(LB_ACTIVE) {
+    case 'vol':
+      title='🔥 Top 25 by Volume';
+      rows=data.filter(r=>safeN(r.vol)!==null&&isEq(r)).sort((a,b)=>safeN0(b.vol)-safeN0(a.vol)).slice(0,25);
+      cols=['#','Company','Symbol','Sector','Volume','Del %','₹Cr','Chg %'];
+      panel.innerHTML=buildLBTable(title,cols,rows.map((r,i)=>[i+1,r.company||r.symbol||'—',r.symbol||'—',r.sector||'—',
+        '<span style="font-weight:800;color:#ff7c00;">'+fmtNum(r.vol)+'</span>',
+        safeN(r.del)!==null?fmtDel(safeN(r.del)):'—',
+        safeN(r.turnover)!==null?'₹'+safeN0(r.turnover).toFixed(1):'—',
+        fmtPct(r.pctChg)]),ourSymbols,rows);
+      break;
+    case 'del':
+      title='📦 Top 25 Delivery % — Our 765';
+      rows=data.filter(r=>safeN(r.del)!==null&&safeN0(r.vol)>5000&&ourSymbols.has(r.symbol)).sort((a,b)=>safeN0(b.del)-safeN0(a.del)).slice(0,25);
+      cols=['#','Company','Symbol','Del %','Volume','Chg %','Vol ⭐'];
+      panel.innerHTML=buildLBTable(title,cols,rows.map((r,i)=>[i+1,r.company||r.symbol||'—',r.symbol||'—',
+        fmtDel(safeN0(r.del)),fmtNum(r.vol),fmtPct(r.pctChg),
+        r.volScore?'<span class="lb-score-'+r.volScore+'">'+r.volScore+'/5</span>':'—']),ourSymbols,rows);
+      break;
+    case 'turn':
+      title='💰 Top 25 Turnover (₹Cr)';
+      rows=data.filter(r=>safeN(r.turnover)!==null&&isEq(r)).sort((a,b)=>safeN0(b.turnover)-safeN0(a.turnover)).slice(0,25);
+      cols=['#','Company','Symbol','₹Cr','Volume','Del %','Chg %'];
+      panel.innerHTML=buildLBTable(title,cols,rows.map((r,i)=>[i+1,r.company||r.symbol||'—',r.symbol||'—',
+        '<span style="font-weight:800;color:#ff7c00;">₹'+safeN0(r.turnover).toFixed(1)+'</span>',
+        fmtNum(r.vol),safeN(r.del)!==null?fmtDel(safeN(r.del)):'—',fmtPct(r.pctChg)]),ourSymbols,rows);
+      break;
+    case 'gain':
+      title='📈 Top 25 Gainers';
+      rows=data.filter(r=>safeN(r.pctChg)!==null&&isEq(r)).sort((a,b)=>safeN0(b.pctChg)-safeN0(a.pctChg)).slice(0,25);
+      cols=['#','Company','Symbol','Chg %','Close ₹','Del %','Volume','Sent ⭐'];
+      panel.innerHTML=buildLBTable(title,cols,rows.map((r,i)=>[i+1,r.company||r.symbol||'—',r.symbol||'—',
+        fmtPct(r.pctChg),safeN(r.close)!==null?'₹'+(+r.close).toLocaleString('en-IN'):'—',
+        safeN(r.del)!==null?fmtDel(safeN(r.del)):'—',fmtNum(r.vol),
+        r.sentScore?'<span class="lb-score-'+r.sentScore+'">'+r.sentScore+'/5</span>':'—']),ourSymbols,rows);
+      break;
+    case 'loss':
+      title='📉 Top 25 Losers';
+      rows=data.filter(r=>safeN(r.pctChg)!==null&&isEq(r)).sort((a,b)=>safeN0(a.pctChg)-safeN0(b.pctChg)).slice(0,25);
+      cols=['#','Company','Symbol','Chg %','Close ₹','Del %','Volume','Signal'];
+      panel.innerHTML=buildLBTable(title,cols,rows.map((r,i)=>{
+        var dp=safeN(r.del);
+        var sig=dp!==null?(dp>50?'<span style="color:#c00000;font-weight:700;">High Del—Real Selling</span>':dp<25?'<span style="color:#ff7c00;font-weight:700;">Low Del—Intraday Panic</span>':'Mixed'):'—';
+        return [i+1,r.company||r.symbol||'—',r.symbol||'—',fmtPct(r.pctChg),
+          safeN(r.close)!==null?'₹'+(+r.close).toLocaleString('en-IN'):'—',
+          dp!==null?fmtDel(dp):'—',fmtNum(r.vol),sig];
+      }),ourSymbols,rows);
+      break;
+    case 'vscore':
+      title='⭐ Top 25 Vol Score — Our 765 | Vol ≥50K';
+      rows=data.filter(r=>ourSymbols.has(r.symbol)&&r.volScore&&+r.volScore>0&&safeN0(r.vol)>=50000)
+        .sort((a,b)=>+b.volScore-+a.volScore||safeN0(b.del)-safeN0(a.del)).slice(0,25);
+      cols=['#','Company','Symbol','Vol ⭐','Del %','Volume','Rationale'];
+      panel.innerHTML=buildLBTable(title,cols,rows.map((r,i)=>[i+1,r.company||r.symbol||'—',r.symbol||'—',
+        '<span class="lb-score-'+r.volScore+'">'+r.volScore+'/5</span>',
+        safeN(r.del)!==null?fmtDel(safeN(r.del)):'—',fmtNum(r.vol),
+        '<span style="font-size:9px;color:#7a829a;">'+(r.volRationale||'—')+'</span>']),ourSymbols,rows);
+      break;
+    case 'sscore':
+      title='😊 Top 25 Sent Score — Our 765 | Vol ≥50K | ≥3 signals';
+      rows=data.filter(r=>{
+        if (!ourSymbols.has(r.symbol)) return false;
+        if (!r.sentScore||+r.sentScore<1) return false;
+        if (safeN0(r.vol)<50000) return false;
+        return (r.sentComponents||[]).length>=3;
+      }).sort((a,b)=>{
+        var sc=+b.sentScore-+a.sentScore; if(sc) return sc;
+        var bc=(b.sentComponents||[]).length-(a.sentComponents||[]).length; if(bc) return bc;
+        return safeN0(b.vol)-safeN0(a.vol);
+      }).slice(0,25);
+      cols=['#','Company','Symbol','Sent ⭐','Vol ⭐','Del %','Chg %','Sigs','Signals'];
+      panel.innerHTML=buildLBTable(title,cols,rows.map((r,i)=>{
+        var sc=(r.sentComponents||[]).length;
+        return [i+1,r.company||r.symbol||'—',r.symbol||'—',
+          '<span class="lb-score-'+r.sentScore+'">'+r.sentScore+'/5</span>',
+          r.volScore?'<span class="lb-score-'+r.volScore+'">'+r.volScore+'/5</span>':'—',
+          safeN(r.del)!==null?fmtDel(safeN(r.del)):'—',fmtPct(r.pctChg),
+          '<span style="font-size:9px;font-weight:700;color:#7a829a;">'+sc+'/7</span>',
+          '<span style="font-size:9px;color:#7a829a;">'+(r.sentRationale||'—')+'</span>'];
+      }),ourSymbols,rows);
+      break;
+    case 'ourlist':
+      var ourData=data.filter(r=>ourSymbols.has(r.symbol)).sort((a,b)=>(+b.volScore+b.sentScore)-(+a.volScore+a.sentScore));
+      rows=ourData; cols=['#','Company','Symbol','Sector','Vol ⭐','Sent ⭐','Del %','Chg %','Volume'];
+      panel.innerHTML=(ourData.length
+        ?buildLBTable('🎯 Our 765 Companies',cols,ourData.map((r,i)=>[i+1,r.company||r.symbol||'—',r.symbol||'—',r.sector||'—',
+          r.volScore?'<span class="lb-score-'+r.volScore+'">'+r.volScore+'/5</span>':'—',
+          r.sentScore?'<span class="lb-score-'+r.sentScore+'">'+r.sentScore+'/5</span>':'—',
+          safeN(r.del)!==null?fmtDel(safeN(r.del)):'—',fmtPct(r.pctChg),fmtNum(r.vol)]),ourSymbols,rows)
+        :'<div class="lb-empty">None of our 765 in today\'s data yet</div>');
+      break;
+    default:
+      panel.innerHTML='<div class="lb-empty">Select a leaderboard above</div>';
+  }
+}
+
+function buildLBTable(title,cols,dataRows,ourSymbols,rawRows) {
+  var esc=s=>s===null||s===undefined?'—':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  var thead='<tr>'+cols.map(c=>'<th>'+esc(c)+'</th>').join('')+'</tr>';
+  var tbody=dataRows.map((row,i)=>{
+    var raw=rawRows?rawRows[i]:null;
+    var sym=raw?raw.symbol:null;
+    var inList=sym&&ourSymbols&&ourSymbols.has(sym);
+    var cells=row.map((cell,ci)=>{
+      var cls=ci===0?'lb-rank':ci===1?'lb-name':'';
+      var val=(cell===null||cell===undefined)?'—':String(cell);
+      var isHTML=val.indexOf('<')!==-1;
+      return '<td class="'+cls+'">'+(isHTML?val:esc(val))+'</td>';
+    }).join('');
+    return '<tr'+(inList?' class="lb-inlist"':'')+'>'+cells+'</tr>';
+  }).join('');
+  return '<div style="font-size:11px;font-weight:800;color:#1565c0;padding:10px 14px;background:#f0f4ff;border-bottom:1.5px solid #dde3ef;">'+
+    esc(title)+(ourSymbols?' &nbsp;<span style="font-size:9px;color:#00a854;font-weight:700;">🟢 green = our 765</span>':'')+
+    '</div><div style="overflow-x:auto;"><table class="lb-table"><thead>'+thead+'</thead><tbody>'+tbody+'</tbody></table></div>';
+}
+
+// ── COMPANIES TAB ─────────────────────────────────────────────────
+function renderCompaniesTab() {
+  var body=document.getElementById('coBody'); if(!body) return;
+  var sector=(document.getElementById('coSectorFilter')||{}).value||'all';
+  var search=((document.getElementById('coSearch')||{}).value||'').toLowerCase().trim();
+  var rows=[],idx=0;
+  Object.entries(COMPANIES).forEach(([sec,cos])=>{
+    if(sector!=='all'&&sec!==sector) return;
+    cos.forEach(c=>{
+      var sym=NSE_SYMBOL_MAP[c.name]||null;
+      if(search&&!c.name.toLowerCase().includes(search)&&!(sym||'').toLowerCase().includes(search)) return;
+      idx++;
+      var l=sym?(TODAY[sym]||null):null;
+      var hasData=!!l&&!l.error;
+      var pctChg=hasData&&l.pctChg!==null?+l.pctChg:null;
+      var pctCol=pctChg===null?'#6b7498':pctChg>=2?'#006b30':pctChg>=0?'#00a854':pctChg>=-2?'#e53935':'#b71c1c';
+      rows.push('<tr style="'+(hasData?'':'opacity:.55;')+'">'+
+        '<td style="font-size:10px;color:#7a829a;text-align:center;">'+idx+'</td>'+
+        '<td><span class="tag-sector">'+sec+'</span></td>'+
+        '<td style="font-weight:800;font-size:11px;color:#1a1e2e;">'+c.name+'</td>'+
+        '<td style="font-weight:800;color:#ff7c00;font-size:11px;">'+(sym||'—')+'</td>'+
+        '<td>'+(hasData&&l.close?'₹'+(+l.close).toLocaleString('en-IN'):'—')+'</td>'+
+        '<td style="font-weight:800;color:'+pctCol+';">'+(pctChg!==null?(pctChg>=0?'+':'')+pctChg.toFixed(2)+'%':'—')+'</td>'+
+        '<td>'+(hasData&&l.del!=null?fmtDel(+l.del):'—')+'</td>'+
+        '<td>'+(hasData&&l.vol?fmtNum(l.vol):'—')+'</td>'+
+        '<td>'+(hasData&&l.volScore?scoreSpan(l.volScore):'—')+'</td>'+
+        '<td>'+(hasData&&l.sentScore?scoreSpan(l.sentScore):'—')+'</td>'+
+        '<td style="font-size:9px;">'+(function(){
+          var bd=l&&l.bulkDeals&&l.bulkDeals.length?l.bulkDeals:[];
+          if(!bd.length) return '<span style="color:#9098b0;">—</span>';
+          return bd.slice(0,1).map(d=>'<span style="color:'+(d.type==='BUY'?'#00a854':'#e53935')+';font-weight:800;">'+d.type+'</span>').join('');
+        })()+'</td>'+
+        '</tr>');
+    });
+  });
+  document.getElementById('coRowCount').textContent=idx;
+  body.innerHTML=rows.join('')||'<tr><td colspan="11" style="text-align:center;padding:24px;color:#9098b0;">No companies match</td></tr>';
+}
+
+// ── HISTORY VIEWER ────────────────────────────────────────────────
+function buildHistoryDropdown() {
+  var sel=document.getElementById('histDate'); if(!sel) return;
+  var dates=getAllStoredDates();
+  var countEl=document.getElementById('histCount');
+  var debugEl=document.getElementById('histDebug');
+  if(countEl) countEl.textContent=dates.length>0?dates.length+' days stored':'No history yet';
+  if(debugEl) debugEl.textContent=dates.length>0?'Dates: '+dates.join(', '):'localStorage empty or no valid date entries';
+  sel.innerHTML='<option value="">Select a date…</option>'+dates.map(d=>'<option value="'+d+'">'+d+'</option>').join('');
+
+  // also populate manage delete dropdown
+  var delSel=document.getElementById('delDateSel');
+  if(delSel) delSel.innerHTML='<option value="">Select date…</option>'+dates.map(d=>'<option value="'+d+'">'+d+'</option>').join('');
+}
+
+function showHistory() {
+  var sel=document.getElementById('histDate'),wrap=document.getElementById('histWrap'),tbody=document.getElementById('histBody');
+  if(!sel||!wrap||!tbody) return;
+  var dateKey=sel.value;
+  if (!dateKey) {wrap.style.display='none';return;}
+
+  var combined={};
+  LEGACY_KEYS.forEach(k=>{
+    try { var p=JSON.parse(localStorage.getItem(k)||'{}');
+      Object.keys(p).forEach(d=>{if(/^\d{4}-\d{2}-\d{2}$/.test(d)&&!combined[d]) combined[d]=p[d];}); } catch(e){}
+  });
+  var day=combined[dateKey];
+  if(!day||typeof day!=='object'){
+    tbody.innerHTML='<tr><td colspan="13" style="text-align:center;color:#7a829a;padding:16px;">No data for '+dateKey+'</td></tr>';
+    wrap.style.display='block'; return;
+  }
+  var allRows=Object.values(day).filter(r=>r&&typeof r==='object'&&(r.symbol||r.company));
+  TODAY={}; BHAVCOPY_DATE=dateKey;
+  allRows.forEach(r=>{if(r.symbol) TODAY[r.symbol]=r;});
+  renderTable(); renderLeaderboard();
+
+  var our765=new Set(); getAllFlat().forEach(co=>{var s=NSE_SYMBOL_MAP[co.name];if(s)our765.add(s);});
+  var only=document.getElementById('histOur765')?.checked;
+  var minVol=document.getElementById('histMinVol')?.checked;
+  var minVolVal=+(document.getElementById('histMinVolVal')?.value||50000);
+  var rows=allRows.filter(r=>{
+    if(only&&!our765.has(r.symbol)) return false;
+    if(minVol&&(+r.vol||0)<minVolVal) return false;
+    return true;
+  }).sort((a,b)=>((+b.sentScore||0)+(+b.volScore||0))-((+a.sentScore||0)+(+a.volScore||0)));
+
+  var SCOLS={'1':'#e53935','2':'#ff7c00','3':'#f59e0b','4':'#00a854','5':'#1565c0'};
+  tbody.innerHTML=rows.map(r=>{
+    var pct=r.pctChg!==null&&r.pctChg!==undefined?+r.pctChg:null;
+    var pctCol=pct===null?'#6b7498':pct>=0?'#00a854':'#e53935';
+    return '<tr>'+
+      '<td style="font-weight:700;font-size:11px;">'+(r.company||r.symbol||'—')+'</td>'+
+      '<td style="font-weight:800;color:#ff7c00;">'+(r.symbol||'—')+'</td>'+
+      '<td style="font-size:9px;color:#7a829a;">'+(r.sector||'—')+'</td>'+
+      '<td>'+(r.close?'₹'+(+r.close).toLocaleString('en-IN'):'—')+'</td>'+
+      '<td style="font-weight:800;color:'+pctCol+';">'+(pct!==null?(pct>=0?'+':'')+pct.toFixed(2)+'%':'—')+'</td>'+
+      '<td>'+(r.vol?fmtNum(r.vol):'—')+'</td>'+
+      '<td>'+(r.del!=null?fmtDel(+r.del):'—')+'</td>'+
+      '<td>'+(r.turnover?'₹'+r.turnover:'—')+'</td>'+
+      '<td style="color:'+(r.fiiNet>=0?'#00a854':'#e53935')+';font-weight:700;">'+(r.fiiNet!=null?(r.fiiNet>=0?'+':'')+fmtNum(r.fiiNet):'—')+'</td>'+
+      '<td>'+(r.pcr||'—')+'</td>'+
+      '<td>'+(r.bulkDeals&&r.bulkDeals.length?r.bulkDeals.length+' deal(s)':'—')+'</td>'+
+      '<td style="font-weight:900;color:'+(SCOLS[r.volScore]||'#6b7498')+'">'+(r.volScore?r.volScore+'/5':'—')+'</td>'+
+      '<td style="font-weight:900;color:'+(SCOLS[r.sentScore]||'#6b7498')+'">'+(r.sentScore?r.sentScore+'/5':'—')+'</td>'+
+      '</tr>';
+  }).join('');
+  wrap.style.display='block';
+}
+
+// ── LB DATE PICKER ────────────────────────────────────────────────
+function lbPopulateDatePicker() {
+  LB_POPULATING=true;
+  var picker=document.getElementById('lbDatePicker'); if(!picker) {LB_POPULATING=false;return;}
+  var dates=getAllStoredDates();
+  picker.innerHTML='<option value="">— select date —</option>'+dates.map(d=>'<option value="'+d+'">'+d+'</option>').join('');
+  if (BHAVCOPY_DATE&&dates.includes(BHAVCOPY_DATE)) picker.value=BHAVCOPY_DATE;
+  LB_POPULATING=false;
+}
+
+function lbLoadDate() {
+  if(LB_POPULATING) return;
+  var date=(document.getElementById('lbDatePicker')||{}).value; if(!date) return;
+  var combined={};
+  LEGACY_KEYS.forEach(k=>{
+    try{Object.assign(combined,JSON.parse(localStorage.getItem(k)||'{}'));}catch(e){}
+  });
+  var dates=Object.keys(combined).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d));
+  if(!dates.includes(date)){
+    alert('No stored data for '+date+'.\n\nPaste Bhavcopy for that date and click Parse & Load to build history.');
+    return;
+  }
+  var day=combined[date];
+  var rows=Object.values(day||{}).filter(r=>r&&(r.symbol||r.company));
+  if(!rows.length){alert('No stock data found for '+date);return;}
+  TODAY={}; BHAVCOPY_DATE=date;
+  rows.forEach(r=>{if(r.symbol)TODAY[r.symbol]=r;});
+  var badge=document.getElementById('lbActiveBadge');
+  if(badge){badge.textContent='📅 '+date;badge.style.display='inline';}
+  renderLeaderboard(); renderTable();
+}
+
+// ── MANAGE / DELETE ───────────────────────────────────────────────
+function deleteOneDate() {
+  var sel=document.getElementById('delDateSel'); if(!sel||!sel.value) return;
+  var date=sel.value;
+  if(!confirm('Delete data for '+date+'? This cannot be undone.')) return;
+  LEGACY_KEYS.forEach(k=>{
+    try{var d=JSON.parse(localStorage.getItem(k)||'{}');if(d[date]){delete d[date];localStorage.setItem(k,JSON.stringify(d));}}catch(e){}
+  });
+  if(BHAVCOPY_DATE===date){TODAY={};BHAVCOPY_DATE=null;}
+  buildHistoryDropdown(); lbPopulateDatePicker(); renderTable(); renderLeaderboard();
+  showStatus('delDateStatus','✔ Deleted '+date,'#006b30');
+}
+
+function clearTodayMemory() {
+  TODAY={}; renderTable(); renderLeaderboard();
+  showStatus('bhavStatus','In-memory data cleared');
+}
+
+function clearManualFII(){
+  ['cbf_manual_fii','cbf_manual_dii'].forEach(k=>localStorage.removeItem(k));
+  FII_STATE.fiiNet=null;FII_STATE.diiNet=null;
+  ['fiiInput','diiInput'].forEach(id=>{var e=document.getElementById(id);if(e)e.value='';});
+  updateFIIBanner();
+}
+
+function clearManualAll() {
+  ['cbf_manual_fii','cbf_manual_dii','cbf_manual_pcr','cbf_manual_bank_pcr'].forEach(k=>localStorage.removeItem(k));
+  FII_STATE={fiiNet:null,diiNet:null,niftyPCR:null,bankNiftyPCR:null};
+  ['fiiInput','diiInput','niftyPCRInput','bankPCRInput'].forEach(id=>{var e=document.getElementById(id);if(e)e.value='';});
+  updateFIIBanner();
+  alert('✔ All manual FII/DII/PCR inputs cleared. PCR history log preserved.');
+}
+
+function nuclearDelete() {
+  var dates=getAllStoredDates();
+  if(!dates.length){alert('No NSE data found. Already clean!');return;}
+  if(!confirm('☢ DELETE ALL NSE DATA?\n\nThis will permanently erase '+dates.length+' stored date(s):\n'+dates.sort().join(', ')+'\n\nFII/DII, PCR history, and Bulk deals will also be cleared.\n\nThis CANNOT be undone. Proceed?')) return;
+  var allWipe=['cbf26_daily_dash_v2','cbf26_daily_dash_v1','cbf26_daily_dash','cbf26_dash',
+    'cbf_manual_fii','cbf_manual_dii','cbf_manual_pcr','cbf_manual_bank_pcr',
+    'cbf_pcr_history','cbf_bulk_deals','cbf_bulk_date','cbf26_dash_fii','cbf26_fii_today'];
+  allWipe.forEach(k=>{try{localStorage.removeItem(k);}catch(e){}});
+  TODAY={}; BHAVCOPY_DATE=null; HIST_CACHE={}; FII_STATE={fiiNet:null,diiNet:null,niftyPCR:null,bankNiftyPCR:null};
+  buildHistoryDropdown(); lbPopulateDatePicker(); renderTable(); renderLeaderboard(); updateFIIBanner();
+  var badge=document.getElementById('lbActiveBadge'); if(badge) badge.style.display='none';
+  document.getElementById('mainBody').innerHTML='<tr><td colspan="14" style="text-align:center;padding:32px;color:#9098b0;">✅ All NSE data cleared — paste fresh Bhavcopy to start again.</td></tr>';
+  alert('✅ All NSE data deleted ('+dates.length+' date(s) cleared).\n\nScreen is blank. Upload fresh Bhavcopy to start fresh.');
+}
+
+function inspectStorage() {
+  var out='', totalKB=0;
+  LEGACY_KEYS.forEach(k=>{
+    var val=localStorage.getItem(k)||''; var kb=(val.length/1024).toFixed(1);
+    totalKB+=(val.length/1024);
+    try {
+      var p=JSON.parse(val||'{}');
+      var dates=Object.keys(p).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)).sort();
+      out+=k+': '+kb+' KB · '+dates.length+' dates'+( dates.length?'\n  → '+dates.join(', '):'')+'\n';
+    } catch(e){ out+=k+': '+kb+' KB (parse error)\n'; }
+  });
+  out+='\nOther CB keys:\n';
+  ['cbf_pcr_history','cbf_bulk_deals','cbf_manual_fii','cbf_manual_dii','cbf_manual_pcr','cbf_manual_bank_pcr','cbf26_fii_today'].forEach(k=>{
+    var val=localStorage.getItem(k); if(val) out+='  '+k+': '+(val.length/1024).toFixed(1)+' KB\n';
+  });
+  out+='\nTotal CB storage: ~'+totalKB.toFixed(1)+' KB';
+  document.getElementById('storageReport').textContent=out;
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────
+function exportToday() {
+  var rows=Object.values(TODAY);
+  if(!rows.length){alert('No data to export.');return;}
+  exportCSV(rows,'CB_TradeFeed_'+( BHAVCOPY_DATE||todayKey())+'.csv');
+}
+function exportHistory() {
+  var all=[];
+  LEGACY_KEYS.forEach(k=>{
+    try{var h=JSON.parse(localStorage.getItem(k)||'{}');
+      Object.entries(h).sort().forEach(([date,day])=>{if(/^\d{4}-\d{2}-\d{2}$/.test(date)) Object.values(day).forEach(r=>all.push(Object.assign({date},r)));});}catch(e){}
+  });
+  if(!all.length){alert('No history to export.');return;}
+  exportCSV(all,'CB_TradeFeed_History_All.csv',true);
+}
+function exportCSV(rows,fn,incDate) {
+  var hdr=(incDate?'Date,':'')+
+    'Symbol,Company,Sector,Close_INR,Chg_Pct,Volume,Delivery_Pct,Turnover_Cr,FII_Net_Cr,DII_Net_Cr,PCR,Bulk_Deals,Vol_Score,Sent_Score,History_Days,Vol_Rationale,Sent_Rationale';
+  var lines=[hdr];
+  rows.forEach(r=>{
+    var cols=[incDate?(r.date||''):null,r.symbol||'','"'+(r.company||'').replace(/"/g,'""')+'"','"'+(r.sector||'').replace(/"/g,'""')+'"',
+      r.close||'',r.pctChg||'',r.vol||'',r.del!=null?(+r.del).toFixed(2):'',r.turnover||'',
+      r.fiiNet!=null?r.fiiNet:'',r.diiNet!=null?r.diiNet:'',r.pcr||'',
+      r.bulkDeals?r.bulkDeals.length:0,r.volScore||'',r.sentScore||'',r.histDays||0,
+      '"'+(r.volRationale||'').replace(/"/g,'""')+'"','"'+(r.sentRationale||'').replace(/"/g,'""')+'"'].filter(c=>c!==null);
+    lines.push(cols.join(','));
+  });
+  var blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download=fn;
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+// ── UI HELPERS ────────────────────────────────────────────────────
+function switchTab(tab,btn) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  var p=document.getElementById('panel-'+tab); if(p) p.classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (tab==='leaderboard') renderLeaderboard();
+  if (tab==='companies') renderCompaniesTab();
+  if (tab==='history') buildHistoryDropdown();
+  if (tab==='manage') { buildHistoryDropdown(); }
+}
+function showStatus(id,msg,color) {
+  var el=document.getElementById(id);
+  if(!el) return;
+  el.textContent=msg; el.style.color=color||'#c8d0e8';
+}
+function flashInput(id) {
+  var el=document.getElementById(id);
+  if(!el) return;
+  el.style.border='2px solid #00a854';
+  setTimeout(()=>el.style.border='1.5px solid #2a3a5a',1500);
+}
+function updateLastUpdateBadge(text) {
+  var badge=document.getElementById('lastUpdateBadge');
+  if(badge){badge.textContent='✔ '+text;badge.style.display='inline';}
+}
+function getAllFlat() {
+  var flat=[];
+  Object.entries(COMPANIES).forEach(([sector,arr])=>{
+    if(Array.isArray(arr)) arr.forEach(c=>flat.push(Object.assign({},c,{sector})));
+  });
+  return flat;
+}
+
+// ── BUILD SECTOR FILTER ───────────────────────────────────────────
+function buildSectorFilter() {
+  ['sectorFilter','coSectorFilter'].forEach(id=>{
+    var sel=document.getElementById(id);
+    if(!sel) return;
+    var sectors=Object.keys(COMPANIES).sort();
+    var total=Object.values(COMPANIES).reduce((a,b)=>a+b.length,0);
+    sel.innerHTML='<option value="all">All Sectors ('+total+')</option>'+
+      sectors.map(s=>'<option value="'+s+'">'+s+' ('+COMPANIES[s].length+')</option>').join('');
+  });
+  var countEl=document.getElementById('companiesCount');
+  if(countEl) countEl.textContent=Object.values(COMPANIES).reduce((a,b)=>a+b.length,0)+' companies';
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+(function init(){
+  // Set today date display
+  var td=document.getElementById('todayDisplay');
+  if(td) td.textContent=new Date().toLocaleDateString('en-IN',{weekday:'short',year:'numeric',month:'short',day:'numeric'});
+
+  // Set PCR date to today
+  var pcrDate=document.getElementById('pcrDate');
+  if(pcrDate) pcrDate.value=todayKey();
+
+  // Build sector filters
+  buildSectorFilter();
+
+  // Build hist cache
+  buildHistCache();
+
+  // Load from storage
+  loadFromStorage();
+  restoreBulkDeals();
+
+  // Restore manual FII/DII/PCR
+  var sf=localStorage.getItem('cbf_manual_fii');
+  var sd=localStorage.getItem('cbf_manual_dii');
+  var sp=localStorage.getItem('cbf_manual_pcr');
+  var sb=localStorage.getItem('cbf_manual_bank_pcr');
+  if(sf!==null){FII_STATE.fiiNet=+sf;var e=document.getElementById('fiiInput');if(e)e.value=sf;}
+  if(sd!==null){FII_STATE.diiNet=+sd;var e=document.getElementById('diiInput');if(e)e.value=sd;}
+  if(sp){FII_STATE.niftyPCR=sp;var e=document.getElementById('niftyPCRInput');if(e)e.value=sp;}
+  if(sb){FII_STATE.bankNiftyPCR=sb;var e=document.getElementById('bankPCRInput');if(e)e.value=sb;}
+
+  // Build UI
+  buildHistoryDropdown();
+  lbPopulateDatePicker();
+  renderTable();
+  renderLeaderboard();
+  updateFIIBanner();
+
+  if (BHAVCOPY_DATE) {
+    updateLastUpdateBadge('Loaded from storage: '+BHAVCOPY_DATE+' · '+Object.keys(TODAY).length+' stocks');
+    var badge=document.getElementById('lbActiveBadge');
+    if(badge){badge.textContent='📅 '+BHAVCOPY_DATE;badge.style.display='inline';}
+  }
+})();
+
+</script>
+</body>
+</html>
