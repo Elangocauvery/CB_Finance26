@@ -1599,23 +1599,65 @@ function parseDelivery() {
   var lines=raw.split('\n').map(l=>l.trim()).filter(Boolean);
   if (lines.length<2) return;
   var merged=0,notFound=0;
-  lines.forEach(line=>{
-    if (!line.startsWith('20,')) return;
-    var p=line.split(',');
-    if (p.length<7) return;
-    var sym=(p[2]||'').trim().toUpperCase();
-    var ser=(p[3]||'').trim().toUpperCase();
-    var del=+p[6];
-    if (!sym||ser!=='EQ'||isNaN(del)||del<0||del>100) return;
-    if (TODAY[sym]) { TODAY[sym].del=del; TODAY[sym]=computeScores(TODAY[sym]); merged++; }
-    else notFound++;
-  });
+
+  // Detect format: UDiFF (tab-separated, has TckrSymb header) or old CM (comma, starts with 20,)
+  var firstLine=lines[0];
+  var isUDiFF=firstLine.indexOf('TckrSymb')!==-1||firstLine.indexOf('TtlTradgVol')!==-1||firstLine.indexOf('SctySrs')!==-1;
+
+  if (isUDiFF) {
+    // ── UDiFF MTO format (tab-separated with header row) ──
+    // Columns we need: TckrSymb, SctySrs, PrvsCLsgPric, TtlTradgVol, TtlDldQty (or DlvryQty)
+    // Delivery % = TtlDldQty / TtlTradgVol * 100
+    var sep=firstLine.indexOf('\t')!==-1?'\t':',';
+    var headers=firstLine.split(sep).map(h=>h.trim());
+    var iSym=headers.indexOf('TckrSymb');
+    var iSer=headers.indexOf('SctySrs');
+    var iTotVol=headers.indexOf('TtlTradgVol');
+    // Try multiple possible column names for delivery qty
+    var iDel=-1;
+    ['TtlDldQty','DlvryQty','TtlDlvryQty','TtlDeliveryQty','DeliveryQty'].forEach(function(n){
+      if(iDel===-1&&headers.indexOf(n)!==-1) iDel=headers.indexOf(n);
+    });
+    // Also try by position — in NSE UDiFF MTO, delivery qty is typically last few columns
+    // Standard UDiFF MTO header: TradDt,BizDt,Sgmt,Src,FinInstrmTp,FinInstrmId,ISIN,TckrSymb,SctySrs,XpryDt,FinInstrmActlXpryDt,StrkPric,OptnTp,FinInstrmNm,OpnPric,HghPric,LwPric,ClsPric,LastPric,PrvsCLsgPric,TtlTradgVol,TtlTradgVal,TtlDldQty,TtlDldVal,OpnIntrst,ChngInOpnIntrst,TtlTrfTVal
+    if(iDel===-1&&headers.length>22) iDel=22; // position 22 = TtlDldQty in standard UDiFF MTO
+
+    lines.slice(1).forEach(function(line){
+      if(!line) return;
+      var p=line.split(sep);
+      if(p.length<8) return;
+      var sym=iSym!==-1?(p[iSym]||'').trim().toUpperCase():'';
+      var ser=iSer!==-1?(p[iSer]||'').trim().toUpperCase():'EQ';
+      if(!sym||ser!=='EQ') return;
+      var totVol=iTotVol!==-1?+p[iTotVol]:0;
+      var delQty=iDel!==-1?+p[iDel]:0;
+      if(isNaN(totVol)||isNaN(delQty)||totVol<=0) return;
+      var delPct=Math.min(100,Math.max(0,(delQty/totVol)*100));
+      if(TODAY[sym]){ TODAY[sym].del=parseFloat(delPct.toFixed(2)); TODAY[sym]=computeScores(TODAY[sym]); merged++; }
+      else notFound++;
+    });
+
+  } else {
+    // ── Old CM format (comma-separated, lines start with 20,) ──
+    lines.forEach(function(line){
+      if (!line.startsWith('20,')) return;
+      var p=line.split(',');
+      if (p.length<7) return;
+      var sym=(p[2]||'').trim().toUpperCase();
+      var ser=(p[3]||'').trim().toUpperCase();
+      var del=+p[6];
+      if (!sym||ser!=='EQ'||isNaN(del)||del<0||del>100) return;
+      if (TODAY[sym]) { TODAY[sym].del=del; TODAY[sym]=computeScores(TODAY[sym]); merged++; }
+      else notFound++;
+    });
+  }
+
   buildHistCache(); saveToStorage();
   renderTable(); renderLeaderboard();
   var inMem=Object.keys(TODAY).length;
   if (inMem===0) showStatus('delivStatus','⚠ Bhavcopy not in memory — paste Bhavcopy first','#e53935');
   else if (merged===0) showStatus('delivStatus','⚠ 0 merged ('+inMem+' in memory) — check symbol format','#e53935');
-  else showStatus('delivStatus','✔ Delivery % merged for '+merged+' of '+inMem+' companies'+(notFound>0?' · '+notFound+' in MTO not matched':''),'#006b30');
+  else showStatus('delivStatus','✔ Delivery % merged for '+merged+' of '+inMem+' companies'+(notFound>0?' · '+notFound+' symbols in MTO not in CB list':''),'#006b30');
 }
 
 // ── BULK DEALS PARSER ─────────────────────────────────────────────
