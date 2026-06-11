@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CB Finance26™ — Asset Compass</title>
+<meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
+<style>
+:root{
+  --bg:#f5f7fa;--card:#fff;--input:#f8f9fc;
+  --border:#dde3ef;--border-hi:#b0bcd8;
+  --text:#1a1e2e;--soft:#3a3f5c;--muted:#5a6080;
+  --orange:#ff7c00;--amber:#ffab40;--gold:#ffc107;
+  --green:#00a854;--green-dk:#007a3d;
+  --red:#e53935;--red-dk:#b71c1c;
+  --yellow:#f59e0b;--blue:#1976d2;--purple:#8e24aa;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+#accessGate{position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#fff8f2,#fff3e8,#fef9f0);display:flex;align-items:center;justify-content:center;}
+.gate-card{background:#fff;border:1.5px solid #ffe0c0;border-radius:24px;padding:40px 44px;max-width:420px;width:90%;text-align:center;box-shadow:0 12px 48px #ff7c0018;}
+.gate-logo{font-size:24px;font-weight:900;color:#c45000;margin-bottom:3px;}.gate-logo span{color:#ff7c00;}
+.gate-sub{font-size:10px;font-weight:700;color:#9a7060;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:20px;}
+.gate-divider{width:40px;height:2px;background:linear-gradient(90deg,#ff7c00,#ffc107);border-radius:2px;margin:0 auto 20px;}
+.gate-icon{width:50px;height:50px;background:linear-gradient(135deg,#ff7c00,#ffab40);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 13px;}
+.gate-title{font-size:16px;font-weight:800;color:#1a1e2e;margin-bottom:5px;}
+.gate-desc{font-size:11px;color:#5a4a40;margin-bottom:22px;line-height:1.7;}
+.gate-input{width:100%;background:#fff8f4;border:1.5px solid #e8c8b0;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:700;text-align:center;outline:none;margin-bottom:9px;color:#1a1e2e;letter-spacing:3px;font-family:inherit;}
+.gate-input:focus{border-color:#ff7c00;}
+.gate-btn{width:100%;background:linear-gradient(135deg,#ff7c00,#ff9a00);color:#fff;border:none;padding:13px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;margin-bottom:14px;font-family:inherit;}
+.gate-error{font-size:11px;font-weight:700;color:#c0392b;margin-bottom:7px;min-height:15px;}
+.gate-legal{font-size:10px;color:#7a6858;line-height:1.8;border-top:1px solid #f0d8c8;padding-top:13px;text-align:left;}
+#wm{position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:0.03;overflow:hidden;}
+#wm div{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:40px;font-weight:900;color:#1a1e2e;white-space:nowrap;letter-spacing:4px;user-select:none;}
+.nav{background:#fff;border-bottom:2px solid var(--border-hi);position:sticky;top:0;z-index:100;box-shadow:0 2px 10px #0000001a;}
+.nav-inner{display:flex;align-items:center;padding:0 16px;overflow-x:auto;}
+.nav-logo{font-size:13px;font-weight:900;color:#c45000;padding:11px 0;margin-right:14px;white-space:nowrap;flex-shrink:0;}.nav-logo span{color:#ff7c00;}
+.nav-tab{padding:11px 13px;font-size:11px;font-weight:700;color:#4a5070;cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;background:transparent;border:none;border-bottom:3px solid transparent;font-family:inherit;transition:all .2s;}
+.nav-tab:hover{color:var(--amber);}.nav-tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+.hub-link{margin-left:auto;font-size:11px;font-weight:700;color:var(--blue);text-decoration:none;padding:5px 11px;border:1px solid #90caf9;border-radius:14px;white-space:nowrap;background:#e3f2fd;flex-shrink:0;}
+.page{display:none;padding:16px;animation:pgIn .25s ease;}.page.active{display:block;}
+@keyframes pgIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:none;}}
+.hdr{background:linear-gradient(135deg,#1a1e2e,#2a3050);padding:16px 22px;border-radius:12px;margin-bottom:14px;}
+.hdr h1{font-size:18px;font-weight:900;color:#ffab40;}.hdr p{color:#c8d0e8;font-size:11px;margin-top:3px;}
+.hdr-meta{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap;}
+.badge{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);padding:3px 10px;border-radius:16px;font-size:11px;font-weight:600;color:#c8d0e8;}.badge span{color:#ffc107;font-weight:800;}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:13px;margin-bottom:13px;}
+.full{margin-bottom:13px;}
+.card{background:var(--card);padding:15px;border-radius:11px;border:1px solid var(--border);}
+.card h2{font-size:12px;font-weight:800;color:#c45000;margin-bottom:9px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px;}
+.card h2 .ico{width:22px;height:22px;border-radius:5px;background:#f0f2f8;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.sec{font-size:10px;font-weight:700;color:#6b7498;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px;margin-bottom:13px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px;position:relative;overflow:hidden;}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi.k-or::after{background:linear-gradient(90deg,#e65100,var(--amber));}.kpi.k-gr::after{background:linear-gradient(90deg,var(--green-dk),var(--green));}
+.kpi.k-bl::after{background:linear-gradient(90deg,#0277bd,var(--blue));}.kpi.k-pu::after{background:linear-gradient(90deg,#7b1fa2,var(--purple));}
+.kpi.k-go::after{background:linear-gradient(90deg,#b8860b,var(--gold));}.kpi.k-re::after{background:linear-gradient(90deg,var(--red-dk),var(--red));}
+.kpi-l{font-size:9px;font-weight:700;color:#6b7498;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px;}
+.kpi-v{font-size:17px;font-weight:900;line-height:1;}.kpi-s{font-size:9px;font-weight:600;color:#6b7498;margin-top:2px;}
+.co-table{width:100%;border-collapse:collapse;}
+.co-table th{padding:7px 9px;text-align:left;font-size:10px;font-weight:800;color:#b35c00;text-transform:uppercase;letter-spacing:.7px;border-bottom:2px solid var(--border-hi);background:#f8f9fc;}
+.co-table td{padding:7px 9px;font-size:11px;font-weight:600;border-bottom:1px solid #f0f2f8;vertical-align:middle;}
+.co-table tr:last-child td{border-bottom:none;}.co-table tr:hover td{background:#f8f9fc;}
+.tbl-scroll{overflow-x:auto;}
+.inp{background:var(--input);border:1.5px solid var(--border);border-radius:7px;padding:7px 10px;font-size:12px;font-weight:600;color:var(--text);outline:none;font-family:inherit;width:100%;}
+.inp:focus{border-color:var(--orange);}
+.btn{background:linear-gradient(135deg,#ff7c00,#ff9a00);color:#fff;border:none;padding:9px 18px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;}
+.btn-sec{background:#f0f2f8;color:var(--soft);border:1px solid var(--border);padding:8px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.btn-del{background:#fce8e8;color:#b71c1c;border:1px solid #ffcdd2;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.hl{background:#fff8f0;border-left:3px solid var(--orange);padding:8px 12px;border-radius:0 7px 7px 0;font-size:11px;color:var(--soft);margin-bottom:8px;}
+.info{background:#e3f2fd;border-left:3px solid var(--blue);padding:8px 12px;border-radius:0 7px 7px 0;font-size:11px;color:#0d47a1;font-weight:600;margin-bottom:8px;}
+.warn{background:#fff8e1;border-left:3px solid var(--gold);padding:8px 12px;border-radius:0 7px 7px 0;font-size:11px;color:#7f6000;font-weight:600;margin-bottom:8px;}
+.alloc-bar{display:flex;height:30px;border-radius:8px;overflow:hidden;margin:8px 0;}
+.alloc-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;min-width:30px;}
+.prog{height:5px;background:#e8ecf5;border-radius:3px;overflow:hidden;display:inline-block;width:60px;vertical-align:middle;margin-right:5px;}
+.prog div{height:100%;border-radius:3px;}
+.footer{text-align:center;padding:16px;font-size:10px;color:#9a9a9a;border-top:1px solid var(--border);margin-top:8px;}
+@media(max-width:600px){.g2{grid-template-columns:1fr;}.kpi-row{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<div id="accessGate">
+  <div class="gate-card">
+    <div class="gate-logo">★ CB <span>Finance26</span></div>
+    <div class="gate-sub">Capital Research Framework</div>
+    <div class="gate-divider"></div>
+    <div class="gate-icon">🧭</div>
+    <div class="gate-title">Asset Compass</div>
+    <div class="gate-desc">For authorised CB Finance26 members only.<br>Enter your access code to continue.</div>
+    <input type="password" id="accessCodeInput" class="gate-input" placeholder="Access code" onkeydown="if(event.key==='Enter')checkAccess()">
+    <div id="accessError" class="gate-error"></div>
+    <button onclick="checkAccess()" class="gate-btn">Enter →</button>
+    <div class="gate-legal">By entering you confirm this tool is for personal research only. Not financial advice. Redistribution prohibited. © 2025 CB Finance26™ · Proprietary &amp; Confidential</div>
+  </div>
+</div>
+<div id="wm"><div>CB FINANCE26™ · CONFIDENTIAL</div></div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">★ CB <span>Finance26</span></div>
+    <button class="nav-tab active" onclick="showPage('overview',this)">🧭 Overview</button>
+    <button class="nav-tab" onclick="showPage('india',this)">🇮🇳 India Holdings</button>
+    <button class="nav-tab" onclick="showPage('us',this)">🇺🇸 US Holdings</button>
+    <button class="nav-tab" onclick="showPage('compare',this)">⚖️ Vs CB Model</button>
+    <a class="hub-link" href="index.html">⬡ Hub</a>
+  </div>
+</nav>
+
+<!-- OVERVIEW -->
+<div class="page active" id="page-overview">
+  <div class="hdr">
+    <h1>🧭 Asset Compass — Your Total Portfolio Map</h1>
+    <p>India + US holdings · Asset class allocation · Compare against CB Finance26 recommended model</p>
+    <div class="hdr-meta">
+      <span class="badge">USD/INR: <span id="hdr-fx">88.00</span></span>
+      <span class="badge">Total: <span id="hdr-total">—</span></span>
+      <span class="badge">Holdings: <span id="hdr-count">0</span></span>
+    </div>
+  </div>
+
+  <div class="card full">
+    <h2><span class="ico">💱</span>USD → INR Rate</h2>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <input type="number" id="fxRate" class="inp" style="max-width:140px;" step="0.01" placeholder="88.00" onchange="saveFX()">
+      <span style="font-size:11px;color:var(--muted);">Used to convert US holdings to ₹. Update from Google: "USD to INR"</span>
+      <button class="btn-sec" onclick="saveFX()">Save Rate</button>
+    </div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi k-or"><div class="kpi-l">Total Portfolio</div><div class="kpi-v" id="kpi-total" style="color:var(--orange);">₹0</div><div class="kpi-s">India + US in ₹</div></div>
+    <div class="kpi k-bl"><div class="kpi-l">India Holdings</div><div class="kpi-v" id="kpi-india" style="color:var(--blue);">₹0</div><div class="kpi-s" id="kpi-india-pct">0% of total</div></div>
+    <div class="kpi k-pu"><div class="kpi-l">US Holdings</div><div class="kpi-v" id="kpi-us" style="color:var(--purple);">₹0</div><div class="kpi-s" id="kpi-us-pct">0% of total</div></div>
+    <div class="kpi k-gr"><div class="kpi-l">Equity Total</div><div class="kpi-v" id="kpi-eq" style="color:var(--green);">0%</div><div class="kpi-s">Of total portfolio</div></div>
+    <div class="kpi k-go"><div class="kpi-l">Gold + Debt</div><div class="kpi-v" id="kpi-safe" style="color:var(--gold);">0%</div><div class="kpi-s">Defensive assets</div></div>
+    <div class="kpi k-re"><div class="kpi-l">Cash</div><div class="kpi-v" id="kpi-cash" style="color:var(--red);">0%</div><div class="kpi-s">Dry powder</div></div>
+  </div>
+
+  <div class="card full">
+    <h2><span class="ico">📊</span>Asset Class Allocation — Actual</h2>
+    <div id="allocBarWrap"></div>
+    <div id="allocTable"></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <h2><span class="ico">🏆</span>Top Holdings (All Markets)</h2>
+      <div id="topHoldings"><div style="color:var(--muted);font-size:11px;padding:10px 0;">Add holdings in the India / US tabs first.</div></div>
+    </div>
+    <div class="card">
+      <h2><span class="ico">📂</span>Asset Class Entry</h2>
+      <div class="sec">Record non-equity assets (debt funds, gold, FDs, cash)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+        <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Debt / FD (₹)</div><input type="number" id="assetDebt" class="inp" placeholder="0" onchange="saveAssets()"></div>
+        <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Gold / SGB (₹)</div><input type="number" id="assetGold" class="inp" placeholder="0" onchange="saveAssets()"></div>
+        <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Cash / Liquid (₹)</div><input type="number" id="assetCash" class="inp" placeholder="0" onchange="saveAssets()"></div>
+        <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Real Estate (₹)</div><input type="number" id="assetRE" class="inp" placeholder="0" onchange="saveAssets()"></div>
+      </div>
+      <button class="btn" onclick="saveAssets()" style="width:100%;">Save Asset Values</button>
+    </div>
+  </div>
+  <div class="footer">CB Finance26™ — Asset Compass v1.0 · Data stored locally in your browser only · Not Financial Advice</div>
+</div>
+
+<!-- INDIA HOLDINGS -->
+<div class="page" id="page-india">
+  <div class="hdr"><h1>🇮🇳 India Holdings</h1><p>Your NSE/BSE equity + mutual fund holdings — valued in ₹</p></div>
+  <div class="card full">
+    <h2><span class="ico">➕</span>Add India Holding</h2>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;align-items:end;">
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Name / Symbol</div><input type="text" id="in-name" class="inp" placeholder="e.g. HDFC Bank / Parag Parikh Flexi"></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Type</div>
+        <select id="in-type" class="inp"><option>Stock</option><option>Mutual Fund</option><option>ETF</option><option>SGB</option></select></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Sector</div>
+        <select id="in-sector" class="inp"><option>Banking</option><option>Power</option><option>Defence</option><option>Pharma</option><option>AMC</option><option>Capital Goods</option><option>Auto 2W</option><option>Auto 4W</option><option>IT Services</option><option>FMCG</option><option>Hospitals</option><option>Insurance</option><option>NBFC</option><option>Metals</option><option>Minerals</option><option>Diversified Fund</option><option>Index Fund</option><option>Other</option></select></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Current Value (₹)</div><input type="number" id="in-value" class="inp" placeholder="100000"></div>
+      <button class="btn" onclick="addIndia()">Add</button>
+    </div>
+  </div>
+  <div class="card full">
+    <h2><span class="ico">📋</span>India Portfolio <span id="in-total" style="margin-left:auto;color:var(--blue);font-size:13px;"></span></h2>
+    <div class="tbl-scroll">
+      <table class="co-table">
+        <thead><tr><th>#</th><th>Name</th><th>Type</th><th>Sector</th><th>Value ₹</th><th>% of India</th><th>% of Total</th><th></th></tr></thead>
+        <tbody id="indiaBody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card full">
+    <h2><span class="ico">🏭</span>India Sector Exposure</h2>
+    <div id="indiaSectorExposure"></div>
+  </div>
+  <div class="footer">CB Finance26™ · India Holdings · Not Financial Advice</div>
+</div>
+
+<!-- US HOLDINGS -->
+<div class="page" id="page-us">
+  <div class="hdr"><h1>🇺🇸 US Holdings</h1><p>Your US market investments — entered in $, converted to ₹ at your saved FX rate</p></div>
+  <div class="card full">
+    <h2><span class="ico">➕</span>Add US Holding</h2>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;align-items:end;">
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Name / Ticker</div><input type="text" id="us-name" class="inp" placeholder="e.g. AAPL / VOO / NVDA"></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Type</div>
+        <select id="us-type" class="inp"><option>Stock</option><option>ETF</option><option>Index Fund</option><option>Bond Fund</option></select></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Category</div>
+        <select id="us-cat" class="inp"><option>Big Tech</option><option>S&P 500 Index</option><option>Nasdaq Index</option><option>AI/Semis</option><option>Healthcare</option><option>Finance</option><option>Energy</option><option>Bonds</option><option>Other</option></select></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Current Value ($)</div><input type="number" id="us-value" class="inp" placeholder="5000"></div>
+      <button class="btn" onclick="addUS()">Add</button>
+    </div>
+  </div>
+  <div class="card full">
+    <h2><span class="ico">📋</span>US Portfolio <span id="us-total" style="margin-left:auto;color:var(--purple);font-size:13px;"></span></h2>
+    <div class="tbl-scroll">
+      <table class="co-table">
+        <thead><tr><th>#</th><th>Name</th><th>Type</th><th>Category</th><th>Value $</th><th>Value ₹</th><th>% of US</th><th>% of Total</th><th></th></tr></thead>
+        <tbody id="usBody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card full">
+    <h2><span class="ico">📊</span>US Category Exposure</h2>
+    <div id="usCategoryExposure"></div>
+  </div>
+  <div class="footer">CB Finance26™ · US Holdings · Not Financial Advice</div>
+</div>
+
+<!-- COMPARE VS CB MODEL -->
+<div class="page" id="page-compare">
+  <div class="hdr">
+    <h1>⚖️ Your Allocation vs CB Finance26 Model</h1>
+    <p>The CB model allocation comes from Macro Pulse score — load it there first, or set manually below</p>
+  </div>
+  <div class="card full">
+    <h2><span class="ico">🎯</span>CB Model Source</h2>
+    <div id="macroStatusBar" class="warn">⚠️ No Macro Pulse data found. Set the macro score manually below or update indicators in Macro Pulse app.</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Macro Score (−15 to +15)</div>
+        <input type="number" id="manualMacroScore" class="inp" style="max-width:120px;" min="-15" max="15" placeholder="e.g. 6" onchange="renderCompare()"></div>
+      <div id="stanceDisplay" style="flex:1;min-width:200px;"></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card">
+      <h2><span class="ico">📊</span>Your Actual Allocation</h2>
+      <div id="actualAllocChart"></div>
+    </div>
+    <div class="card">
+      <h2><span class="ico">🎯</span>CB Recommended Allocation</h2>
+      <div id="modelAllocChart"></div>
+    </div>
+  </div>
+  <div class="card full">
+    <h2><span class="ico">🔀</span>Gap Analysis — What to Rebalance</h2>
+    <div id="gapAnalysis"></div>
+  </div>
+  <div class="footer">CB Finance26™ · Allocation Compare · Educational framework only · Not Financial Advice</div>
+</div>
+
+<script>
+document.addEventListener('contextmenu',e=>{e.preventDefault();return false;});
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['s','p','u'].includes(e.key.toLowerCase())){e.preventDefault();return false;}if(e.key==='F12'){e.preventDefault();return false;}});
+(function(){if(sessionStorage.getItem('cbf26_auth')==='granted')document.getElementById('accessGate').style.display='none';setTimeout(()=>document.getElementById('accessCodeInput')?.focus(),300);})();
+function checkAccess(){
+  const inp=document.getElementById('accessCodeInput'),err=document.getElementById('accessError');
+  const val=(inp?.value||'').trim().toUpperCase();
+  if(['CBF26','MEMBER2025','RESEARCH26','CBFINANCE','ALPHA2025'].includes(val)){
+    sessionStorage.setItem('cbf26_auth','granted');
+    const g=document.getElementById('accessGate');g.style.transition='opacity .5s';g.style.opacity='0';
+    setTimeout(()=>{g.style.display='none';initApp();},500);
+  } else {err.textContent='Incorrect code.';inp.value='';}
+}
+function showPage(id,tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  if(tab)tab.classList.add('active');
+}
+
+// ── ALLOC MATRIX (from v16) ───────────────────────────────────────────────
+const ALLOC_MATRIX=[
+  {minScore:12,eq:70,debt:10,gold:10,cash:10,stance:"Aggressively Bullish",desc:"Early bull — deploy capital across quality sectors"},
+  {minScore:8, eq:65,debt:12,gold:10,cash:13,stance:"Bullish",desc:"Bull market underway — stay invested, tilt to growth"},
+  {minScore:5, eq:60,debt:15,gold:10,cash:15,stance:"Moderately Aggressive",desc:"More stocks than normal, pick sectors carefully"},
+  {minScore:2, eq:50,debt:20,gold:15,cash:15,stance:"Selective / Neutral",desc:"Be selective — quality large caps"},
+  {minScore:-1,eq:40,debt:25,gold:15,cash:20,stance:"Cautious — Defensive",desc:"Reduce stocks gradually, build cash and debt"},
+  {minScore:-4,eq:30,debt:30,gold:20,cash:20,stance:"Defensive — Bear Watch",desc:"Significant risk-off — heavy debt, gold, cash"},
+  {minScore:-99,eq:15,debt:35,gold:25,cash:25,stance:"Fully Defensive",desc:"Preserve capital — cash, gold, short-term debt only"}
+];
+function allocFor(score){for(const a of ALLOC_MATRIX)if(score>=a.minScore)return a;return ALLOC_MATRIX[ALLOC_MATRIX.length-1];}
+
+// ── STORAGE ───────────────────────────────────────────────────────────────
+const KEY='cbf26_assets_v1';
+let STATE={fx:88.0,india:[],us:[],assets:{debt:0,gold:0,cash:0,re:0},manualMacro:null};
+function load(){
+  try{const d=localStorage.getItem(KEY);if(d)STATE={...STATE,...JSON.parse(d)};}catch(e){}
+}
+function save(){
+  try{localStorage.setItem(KEY,JSON.stringify(STATE));}catch(e){}
+  renderAll();
+}
+const fmt=n=>{
+  if(n>=1e7)return '₹'+(n/1e7).toFixed(2)+'Cr';
+  if(n>=1e5)return '₹'+(n/1e5).toFixed(2)+'L';
+  return '₹'+Math.round(n).toLocaleString('en-IN');
+};
+const fmtUSD=n=>'$'+Math.round(n).toLocaleString('en-US');
+
+// ── TOTALS ────────────────────────────────────────────────────────────────
+function totals(){
+  const indiaTotal=STATE.india.reduce((a,h)=>a+(h.value||0),0);
+  const usTotalUSD=STATE.us.reduce((a,h)=>a+(h.value||0),0);
+  const usTotalINR=usTotalUSD*STATE.fx;
+  const eqTotal=indiaTotal+usTotalINR;
+  const debt=STATE.assets.debt||0, gold=STATE.assets.gold||0, cash=STATE.assets.cash||0, re=STATE.assets.re||0;
+  const total=eqTotal+debt+gold+cash+re;
+  return {indiaTotal,usTotalUSD,usTotalINR,eqTotal,debt,gold,cash,re,total};
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{if(sessionStorage.getItem('cbf26_auth')==='granted')initApp();});
+if(document.readyState==='complete'&&sessionStorage.getItem('cbf26_auth')==='granted')initApp();
+function initApp(){
+  load();
+  document.getElementById('fxRate').value=STATE.fx;
+  document.getElementById('assetDebt').value=STATE.assets.debt||'';
+  document.getElementById('assetGold').value=STATE.assets.gold||'';
+  document.getElementById('assetCash').value=STATE.assets.cash||'';
+  document.getElementById('assetRE').value=STATE.assets.re||'';
+  if(STATE.manualMacro!=null)document.getElementById('manualMacroScore').value=STATE.manualMacro;
+  loadMacroScore();
+  renderAll();
+}
+function saveFX(){
+  const v=parseFloat(document.getElementById('fxRate').value);
+  if(v>0){STATE.fx=v;save();}
+}
+function saveAssets(){
+  STATE.assets={
+    debt:parseFloat(document.getElementById('assetDebt').value)||0,
+    gold:parseFloat(document.getElementById('assetGold').value)||0,
+    cash:parseFloat(document.getElementById('assetCash').value)||0,
+    re:parseFloat(document.getElementById('assetRE').value)||0
+  };
+  save();
+}
+
+// ── INDIA ─────────────────────────────────────────────────────────────────
+function addIndia(){
+  const name=document.getElementById('in-name').value.trim();
+  const type=document.getElementById('in-type').value;
+  const sector=document.getElementById('in-sector').value;
+  const value=parseFloat(document.getElementById('in-value').value)||0;
+  if(!name||value<=0)return;
+  STATE.india.push({name,type,sector,value});
+  document.getElementById('in-name').value='';document.getElementById('in-value').value='';
+  save();
+}
+function delIndia(i){STATE.india.splice(i,1);save();}
+function renderIndia(){
+  const t=totals();
+  document.getElementById('in-total').textContent=fmt(t.indiaTotal);
+  document.getElementById('indiaBody').innerHTML=STATE.india.map((h,i)=>{
+    const pctIn=t.indiaTotal?Math.round(h.value/t.indiaTotal*100):0;
+    const pctTot=t.total?Math.round(h.value/t.total*100):0;
+    return `<tr>
+      <td style="color:var(--muted);">${i+1}</td>
+      <td style="font-weight:800;">${h.name}</td>
+      <td style="font-size:10px;color:var(--blue);font-weight:700;">${h.type}</td>
+      <td style="font-size:10px;color:var(--muted);">${h.sector}</td>
+      <td style="font-weight:800;">${fmt(h.value)}</td>
+      <td><div class="prog"><div style="width:${pctIn}%;background:var(--blue);"></div></div><span style="font-weight:800;color:var(--blue);">${pctIn}%</span></td>
+      <td style="font-weight:700;color:var(--muted);">${pctTot}%</td>
+      <td><button class="btn-del" onclick="delIndia(${i})">✕</button></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px;">No India holdings yet — add above</td></tr>';
+  // Sector exposure
+  const bySector={};
+  STATE.india.forEach(h=>{bySector[h.sector]=(bySector[h.sector]||0)+h.value;});
+  const sorted=Object.entries(bySector).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('indiaSectorExposure').innerHTML=sorted.length?sorted.map(([s,v])=>{
+    const pct=t.indiaTotal?Math.round(v/t.indiaTotal*100):0;
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <div style="min-width:130px;font-size:11px;font-weight:700;">${s}</div>
+      <div style="flex:1;background:#e8ecf5;border-radius:3px;height:14px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:linear-gradient(90deg,#1976d2,#42a5f5);border-radius:3px;"></div></div>
+      <div style="min-width:80px;text-align:right;font-size:11px;font-weight:800;">${pct}% · ${fmt(v)}</div>
+    </div>`;
+  }).join(''):'<div style="color:var(--muted);font-size:11px;">Add holdings to see sector exposure.</div>';
+}
+
+// ── US ────────────────────────────────────────────────────────────────────
+function addUS(){
+  const name=document.getElementById('us-name').value.trim();
+  const type=document.getElementById('us-type').value;
+  const cat=document.getElementById('us-cat').value;
+  const value=parseFloat(document.getElementById('us-value').value)||0;
+  if(!name||value<=0)return;
+  STATE.us.push({name,type,cat,value});
+  document.getElementById('us-name').value='';document.getElementById('us-value').value='';
+  save();
+}
+function delUS(i){STATE.us.splice(i,1);save();}
+function renderUS(){
+  const t=totals();
+  document.getElementById('us-total').textContent=fmtUSD(t.usTotalUSD)+' = '+fmt(t.usTotalINR);
+  document.getElementById('usBody').innerHTML=STATE.us.map((h,i)=>{
+    const inr=h.value*STATE.fx;
+    const pctUS=t.usTotalUSD?Math.round(h.value/t.usTotalUSD*100):0;
+    const pctTot=t.total?Math.round(inr/t.total*100):0;
+    return `<tr>
+      <td style="color:var(--muted);">${i+1}</td>
+      <td style="font-weight:800;">${h.name}</td>
+      <td style="font-size:10px;color:var(--purple);font-weight:700;">${h.type}</td>
+      <td style="font-size:10px;color:var(--muted);">${h.cat}</td>
+      <td style="font-weight:800;">${fmtUSD(h.value)}</td>
+      <td style="font-weight:700;color:var(--muted);">${fmt(inr)}</td>
+      <td><div class="prog"><div style="width:${pctUS}%;background:var(--purple);"></div></div><span style="font-weight:800;color:var(--purple);">${pctUS}%</span></td>
+      <td style="font-weight:700;color:var(--muted);">${pctTot}%</td>
+      <td><button class="btn-del" onclick="delUS(${i})">✕</button></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:20px;">No US holdings yet — add above</td></tr>';
+  // Category exposure
+  const byCat={};
+  STATE.us.forEach(h=>{byCat[h.cat]=(byCat[h.cat]||0)+h.value;});
+  const sorted=Object.entries(byCat).sort((a,b)=>b[1]-a[1]);
+  document.getElementById('usCategoryExposure').innerHTML=sorted.length?sorted.map(([c,v])=>{
+    const pct=t.usTotalUSD?Math.round(v/t.usTotalUSD*100):0;
+    return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+      <div style="min-width:130px;font-size:11px;font-weight:700;">${c}</div>
+      <div style="flex:1;background:#e8ecf5;border-radius:3px;height:14px;overflow:hidden;"><div style="width:${pct}%;height:100%;background:linear-gradient(90deg,#7b1fa2,#ab47bc);border-radius:3px;"></div></div>
+      <div style="min-width:80px;text-align:right;font-size:11px;font-weight:800;">${pct}% · ${fmtUSD(v)}</div>
+    </div>`;
+  }).join(''):'<div style="color:var(--muted);font-size:11px;">Add holdings to see category exposure.</div>';
+}
+
+// ── OVERVIEW ──────────────────────────────────────────────────────────────
+function renderOverview(){
+  const t=totals();
+  document.getElementById('hdr-fx').textContent=STATE.fx.toFixed(2);
+  document.getElementById('hdr-total').textContent=fmt(t.total);
+  document.getElementById('hdr-count').textContent=STATE.india.length+STATE.us.length;
+  document.getElementById('kpi-total').textContent=fmt(t.total);
+  document.getElementById('kpi-india').textContent=fmt(t.indiaTotal);
+  document.getElementById('kpi-india-pct').textContent=(t.total?Math.round(t.indiaTotal/t.total*100):0)+'% of total';
+  document.getElementById('kpi-us').textContent=fmt(t.usTotalINR);
+  document.getElementById('kpi-us-pct').textContent=(t.total?Math.round(t.usTotalINR/t.total*100):0)+'% of total';
+  const eqPct=t.total?Math.round(t.eqTotal/t.total*100):0;
+  const safePct=t.total?Math.round((t.debt+t.gold)/t.total*100):0;
+  const cashPct=t.total?Math.round(t.cash/t.total*100):0;
+  document.getElementById('kpi-eq').textContent=eqPct+'%';
+  document.getElementById('kpi-safe').textContent=safePct+'%';
+  document.getElementById('kpi-cash').textContent=cashPct+'%';
+
+  // Alloc bar
+  const segs=[
+    {label:'India Eq',v:t.indiaTotal,c:'#1976d2'},
+    {label:'US Eq',v:t.usTotalINR,c:'#7b1fa2'},
+    {label:'Debt',v:t.debt,c:'#00897b'},
+    {label:'Gold',v:t.gold,c:'#f9a825'},
+    {label:'Cash',v:t.cash,c:'#90a4ae'},
+    {label:'RE',v:t.re,c:'#6d4c41'}
+  ].filter(s=>s.v>0);
+  document.getElementById('allocBarWrap').innerHTML=t.total?`<div class="alloc-bar">${segs.map(s=>{
+    const pct=Math.round(s.v/t.total*100);
+    return `<div class="alloc-seg" style="background:${s.c};width:${pct}%;" title="${s.label}: ${pct}%">${pct>=8?s.label+' '+pct+'%':''}</div>`;
+  }).join('')}</div>`:'<div style="color:var(--muted);font-size:11px;padding:8px 0;">Add holdings and assets to see allocation.</div>';
+
+  document.getElementById('allocTable').innerHTML=t.total?`<table class="co-table"><thead><tr><th>Asset Class</th><th>Value</th><th>%</th></tr></thead><tbody>${segs.map(s=>{
+    const pct=Math.round(s.v/t.total*100);
+    return `<tr><td style="font-weight:700;"><span style="display:inline-block;width:10px;height:10px;background:${s.c};border-radius:2px;margin-right:6px;"></span>${s.label}</td><td style="font-weight:800;">${fmt(s.v)}</td><td style="font-weight:800;">${pct}%</td></tr>`;
+  }).join('')}</tbody></table>`:'';
+
+  // Top holdings combined
+  const all=[
+    ...STATE.india.map(h=>({...h,inr:h.value,market:'🇮🇳'})),
+    ...STATE.us.map(h=>({...h,inr:h.value*STATE.fx,market:'🇺🇸'}))
+  ].sort((a,b)=>b.inr-a.inr).slice(0,10);
+  document.getElementById('topHoldings').innerHTML=all.length?all.map((h,i)=>{
+    const pct=t.total?Math.round(h.inr/t.total*100):0;
+    return `<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f5f7fa;">
+      <span style="font-size:11px;color:var(--muted);font-weight:700;min-width:18px;">${i+1}</span>
+      <span style="font-size:13px;">${h.market}</span>
+      <div style="flex:1;"><div style="font-size:12px;font-weight:700;">${h.name}</div><div style="font-size:9px;color:var(--muted);">${h.sector||h.cat||h.type}</div></div>
+      <div style="text-align:right;"><div style="font-size:12px;font-weight:900;">${fmt(h.inr)}</div><div style="font-size:9px;color:var(--muted);">${pct}% of total</div></div>
+    </div>`;
+  }).join(''):'<div style="color:var(--muted);font-size:11px;padding:10px 0;">Add holdings in the India / US tabs first.</div>';
+}
+
+// ── MACRO SCORE (from Macro Pulse localStorage) ───────────────────────────
+let macroScore=null;
+function loadMacroScore(){
+  try{
+    const d=localStorage.getItem('cbf26_macro_v1');
+    if(d){
+      const m=JSON.parse(d);
+      // Macro Pulse stores indicator values; total score may be stored as totalScore or score
+      if(typeof m.totalScore==='number')macroScore=m.totalScore;
+      else if(typeof m.score==='number')macroScore=m.score;
+      else if(m.indicators){
+        // Sum indicator scores if stored individually
+        const vals=Object.values(m.indicators).map(v=>typeof v==='number'?v:(v?.score||0));
+        if(vals.length)macroScore=vals.reduce((a,b)=>a+b,0);
+      }
+    }
+  }catch(e){}
+  const bar=document.getElementById('macroStatusBar');
+  if(macroScore!=null){
+    bar.className='info';
+    bar.textContent=`✅ Macro Pulse score loaded: ${macroScore>=0?'+':''}${macroScore} — CB model allocation derived automatically. Override below if needed.`;
+  }
+}
+function getActiveScore(){
+  const manual=document.getElementById('manualMacroScore').value;
+  if(manual!==''&&manual!=null){
+    STATE.manualMacro=parseFloat(manual);
+    try{localStorage.setItem(KEY,JSON.stringify(STATE));}catch(e){}
+    return parseFloat(manual);
+  }
+  return macroScore!=null?macroScore:3; // default neutral-positive
+}
+
+// ── COMPARE ───────────────────────────────────────────────────────────────
+function renderCompare(){
+  const t=totals();
+  const score=getActiveScore();
+  const model=allocFor(score);
+  document.getElementById('stanceDisplay').innerHTML=`
+    <div style="background:#fff8f0;border:1.5px solid #ffcc80;border-radius:9px;padding:9px 14px;">
+      <div style="font-size:13px;font-weight:900;color:#b35c00;">${model.stance}</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px;">${model.desc} · Score: ${score>=0?'+':''}${score}</div>
+    </div>`;
+
+  // Actual allocation %
+  const aEq=t.total?Math.round(t.eqTotal/t.total*100):0;
+  const aDebt=t.total?Math.round(t.debt/t.total*100):0;
+  const aGold=t.total?Math.round(t.gold/t.total*100):0;
+  const aCash=t.total?Math.round(t.cash/t.total*100):0;
+
+  const chartRow=(label,pct,color)=>`
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <div style="min-width:60px;font-size:11px;font-weight:700;">${label}</div>
+      <div style="flex:1;background:#e8ecf5;border-radius:4px;height:22px;overflow:hidden;position:relative;">
+        <div style="width:${pct}%;height:100%;background:${color};border-radius:4px;"></div>
+        <span style="position:absolute;left:8px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:900;color:${pct>15?'#fff':'var(--text)'};">${pct}%</span>
+      </div>
+    </div>`;
+
+  document.getElementById('actualAllocChart').innerHTML=t.total?
+    chartRow('Equity',aEq,'linear-gradient(90deg,#1976d2,#42a5f5)')+
+    chartRow('Debt',aDebt,'linear-gradient(90deg,#00897b,#4db6ac)')+
+    chartRow('Gold',aGold,'linear-gradient(90deg,#f9a825,#ffd54f)')+
+    chartRow('Cash',aCash,'linear-gradient(90deg,#90a4ae,#cfd8dc)')+
+    (t.re>0?chartRow('Real Estate',Math.round(t.re/t.total*100),'linear-gradient(90deg,#6d4c41,#a1887f)'):'')
+    :'<div style="color:var(--muted);font-size:11px;">Add holdings and asset values first.</div>';
+
+  document.getElementById('modelAllocChart').innerHTML=
+    chartRow('Equity',model.eq,'linear-gradient(90deg,#ff7c00,#ffab40)')+
+    chartRow('Debt',model.debt,'linear-gradient(90deg,#00897b,#4db6ac)')+
+    chartRow('Gold',model.gold,'linear-gradient(90deg,#f9a825,#ffd54f)')+
+    chartRow('Cash',model.cash,'linear-gradient(90deg,#90a4ae,#cfd8dc)');
+
+  // Gap analysis
+  if(!t.total){
+    document.getElementById('gapAnalysis').innerHTML='<div style="color:var(--muted);font-size:11px;">Add holdings to see gap analysis.</div>';
+    return;
+  }
+  const gaps=[
+    {label:'Equity',actual:aEq,model:model.eq},
+    {label:'Debt',actual:aDebt,model:model.debt},
+    {label:'Gold',actual:aGold,model:model.gold},
+    {label:'Cash',actual:aCash,model:model.cash}
+  ];
+  document.getElementById('gapAnalysis').innerHTML=`<table class="co-table">
+    <thead><tr><th>Asset Class</th><th>Your %</th><th>CB Model %</th><th>Gap</th><th>₹ Amount to Move</th><th>Direction</th></tr></thead>
+    <tbody>${gaps.map(g=>{
+      const gap=g.actual-g.model;
+      const amt=Math.abs(gap)/100*t.total;
+      const dir=gap>3?'Overweight — consider trimming':gap<-3?'Underweight — consider adding':'✓ In line';
+      const dirColor=Math.abs(gap)<=3?'var(--green)':gap>0?'var(--red)':'var(--blue)';
+      return `<tr>
+        <td style="font-weight:800;">${g.label}</td>
+        <td style="font-weight:800;">${g.actual}%</td>
+        <td style="font-weight:800;color:var(--orange);">${g.model}%</td>
+        <td style="font-weight:900;color:${dirColor};">${gap>0?'+':''}${gap}%</td>
+        <td style="font-weight:700;">${Math.abs(gap)>3?fmt(amt):'—'}</td>
+        <td style="font-size:10px;font-weight:700;color:${dirColor};">${dir}</td>
+      </tr>`;
+    }).join('')}</tbody></table>
+    <div class="hl" style="margin-top:10px;">This is an educational comparison against the CB Finance26 framework allocation — not a recommendation to buy or sell. Rebalancing decisions are entirely yours and should consider taxes, exit loads, and your personal situation.</div>`;
+}
+
+function renderAll(){
+  renderOverview();
+  renderIndia();
+  renderUS();
+  renderCompare();
+}
+</script>
+</body>
+</html>
