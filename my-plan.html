@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CB Finance26™ — My Plan</title>
+<meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
+<style>
+:root{
+  --bg:#f5f7fa;--card:#fff;--input:#f8f9fc;
+  --border:#dde3ef;--border-hi:#b0bcd8;
+  --text:#1a1e2e;--soft:#3a3f5c;--muted:#5a6080;
+  --orange:#ff7c00;--amber:#ffab40;--gold:#ffc107;
+  --green:#00a854;--green-dk:#007a3d;
+  --red:#e53935;--red-dk:#b71c1c;
+  --yellow:#f59e0b;--blue:#1976d2;--purple:#8e24aa;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+#accessGate{position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#fff8f2,#fff3e8,#fef9f0);display:flex;align-items:center;justify-content:center;}
+.gate-card{background:#fff;border:1.5px solid #ffe0c0;border-radius:24px;padding:40px 44px;max-width:420px;width:90%;text-align:center;box-shadow:0 12px 48px #ff7c0018;}
+.gate-logo{font-size:24px;font-weight:900;color:#c45000;margin-bottom:3px;}.gate-logo span{color:#ff7c00;}
+.gate-sub{font-size:10px;font-weight:700;color:#9a7060;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:20px;}
+.gate-divider{width:40px;height:2px;background:linear-gradient(90deg,#ff7c00,#ffc107);border-radius:2px;margin:0 auto 20px;}
+.gate-icon{width:50px;height:50px;background:linear-gradient(135deg,#ff7c00,#ffab40);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;margin:0 auto 13px;}
+.gate-title{font-size:16px;font-weight:800;color:#1a1e2e;margin-bottom:5px;}
+.gate-desc{font-size:11px;color:#5a4a40;margin-bottom:22px;line-height:1.7;}
+.gate-input{width:100%;background:#fff8f4;border:1.5px solid #e8c8b0;border-radius:10px;padding:11px 16px;font-size:14px;font-weight:700;text-align:center;outline:none;margin-bottom:9px;color:#1a1e2e;letter-spacing:3px;font-family:inherit;}
+.gate-input:focus{border-color:#ff7c00;}
+.gate-btn{width:100%;background:linear-gradient(135deg,#ff7c00,#ff9a00);color:#fff;border:none;padding:13px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;margin-bottom:14px;font-family:inherit;}
+.gate-error{font-size:11px;font-weight:700;color:#c0392b;margin-bottom:7px;min-height:15px;}
+.gate-legal{font-size:10px;color:#7a6858;line-height:1.8;border-top:1px solid #f0d8c8;padding-top:13px;text-align:left;}
+#wm{position:fixed;inset:0;pointer-events:none;z-index:9998;opacity:0.03;overflow:hidden;}
+#wm div{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);font-size:40px;font-weight:900;color:#1a1e2e;white-space:nowrap;letter-spacing:4px;user-select:none;}
+.nav{background:#fff;border-bottom:2px solid var(--border-hi);position:sticky;top:0;z-index:100;box-shadow:0 2px 10px #0000001a;}
+.nav-inner{display:flex;align-items:center;padding:0 16px;overflow-x:auto;}
+.nav-logo{font-size:13px;font-weight:900;color:#c45000;padding:11px 0;margin-right:14px;white-space:nowrap;flex-shrink:0;}.nav-logo span{color:#ff7c00;}
+.nav-tab{padding:11px 13px;font-size:11px;font-weight:700;color:#4a5070;cursor:pointer;white-space:nowrap;background:transparent;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;font-family:inherit;transition:all .2s;}
+.nav-tab:hover{color:var(--amber);}.nav-tab.active{color:var(--orange);border-bottom-color:var(--orange);}
+.hub-link{margin-left:auto;font-size:11px;font-weight:700;color:var(--blue);text-decoration:none;padding:5px 11px;border:1px solid #90caf9;border-radius:14px;white-space:nowrap;background:#e3f2fd;flex-shrink:0;}
+.page{display:none;padding:16px;animation:pgIn .25s ease;}.page.active{display:block;}
+@keyframes pgIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:none;}}
+.hdr{background:linear-gradient(135deg,#1a1e2e,#2a3050);padding:16px 22px;border-radius:12px;margin-bottom:14px;}
+.hdr h1{font-size:18px;font-weight:900;color:#ffab40;}.hdr p{color:#c8d0e8;font-size:11px;margin-top:3px;}
+.hdr-meta{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap;}
+.badge{background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);padding:3px 10px;border-radius:16px;font-size:11px;font-weight:600;color:#c8d0e8;}.badge span{color:#ffc107;font-weight:800;}
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:13px;margin-bottom:13px;}
+.full{margin-bottom:13px;}
+.card{background:var(--card);padding:15px;border-radius:11px;border:1px solid var(--border);}
+.card h2{font-size:12px;font-weight:800;color:#c45000;margin-bottom:9px;display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.5px;}
+.card h2 .ico{width:22px;height:22px;border-radius:5px;background:#f0f2f8;display:flex;align-items:center;justify-content:center;font-size:12px;}
+.sec{font-size:10px;font-weight:700;color:#6b7498;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:9px;margin-bottom:13px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:10px 12px;position:relative;overflow:hidden;}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
+.kpi.k-or::after{background:linear-gradient(90deg,#e65100,var(--amber));}.kpi.k-gr::after{background:linear-gradient(90deg,var(--green-dk),var(--green));}
+.kpi.k-bl::after{background:linear-gradient(90deg,#0277bd,var(--blue));}.kpi.k-go::after{background:linear-gradient(90deg,#b8860b,var(--gold));}
+.kpi-l{font-size:9px;font-weight:700;color:#6b7498;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px;}
+.kpi-v{font-size:17px;font-weight:900;line-height:1;}.kpi-s{font-size:9px;font-weight:600;color:#6b7498;margin-top:2px;}
+.co-table{width:100%;border-collapse:collapse;}
+.co-table th{padding:7px 9px;text-align:left;font-size:10px;font-weight:800;color:#b35c00;text-transform:uppercase;letter-spacing:.7px;border-bottom:2px solid var(--border-hi);background:#f8f9fc;}
+.co-table td{padding:7px 9px;font-size:11px;font-weight:600;border-bottom:1px solid #f0f2f8;vertical-align:middle;}
+.co-table tr:last-child td{border-bottom:none;}.co-table tr:hover td{background:#f8f9fc;}
+.tbl-scroll{overflow-x:auto;}
+.inp{background:var(--input);border:1.5px solid var(--border);border-radius:7px;padding:7px 10px;font-size:12px;font-weight:600;color:var(--text);outline:none;font-family:inherit;width:100%;}
+.inp:focus{border-color:var(--orange);}
+.btn{background:linear-gradient(135deg,#ff7c00,#ff9a00);color:#fff;border:none;padding:9px 18px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;}
+.btn-del{background:#fce8e8;color:#b71c1c;border:1px solid #ffcdd2;padding:4px 9px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;}
+.hl{background:#fff8f0;border-left:3px solid var(--orange);padding:8px 12px;border-radius:0 7px 7px 0;font-size:11px;color:var(--soft);margin-bottom:8px;}
+.info{background:#e3f2fd;border-left:3px solid var(--blue);padding:8px 12px;border-radius:0 7px 7px 0;font-size:11px;color:#0d47a1;font-weight:600;margin-bottom:8px;}
+.prog{height:5px;background:#e8ecf5;border-radius:3px;overflow:hidden;display:inline-block;width:60px;vertical-align:middle;margin-right:5px;}
+.prog div{height:100%;border-radius:3px;}
+.footer{text-align:center;padding:16px;font-size:10px;color:#9a9a9a;border-top:1px solid var(--border);margin-top:8px;}
+@media(max-width:600px){.g2{grid-template-columns:1fr;}.kpi-row{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<div id="accessGate">
+  <div class="gate-card">
+    <div class="gate-logo">★ CB <span>Finance26</span></div>
+    <div class="gate-sub">Capital Research Framework</div>
+    <div class="gate-divider"></div>
+    <div class="gate-icon">📝</div>
+    <div class="gate-title">My Plan</div>
+    <div class="gate-desc">For authorised CB Finance26 members only.<br>Enter your access code to continue.</div>
+    <input type="password" id="accessCodeInput" class="gate-input" placeholder="Access code" onkeydown="if(event.key==='Enter')checkAccess()">
+    <div id="accessError" class="gate-error"></div>
+    <button onclick="checkAccess()" class="gate-btn">Enter →</button>
+    <div class="gate-legal">By entering you confirm this tool is for personal research only. Not financial advice. Redistribution prohibited. © 2025 CB Finance26™ · Proprietary &amp; Confidential</div>
+  </div>
+</div>
+<div id="wm"><div>CB FINANCE26™ · CONFIDENTIAL</div></div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-logo">★ CB <span>Finance26</span></div>
+    <button class="nav-tab active" onclick="showPage('plan',this)">📝 My Plan</button>
+    <button class="nav-tab" onclick="showPage('sectors',this)">🏭 Sector Targets</button>
+    <button class="nav-tab" onclick="showPage('watchlist',this)">👁 Watchlist</button>
+    <button class="nav-tab" onclick="showPage('journal',this)">📓 Decision Journal</button>
+    <a class="hub-link" href="index.html">⬡ Hub</a>
+  </div>
+</nav>
+
+<!-- MY PLAN -->
+<div class="page active" id="page-plan">
+  <div class="hdr">
+    <h1>📝 My Plan — Personal Capital Deployment Framework</h1>
+    <p>Set your portfolio size, equity allocation, and monthly deployment plan based on the CB Finance26 framework</p>
+    <div class="hdr-meta">
+      <span class="badge">Equity Target: <span id="hdr-eq">—</span></span>
+      <span class="badge">Monthly Deploy: <span id="hdr-deploy">—</span></span>
+    </div>
+  </div>
+
+  <div class="card full">
+    <h2><span class="ico">⚙️</span>Plan Inputs</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Total Investable Capital (₹)</div>
+        <input type="number" id="pl-capital" class="inp" placeholder="e.g. 5000000" onchange="savePlan()"></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Monthly Fresh Investment (₹)</div>
+        <input type="number" id="pl-monthly" class="inp" placeholder="e.g. 100000" onchange="savePlan()"></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Macro Score (−15 to +15)</div>
+        <input type="number" id="pl-macro" class="inp" min="-15" max="15" placeholder="from Macro Pulse" onchange="savePlan()"></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Investment Horizon</div>
+        <select id="pl-horizon" class="inp" onchange="savePlan()"><option>3-5 Years</option><option>5-10 Years</option><option>10+ Years</option><option>1-3 Years</option></select></div>
+    </div>
+    <div id="macroAutoBar" style="margin-top:10px;"></div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi k-or"><div class="kpi-l">Stance</div><div class="kpi-v" id="kpi-stance" style="font-size:12px;font-weight:900;padding-top:3px;color:var(--orange);">—</div><div class="kpi-s" id="kpi-stance-desc">From ALLOC_MATRIX</div></div>
+    <div class="kpi k-bl"><div class="kpi-l">Equity Allocation</div><div class="kpi-v" id="kpi-eq" style="color:var(--blue);">—</div><div class="kpi-s" id="kpi-eq-amt">₹—</div></div>
+    <div class="kpi k-gr"><div class="kpi-l">Debt</div><div class="kpi-v" id="kpi-debt" style="color:var(--green);">—</div><div class="kpi-s" id="kpi-debt-amt">₹—</div></div>
+    <div class="kpi k-go"><div class="kpi-l">Gold</div><div class="kpi-v" id="kpi-gold" style="color:var(--gold);">—</div><div class="kpi-s" id="kpi-gold-amt">₹—</div></div>
+    <div class="kpi k-or"><div class="kpi-l">Cash</div><div class="kpi-v" id="kpi-cash" style="color:var(--muted);">—</div><div class="kpi-s" id="kpi-cash-amt">₹—</div></div>
+  </div>
+
+  <div class="card full">
+    <h2><span class="ico">📅</span>Monthly Deployment Split</h2>
+    <div class="sec">Your monthly fresh investment, split by the current CB allocation model</div>
+    <div id="monthlySplit"></div>
+  </div>
+  <div class="footer">CB Finance26™ — My Plan v1.0 · Data stored locally only · Educational framework · Not Financial Advice</div>
+</div>
+
+<!-- SECTOR TARGETS -->
+<div class="page" id="page-sectors">
+  <div class="hdr"><h1>🏭 Sector Targets</h1><p>Equity portion split across CB Finance26 priority sectors — your personal target weights</p></div>
+  <div class="card full">
+    <h2><span class="ico">🎯</span>Sector Allocation of Equity Portion <span id="sec-total-badge" style="margin-left:auto;font-size:12px;"></span></h2>
+    <div class="info">CB Finance26 default weights shown. Adjust % per sector — should total 100%. Equity ₹ amount comes from My Plan tab.</div>
+    <div class="tbl-scroll">
+      <table class="co-table">
+        <thead><tr><th>Sector</th><th>CB Priority</th><th>Your Target %</th><th>₹ Amount</th><th></th></tr></thead>
+        <tbody id="sectorBody"></tbody>
+      </table>
+    </div>
+    <button class="btn" style="margin-top:10px;" onclick="resetSectorDefaults()">Reset to CB Defaults</button>
+  </div>
+  <div class="footer">CB Finance26™ · Sector Targets · Not Financial Advice</div>
+</div>
+
+<!-- WATCHLIST -->
+<div class="page" id="page-watchlist">
+  <div class="hdr"><h1>👁 Watchlist</h1><p>Companies you're tracking with target entry prices</p></div>
+  <div class="card full">
+    <h2><span class="ico">➕</span>Add to Watchlist</h2>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:8px;align-items:end;">
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Company</div><input type="text" id="wl-name" class="inp" placeholder="e.g. HDFC Bank"></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Current Price ₹</div><input type="number" id="wl-cmp" class="inp" placeholder="1650"></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Target Entry ₹</div><input type="number" id="wl-target" class="inp" placeholder="1500"></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Note</div><input type="text" id="wl-note" class="inp" placeholder="Why watching"></div>
+      <button class="btn" onclick="addWatch()">Add</button>
+    </div>
+  </div>
+  <div class="card full">
+    <h2><span class="ico">📋</span>Watching <span id="wl-count" style="margin-left:auto;font-size:12px;color:var(--blue);"></span></h2>
+    <div class="tbl-scroll">
+      <table class="co-table">
+        <thead><tr><th>#</th><th>Company</th><th>Current ₹</th><th>Target ₹</th><th>Distance</th><th>Note</th><th>Added</th><th></th></tr></thead>
+        <tbody id="watchBody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="footer">CB Finance26™ · Watchlist · Not Financial Advice</div>
+</div>
+
+<!-- JOURNAL -->
+<div class="page" id="page-journal">
+  <div class="hdr"><h1>📓 Decision Journal</h1><p>Record every major investment decision with reasoning — review later to improve judgment</p></div>
+  <div class="card full">
+    <h2><span class="ico">➕</span>New Entry</h2>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Decision</div>
+        <input type="text" id="jr-title" class="inp" placeholder="e.g. Added NTPC 100 shares @ 350"></div>
+      <div><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Type</div>
+        <select id="jr-type" class="inp"><option>Entry</option><option>Add More</option><option>Trim</option><option>Full Exit</option><option>Skip / Pass</option><option>Rebalance</option></select></div>
+    </div>
+    <div style="margin-bottom:8px;"><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:3px;">Reasoning — why this decision now?</div>
+      <textarea id="jr-reason" class="inp" rows="3" placeholder="Macro score +6, Power sector score 95, NTPC at reasonable PE with RE pivot..."></textarea></div>
+    <button class="btn" onclick="addJournal()">Save Entry</button>
+  </div>
+  <div class="card full">
+    <h2><span class="ico">📜</span>Journal History</h2>
+    <div id="journalList"></div>
+  </div>
+  <div class="footer">CB Finance26™ · Decision Journal · Not Financial Advice</div>
+</div>
+
+<script>
+document.addEventListener('contextmenu',e=>{e.preventDefault();return false;});
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&['s','p','u'].includes(e.key.toLowerCase())){e.preventDefault();return false;}if(e.key==='F12'){e.preventDefault();return false;}});
+(function(){if(sessionStorage.getItem('cbf26_auth')==='granted')document.getElementById('accessGate').style.display='none';setTimeout(()=>document.getElementById('accessCodeInput')?.focus(),300);})();
+function checkAccess(){
+  const inp=document.getElementById('accessCodeInput'),err=document.getElementById('accessError');
+  const val=(inp?.value||'').trim().toUpperCase();
+  if(['CBF26','MEMBER2025','RESEARCH26','CBFINANCE','ALPHA2025'].includes(val)){
+    sessionStorage.setItem('cbf26_auth','granted');
+    const g=document.getElementById('accessGate');g.style.transition='opacity .5s';g.style.opacity='0';
+    setTimeout(()=>{g.style.display='none';initApp();},500);
+  } else {err.textContent='Incorrect code.';inp.value='';}
+}
+function showPage(id,tab){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  if(tab)tab.classList.add('active');
+}
+
+const ALLOC_MATRIX=[
+  {minScore:12,eq:70,debt:10,gold:10,cash:10,stance:"Aggressively Bullish",desc:"Early bull — deploy aggressively"},
+  {minScore:8, eq:65,debt:12,gold:10,cash:13,stance:"Bullish",desc:"Stay invested, tilt to growth"},
+  {minScore:5, eq:60,debt:15,gold:10,cash:15,stance:"Moderately Aggressive",desc:"More stocks, pick carefully"},
+  {minScore:2, eq:50,debt:20,gold:15,cash:15,stance:"Selective / Neutral",desc:"Quality large caps only"},
+  {minScore:-1,eq:40,debt:25,gold:15,cash:20,stance:"Cautious — Defensive",desc:"Reduce stocks, build cash"},
+  {minScore:-4,eq:30,debt:30,gold:20,cash:20,stance:"Defensive — Bear Watch",desc:"Heavy debt, gold, cash"},
+  {minScore:-99,eq:15,debt:35,gold:25,cash:25,stance:"Fully Defensive",desc:"Preserve capital only"}
+];
+function allocFor(s){for(const a of ALLOC_MATRIX)if(s>=a.minScore)return a;return ALLOC_MATRIX[ALLOC_MATRIX.length-1];}
+
+// CB sector default weights (equity portion)
+const SECTOR_DEFAULTS=[
+  {sector:"Power",priority:"Core",weight:16},
+  {sector:"Pharma",priority:"Core",weight:12},
+  {sector:"Defence",priority:"Core",weight:11},
+  {sector:"Capital Goods",priority:"Core",weight:9},
+  {sector:"Banking",priority:"Selective",weight:9},
+  {sector:"AMC",priority:"Core",weight:7},
+  {sector:"Auto 2W",priority:"Core",weight:6},
+  {sector:"Brokers/Wealth",priority:"Core",weight:6},
+  {sector:"Hospitals",priority:"Focus",weight:3},
+  {sector:"Auto Spares",priority:"Focus",weight:3},
+  {sector:"Insurance",priority:"Selective",weight:3},
+  {sector:"Reliance Group",priority:"Core",weight:3},
+  {sector:"Cement",priority:"Selective",weight:3},
+  {sector:"Hotels/Tourism",priority:"Focus",weight:2},
+  {sector:"Gold/Jewellery",priority:"Watch",weight:2},
+  {sector:"Diversified",priority:"Watch",weight:2},
+  {sector:"Others/Flexible",priority:"—",weight:3}
+];
+
+const KEY='cbf26_myplan_v1';
+let STATE={capital:0,monthly:0,macro:null,horizon:'3-5 Years',sectors:null,watchlist:[],journal:[]};
+function load(){try{const d=localStorage.getItem(KEY);if(d)STATE={...STATE,...JSON.parse(d)};}catch(e){}}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(STATE));}catch(e){}}
+const fmt=n=>{
+  if(n>=1e7)return '₹'+(n/1e7).toFixed(2)+'Cr';
+  if(n>=1e5)return '₹'+(n/1e5).toFixed(1)+'L';
+  return '₹'+Math.round(n).toLocaleString('en-IN');
+};
+
+document.addEventListener('DOMContentLoaded',()=>{if(sessionStorage.getItem('cbf26_auth')==='granted')initApp();});
+if(document.readyState==='complete'&&sessionStorage.getItem('cbf26_auth')==='granted')initApp();
+
+function initApp(){
+  load();
+  if(!STATE.sectors)STATE.sectors=SECTOR_DEFAULTS.map(s=>({...s}));
+  document.getElementById('pl-capital').value=STATE.capital||'';
+  document.getElementById('pl-monthly').value=STATE.monthly||'';
+  document.getElementById('pl-horizon').value=STATE.horizon||'3-5 Years';
+  // Try auto-load macro score from Macro Pulse
+  let autoMacro=null;
+  try{
+    const m=JSON.parse(localStorage.getItem('cbf26_macro_v1')||'{}');
+    if(typeof m.totalScore==='number')autoMacro=m.totalScore;
+    else if(typeof m.score==='number')autoMacro=m.score;
+  }catch(e){}
+  if(STATE.macro!=null)document.getElementById('pl-macro').value=STATE.macro;
+  else if(autoMacro!=null)document.getElementById('pl-macro').value=autoMacro;
+  const bar=document.getElementById('macroAutoBar');
+  if(autoMacro!=null)bar.innerHTML=`<div class="info">✅ Macro Pulse score auto-loaded: ${autoMacro>=0?'+':''}${autoMacro}. Override above if needed.</div>`;
+  renderAll();
+}
+function savePlan(){
+  STATE.capital=parseFloat(document.getElementById('pl-capital').value)||0;
+  STATE.monthly=parseFloat(document.getElementById('pl-monthly').value)||0;
+  const m=document.getElementById('pl-macro').value;
+  STATE.macro=m===''?null:parseFloat(m);
+  STATE.horizon=document.getElementById('pl-horizon').value;
+  persist();renderAll();
+}
+function getScore(){return STATE.macro!=null?STATE.macro:3;}
+
+function renderPlan(){
+  const score=getScore();
+  const a=allocFor(score);
+  const cap=STATE.capital||0;
+  document.getElementById('kpi-stance').textContent=a.stance;
+  document.getElementById('kpi-stance-desc').textContent=a.desc;
+  document.getElementById('kpi-eq').textContent=a.eq+'%';
+  document.getElementById('kpi-eq-amt').textContent=fmt(cap*a.eq/100);
+  document.getElementById('kpi-debt').textContent=a.debt+'%';
+  document.getElementById('kpi-debt-amt').textContent=fmt(cap*a.debt/100);
+  document.getElementById('kpi-gold').textContent=a.gold+'%';
+  document.getElementById('kpi-gold-amt').textContent=fmt(cap*a.gold/100);
+  document.getElementById('kpi-cash').textContent=a.cash+'%';
+  document.getElementById('kpi-cash-amt').textContent=fmt(cap*a.cash/100);
+  document.getElementById('hdr-eq').textContent=a.eq+'% ('+fmt(cap*a.eq/100)+')';
+  document.getElementById('hdr-deploy').textContent=fmt(STATE.monthly||0)+'/mo';
+  // Monthly split
+  const mo=STATE.monthly||0;
+  document.getElementById('monthlySplit').innerHTML=mo?`<table class="co-table">
+    <thead><tr><th>Asset Class</th><th>%</th><th>Monthly ₹</th><th>How</th></tr></thead><tbody>
+    <tr><td style="font-weight:800;color:var(--blue);">Equity</td><td style="font-weight:800;">${a.eq}%</td><td style="font-weight:900;">${fmt(mo*a.eq/100)}</td><td style="font-size:10px;color:var(--muted);">Direct stocks per Sector Targets + index/flexi SIP</td></tr>
+    <tr><td style="font-weight:800;color:var(--green);">Debt</td><td style="font-weight:800;">${a.debt}%</td><td style="font-weight:900;">${fmt(mo*a.debt/100)}</td><td style="font-size:10px;color:var(--muted);">Short-duration / liquid funds, FDs</td></tr>
+    <tr><td style="font-weight:800;color:var(--gold);">Gold</td><td style="font-weight:800;">${a.gold}%</td><td style="font-weight:900;">${fmt(mo*a.gold/100)}</td><td style="font-size:10px;color:var(--muted);">SGB / Gold ETF</td></tr>
+    <tr><td style="font-weight:800;color:var(--muted);">Cash</td><td style="font-weight:800;">${a.cash}%</td><td style="font-weight:900;">${fmt(mo*a.cash/100)}</td><td style="font-size:10px;color:var(--muted);">Liquid fund — dry powder for corrections</td></tr>
+    </tbody></table>
+    <div class="hl" style="margin-top:10px;">Allocation derives from your macro score of ${score>=0?'+':''}${score} → ${a.stance}. Update the score monthly from Macro Pulse for current stance.</div>`
+    :'<div style="color:var(--muted);font-size:11px;">Enter monthly investment amount above to see the split.</div>';
+}
+
+// ── SECTOR TARGETS ────────────────────────────────────────────────────────
+function renderSectors(){
+  const score=getScore();
+  const a=allocFor(score);
+  const eqAmt=(STATE.capital||0)*a.eq/100;
+  const total=STATE.sectors.reduce((s,x)=>s+(x.weight||0),0);
+  const badge=document.getElementById('sec-total-badge');
+  badge.textContent='Total: '+total+'%';
+  badge.style.color=total===100?'var(--green)':'var(--red)';
+  document.getElementById('sectorBody').innerHTML=STATE.sectors.map((s,i)=>{
+    const amt=eqAmt*s.weight/100;
+    const pc=s.priority==='Core'?'#e6f4ef;color:#006b30':s.priority==='Focus'?'#e3f2fd;color:#1565c0':s.priority==='Selective'?'#fff8e1;color:#b35c00':'#f5f5f5;color:#9e9e9e';
+    return `<tr>
+      <td style="font-weight:800;">${s.sector}</td>
+      <td><span style="background:${pc};padding:2px 8px;border-radius:6px;font-size:10px;font-weight:800;">${s.priority}</span></td>
+      <td><input type="number" class="inp" style="max-width:80px;" value="${s.weight}" min="0" max="100" onchange="updateSectorWeight(${i},this.value)"></td>
+      <td style="font-weight:900;color:var(--orange);">${fmt(amt)}</td>
+      <td><button class="btn-del" onclick="delSector(${i})">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+function updateSectorWeight(i,v){STATE.sectors[i].weight=parseFloat(v)||0;persist();renderSectors();}
+function delSector(i){STATE.sectors.splice(i,1);persist();renderSectors();}
+function resetSectorDefaults(){STATE.sectors=SECTOR_DEFAULTS.map(s=>({...s}));persist();renderSectors();}
+
+// ── WATCHLIST ─────────────────────────────────────────────────────────────
+function addWatch(){
+  const name=document.getElementById('wl-name').value.trim();
+  const cmp=parseFloat(document.getElementById('wl-cmp').value)||0;
+  const target=parseFloat(document.getElementById('wl-target').value)||0;
+  const note=document.getElementById('wl-note').value.trim();
+  if(!name)return;
+  STATE.watchlist.push({name,cmp,target,note,date:new Date().toISOString().slice(0,10)});
+  ['wl-name','wl-cmp','wl-target','wl-note'].forEach(id=>document.getElementById(id).value='');
+  persist();renderWatch();
+}
+function delWatch(i){STATE.watchlist.splice(i,1);persist();renderWatch();}
+function renderWatch(){
+  document.getElementById('wl-count').textContent=STATE.watchlist.length+' companies';
+  document.getElementById('watchBody').innerHTML=STATE.watchlist.map((w,i)=>{
+    const dist=w.cmp&&w.target?Math.round((w.cmp-w.target)/w.cmp*100):null;
+    const distTxt=dist==null?'—':dist<=0?'🎯 At/below target!':dist+'% above target';
+    const distCol=dist==null?'var(--muted)':dist<=0?'var(--green)':dist<=5?'var(--yellow)':'var(--muted)';
+    return `<tr>
+      <td style="color:var(--muted);">${i+1}</td>
+      <td style="font-weight:800;">${w.name}</td>
+      <td style="font-weight:700;">₹${w.cmp||'—'}</td>
+      <td style="font-weight:800;color:var(--blue);">₹${w.target||'—'}</td>
+      <td style="font-weight:800;color:${distCol};font-size:10px;">${distTxt}</td>
+      <td style="font-size:10px;color:var(--muted);">${w.note||''}</td>
+      <td style="font-size:10px;color:var(--muted);">${w.date||''}</td>
+      <td><button class="btn-del" onclick="delWatch(${i})">✕</button></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px;">Watchlist empty — add companies above</td></tr>';
+}
+
+// ── JOURNAL ───────────────────────────────────────────────────────────────
+function addJournal(){
+  const title=document.getElementById('jr-title').value.trim();
+  const type=document.getElementById('jr-type').value;
+  const reason=document.getElementById('jr-reason').value.trim();
+  if(!title)return;
+  STATE.journal.unshift({title,type,reason,date:new Date().toISOString().slice(0,16).replace('T',' ')});
+  document.getElementById('jr-title').value='';document.getElementById('jr-reason').value='';
+  persist();renderJournal();
+}
+function delJournal(i){STATE.journal.splice(i,1);persist();renderJournal();}
+function renderJournal(){
+  const tc={'Entry':'#e6f4ef;color:#006b30','Add More':'#e3f2fd;color:#1565c0','Trim':'#fff8e1;color:#b35c00','Full Exit':'#fce8e8;color:#b71c1c','Skip / Pass':'#f5f5f5;color:#9e9e9e','Rebalance':'#f3e5f5;color:#7b1fa2'};
+  document.getElementById('journalList').innerHTML=STATE.journal.length?STATE.journal.map((j,i)=>`
+    <div style="padding:10px 0;border-bottom:1px solid var(--border);">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+        <span style="background:${tc[j.type]||tc['Entry']};padding:2px 8px;border-radius:6px;font-size:10px;font-weight:800;">${j.type}</span>
+        <span style="font-size:13px;font-weight:800;">${j.title}</span>
+        <span style="font-size:10px;color:var(--muted);margin-left:auto;">${j.date}</span>
+        <button class="btn-del" onclick="delJournal(${i})">✕</button>
+      </div>
+      <div style="font-size:11px;color:var(--soft);line-height:1.6;">${j.reason||''}</div>
+    </div>`).join(''):'<div style="color:var(--muted);font-size:11px;padding:10px 0;">No journal entries yet. Record your first decision above.</div>';
+}
+
+function renderAll(){renderPlan();renderSectors();renderWatch();renderJournal();}
+</script>
+</body>
+</html>
