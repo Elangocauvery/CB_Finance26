@@ -1521,23 +1521,34 @@ function grParseHTML(htmlText,fname){
         ambers:(html.match(/#d97706|td-amber/g)||[]).length};
     });
   } else {
-    // Priority 3: generic — first tbody whose rows start with a <strong> company name and have numeric cells
+    // Priority 3: header-aware table scan (works on plain positional tables — Defence/Power style)
     fmt='table-scan';
-    const bodies=[...doc.querySelectorAll('tbody')];
-    for(const tb of bodies){
-      const trs=[...tb.querySelectorAll('tr')].filter(tr=>tr.querySelector('td strong')&&tr.cells.length>=4);
-      if(trs.length>=3){
-        cos=trs.map(tr=>{
-          const name=tr.querySelector('td strong').textContent.trim();
-          const nums=[...tr.cells].map(td=>parseFloat(td.textContent.replace(/[₹,%#*+]/g,'').replace(/,/g,''))).filter(n=>!isNaN(n));
-          const html=tr.innerHTML;
-          return {name,rev:nums[0]||0,ebitda:null,pat:null,
-            greens:(html.match(/#16a34a|td-green|#166534/g)||[]).length,
-            reds:(html.match(/#dc2626|td-red/g)||[]).length,
-            ambers:(html.match(/#d97706|td-amber/g)||[]).length};
-        });
-        break;
-      }
+    const tables=[...doc.querySelectorAll('table')];
+    for(const tbl of tables){
+      const thEls=[...tbl.querySelectorAll('thead th')];
+      if(!thEls.length) continue;
+      if(thEls.some(th=>(parseInt(th.getAttribute('colspan'))||1)>1||(parseInt(th.getAttribute('rowspan'))||1)>1)) continue;
+      const ths=thEls.map(th=>th.textContent.toLowerCase());
+      if(!ths[0]||!ths[0].includes('company')) continue;
+      const iRev=ths.findIndex(h=>h.includes('rev')&&!h.includes('yoy'));
+      const iYoY=ths.findIndex(h=>h.includes('yoy'));
+      const iEb=ths.findIndex(h=>h.includes('ebitda')&&h.includes('%'));
+      const iPat=ths.findIndex(h=>h.includes('pat')&&!h.includes('%'));
+      if(iRev<0) continue;
+      const trs=[...tbl.querySelectorAll('tbody tr')];
+      trs.forEach(tr=>{
+        const tds=[...tr.cells]; if(tds.length<4) return;
+        const nc=tds[0], name=nc.textContent.trim();
+        if(!name||name.length>40||/total|average|sector|metric/i.test(name)) return;
+        if(!(nc.querySelector('strong')||/(^|\s)tb(\s|$)/.test(nc.className))) return;
+        const num=i=>{ if(i<0||!tds[i]) return NaN; return parseFloat(tds[i].textContent.replace(/[₹~%★+]/g,'').replace(/,/g,'')); };
+        const html=tr.innerHTML;
+        const rv=num(iRev), yy=num(iYoY), eb=num(iEb), pt=num(iPat);
+        cos.push({name,rev:isNaN(rv)?0:rv,revYoY:isNaN(yy)?null:yy,ebitda:isNaN(eb)?null:eb,pat:isNaN(pt)?0:pt,
+          greens:(html.match(/tpos|"num pos"|#16a34a|td-green|#166534|#15803d/g)||[]).length,
+          reds:(html.match(/tneg|"neg"|class="neg"|#dc2626|td-red|#b91c1c/g)||[]).length,
+          ambers:(html.match(/tneu|#d97706|td-amber/g)||[]).length});
+      });
     }
   }
   if(!cos.length) return null;
@@ -1553,12 +1564,14 @@ function grAggregate(parsed){
   const totalRev=cos.reduce((a,c)=>a+(c.rev||0),0);
   const withE=cos.filter(c=>c.ebitda!=null);
   const avgEbitda=withE.length?withE.reduce((a,c)=>a+c.ebitda,0)/withE.length:null;
+  const withY=cos.filter(c=>c.revYoY!=null&&!isNaN(c.revYoY));
+  const avgRevYoY=withY.length?withY.reduce((a,c)=>a+c.revYoY,0)/withY.length:null;
   const g=cos.reduce((a,c)=>a+c.greens,0), r=cos.reduce((a,c)=>a+c.reds,0), am=cos.reduce((a,c)=>a+c.ambers,0);
   const tot=g+r+am||1;
   const toneScore=(g-r)/tot;
   const tone=toneScore>0.25?'strong':toneScore<-0.1?'weak':'mixed';
   const top=cos.slice().sort((a,b)=>(b.ebitda||0)-(a.ebitda||0)).slice(0,3).map(c=>c.name);
-  return {n,totalRev:Math.round(totalRev),avgEbitda:avgEbitda!=null?+avgEbitda.toFixed(1):null,
+  return {n,totalRev:Math.round(totalRev),avgEbitda:avgEbitda!=null?+avgEbitda.toFixed(1):null,avgRevYoY:avgRevYoY!=null?+avgRevYoY.toFixed(1):null,
     greens:g,reds:r,ambers:am,tone,toneScore:+toneScore.toFixed(2),top,period:parsed.period,fmt:parsed.fmt};
 }
 // ── FETCH FROM YOUR GITHUB PAGES ──
@@ -1591,7 +1604,10 @@ async function grFetchAll(){
     }catch(e){ out.files.push({file:en.file,sectors:en.sectors,err:e.message}); }
   }
   grSaveCache(out);
-  log('✅ Loaded '+out.files.filter(f=>f.agg).length+' of '+entries.length+' files from index · '+new Date(out.ts).toLocaleString());
+  const lines=out.files.map(f=>f.agg
+    ?'✅ '+f.file+' — '+f.agg.n+' companies parsed ('+(f.agg.period||'period n/a')+') → '+f.sectors.join(', ')
+    :'❌ '+f.file+' — '+f.err+(String(f.err).includes('404')?' (file not found at this address — check exact spelling/case in repo vs index)':String(f.err).includes('parseable')?' (file is reachable but its tables have no data attributes — send this file to Claude to adapt the parser)':''));
+  log('Loaded '+out.files.filter(f=>f.agg).length+' of '+entries.length+' files · '+new Date(out.ts).toLocaleString()+'<br>'+lines.join('<br>'));
   renderSectorImpact();
 }
 // ── LOCAL FILE PICKER (works without hosting) ──
@@ -1650,6 +1666,7 @@ function grSection(sectorName,macroPts){
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
         <span style="font-size:10px;color:#3a3f5c;"><strong>${a.n}</strong> companies</span>
         <span style="font-size:10px;color:#3a3f5c;">Revenue <strong>₹${a.totalRev.toLocaleString('en-IN')}Cr</strong></span>
+        ${a.avgRevYoY!=null?`<span style="font-size:10px;color:#3a3f5c;">Avg Rev growth <strong>${a.avgRevYoY>0?'+':''}${a.avgRevYoY}% YoY</strong></span>`:''}
         ${a.avgEbitda!=null?`<span style="font-size:10px;color:#3a3f5c;">Avg EBITDA <strong>${a.avgEbitda}%</strong></span>`:''}
         <span style="font-size:10px;font-weight:700;color:${a.tone==='strong'?'#006b30':a.tone==='weak'?'#b71c1c':'#b35c00'};">${toneTxt} (${a.greens}🟢/${a.ambers}🟡/${a.reds}🔴 data points)</span>
       </div>
