@@ -258,6 +258,7 @@ tr:last-child td{border-bottom:none;}
     <button class="nav-tab" onclick="showPage('fiidii',this)">🌍 FII / DII</button>
     <button class="nav-tab" onclick="showPage('indicators',this)">🎛 13 Indicators</button>
     <button class="nav-tab" onclick="showPage('scenarios',this)">🎭 Scenarios</button>
+    <button class="nav-tab" onclick="showPage('sectors',this)">🧭 Sector Impact</button>
     <button class="nav-tab" onclick="showPage('risks',this)">⚠️ Risk Map</button>
     <a class="hub-link" href="hub.html">⬡ Hub</a>
   </div>
@@ -266,8 +267,8 @@ tr:last-child td{border-bottom:none;}
 <!-- ═══ DASHBOARD ═══ -->
 <div class="page active" id="page-dash">
   <div class="hdr">
-    <h1>📊 Macro Pulse — India Market Signal Engine</h1>
-    <p>Enter real market numbers → get macro score → allocation stance → sector direction</p>
+    <h1>📊 Macro Pulse — Macro-to-Sector Reasoning Engine</h1>
+    <p>Real macro numbers in → reasoned sector tailwinds &amp; headwinds out. Every signal explained — no vague scores.</p>
     <div class="hdr-meta">
       <span class="badge">Score: <span id="hdr-score">—</span></span>
       <span class="badge">Stance: <span id="hdr-stance">—</span></span>
@@ -761,6 +762,37 @@ tr:last-child td{border-bottom:none;}
   <div class="footer">CB Finance26™ · Scenario Analysis · Educational Framework · Not Financial Advice</div>
 </div>
 
+<!-- ═══ SECTOR IMPACT ═══ -->
+<div class="page" id="page-sectors">
+  <div class="hdr">
+    <h1>🧭 Sector Impact — Reasoned, Not Scored</h1>
+    <p>34 sectors · each judged on its OWN business metrics · every 🟢/🔴 comes with the actual cause-and-effect from today's macro inputs</p>
+    <div class="hdr-meta">
+      <span class="badge">🟢 Tailwind: <span id="si-green">—</span></span>
+      <span class="badge">🔴 Headwind: <span id="si-red">—</span></span>
+      <span class="badge">🟡 Mixed/Neutral: <span id="si-neu">—</span></span>
+      <span class="badge">Driven by: <span id="si-drivers">—</span></span>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:14px;">
+    <div class="sec">How to read this</div>
+    <div style="font-size:11px;color:#3a3f5c;line-height:1.7;">Signals below are computed from your <strong>live inputs</strong> — Crude &amp; INR from the Market Data tab (or the indicator band if not entered), plus the 13 Indicators tab selections. Each sector shows: <strong>① the macro factors that actually drive it</strong> (★ = dominant), <strong>② written reasoning</strong> for each triggered factor with the real number, and <strong>③ the sector-specific metrics</strong> to check in quarterly results — Banking is judged on NIM/GNPA, AMC on AUM &amp; SIP yield, Aviation on PLF &amp; ATF — never one generic yardstick.</div>
+  </div>
+  <div class="card" style="margin-bottom:14px;">
+    <div class="sec">📊 Ground Reality — link your published sector research</div>
+    <div style="font-size:10.5px;color:#3a3f5c;line-height:1.65;margin-bottom:9px;">Pull actual Q4 numbers from your sector dashboards so every macro signal is cross-checked against real results. <strong>Hosted:</strong> click Fetch (reads sector-index.json from the same folder on your GitHub Pages). <strong>Testing locally:</strong> use Load files from computer.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <input id="grBaseUrl" type="text" placeholder="Base URL (blank = same folder as this app)" style="flex:1;min-width:220px;padding:8px 11px;border:1px solid var(--border-hi);border-radius:8px;background:#f8f9fc;color:var(--text);font-size:11px;font-family:inherit;">
+      <button onclick="grFetchAll()" style="padding:8px 16px;border-radius:8px;border:none;background:#ff7c00;color:#fff;font-size:11px;font-weight:800;cursor:pointer;">🔄 Fetch from GitHub</button>
+      <label style="padding:8px 16px;border-radius:8px;border:1px solid var(--border-hi);background:#fff;color:#3a3f5c;font-size:11px;font-weight:700;cursor:pointer;">📁 Load files from computer<input type="file" accept=".html,.htm" multiple style="display:none;" onchange="grPickFiles(this.files)"></label>
+    </div>
+    <div id="grStatus" style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6;"></div>
+  </div>
+  <div id="si-filters" style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;"></div>
+  <div id="sectorImpactGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;"></div>
+  <div class="footer">CB Finance26™ · Sector Impact Engine · Educational Framework · Not Financial Advice · Not SEBI Registered</div>
+</div>
+
 <!-- ═══ RISK MAP ═══ -->
 <div class="page" id="page-risks">
   <div class="hdr">
@@ -822,7 +854,7 @@ const MACRO_INDICATORS=[
    options:[{label:"Very Low — Below 2% (deflationary risk)",score:1,cls:"pos"},{label:"Comfortable — 2–4% (ideal range)",score:2,cls:"pos"},{label:"Moderate — 4–5% (within RBI tolerance)",score:0,cls:"neu"},{label:"Elevated — 5–6.5% (RBI watching)",score:-1,cls:"neg"},{label:"High — Above 6.5% (RBI forced to act)",score:-2,cls:"neg"}],default:2},
   {name:"Crude Oil (Brent $/bbl)",icon:"🛢",
    tooltip:"India imports 85% of crude. Every $10 rise adds ~0.5% to inflation and widens CAD. Hurts INR, aviation, paints, tyres, chemicals. Low crude = windfall — lower inflation, better CAD, room for RBI rate cuts.",
-   options:[{label:"Very Low — Below $60 (windfall for India)",score:2,cls:"pos"},{label:"Low — $60–75 (comfortable)",score:1,cls:"pos"},{label:"Moderate — $75–90 (manageable)",score:0,cls:"neu"},{label:"High — $90–105 (pressure building)",score:-1,cls:"neg"},{label:"Very High — Above $105 (crisis level)",score:-2,cls:"neg"}],default:2},
+   options:[{label:"Very Low — Below $60 (windfall for India)",score:2,cls:"pos"},{label:"Low — $60–75 (comfortable)",score:1,cls:"pos"},{label:"Moderate — $75–85 (manageable)",score:0,cls:"neu"},{label:"High — $85–100 (pressure building — current zone)",score:-1,cls:"neg"},{label:"Very High — Above $100 (crisis level)",score:-2,cls:"neg"}],default:3},
   {name:"RBI Liquidity (Money Supply)",icon:"💧",
    tooltip:"Surplus liquidity = banks have excess cash → rates fall → credit grows → markets get boost. Deficit = tight money → higher short rates → slowdown risk. RBI controls via OMOs, CRR cuts, repo rate. Surplus + rate cuts = double tailwind.",
    options:[{label:"Very Surplus — Large OMO purchases, SLR cuts",score:3,cls:"pos"},{label:"Surplus — Comfortable banking liquidity",score:2,cls:"pos"},{label:"Neutral — Balanced, no stress",score:0,cls:"neu"},{label:"Deficit — Banks borrowing from RBI",score:-1,cls:"neg"},{label:"Severe Deficit — Tight money, credit crunch risk",score:-2,cls:"neg"}],default:1},
@@ -830,8 +862,8 @@ const MACRO_INDICATORS=[
    tooltip:"Govt capex on roads, rail, defence, power directly benefits capital goods, cement, steel, infra. FY26 budget: ₹11L Cr capex. Front-loading is the key signal. Q1 capex data tells you if govt is on track.",
    options:[{label:"Surge — Front-loaded, budget beats target",score:3,cls:"pos"},{label:"Strong — On-track, beats last year",score:2,cls:"pos"},{label:"Moderate — In-line with budget",score:1,cls:"neu"},{label:"Slowing — Below target, fiscal constraint",score:-1,cls:"neg"},{label:"Austerity — Sharp cuts; fiscal crisis mode",score:-2,cls:"neg"}],default:1},
   {name:"Rupee (INR/USD)",icon:"💱",
-   tooltip:"Weak rupee hurts importers (crude, electronics) but helps exporters (IT, pharma, textiles). Sharp fall triggers RBI intervention and imported inflation. Moderate depreciation = neutral for equity. Pharma and IT benefit via USD revenues.",
-   options:[{label:"Strong Appreciation — INR strengthening vs USD",score:2,cls:"pos"},{label:"Stable Strong — INR 80–83/USD",score:1,cls:"pos"},{label:"Mild Weakness — INR 83–86/USD",score:0,cls:"neu"},{label:"Depreciating — INR 86–90/USD",score:-1,cls:"neg"},{label:"Sharp Fall — INR >90/USD (crisis signal)",score:-2,cls:"neg"}],default:2},
+   tooltip:"Weak rupee hurts importers (crude, electronics, ATF, fertiliser) but is a revenue bonus for USD earners (IT, pharma, textiles, chemicals exporters). With INR near ₹96/USD, imported inflation and RBI intervention are live risks — but exporter margins get a structural tailwind. Every ₹1 depreciation ≈ +0.3–0.5% revenue for USD-billed businesses.",
+   options:[{label:"Strong — INR below 84/USD",score:2,cls:"pos"},{label:"Stable — INR 84–88/USD",score:1,cls:"pos"},{label:"Mild Weakness — INR 88–92/USD",score:0,cls:"neu"},{label:"Depreciating — INR 92–96/USD (current zone)",score:-1,cls:"neg"},{label:"Sharp Fall — INR above 96/USD (RBI defence zone)",score:-2,cls:"neg"}],default:3},
   {name:"Global Risk / US Economy",icon:"🌐",
    tooltip:"FII flows heavily influenced by US Fed policy and global risk. Risk-off events pull FII money out of EMs. India better insulated than most EMs but a global crisis still hurts via FII outflows and INR depreciation.",
    options:[{label:"Risk-On — US soft landing, FII buying EMs",score:2,cls:"pos"},{label:"Stable — No major global stress",score:1,cls:"pos"},{label:"Cautious — Mixed global signals",score:-1,cls:"neu"},{label:"Risk-Off — FII selling, USD strengthening",score:-2,cls:"neg"},{label:"Crisis — Recession / War / Banking collapse",score:-3,cls:"neg"}],default:1},
@@ -939,6 +971,9 @@ function initApp(){
   renderFDHistory();
   renderFlowChart();
   updateFIIKPIs();
+  try{const u=localStorage.getItem(GR_URL_KEY);if(u!=null){const el=document.getElementById('grBaseUrl');if(el)el.value=u;}}catch(e){}
+  const grc=grLoadCache();
+  if(grc){const st=document.getElementById('grStatus');if(st)st.innerHTML='💾 Cached: '+grc.files.filter(f=>f.agg).length+' file(s) · last loaded '+new Date(grc.ts).toLocaleString()+' — click Fetch to refresh';}
 }
 
 // ── ALLOC CHART ───────────────────────────────────────────────────────────
@@ -1029,6 +1064,7 @@ function updateAll(){
 
   // Market snapshot
   renderMarketSnapshot();
+  renderSectorImpact();
   saveSel();
 }
 
@@ -1166,8 +1202,8 @@ function updateSignalPanel(){
   if(!isNaN(pe)) rows.push({l:'Nifty PE',v:pe,s:peSig(pe),c:pe>25?'#b71c1c':pe<18?'#006b30':'#b35c00'});
   if(!isNaN(vix)) rows.push({l:'India VIX',v:vix,s:vixSig(vix),c:vix>20?'#b71c1c':vix<14?'#006b30':'#b35c00'});
   if(!isNaN(pcr)) rows.push({l:'Nifty PCR',v:pcr,s:pcrSignal(pcr),c:pcr>1.1?'#006b30':pcr<0.8?'#b71c1c':'#b35c00'});
-  if(!isNaN(crude)) rows.push({l:'Crude $/bbl',v:`$${crude}`,s:crude<60?'🟢 Very Low':crude<75?'🟢 Comfortable':crude<90?'🟡 Manageable':crude<105?'🔴 Pressure':'🔴 Crisis',c:crude>90?'#b71c1c':crude<75?'#006b30':'#b35c00'});
-  if(!isNaN(inr)) rows.push({l:'INR/USD',v:`₹${inr}`,s:inr<83?'🟢 Strong':inr<86?'🟡 Mild Weakness':inr<90?'🔴 Depreciating':'🔴 Sharp Fall',c:inr>86?'#b71c1c':inr<83?'#006b30':'#b35c00'});
+  if(!isNaN(crude)) rows.push({l:'Crude $/bbl',v:`$${crude}`,s:crude<60?'🟢 Very Low':crude<75?'🟢 Comfortable':crude<85?'🟡 Manageable':crude<100?'🔴 Pressure':'🔴 Crisis',c:crude>=85?'#b71c1c':crude<75?'#006b30':'#b35c00'});
+  if(!isNaN(inr)) rows.push({l:'INR/USD',v:`₹${inr}`,s:inr<84?'🟢 Strong':inr<88?'🟡 Stable':inr<92?'🟡 Mild Weakness':inr<96?'🔴 Depreciating':'🔴 Sharp Fall (RBI zone)',c:inr>=92?'#b71c1c':inr<84?'#006b30':'#b35c00'});
   if(!isNaN(adv)&&!isNaN(dec)){const ratio=(adv/dec).toFixed(2);rows.push({l:'Adv/Dec Ratio',v:ratio,s:adv>dec*1.5?'🟢 Strong Breadth':adv>dec?'🟡 Moderate':dec>adv*1.5?'🔴 Weak Breadth':'🔴 Declining',c:adv>dec*1.5?'#006b30':dec>adv*1.5?'#b71c1c':'#b35c00'});}
   if(!rows.length){el.innerHTML='<div style="color:var(--muted);font-size:11px;">Enter numbers to see signals.</div>';return;}
   el.innerHTML=rows.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f5f7fa;">
@@ -1408,6 +1444,474 @@ function showSave(){
   document.querySelectorAll('.save-flash').forEach(e=>e.remove());
   const el=document.createElement('div');el.className='save-flash';el.textContent='✓ Saved';
   document.body.appendChild(el);setTimeout(()=>el.remove(),2400);
+}
+
+// ── GROUND REALITY BRIDGE ─────────────────────────────────────────────────
+// Fetches your published sector research files, parses actual company results,
+// and cross-checks them against the macro reasoning above.
+const GR_KEY='cbf26_sector_actuals_v1';
+const GR_URL_KEY='cbf26_gr_baseurl_v1';
+// filename keyword → Macro Pulse sector name(s)
+const GR_FILE_MAP=[
+ {kw:'pharma',sectors:['Pharma']},
+ {kw:'defence',sectors:['Defence']},
+ {kw:'defense',sectors:['Defence']},
+ {kw:'power',sectors:['Power (Gencos/Transmission)']},
+ {kw:'capgoods',sectors:['Capital Goods']},
+ {kw:'capital',sectors:['Capital Goods']},
+ {kw:'bank',sectors:['Banking']},
+ {kw:'textile',sectors:['Textiles']},
+ {kw:'solar',sectors:['Solar / Renewables']},
+ {kw:'ems',sectors:['EMS']},
+ {kw:'cable',sectors:['Cables & Wires']},
+ {kw:'wheeler',sectors:['Auto 2W']},
+ {kw:'2w',sectors:['Auto 2W']},
+ {kw:'exchange',sectors:['Exchanges / Depositories']},
+ {kw:'bse',sectors:['Exchanges / Depositories']},
+ {kw:'mcx',sectors:['Exchanges / Depositories']},
+ {kw:'pfc',sectors:['Power Financiers (PFC/REC/IREDA)']},
+ {kw:'rec_',sectors:['Power Financiers (PFC/REC/IREDA)']},
+ {kw:'nbfc',sectors:['NBFC (Lending)']},
+ {kw:'hotel',sectors:['Hotels']},
+ {kw:'hospital',sectors:['Hospitals']},
+ {kw:'cement',sectors:['Cement']},
+ {kw:'fmcg',sectors:['FMCG']},
+ {kw:'paint',sectors:['Paints']},
+ {kw:'aviation',sectors:['Aviation']},
+ {kw:'sugar',sectors:['Sugar / Ethanol']},
+ {kw:'chemical',sectors:['Chemicals / Specialty']},
+ {kw:'amc',sectors:['AMC']},
+ {kw:'it_',sectors:['IT Services']},
+ {kw:'realestate',sectors:['Real Estate']},
+ {kw:'metal',sectors:['Metals']},
+ {kw:'auto',sectors:['Auto 4W']},
+ {kw:'insurance',sectors:['Insurance']},
+ {kw:'water',sectors:['Capital Goods']}
+];
+function grMapFile(entry){
+  if(typeof entry==='object'&&entry.file) return {file:entry.file,sectors:entry.sectors||grKw(entry.file)};
+  return {file:entry,sectors:grKw(entry)};
+}
+function grKw(fname){
+  const f=fname.toLowerCase(); const out=[];
+  GR_FILE_MAP.forEach(m=>{ if(f.includes(m.kw)) m.sectors.forEach(s=>{ if(!out.includes(s)) out.push(s); }); });
+  return out;
+}
+function grLoadCache(){ try{return JSON.parse(localStorage.getItem(GR_KEY)||'null');}catch(e){return null;} }
+function grSaveCache(d){ try{localStorage.setItem(GR_KEY,JSON.stringify(d));}catch(e){} }
+// ── PARSER: works on your real file formats ──
+function grParseHTML(htmlText,fname){
+  const doc=new DOMParser().parseFromString(htmlText,'text/html');
+  // Priority 1: future machine-readable block
+  const jb=doc.querySelector('script#cb-data[type="application/json"]');
+  if(jb){ try{const d=JSON.parse(jb.textContent); if(d&&d.companies) return {fmt:'cb-data',period:d.period||'',cos:d.companies};}catch(e){} }
+  // Priority 2: rows with data-name + data-rev attributes (your geo tables)
+  let rows=[...doc.querySelectorAll('tr[data-name][data-rev]')];
+  let fmt='data-attrs';
+  let cos=[];
+  if(rows.length){
+    cos=rows.map(tr=>{
+      const html=tr.innerHTML;
+      return {name:tr.dataset.name,
+        rev:parseFloat(tr.dataset.rev)||0,
+        ebitda:parseFloat(tr.dataset.ebitda)||null,
+        pat:parseFloat(tr.dataset.pat)||0,
+        greens:(html.match(/#16a34a|td-green|#166534/g)||[]).length,
+        reds:(html.match(/#dc2626|td-red/g)||[]).length,
+        ambers:(html.match(/#d97706|td-amber/g)||[]).length};
+    });
+  } else {
+    // Priority 3: generic — first tbody whose rows start with a <strong> company name and have numeric cells
+    fmt='table-scan';
+    const bodies=[...doc.querySelectorAll('tbody')];
+    for(const tb of bodies){
+      const trs=[...tb.querySelectorAll('tr')].filter(tr=>tr.querySelector('td strong')&&tr.cells.length>=4);
+      if(trs.length>=3){
+        cos=trs.map(tr=>{
+          const name=tr.querySelector('td strong').textContent.trim();
+          const nums=[...tr.cells].map(td=>parseFloat(td.textContent.replace(/[₹,%#*+]/g,'').replace(/,/g,''))).filter(n=>!isNaN(n));
+          const html=tr.innerHTML;
+          return {name,rev:nums[0]||0,ebitda:null,pat:null,
+            greens:(html.match(/#16a34a|td-green|#166534/g)||[]).length,
+            reds:(html.match(/#dc2626|td-red/g)||[]).length,
+            ambers:(html.match(/#d97706|td-amber/g)||[]).length};
+        });
+        break;
+      }
+    }
+  }
+  if(!cos.length) return null;
+  // dedupe by name (a company may appear in several tables)
+  const seen={}; cos=cos.filter(c=>{ if(seen[c.name])return false; seen[c.name]=1; return true; });
+  // period detection
+  const pm=htmlText.match(/Q[1-4]\s*FY\s*\d{2}/i);
+  return {fmt,period:pm?pm[0].replace(/\s+/g,' '):'',cos};
+}
+function grAggregate(parsed){
+  const cos=parsed.cos;
+  const n=cos.length;
+  const totalRev=cos.reduce((a,c)=>a+(c.rev||0),0);
+  const withE=cos.filter(c=>c.ebitda!=null);
+  const avgEbitda=withE.length?withE.reduce((a,c)=>a+c.ebitda,0)/withE.length:null;
+  const g=cos.reduce((a,c)=>a+c.greens,0), r=cos.reduce((a,c)=>a+c.reds,0), am=cos.reduce((a,c)=>a+c.ambers,0);
+  const tot=g+r+am||1;
+  const toneScore=(g-r)/tot;
+  const tone=toneScore>0.25?'strong':toneScore<-0.1?'weak':'mixed';
+  const top=cos.slice().sort((a,b)=>(b.ebitda||0)-(a.ebitda||0)).slice(0,3).map(c=>c.name);
+  return {n,totalRev:Math.round(totalRev),avgEbitda:avgEbitda!=null?+avgEbitda.toFixed(1):null,
+    greens:g,reds:r,ambers:am,tone,toneScore:+toneScore.toFixed(2),top,period:parsed.period,fmt:parsed.fmt};
+}
+// ── FETCH FROM YOUR GITHUB PAGES ──
+async function grFetchAll(){
+  const st=document.getElementById('grStatus');
+  const base=(document.getElementById('grBaseUrl')?.value||'').trim().replace(/\/+$/,'');
+  try{localStorage.setItem(GR_URL_KEY,base);}catch(e){}
+  const url=p=>base?base+'/'+p:p;
+  const log=m=>{ if(st) st.innerHTML=m; };
+  log('Fetching sector-index.json …');
+  let index;
+  try{
+    const r=await fetch(url('sector-index.json'),{cache:'no-store'});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    index=await r.json();
+  }catch(e){
+    log('❌ Could not fetch sector-index.json ('+e.message+'). If you are testing locally (file://), use "Load files from computer" instead — fetching works once this app is hosted on your GitHub Pages alongside the sector files.');
+    return;
+  }
+  const entries=(Array.isArray(index)?index:[]).map(grMapFile);
+  const out={ts:Date.now(),files:[]};
+  for(const en of entries){
+    log('Fetching '+en.file+' …');
+    try{
+      const r=await fetch(url(en.file),{cache:'no-store'});
+      if(!r.ok) throw new Error('HTTP '+r.status);
+      const parsed=grParseHTML(await r.text(),en.file);
+      if(parsed) out.files.push({file:en.file,sectors:en.sectors,agg:grAggregate(parsed)});
+      else out.files.push({file:en.file,sectors:en.sectors,err:'no parseable table found'});
+    }catch(e){ out.files.push({file:en.file,sectors:en.sectors,err:e.message}); }
+  }
+  grSaveCache(out);
+  log('✅ Loaded '+out.files.filter(f=>f.agg).length+' of '+entries.length+' files from index · '+new Date(out.ts).toLocaleString());
+  renderSectorImpact();
+}
+// ── LOCAL FILE PICKER (works without hosting) ──
+function grPickFiles(fileList){
+  const st=document.getElementById('grStatus');
+  const files=[...fileList];
+  if(!files.length) return;
+  const cache=grLoadCache()||{ts:Date.now(),files:[]};
+  let done=0;
+  files.forEach(f=>{
+    const reader=new FileReader();
+    reader.onload=()=>{
+      const parsed=grParseHTML(reader.result,f.name);
+      const sectors=grKw(f.name);
+      cache.files=cache.files.filter(x=>x.file!==f.name);
+      if(parsed) cache.files.push({file:f.name,sectors,agg:grAggregate(parsed)});
+      else cache.files.push({file:f.name,sectors,err:'no parseable table found'});
+      done++;
+      if(done===files.length){
+        cache.ts=Date.now();
+        grSaveCache(cache);
+        if(st) st.innerHTML='✅ Loaded '+files.length+' local file(s) · sectors matched: '+(cache.files.flatMap(x=>x.sectors).join(', ')||'none — rename file to include sector keyword');
+        renderSectorImpact();
+      }
+    };
+    reader.readAsText(f);
+  });
+}
+function grForSector(name){
+  const cache=grLoadCache(); if(!cache) return null;
+  const hits=cache.files.filter(f=>f.agg&&f.sectors.includes(name));
+  return hits.length?hits:null;
+}
+// combined verdict: macro pts × results tone
+function grCombined(macroPts,tone){
+  const m=macroPts>=1?1:macroPts<=-1?-1:0;
+  if(m===1&&tone==='strong') return {e:'🟢🟢',t:'Confirmed tailwind — macro and actual results agree',c:'#006b30',bg:'#e6f4ef'};
+  if(m===1&&tone==='mixed')  return {e:'🟢🟡',t:'Macro tailwind, results mixed — early cycle or stock-specific; watch next quarter',c:'#b35c00',bg:'#fff8ee'};
+  if(m===1&&tone==='weak')   return {e:'🟢🔴',t:'Macro says tailwind but results are weak — thesis not yet visible in numbers',c:'#b35c00',bg:'#fff3e0'};
+  if(m===-1&&tone==='strong')return {e:'🔴🟢',t:'Macro headwind but companies printing strong — pricing power defying macro',c:'#1d6fa5',bg:'#e8f1fa'};
+  if(m===-1&&tone==='mixed') return {e:'🔴🟡',t:'Macro headwind, results mixed — pressure starting to show',c:'#c62828',bg:'#fdf0f0'};
+  if(m===-1&&tone==='weak')  return {e:'🔴🔴',t:'Confirmed headwind — macro pressure visible in actual results',c:'#b71c1c',bg:'#fce8e8'};
+  if(tone==='strong')        return {e:'🟡🟢',t:'Macro neutral, results strong — company execution is the driver here',c:'#006b30',bg:'#eef7f2'};
+  if(tone==='weak')          return {e:'🟡🔴',t:'Macro neutral but results weak — issues are company-specific, not macro',c:'#c62828',bg:'#fdf0f0'};
+  return {e:'🟡🟡',t:'Neutral on both lenses — no strong signal either way',c:'#b35c00',bg:'#fff8ee'};
+}
+function grSection(sectorName,macroPts){
+  const hits=grForSector(sectorName);
+  if(!hits) return `<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#f8f9fc;border:1px dashed var(--border);font-size:9.5px;color:var(--muted);">📂 No CB Research file yet for this sector — macro view only. Publish a sector dashboard and add it to sector-index.json.</div>`;
+  return hits.map(h=>{
+    const a=h.agg;
+    const cv=grCombined(macroPts,a.tone);
+    const toneTxt=a.tone==='strong'?'🟢 Strong prints':a.tone==='weak'?'🔴 Weak prints':'🟡 Mixed prints';
+    return `<div style="margin-top:8px;padding:9px 11px;border-radius:8px;background:${cv.bg};border:1px solid ${cv.c}30;">
+      <div style="font-size:9px;font-weight:800;color:${cv.c};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">📊 Ground reality — ${a.period||'latest'} actuals (${h.file.length>34?h.file.substring(0,32)+'…':h.file})</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
+        <span style="font-size:10px;color:#3a3f5c;"><strong>${a.n}</strong> companies</span>
+        <span style="font-size:10px;color:#3a3f5c;">Revenue <strong>₹${a.totalRev.toLocaleString('en-IN')}Cr</strong></span>
+        ${a.avgEbitda!=null?`<span style="font-size:10px;color:#3a3f5c;">Avg EBITDA <strong>${a.avgEbitda}%</strong></span>`:''}
+        <span style="font-size:10px;font-weight:700;color:${a.tone==='strong'?'#006b30':a.tone==='weak'?'#b71c1c':'#b35c00'};">${toneTxt} (${a.greens}🟢/${a.ambers}🟡/${a.reds}🔴 data points)</span>
+      </div>
+      ${a.top.length?`<div style="font-size:9.5px;color:#5a6080;margin-bottom:6px;">Margin leaders: ${a.top.join(' · ')}</div>`:''}
+      <div style="font-size:10px;font-weight:700;color:${cv.c};line-height:1.55;">${cv.e} ${cv.t}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── SECTOR IMPACT ENGINE ──────────────────────────────────────────────────
+// Every signal = written cause-and-effect from live macro inputs. No bare scores.
+function macroCtx(){
+  const f=fr=>MACRO_INDICATORS.findIndex(x=>x.name.includes(fr));
+  const sc=fr=>{const i=f(fr);return i>=0?MACRO_INDICATORS[i].options[sel[i]].score:0;};
+  const lab=fr=>{const i=f(fr);return i>=0?MACRO_INDICATORS[i].options[sel[i]].label.split('—')[0].trim():'';};
+  const md=getMDHistory(), L=md[md.length-1]||{};
+  const crudeReps=[55,70,80,92,105], inrReps=[82,86,90,94,97];
+  let crude=parseFloat(L.crude), crudeBand=false;
+  if(isNaN(crude)){crude=crudeReps[sel[f('Crude')]]; crudeBand=true;}
+  let inr=parseFloat(L.inr), inrBand=false;
+  if(isNaN(inr)){inr=inrReps[sel[f('Rupee')]]; inrBand=true;}
+  return {sc,lab,crude,inr,
+    crudeTxt:(crudeBand?'~$':'$')+crude+(crudeBand?' (indicator band)':''),
+    inrTxt:'₹'+(crudeBand&&inrBand?'~':'')+inr+(inrBand?' (indicator band)':'')};
+}
+const SI_GROUPS=["Financials","Manufacturing","Auto","Energy & Infra","Consumption & Services","Pharma"];
+const SECTOR_IMPACT=[
+// ════ FINANCIALS ════
+{name:"Banking",group:"Financials",icon:"🏦",links:["RBI Rates★","Liquidity","Credit Cycle"],
+ metrics:["NIM","GNPA / NNPA","PCR","CASA ratio","Credit growth (advances YoY)","RoA","CRAR","P/Book"],
+ rules:[
+  c=>c.sc('Interest')>=2?{p:1,r:`RBI in cut cycle (${c.lab('Interest')}) — short-term NIM compresses as loans reprice faster than deposits, but credit demand revives. Net positive only if credit growth crosses ~13–14%.`}:c.sc('Interest')<=-2?{p:-2,r:`Rate hikes (${c.lab('Interest')}) — deposit costs rise, loan demand cools, and asset-quality stress builds in retail unsecured books.`}:null,
+  c=>c.sc('Liquidity')>=2?{p:1,r:`Surplus banking liquidity (${c.lab('Liquidity')}) — cheaper deposit accretion supports margins and lets banks chase credit growth without pricing wars.`}:c.sc('Liquidity')<=-1?{p:-1,r:`Liquidity deficit (${c.lab('Liquidity')}) — banks bid up bulk deposit rates, CASA share slips, and NIM gets squeezed from the funding side.`}:null,
+  c=>c.sc('FII')<=-1?{p:-1,r:`FII outflows (${c.lab('FII')}) — banking is the largest FII-owned sector, so foreign selling hits bank stock prices hardest even when fundamentals are intact.`}:c.sc('FII')>=2?{p:1,r:`Heavy FII inflows (${c.lab('FII')}) — banks are the default vehicle for foreign money entering India; flow tailwind is strongest here.`}:null]},
+{name:"NBFC (Lending)",group:"Financials",icon:"💳",links:["RBI Rates★","Liquidity"],
+ metrics:["AUM growth","NIM / spread","GNPA Stage-3","Cost of borrowing","RoA / RoE","Capital adequacy","P/Book"],
+ rules:[
+  c=>c.sc('Interest')>=2?{p:2,r:`Rate cuts (${c.lab('Interest')}) — NBFCs borrow wholesale, so funding cost falls immediately while lending yields hold. Spread expansion is direct and fast.`}:c.sc('Interest')<=-2?{p:-2,r:`Rate hikes (${c.lab('Interest')}) — wholesale borrowing reprices instantly against sticky lending books; spreads compress and growth funding gets costlier.`}:null,
+  c=>c.sc('Liquidity')<=-1?{p:-2,r:`Tight liquidity (${c.lab('Liquidity')}) — NBFCs are the first casualty when money tightens: NCD spreads widen, bank lines shrink, AUM growth must slow.`}:c.sc('Liquidity')>=2?{p:1,r:`Surplus liquidity (${c.lab('Liquidity')}) — bond markets open, borrowing spreads narrow, AUM growth funding becomes cheap.`}:null]},
+{name:"Housing Finance",group:"Financials",icon:"🏠",links:["RBI Rates★","Govt Housing Push"],
+ metrics:["Loan book growth","Spread","GNPA","Disbursement growth","Borrowing mix (bank vs NCD)","P/Book"],
+ rules:[
+  c=>c.sc('Interest')>=2?{p:2,r:`Rate cuts (${c.lab('Interest')}) — home-loan EMIs fall, affordability improves, disbursement demand rises while HFC borrowing cost drops. Double benefit.`}:c.sc('Interest')<=-2?{p:-2,r:`Rate hikes — EMI burden rises, home purchase decisions get postponed, and balance-transfer churn intensifies.`}:null,
+  c=>c.sc('Capex')>=2?{p:1,r:`Strong govt spending (${c.lab('Capex')}) — PMAY-class housing programmes and infra-led urbanisation feed directly into affordable-housing loan demand.`}:null]},
+{name:"Power Financiers (PFC/REC/IREDA)",group:"Financials",icon:"⚡",links:["Govt Capex★","RBI Rates"],
+ metrics:["Sanctions vs disbursements","NIM","Stage-3 assets","Renewable book share","RoE","Dividend yield","P/Book"],
+ rules:[
+  c=>c.sc('Capex')>=2?{p:2,r:`Govt capex strong (${c.lab('Capex')}) — power/transmission/renewable project pipeline = sanction book growth for PFC/REC/IREDA. Disbursements follow with a 2–4 quarter lag.`}:c.sc('Capex')<=-1?{p:-2,r:`Capex slowdown (${c.lab('Capex')}) — fewer new power projects means sanction growth stalls; the loan book is a direct function of the energy capex cycle.`}:null,
+  c=>c.sc('Interest')>=2?{p:1,r:`Rate cuts — these lenders raise via bonds, so cost of funds falls while long-tenor project loans keep yielding; NIM expands.`}:null]},
+{name:"AMC",group:"Financials",icon:"📈",links:["Market Levels★","SIP Flows★","FII/DII Flows"],
+ metrics:["Total AUM growth (QoQ/YoY)","Equity AUM mix %","SIP flow trend","Revenue yield (bps on AAUM)","Operating margin","PAT growth","Market share movement"],
+ rules:[
+  c=>c.sc('SIP')>=2?{p:2,r:`SIP flows ${c.lab('SIP')} — AMC revenue = bps × AUM, and SIPs grow AUM every single month regardless of market direction. This is the sector's compounding engine.`}:c.sc('SIP')<=-1?{p:-2,r:`SIP slowdown (${c.lab('SIP')}) — rising stoppage ratio means the AUM growth engine stalls exactly when mark-to-market is also weak. Revenue hit is double-barrelled.`}:c.sc('SIP')===1?{p:1,r:`Healthy SIP flows (${c.lab('SIP')}) — steady monthly AUM accretion keeps fee income growing even in flat markets.`}:null,
+  c=>c.sc('Valuations')<=-1?{p:-1,r:`Market in '${c.lab('Valuations')}' zone — AMC earnings are leveraged to index levels; a correction from expensive valuations marks down equity AUM and fee income immediately.`}:c.sc('Valuations')>=1?{p:1,r:`Valuations reasonable (${c.lab('Valuations')}) — room for markets to re-rate upward lifts equity AUM mark-to-market, the highest-yield AUM bucket.`}:null,
+  c=>c.sc('DII')>=2?{p:1,r:`DIIs deploying strongly (${c.lab('DII')}) — mutual funds ARE the DII flow; sustained domestic deployment confirms the AUM growth runway.`}:null]},
+{name:"Brokers / Wealth",group:"Financials",icon:"💹",links:["Market Levels★","Volumes & Sentiment","Regulation"],
+ metrics:["Active client growth","ADTO (avg daily turnover)","Revenue per client","F&O vs cash mix","MTF book size","Operating margin","Regulatory risk (F&O curbs)"],
+ rules:[
+  c=>c.sc('Valuations')>=1&&c.sc('FII')>=1?{p:2,r:`Constructive market + flows — turnover and new account opening are pro-cyclical; bull phases lift ADTO, MTF books and revenue per client together.`}:null,
+  c=>c.sc('Valuations')<=-1?{p:-1,r:`Expensive market (${c.lab('Valuations')}) — when the correction comes, retail turnover and F&O volumes fall faster than the index; broker earnings are high-beta to activity, not just price.`}:null,
+  c=>c.sc('Global')<=-2?{p:-1,r:`Global risk-off (${c.lab('Global')}) — volatility spikes first boost churn, then kill it; sustained risk-off shrinks both volumes and MTF books.`}:null]},
+{name:"Exchanges / Depositories",group:"Financials",icon:"🏛",links:["Market Levels★","Volumes"],
+ metrics:["Transaction volume growth","Premium ADTO (BSE/MCX)","Market share vs rival","Demat additions (CDSL/NSDL)","EBITDA margin / operating leverage","Regulatory changes"],
+ rules:[
+  c=>c.sc('SIP')>=1&&c.sc('Valuations')>=0?{p:1,r:`Retail participation steady (SIP ${c.lab('SIP')}) — demat additions and transaction counts keep compounding; exchanges monetise activity with near-100% incremental margins.`}:null,
+  c=>c.sc('Valuations')<=-1?{p:-1,r:`Euphoric/expensive market — regulatory tightening risk (F&O curbs, true-to-label) historically peaks when speculation peaks; volume-dependent revenue is exposed.`}:null]},
+{name:"Insurance",group:"Financials",icon:"🛡",links:["Bond Yields / Rates★","Tax Policy"],
+ metrics:["APE growth","VNB margin","Persistency (13th/61st month)","Solvency ratio","Embedded value growth","P/EV"],
+ rules:[
+  c=>c.sc('Interest')<=-2?{p:1,r:`Higher rates — counterintuitively mildly positive: higher bond yields improve solvency ratios and non-par product attractiveness.`}:c.sc('Interest')>=2?{p:0,r:`Rate cuts — guaranteed-return (non-par) products get harder to price profitably, but ULIPs benefit from equity buoyancy. Net neutral-to-mild effect.`}:null,
+  c=>c.sc('Earnings')>=1?{p:1,r:`Healthy economy (${c.lab('Earnings')}) — discretionary protection and savings products track household income confidence; APE growth follows.`}:null]},
+// ════ MANUFACTURING ════
+{name:"Defence",group:"Manufacturing",icon:"🛡️",links:["Defence Budget★","Global Tensions★"],
+ metrics:["Order book / revenue ratio","Order inflow guidance","Execution (revenue growth)","EBITDA margin","Indigenisation content","Working capital days","Export wins"],
+ rules:[
+  c=>c.sc('Global')<=-2?{p:2,r:`Global tensions (${c.lab('Global')}) — the only sector where crisis is a tailwind: conflict accelerates procurement, emergency purchases and export enquiries for Indian platforms.`}:null,
+  c=>c.sc('Capex')>=2?{p:2,r:`Strong govt spending (${c.lab('Capex')}) — defence capital outlay rides the same fiscal push; order inflows convert to multi-year revenue visibility via the order book.`}:c.sc('Capex')<=-1?{p:-1,r:`Fiscal constraint (${c.lab('Capex')}) — defence capital acquisition is deferrable spending; order inflow guidance is the first casualty of budget squeeze.`}:null]},
+{name:"Capital Goods",group:"Manufacturing",icon:"⚙️",links:["Govt Capex★","Corporate Capex Cycle"],
+ metrics:["Order inflow growth","Order book / revenue","Revenue execution","EBITDA margin","Working capital cycle","ROCE","Private vs govt capex mix"],
+ rules:[
+  c=>c.sc('Capex')>=2?{p:2,r:`Govt capex ${c.lab('Capex')} — roads, rail, power T&D and water orders flow straight into capital goods order books; execution converts to revenue over 12–24 months.`}:c.sc('Capex')<=-1?{p:-2,r:`Capex slowing (${c.lab('Capex')}) — order inflows stall first, then execution; this sector has no defence against a fiscal pause.`}:null,
+  c=>c.sc('Earnings')>=1&&c.sc('Interest')>=2?{p:1,r:`Earnings growth + rate cuts — the private capex trigger: corporates expand capacity when demand is visible and borrowing is cheap. Watch utilisation crossing ~80%.`}:null]},
+{name:"EMS",group:"Manufacturing",icon:"🔌",links:["PLI Policy★","Rupee"],
+ metrics:["Revenue growth","Order book","Customer concentration","EBITDA margin (thin — trend matters)","ROCE","Working capital days","PLI benefit"],
+ rules:[
+  c=>c.inr>=92?{p:1,r:`Rupee at ${c.inrTxt} — export-oriented EMS players gain price competitiveness vs China/Vietnam; but imported components (still 60–70% BOM) partly offset. Net mild positive for exporters only.`}:null,
+  c=>c.sc('Capex')>=2?{p:1,r:`Policy momentum (${c.lab('Capex')}) — PLI disbursements and electronics-manufacturing push keep the order pipeline and capacity additions funded.`}:null]},
+{name:"Cables & Wires",group:"Manufacturing",icon:"🔋",links:["Govt Capex (Power/Infra)★","Metal Prices"],
+ metrics:["Volume growth","Copper/aluminium pass-through","EBITDA/kg or margin trend","Distribution expansion","Exports share","Capacity utilisation"],
+ rules:[
+  c=>c.sc('Capex')>=2?{p:2,r:`Power & infra capex ${c.lab('Capex')} — transmission, distribution and real-estate wiring demand is a direct multiple of the capex cycle; order books stay full.`}:null,
+  c=>c.inr>=92?{p:-1,r:`Rupee at ${c.inrTxt} — copper and aluminium are USD-priced imports; a weak rupee inflates input cost in ₹ terms. Pass-through works with a lag, squeezing margin for a quarter or two.`}:null]},
+{name:"Cement",group:"Manufacturing",icon:"🏗",links:["Govt Capex★","Crude (fuel/freight)"],
+ metrics:["Volume growth","EBITDA/tonne","Capacity utilisation","Fuel & power cost/tonne","Regional price trends","Net debt/EBITDA"],
+ rules:[
+  c=>c.sc('Capex')>=2?{p:2,r:`Infra + housing capex ${c.lab('Capex')} — cement volume is the most direct physical proxy of construction activity; utilisation and pricing power both improve.`}:null,
+  c=>c.crude>=85?{p:-2,r:`Crude at ${c.crudeTxt} — pet coke, diesel freight and packing costs all track crude; every $10/bbl adds roughly ₹80–120/tonne to cost. EBITDA/tonne compresses unless prices are hiked.`}:c.crude<=70?{p:1,r:`Crude at ${c.crudeTxt} — fuel and freight relief flows straight to EBITDA/tonne; cement is among the biggest beneficiaries of cheap energy.`}:null]},
+{name:"Metals",group:"Manufacturing",icon:"⛏",links:["Global/China★","Rupee"],
+ metrics:["Realisation/tonne","EBITDA/tonne","Volume growth","China price/export trend","Net debt/EBITDA","Capex cycle stage"],
+ rules:[
+  c=>c.sc('Global')<=-2?{p:-2,r:`Global risk-off (${c.lab('Global')}) — metals are the purest global-growth trade; recession fear means falling LME prices and Chinese export dumping into India simultaneously.`}:c.sc('Global')>=2?{p:2,r:`Global risk-on (${c.lab('Global')}) — LME prices and realisations rise with global demand; operating leverage on fixed-cost smelters is enormous.`}:null,
+  c=>c.inr>=92?{p:1,r:`Rupee at ${c.inrTxt} — metal prices are USD-benchmarked, so a weak rupee lifts ₹ realisations for domestic producers and improves export margins.`}:null]},
+{name:"Textiles",group:"Manufacturing",icon:"🧵",links:["Rupee★","US/EU Demand"],
+ metrics:["Revenue growth","EBITDA margin","Cotton/yarn spread","Export order flow","US/EU demand","Inventory days","Capacity utilisation"],
+ rules:[
+  c=>c.inr>=92?{p:2,r:`Rupee at ${c.inrTxt} — exports are USD-billed against ₹ costs; depreciation is a direct margin transfer to Indian mills and improves competitiveness vs Bangladesh/Vietnam.`}:null,
+  c=>c.sc('Global')<=-2?{p:-2,r:`Global slowdown (${c.lab('Global')}) — US/EU retailers cut orders and destock first in apparel; export order flow dries up regardless of currency advantage.`}:null]},
+{name:"Sugar / Ethanol",group:"Manufacturing",icon:"🌾",links:["Ethanol Policy★","Crude","Monsoon"],
+ metrics:["Ethanol revenue share","Distillery capacity utilisation","Sugar realisation vs MSP","Recovery rate","Cane cost","Govt ethanol pricing"],
+ rules:[
+  c=>c.crude>=85?{p:1,r:`Crude at ${c.crudeTxt} — high crude strengthens the case for ethanol blending economics and govt willingness to raise ethanol procurement prices; distillery-heavy players benefit.`}:null,
+  c=>c.sc('Monsoon')<=-1?{p:-1,r:`Monsoon stress (${c.lab('Monsoon')}) — cane availability and recovery rates fall; crushing volumes and ethanol feedstock both shrink the following season.`}:c.sc('Monsoon')>=1?{p:1,r:`Good monsoon (${c.lab('Monsoon')}) — healthy cane crop supports crushing volumes and keeps cane cost inflation manageable.`}:null]},
+{name:"Chemicals / Specialty",group:"Manufacturing",icon:"🧪",links:["Crude (feedstock)★","China Dumping","Rupee"],
+ metrics:["Volume vs realisation split","EBITDA margin trend","China dumping pressure","Capex / new product pipeline","ROCE","Destocking cycle stage"],
+ rules:[
+  c=>c.crude>=85?{p:-1,r:`Crude at ${c.crudeTxt} — most feedstocks (benzene, toluene, methanol chains) are crude derivatives; input costs rise faster than contract reprices, squeezing spreads.`}:null,
+  c=>c.inr>=92?{p:1,r:`Rupee at ${c.inrTxt} — export-oriented specialty players gain on USD billing; partially offsets feedstock inflation for those with high export share.`}:null,
+  c=>c.sc('Global')<=-2?{p:-1,r:`Global weakness (${c.lab('Global')}) — Chinese producers dump excess capacity into India when their domestic demand fails; realisation pressure intensifies.`}:null]},
+{name:"Paints",group:"Manufacturing",icon:"🎨",links:["Crude★ (raw materials)","Urban/Housing Demand","Competition"],
+ metrics:["Volume growth","Gross margin (crude-derivative costs)","Market share vs new entrants","Dealer network expansion","Decorative vs industrial mix","Ad spend intensity"],
+ rules:[
+  c=>c.crude>=85?{p:-2,r:`Crude at ${c.crudeTxt} — monomers, solvents, titanium dioxide and packaging are crude derivatives (~55–60% of raw material cost). Gross margin compresses 150–250 bps unless price hikes are taken — risky amid the Birla Opus market-share war.`}:c.crude<=70?{p:2,r:`Crude at ${c.crudeTxt} — raw material deflation is the paints sector's biggest margin lever; gross margins expand even with competitive pricing.`}:null,
+  c=>c.sc('Interest')>=2?{p:1,r:`Rate cuts (${c.lab('Interest')}) — housing activity and renovation demand pick up with cheaper home loans; decorative volumes follow with a lag.`}:null]},
+{name:"Aviation",group:"Manufacturing",icon:"✈️",links:["Crude/ATF★","Rupee★ (USD leases)","Discretionary Travel"],
+ metrics:["PLF (load factor) %","Yield (revenue per RPK)","ATF cost trend","Fleet additions vs groundings","Market share","Net debt/EBITDA","Forex impact (USD lease liabilities)"],
+ rules:[
+  c=>c.crude>=85?{p:-2,r:`Crude at ${c.crudeTxt} — ATF is ~40% of airline operating cost and tracks crude directly. At this level, profitability depends entirely on yield hikes sticking in a price-sensitive market.`}:c.crude<=70?{p:2,r:`Crude at ${c.crudeTxt} — cheap ATF is the single biggest swing factor for airline P&L; margins expand without touching fares.`}:null,
+  c=>c.inr>=92?{p:-2,r:`Rupee at ${c.inrTxt} — aircraft leases, maintenance and ATF are all USD-linked liabilities against ₹ revenue. Crude high + rupee weak = the classic aviation double squeeze, plus forex MTM losses on lease books.`}:null]},
+// ════ AUTO ════
+{name:"Auto 2W",group:"Auto",icon:"🏍",links:["Rural Demand★","Inflation","Petrol Price"],
+ metrics:["Volume growth (domestic + exports)","Market share","EBITDA/vehicle","Realisation trend","EV transition progress","Rural demand signal"],
+ rules:[
+  c=>c.sc('Monsoon')>=1?{p:1,r:`Good monsoon (${c.lab('Monsoon')}) — rural cash flows drive entry-level 2W volumes; festive-season demand follows a good kharif crop.`}:c.sc('Monsoon')<=-1?{p:-2,r:`Monsoon stress (${c.lab('Monsoon')}) — rural income shock hits 100cc-segment volumes first; 2W is the most monsoon-sensitive sector in the market.`}:null,
+  c=>c.sc('Inflation')<=-1?{p:-1,r:`Elevated inflation (${c.lab('Inflation')}) — food inflation eats rural disposable income, the core 2W buying pool. Volumes lag CPI relief by 2–3 quarters.`}:c.sc('Inflation')>=2?{p:1,r:`Inflation comfortable (${c.lab('Inflation')}) — real rural incomes recover; entry-level demand revival follows.`}:null,
+  c=>c.crude>=85?{p:-1,r:`Crude at ${c.crudeTxt} — petrol near record retail prices raises total cost of ownership; marginal buyers defer purchases or shift to used/EV.`}:null]},
+{name:"Auto 4W",group:"Auto",icon:"🚗",links:["RBI Rates★ (loans)","Urban Demand"],
+ metrics:["Volume growth","UV mix %","Discount levels","EBITDA margin","Order book / waiting period","EV/hybrid strategy"],
+ rules:[
+  c=>c.sc('Interest')>=2?{p:2,r:`Rate cuts (${c.lab('Interest')}) — ~80% of cars are financed; lower EMIs directly expand the addressable buyer pool and shrink discounting pressure.`}:c.sc('Interest')<=-2?{p:-2,r:`Rate hikes — car-loan EMIs rise, entry-segment demand stalls, and inventory builds force higher discounts.`}:null,
+  c=>c.sc('Earnings')>=1?{p:1,r:`Earnings/income growth healthy (${c.lab('Earnings')}) — urban salaried confidence drives the UV premiumisation trend that carries industry margins.`}:null]},
+{name:"Auto Ancillaries",group:"Auto",icon:"🔧",links:["OEM Volumes★","Rupee (exports)"],
+ metrics:["Content per vehicle growth","OEM vs aftermarket mix","EBITDA margin","Export share","EV-readiness of product line","ROCE"],
+ rules:[
+  c=>c.inr>=92?{p:1,r:`Rupee at ${c.inrTxt} — export-focused ancillaries billing in USD/EUR gain margin; India's cost arbitrage vs European suppliers widens further.`}:null,
+  c=>c.sc('Global')<=-2?{p:-1,r:`Global weakness (${c.lab('Global')}) — US/EU OEM production cuts hit export order schedules; global ancillaries feel it before domestic peers.`}:null]},
+// ════ ENERGY & INFRA ════
+{name:"Power (Gencos/Transmission)",group:"Energy & Infra",icon:"⚡",links:["Power Demand★","Govt Capex","IEX Prices"],
+ metrics:["Capacity addition pipeline","PLF / availability","Merchant vs PPA mix","IEX realisation (merchant)","Discom receivables","Regulated equity growth","Net debt/EBITDA"],
+ rules:[
+  c=>c.sc('Capex')>=2?{p:2,r:`Capex push (${c.lab('Capex')}) — generation and transmission build-out grows regulated equity, the base on which gencos/transcos earn assured returns. Demand growth keeps PLFs and merchant prices firm.`}:null,
+  c=>c.sc('Earnings')>=1?{p:1,r:`Economic momentum (${c.lab('Earnings')}) — power demand tracks GDP at ~1x elasticity; industrial recovery lifts both volumes and IEX merchant realisations.`}:null]},
+{name:"Solar / Renewables",group:"Energy & Infra",icon:"☀️",links:["Govt Policy★ (ALMM/PM Surya Ghar)","RBI Rates"],
+ metrics:["Order book (MW)","Module/cell capacity & utilisation","EBITDA margin","ALMM / policy tailwind","Execution rate","Receivable days"],
+ rules:[
+  c=>c.sc('Capex')>=2?{p:2,r:`Policy + capex tailwind (${c.lab('Capex')}) — ALMM enforcement, PM Surya Ghar and 500GW-by-2030 targets keep module/EPC order books overflowing; execution is the only constraint.`}:null,
+  c=>c.sc('Interest')>=2?{p:1,r:`Rate cuts (${c.lab('Interest')}) — solar project IRRs are hypersensitive to debt cost (75–80% leverage); every 50bps cut makes marginal projects bankable and accelerates ordering.`}:null,
+  c=>c.crude>=85?{p:1,r:`Crude at ${c.crudeTxt} — expensive fossil energy strengthens the renewables substitution case and keeps IEX prices high enough to support merchant solar economics.`}:null]},
+{name:"Oil & Gas",group:"Energy & Infra",icon:"🛢",links:["Crude Price★ (dominant)"],
+ metrics:["Crude realisation (upstream)","Marketing margin (OMC)","GRM (refiners)","Volume growth","Subsidy/LPG burden","Capex plans"],
+ rules:[
+  c=>c.crude>=85?{p:0,r:`Crude at ${c.crudeTxt} — SPLIT verdict: upstream (ONGC/Oil India) gains on realisations 🟢, but OMCs lose marketing margin if retail prices stay frozen 🔴, with windfall-tax risk capping upstream upside. Position within the sector matters more than the sector call.`}:c.crude<=70?{p:0,r:`Crude at ${c.crudeTxt} — reversed split: OMC marketing margins fatten 🟢 while upstream realisations fall 🔴. Refining GRMs depend on product cracks, not crude alone.`}:null,
+  c=>c.inr>=92?{p:-1,r:`Rupee at ${c.inrTxt} — crude is imported in USD, so the ₹ import bill rises even at flat crude; OMC working capital and under-recovery risk both grow.`}:null]},
+{name:"Real Estate",group:"Energy & Infra",icon:"🏙",links:["RBI Rates★ (home loans)","Urban Income"],
+ metrics:["Pre-sales (bookings) growth","Collections","Launch pipeline","Net debt/equity","Inventory months","Realisation/sq ft trend"],
+ rules:[
+  c=>c.sc('Interest')>=2?{p:2,r:`Rate cuts (${c.lab('Interest')}) — home-loan rates are the single biggest affordability lever; pre-sales accelerate within 1–2 quarters of cuts, and developer debt also gets cheaper.`}:c.sc('Interest')<=-2?{p:-2,r:`Rate hikes — affordability worsens at both ends: buyer EMIs and developer construction finance. Pre-sales stall first in affordable/mid segments.`}:null,
+  c=>c.sc('Liquidity')<=-1?{p:-1,r:`Tight liquidity (${c.lab('Liquidity')}) — construction finance dries up for weaker developers; consolidation helps listed majors but slows industry launches.`}:null]},
+// ════ CONSUMPTION & SERVICES ════
+{name:"FMCG",group:"Consumption & Services",icon:"🛒",links:["Inflation★","Rural Demand","Monsoon"],
+ metrics:["Volume growth (not just value)","Rural vs urban demand","Gross margin (input costs)","Ad spend trend","Market share","Distribution expansion"],
+ rules:[
+  c=>c.sc('Inflation')>=2?{p:2,r:`Inflation comfortable (${c.lab('Inflation')}) — input costs (palm oil, packaging, agri) ease while consumer wallets recover; gross margin and volume growth improve together.`}:c.sc('Inflation')<=-1?{p:-2,r:`Elevated inflation (${c.lab('Inflation')}) — the double squeeze: input costs up AND consumer downtrading to smaller packs. Volume growth, the metric that matters, stalls.`}:null,
+  c=>c.sc('Monsoon')>=1?{p:1,r:`Good monsoon (${c.lab('Monsoon')}) — rural is ~35–40% of FMCG sales; farm income recovery shows up in rural volume growth within 2 quarters.`}:c.sc('Monsoon')<=-1?{p:-1,r:`Weak monsoon (${c.lab('Monsoon')}) — rural demand, already the weak leg, deteriorates further; urban premiumisation can't fully offset.`}:null]},
+{name:"Retail",group:"Consumption & Services",icon:"🛍",links:["Urban Consumption★","Inflation"],
+ metrics:["SSSG (same-store sales growth)","Store addition pace","Gross margin","Inventory turns","Revenue/sq ft","Footfalls vs ticket size"],
+ rules:[
+  c=>c.sc('Inflation')<=-1?{p:-2,r:`Elevated inflation (${c.lab('Inflation')}) — discretionary retail is the first cut in a squeezed household budget; SSSG turns negative before FMCG volumes do.`}:c.sc('Inflation')>=2?{p:1,r:`Inflation easing (${c.lab('Inflation')}) — discretionary wallet recovers; footfalls and ticket sizes both improve.`}:null,
+  c=>c.sc('Earnings')>=1?{p:1,r:`Income growth healthy (${c.lab('Earnings')}) — urban salaried spending power supports premium retail SSSG and justifies store expansion capex.`}:null]},
+{name:"Hotels",group:"Consumption & Services",icon:"🏨",links:["Urban Discretionary★","Corporate Travel"],
+ metrics:["ARR growth","Occupancy %","RevPAR","Room pipeline (owned vs managed)","EBITDA margin","Corporate vs leisure mix"],
+ rules:[
+  c=>c.sc('Earnings')>=1?{p:2,r:`Economy strong (${c.lab('Earnings')}) — corporate travel, MICE and weddings drive ARR; with supply addition lagging demand, RevPAR growth flows to EBITDA at very high incremental margins.`}:null,
+  c=>c.sc('Global')<=-2?{p:-1,r:`Global stress (${c.lab('Global')}) — foreign tourist arrivals and corporate travel budgets are the first discretionary cuts in a global downturn.`}:null]},
+{name:"Hospitals",group:"Consumption & Services",icon:"🏥",links:["Macro-Immune (defensive)"],
+ metrics:["ARPOB growth","Occupancy %","Bed additions","Payor mix (insurance/cash/govt)","EBITDA/bed","New-hospital ramp-up losses"],
+ rules:[
+  c=>({p:1,r:`Healthcare demand is non-discretionary — admissions don't track GDP, rates or crude. In a high-crude, weak-rupee macro like today's, hospitals function as a portfolio shock absorber. Judge them purely on ARPOB, occupancy and bed-addition execution.`})]},
+{name:"IT Services",group:"Consumption & Services",icon:"💻",links:["USD-INR★ (dominant)","US Economy/Fed"],
+ metrics:["Revenue growth (CC terms)","Deal TCV / order book","EBIT margin","Attrition","Utilisation","Top-10 client concentration","GenAI deal commentary"],
+ rules:[
+  c=>c.inr>=92?{p:2,r:`Rupee at ${c.inrTxt} — ~90% of revenue is foreign-currency against largely ₹ costs; every ₹1 of depreciation adds roughly 25–35 bps to EBIT margin. At ₹96 this is a multi-hundred-bps cushion vs FY25.`}:null,
+  c=>c.sc('Global')<=-2?{p:-2,r:`Global risk-off (${c.lab('Global')}) — US client tech budgets freeze first in a downturn; discretionary project ramp-downs hit revenue growth regardless of the currency tailwind.`}:c.sc('Global')>=2?{p:1,r:`US soft landing (${c.lab('Global')}) — discretionary tech spend revival plus the INR tailwind is the bull case combination for IT.`}:null]},
+{name:"Telecom",group:"Consumption & Services",icon:"📡",links:["Tariff Cycle★","RBI Rates (debt-heavy)"],
+ metrics:["ARPU growth","Subscriber adds / churn","Data usage per user","Capex intensity","Net debt/EBITDA","Tariff hike cycle"],
+ rules:[
+  c=>c.sc('Interest')>=2?{p:1,r:`Rate cuts (${c.lab('Interest')}) — telecom carries the heaviest debt loads in the market; cheaper refinancing directly improves free cash flow and equity value.`}:null,
+  c=>c.inr>=92?{p:-1,r:`Rupee at ${c.inrTxt} — network equipment and spectrum-linked USD obligations cost more in ₹; capex intensity rises just from currency.`}:null]},
+{name:"New Age / Platforms",group:"Consumption & Services",icon:"🚀",links:["Liquidity & Risk Appetite★","FII Flows"],
+ metrics:["GMV/revenue growth","Take rate","Contribution margin","Path to EBITDA breakeven","Cash burn / runway","MAU / transacting users"],
+ rules:[
+  c=>c.sc('FII')<=-1?{p:-2,r:`FII outflows (${c.lab('FII')}) — loss-making platforms are valuation-multiple stocks owned heavily by foreign growth funds; risk-off compresses multiples hardest here.`}:c.sc('FII')>=2?{p:2,r:`FII risk-on (${c.lab('FII')}) — growth-multiple expansion returns; the sector is the highest-beta expression of foreign flows.`}:null,
+  c=>c.sc('Liquidity')<=-1?{p:-1,r:`Tight liquidity (${c.lab('Liquidity')}) — funding winters force burn cuts and down-rounds in the unlisted feeder ecosystem; listed platform sentiment follows.`}:null]},
+// ════ PHARMA ════
+{name:"Pharma",group:"Pharma",icon:"💊",links:["USD-INR★ (export bonus)","US Policy/USFDA"],
+ metrics:["US generics pricing trend","Domestic (IPM) growth vs market","CDMO order book","Gross margin","R&D spend %","USFDA compliance status","New launches / ANDA pipeline"],
+ rules:[
+  c=>c.inr>=92?{p:2,r:`Rupee at ${c.inrTxt} — 40–50% of large-cap pharma revenue is USD-billed (US generics + CDMO); depreciation is a direct revenue and margin bonus, on top of the defensive earnings profile.`}:null,
+  c=>c.sc('Global')<=-2?{p:1,r:`Global stress (${c.lab('Global')}) — medicine demand is recession-proof; pharma historically outperforms in risk-off phases. Combined with the INR tailwind, it is the classic defensive-plus-currency trade.`}:null,
+  c=>c.sc('Valuations')<=-1?{p:0,r:`One caution: after a strong run, check stock-level valuations vs the CDMO/generics growth actually delivered — the macro tailwind may already be priced in for some names.`}:null]}
+];
+let SI_FILTER='All';
+function siVerdict(pts){
+  if(pts>=2) return {t:'Tailwind',e:'🟢',c:'#006b30',bg:'#e6f4ef'};
+  if(pts===1) return {t:'Mild Tailwind',e:'🟢',c:'#2e7d52',bg:'#eef7f2'};
+  if(pts<=-2) return {t:'Headwind',e:'🔴',c:'#b71c1c',bg:'#fce8e8'};
+  if(pts===-1) return {t:'Mild Headwind',e:'🔴',c:'#c62828',bg:'#fdf0f0'};
+  return {t:'Neutral / Mixed',e:'🟡',c:'#b35c00',bg:'#fff8ee'};
+}
+function renderSectorImpact(){
+  const grid=document.getElementById('sectorImpactGrid'); if(!grid) return;
+  const ctx=macroCtx();
+  let g=0,r=0,n=0;
+  const cards=SECTOR_IMPACT.map(s=>{
+    const hits=s.rules.map(fn=>{try{return fn(ctx);}catch(e){return null;}}).filter(Boolean);
+    const pts=hits.reduce((a,h)=>a+h.p,0);
+    const v=siVerdict(pts);
+    if(pts>=1) g++; else if(pts<=-1) r++; else n++;
+    return {s,hits,pts,v};
+  });
+  document.getElementById('si-green').textContent=g;
+  document.getElementById('si-red').textContent=r;
+  document.getElementById('si-neu').textContent=n;
+  document.getElementById('si-drivers').textContent=`Crude ${ctx.crudeTxt.split(' ')[0]} · INR ${ctx.inrTxt.split(' ')[0]}`;
+  // filter chips
+  const fl=document.getElementById('si-filters');
+  if(fl) fl.innerHTML=['All',...SI_GROUPS].map(grp=>`<button onclick="SI_FILTER='${grp}';renderSectorImpact();" style="padding:6px 13px;border-radius:16px;border:1px solid ${SI_FILTER===grp?'#ff7c00':'var(--border)'};background:${SI_FILTER===grp?'#fff3e0':'#fff'};color:${SI_FILTER===grp?'#b35c00':'#5a6080'};font-size:11px;font-weight:700;cursor:pointer;">${grp}</button>`).join('');
+  grid.innerHTML=cards.filter(c=>SI_FILTER==='All'||c.s.group===SI_FILTER)
+    .sort((a,b)=>b.pts-a.pts)
+    .map(({s,hits,pts,v})=>{
+    const reasons=hits.length?hits.map(h=>{
+      const rc=h.p>0?'#006b30':h.p<0?'#b71c1c':'#b35c00';
+      const re=h.p>0?'🟢':h.p<0?'🔴':'⚪';
+      return `<div style="display:flex;gap:7px;align-items:flex-start;padding:6px 0;border-bottom:1px dashed #eef1f8;">
+        <span style="font-size:11px;line-height:1.5;">${re}</span>
+        <span style="font-size:10.5px;color:#3a3f5c;line-height:1.65;"><span style="color:${rc};font-weight:700;">${h.p>0?'+':''}${h.p}</span> ${h.r}</span>
+      </div>`;
+    }).join(''):'<div style="font-size:10.5px;color:var(--muted);padding:6px 0;">No macro factor is materially moving this sector right now — judge it purely on its own metrics below.</div>';
+    return `<div class="card" style="border-top:4px solid ${v.c}33;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+        <span style="font-size:17px;">${s.icon}</span>
+        <span style="font-size:12.5px;font-weight:800;color:#1a1e2e;flex:1;">${s.name}</span>
+        <span style="font-size:10px;font-weight:800;padding:3px 10px;border-radius:9px;background:${v.bg};color:${v.c};">${v.e} ${v.t}</span>
+      </div>
+      <div style="margin-bottom:7px;">${s.links.map(l=>`<span style="font-size:9px;font-weight:700;background:${l.includes('★')?'#fff3e0':'#eef1f8'};color:${l.includes('★')?'#b35c00':'#5a6080'};padding:2px 8px;border-radius:7px;margin-right:4px;display:inline-block;margin-bottom:3px;">${l}</span>`).join('')}</div>
+      <div style="margin-bottom:8px;">${reasons}</div>
+      ${grSection(s.name,pts)}
+      <details style="margin-top:8px;">
+        <summary style="font-size:10px;font-weight:800;color:#ff7c00;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;">📋 Metrics that matter for ${s.name}</summary>
+        <div style="margin-top:7px;display:flex;flex-wrap:wrap;gap:4px;">${s.metrics.map(m=>`<span style="font-size:9.5px;font-weight:600;background:#f8f9fc;border:1px solid var(--border);color:#3a3f5c;padding:3px 9px;border-radius:7px;">${m}</span>`).join('')}</div>
+      </details>
+    </div>`;
+  }).join('');
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────
