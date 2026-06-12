@@ -1486,11 +1486,48 @@ const GR_FILE_MAP=[
  {kw:'metal',sectors:['Metals']},
  {kw:'auto',sectors:['Auto 4W']},
  {kw:'insurance',sectors:['Insurance']},
- {kw:'water',sectors:['Capital Goods']}
+ {kw:'water',sectors:['Capital Goods']},
+ {kw:'railway',sectors:['Railways']},
+ {kw:'tyre',sectors:['Tyres']},
+ {kw:'oilgas',sectors:['Oil & Gas']},
+ {kw:'oil_gas',sectors:['Oil & Gas']},
+ {kw:'omc',sectors:['Oil & Gas']},
+ {kw:'aluminium',sectors:['Metals']},
+ {kw:'aluminum',sectors:['Metals']},
+ {kw:'steel',sectors:['Metals']},
+ {kw:'gold',sectors:['Gold & Jewellery']},
+ {kw:'jewel',sectors:['Gold & Jewellery']},
+ {kw:'recycl',sectors:['Recycling']},
+ {kw:'reit',sectors:['REITs']},
+ {kw:'hospital',sectors:['Hospitals']},
+ {kw:'alcobev',sectors:['Alcobev']},
+ {kw:'liquor',sectors:['Alcobev']},
+ {kw:'brewer',sectors:['Alcobev']},
+ {kw:'sfb',sectors:['Banking']},
+ {kw:'spares',sectors:['Auto Ancillaries']},
+ {kw:'pv_sector',sectors:['Auto 4W']},
+ {kw:'telecom',sectors:['Telecom']},
+ {kw:'fmcg',sectors:['FMCG']},
+ {kw:'mcx',sectors:['Exchanges / Depositories']}
 ];
 function grMapFile(entry){
-  if(typeof entry==='object'&&entry.file) return {file:entry.file,sectors:entry.sectors||grKw(entry.file)};
-  return {file:entry,sectors:grKw(entry)};
+  if(typeof entry==='object'&&entry.file) return {file:entry.file,sectors:entry.sectors||grKw(entry.file),split:entry.split||null,tokens:entry.tokens||null,exclude:entry.exclude||null,companies:entry.companies||null};
+  return {file:entry,sectors:grKw(entry),split:null,tokens:null,exclude:null};
+}
+// turn one parsed file into one or more cache entries; split={CompanyName:SectorName}
+function grEmit(en,parsed){
+  if(en.exclude&&en.exclude.length){
+    parsed={fmt:parsed.fmt,period:parsed.period,cos:parsed.cos.filter(c=>!en.exclude.some(x=>c.name.toLowerCase().includes(x.toLowerCase())))};
+  }
+  if(!en.split) return [{file:en.file,sectors:en.sectors,agg:grAggregate(parsed)}];
+  const bySec={};
+  parsed.cos.forEach(c=>{
+    const sec=Object.keys(en.split).find(k=>c.name.toLowerCase().includes(k.toLowerCase())||k.toLowerCase().includes(c.name.toLowerCase()));
+    const s=sec?en.split[sec]:null; if(!s) return;
+    (bySec[s]=bySec[s]||[]).push(c);
+  });
+  const out=Object.keys(bySec).map(s=>({file:en.file,sectors:[s],agg:grAggregate({fmt:parsed.fmt,period:parsed.period,cos:bySec[s]})}));
+  return out.length?out:[{file:en.file,sectors:en.sectors,agg:grAggregate(parsed)}];
 }
 function grKw(fname){
   const f=fname.toLowerCase(); const out=[];
@@ -1500,7 +1537,8 @@ function grKw(fname){
 function grLoadCache(){ try{return JSON.parse(localStorage.getItem(GR_KEY)||'null');}catch(e){return null;} }
 function grSaveCache(d){ try{localStorage.setItem(GR_KEY,JSON.stringify(d));}catch(e){} }
 // ── PARSER: works on your real file formats ──
-function grParseHTML(htmlText,fname){
+function grParseHTML(htmlText,fname,opts){
+  opts=opts||{};
   const doc=new DOMParser().parseFromString(htmlText,'text/html');
   // Priority 1: future machine-readable block
   const jb=doc.querySelector('script#cb-data[type="application/json"]');
@@ -1525,35 +1563,182 @@ function grParseHTML(htmlText,fname){
     fmt='table-scan';
     const tables=[...doc.querySelectorAll('table')];
     for(const tbl of tables){
-      const thEls=[...tbl.querySelectorAll('thead th')];
+      let thEls=[...tbl.querySelectorAll('thead th')];
+      if(!thEls.length){ const tr1=tbl.querySelector('tr'); if(tr1&&tr1.querySelector('th')) thEls=[...tr1.querySelectorAll('th')]; }
       if(!thEls.length) continue;
       if(thEls.some(th=>(parseInt(th.getAttribute('colspan'))||1)>1||(parseInt(th.getAttribute('rowspan'))||1)>1)) continue;
       const ths=thEls.map(th=>th.textContent.toLowerCase());
-      if(!ths[0]||!ths[0].includes('company')) continue;
+      if(!ths[0]||!/company|bank|name/.test(ths[0])) continue;
       const iRev=ths.findIndex(h=>h.includes('rev')&&!h.includes('yoy'));
       const iYoY=ths.findIndex(h=>h.includes('yoy'));
-      const iEb=ths.findIndex(h=>h.includes('ebitda')&&h.includes('%'));
-      const iPat=ths.findIndex(h=>h.includes('pat')&&!h.includes('%'));
-      if(iRev<0) continue;
-      const trs=[...tbl.querySelectorAll('tbody tr')];
+      const iEb=ths.findIndex(h=>(h.includes('ebitda')||h.includes('ebit')||h.includes('opm'))&&(h.includes('%')||h.includes('margin')));
+      const iPat=ths.findIndex(h=>h.includes('pat')&&!h.includes('%')&&!h.includes('yoy'));
+      let iR=iRev; if(iR<0) iR=ths.findIndex(h=>h.includes('nii')||h.includes('total income'));
+      if(iR<0) continue;
+      const tmp=[];
+      const trs=[...tbl.querySelectorAll('tbody tr,tr')].filter(tr=>!tr.querySelector('th'));
       trs.forEach(tr=>{
         const tds=[...tr.cells]; if(tds.length<4) return;
-        const nc=tds[0], name=nc.textContent.trim();
-        if(!name||name.length>40||/total|average|sector|metric/i.test(name)) return;
-        if(!(nc.querySelector('strong')||/(^|\s)tb(\s|$)/.test(nc.className))) return;
+        const nc=tds[0];
+        let name=nc.textContent.trim()
+          .replace(/\s*\u2605?\s*Q[1-4]\s*FY\s*\d{2}.*$/i,'')
+          .replace(/^([A-Z]{2,5})(?=\1)/,'')
+          .replace(/[~*†]+$/,'')
+          .trim();
+        // strip glued ticker only when it abbreviates the name (NESNestlé→Nestlé) or precedes a multiword name; never mangle real names like HCLTech/LTIMindtree
+        const gm=name.match(/^([A-Z]{2,5})([A-Z][a-z].*)$/);
+        if(gm&&(gm[2].toUpperCase().startsWith(gm[1])||(gm[1].length===3&&gm[2].includes(' ')))) name=gm[2].trim();
+        if(!name||name.length>40||/total|average|sector|metric|^company$|^bank$/i.test(name)) return;
+        if(/^[\d,.%₹\s-]+$/.test(name)) return;
+        if(/[£$€]/.test(name)) return;
         const num=i=>{ if(i<0||!tds[i]) return NaN; return parseFloat(tds[i].textContent.replace(/[₹~%★+]/g,'').replace(/,/g,'')); };
+        const pct=(i,arrowSign)=>{ if(i<0||!tds[i]) return NaN; const t=tds[i].textContent; const m=t.match(/(-?[\d.]+)\s*%/); let v=m?parseFloat(m[1]):num(i); if(arrowSign&&t.includes('\u25BC')&&v>0) v=-v; return v; };
         const html=tr.innerHTML;
-        const rv=num(iRev), yy=num(iYoY), eb=num(iEb), pt=num(iPat);
-        cos.push({name,rev:isNaN(rv)?0:rv,revYoY:isNaN(yy)?null:yy,ebitda:isNaN(eb)?null:eb,pat:isNaN(pt)?0:pt,
-          greens:(html.match(/tpos|"num pos"|#16a34a|td-green|#166534|#15803d/g)||[]).length,
-          reds:(html.match(/tneg|"neg"|class="neg"|#dc2626|td-red|#b91c1c/g)||[]).length,
+        const rv=num(iR), yy=pct(iYoY,true), eb=pct(iEb,false), pt=num(iPat);
+        tmp.push({name,rev:isNaN(rv)?0:rv,revYoY:isNaN(yy)?null:yy,ebitda:isNaN(eb)?null:eb,pat:isNaN(pt)?0:pt,
+          greens:(html.match(/tpos|"num pos"|#16a34a|td-green|#166534|#15803d|#2E7D32|#2e7d32/g)||[]).length,
+          reds:(html.match(/tneg|"neg"|class="neg"|#dc2626|td-red|#b91c1c|#C62828|#c62828/g)||[]).length,
           ambers:(html.match(/tneu|#d97706|td-amber/g)||[]).length});
+      });
+      // validate: table must be financial (most rows carry a real revenue figure)
+      if(tmp.length>=2&&tmp.filter(c=>c.rev>0).length>=tmp.length*0.6) cos.push(...tmp);
+    }
+  }
+  if(!cos.length){
+    // Priority 3.5: TRANSPOSED comparison table (Metric | CompanyA | CompanyB | ...)
+    fmt='transposed';
+    for(const tbl of [...doc.querySelectorAll('table')]){
+      let thEls=[...tbl.querySelectorAll('thead th')];
+      if(!thEls.length){ const tr1=tbl.querySelector('tr'); if(tr1&&tr1.querySelector('th')) thEls=[...tr1.querySelectorAll('th')]; }
+      if(thEls.length<3) continue;
+      const ths=thEls.map(t=>t.textContent.trim());
+      if(!/metric|parameter|item|particulars/i.test(ths[0])) continue;
+      const isPeriod=h=>/fy\s?\d|q[1-4]|\d{4}|change|yoy|9m\b|h[12]\s?fy/i.test(h);
+      const coIdx=[]; for(let i=1;i<ths.length;i++){ if(ths[i]&&!isPeriod(ths[i])&&ths[i].length<=30&&!/^[\d,.%₹\s-]+$/.test(ths[i])) coIdx.push(i); }
+      if(coIdx.length<2) continue;
+      let revRow=null,patRow=null,ebRow=null,yoyRow=null;
+      [...tbl.querySelectorAll('tbody tr,tr')].filter(tr=>!tr.querySelector('th')).forEach(tr=>{
+        const l=(tr.cells[0]?.textContent||'').toLowerCase();
+        if(!revRow&&/revenue|total income/.test(l)&&!/yoy|growth|%|concentration|risk|share|mix|driver|visibility|type|multiple|per\b/.test(l)) revRow=tr;
+        if(!patRow&&(/(^|\s)pat(\s|\b)|net profit/.test(l))&&!/yoy|growth|%/.test(l)) patRow=tr;
+        if(!ebRow&&/ebitda/.test(l)) ebRow=tr;
+        if(!yoyRow&&/revenue.*(yoy|growth)|(yoy|growth).*revenue/.test(l)) yoyRow=tr;
+      });
+      if(!revRow) continue;
+      const val=(tr,i)=>{ if(!tr||!tr.cells[i]) return NaN; return parseFloat(tr.cells[i].textContent.replace(/[~₹%★+]/g,'').replace(/,/g,'')); };
+      const pctv=(tr,i)=>{ if(!tr||!tr.cells[i]) return NaN; const m=tr.cells[i].textContent.match(/(-?[\d.]+)\s*%/); return m?parseFloat(m[1]):NaN; };
+      const tmp2=[];
+      coIdx.forEach(i=>{
+        const rv=val(revRow,i); if(isNaN(rv)||rv<=0) return;
+        const eb=pctv(ebRow,i), yy=pctv(yoyRow,i), pt=val(patRow,i);
+        tmp2.push({name:ths[i].replace(/[*†]+$/,'').trim(),rev:rv,revYoY:isNaN(yy)?null:yy,ebitda:isNaN(eb)?null:eb,pat:isNaN(pt)?0:pt,greens:0,reds:0,ambers:0});
+      });
+      const hasFin=tmp2.some(c=>c.pat>0||c.ebitda!=null);
+      if(tmp2.length>=2&&hasFin){ cos.push(...tmp2); break; }
+    }
+  }
+  if(!cos.length){
+    // Priority 4: per-company metric tables (Item | Q4 | Change) under company section headings
+    fmt='metric-tables';
+    let marks=[...doc.querySelectorAll('.co-name')];
+    if(!marks.length) marks=[...doc.querySelectorAll('h2,h3')];
+    const GENERIC=/quarterly|annual|results|performance|charts?$|snapshot|cb assist|overview|summary|analyst|key |valuation|comparison|segment|revenue|business|financial|p&l|balance|borrowing|asset|crisis|timeline|merger|views|metrics|loan/i;
+    const compList=opts.companies?opts.companies.map(x=>x.toLowerCase()):null;
+    const lastMarkBefore=el=>{ let best=null,bestC=null; marks.forEach(m=>{ if(!(m.compareDocumentPosition(el)&4)) return; const t=m.textContent.toLowerCase(); if(compList&&compList.some(x=>t.includes(x))) bestC=m; if(!GENERIC.test(m.textContent)) best=m; }); return bestC||best; };
+    let coCursor=0;
+    [...doc.querySelectorAll('table')].forEach(tbl=>{
+      let thEls=[...tbl.querySelectorAll('thead th')];
+      if(!thEls.length){ const tr1=tbl.querySelector('tr'); if(tr1&&tr1.querySelector('th')) thEls=[...tr1.querySelectorAll('th')]; }
+      const ths=thEls.map(t=>t.textContent.toLowerCase());
+      if(!ths.length||!(ths[0].includes('item')||ths[0].includes('metric'))) return;
+      const iChg=ths.findIndex(h=>h.includes('change')||h.includes('yoy'));
+      let valIdx=ths.findIndex(h=>/q4\s*fy\s*26/.test(h)); const pyIdx=ths.findIndex(h=>/q4\s*fy\s*25/.test(h));
+      const hasQ4=valIdx>=0; if(valIdx<0) valIdx=1;
+      let cname=null;
+      let tok=null;
+      const hlm=tbl.innerHTML.match(/hl-([a-z0-9]+)/); if(hlm) tok=hlm[1];
+      if(!tok){
+        let anc=tbl.parentElement;
+        for(let d=0; d<3&&anc&&!tok; d++,anc=anc.parentElement){
+          const vm=(anc.outerHTML||'').match(/var\(--([a-z0-9]+)\)/); if(vm) tok=vm[1];
+        }
+      }
+      if(tok){
+        if(opts.tokens&&opts.tokens[tok]) cname=opts.tokens[tok];
+        else { const cand=marks.find(m=>m.textContent.toLowerCase().includes(tok)); if(cand) cname=cand.textContent; }
+      }
+      let usedOrdered=false;
+      if(!cname&&compList&&hasQ4){ if(coCursor<opts.companies.length){ cname=opts.companies[coCursor]; usedOrdered=true; } }
+      if(!cname){ const mk=lastMarkBefore(tbl); if(!mk) return; cname=mk.textContent; }
+      cname=cname.replace(/[^\w\s().&,-]/g,'').trim();
+      if(!cname||cname.length>60) return;
+      let rev=null,pat=null,yoy=null,used=false;
+      const cellNum=(tds,i)=>{ if(i<0||!tds[i]) return NaN; return parseFloat(tds[i].textContent.replace(/[₹~%★+]/g,'').replace(/,/g,'')); };
+      [...tbl.querySelectorAll('tbody tr,tr')].filter(tr=>!tr.querySelector('th')).forEach(tr=>{
+        const tds=[...tr.cells]; if(tds.length<2) return;
+        const lbl=tds[0].textContent.toLowerCase();
+        const v=cellNum(tds,valIdx);
+        if(rev==null&&!isNaN(v)&&(lbl.includes('total revenue')||lbl.includes('revenue from operations')||lbl.includes('total income')||/^revenue\b/.test(lbl))){
+          rev=v;
+          const pv=cellNum(tds,pyIdx);
+          if(!isNaN(pv)&&pv!==0) yoy=+(((v-pv)/Math.abs(pv))*100).toFixed(1);
+          else if(iChg>=0&&tds[iChg]){ const t=tds[iChg].textContent; const m=t.match(/(-?[\d.]+)\s*%/); if(m){ yoy=parseFloat(m[1]); if(t.includes('\u25BC')&&yoy>0) yoy=-yoy; } }
+        }
+        if(pat==null&&!isNaN(v)&&(/(^|\s)pat(\s|$|\b)/.test(lbl)||lbl.includes('net profit'))) pat=v;
+      });
+      if(rev==null) return;
+      if(usedOrdered) coCursor++;
+      const html=tbl.innerHTML;
+      cos.push({name:cname,rev,revYoY:yoy,ebitda:null,pat:pat||0,
+        greens:(html.match(/tpos|"num pos"|class="pos"|#16a34a|td-green|#166534|#15803d|#2E7D32|#2e7d32/g)||[]).length,
+        reds:(html.match(/tneg|class="neg"|#dc2626|td-red|#b91c1c|#C62828|#c62828/g)||[]).length,
+        ambers:(html.match(/tneu|#d97706|td-amber/g)||[]).length});
+    });
+  }
+  if(!cos.length){
+    // Priority 5: JS-rendered dashboards storing data as const DATA = {Metric:{Bank:{Q4FY26:..,Q4FY25:..}}}
+    fmt='js-data';
+    const scripts=[...doc.querySelectorAll('script')].map(s=>s.textContent).join('\n');
+    const grab=(label)=>{
+      const i=scripts.indexOf(label); if(i<0) return null;
+      const j=scripts.indexOf('{',i); if(j<0) return null;
+      let d=0,k=j;
+      for(;k<scripts.length;k++){ const ch=scripts[k]; if(ch==='{')d++; else if(ch==='}'){d--; if(d===0)break;} }
+      try{ return (new Function('return '+scripts.slice(j,k+1)))(); }catch(e){ return null; }
+    };
+    const DATA=grab('const DATA');
+    if(DATA&&typeof DATA==='object'){
+      const metrics=Object.keys(DATA);
+      const mFind=re=>metrics.find(m=>re.test(m.toLowerCase()));
+      const mPat=mFind(/net profit|(^|\W)pat(\W|$)/), mRev=mFind(/nii|net interest|total income|revenue/)||mPat;
+      const banks=mRev?Object.keys(DATA[mRev]):[];
+      const pKeys=o=>Object.keys(o||{});
+      banks.forEach(b=>{
+        const cur=k=>{const o=DATA[k]&&DATA[k][b]; if(!o) return null; const ks=pKeys(o); const q4=ks.find(x=>/q4fy26/i.test(x))||ks[0]; return o[q4]; };
+        const prev=k=>{const o=DATA[k]&&DATA[k][b]; if(!o) return null; const ks=pKeys(o); const py=ks.find(x=>/q4fy25/i.test(x)); return py!=null?o[py]:null; };
+        const rev=cur(mRev), rev0=prev(mRev);
+        if(rev==null) return;
+        let g=0,r=0;
+        metrics.forEach(m=>{
+          const c=cur(m), p=prev(m);
+          if(c==null||p==null||typeof c!=='number'||typeof p!=='number'||c===p) return;
+          const lowerBetter=/gnpa|nnpa|npa|cost|provision|slippage/i.test(m);
+          const improved=lowerBetter?c<p:c>p;
+          improved?g++:r++;
+        });
+        cos.push({name:b,rev,revYoY:(rev0&&rev0!==0)?+(((rev-rev0)/Math.abs(rev0))*100).toFixed(1):null,
+          ebitda:null,pat:cur(mPat)||0,greens:g,reds:r,ambers:0});
       });
     }
   }
   if(!cos.length) return null;
-  // dedupe by name (a company may appear in several tables)
-  const seen={}; cos=cos.filter(c=>{ if(seen[c.name])return false; seen[c.name]=1; return true; });
+  // dedupe by name, treating "Vardhman" and "Vardhman Textiles" as the same company
+  const kept=[];
+  cos=cos.filter(c=>{
+    const n=c.name.toLowerCase().trim();
+    if(kept.some(k=>k===n||(n.length>=3&&k.startsWith(n))||(k.length>=3&&n.startsWith(k)))) return false;
+    kept.push(n); return true;
+  });
   // period detection
   const pm=htmlText.match(/Q[1-4]\s*FY\s*\d{2}/i);
   return {fmt,period:pm?pm[0].replace(/\s+/g,' '):'',cos};
@@ -1567,9 +1752,11 @@ function grAggregate(parsed){
   const withY=cos.filter(c=>c.revYoY!=null&&!isNaN(c.revYoY));
   const avgRevYoY=withY.length?withY.reduce((a,c)=>a+c.revYoY,0)/withY.length:null;
   const g=cos.reduce((a,c)=>a+c.greens,0), r=cos.reduce((a,c)=>a+c.reds,0), am=cos.reduce((a,c)=>a+c.ambers,0);
-  const tot=g+r+am||1;
-  const toneScore=(g-r)/tot;
-  const tone=toneScore>0.25?'strong':toneScore<-0.1?'weak':'mixed';
+  const tot=g+r+am;
+  let tone,toneScore;
+  if(tot>0){ toneScore=(g-r)/tot; tone=toneScore>0.25?'strong':toneScore<-0.1?'weak':'mixed'; }
+  else if(avgRevYoY!=null){ toneScore=avgRevYoY/20; tone=avgRevYoY>=10?'strong':avgRevYoY<0?'weak':'mixed'; }
+  else { toneScore=0; tone='mixed'; }
   const top=cos.slice().sort((a,b)=>(b.ebitda||0)-(a.ebitda||0)).slice(0,3).map(c=>c.name);
   return {n,totalRev:Math.round(totalRev),avgEbitda:avgEbitda!=null?+avgEbitda.toFixed(1):null,avgRevYoY:avgRevYoY!=null?+avgRevYoY.toFixed(1):null,
     greens:g,reds:r,ambers:am,tone,toneScore:+toneScore.toFixed(2),top,period:parsed.period,fmt:parsed.fmt};
@@ -1598,8 +1785,8 @@ async function grFetchAll(){
     try{
       const r=await fetch(url(en.file),{cache:'no-store'});
       if(!r.ok) throw new Error('HTTP '+r.status);
-      const parsed=grParseHTML(await r.text(),en.file);
-      if(parsed) out.files.push({file:en.file,sectors:en.sectors,agg:grAggregate(parsed)});
+      const parsed=grParseHTML(await r.text(),en.file,{tokens:en.tokens,companies:en.companies});
+      if(parsed) grEmit(en,parsed).forEach(e=>out.files.push(e));
       else out.files.push({file:en.file,sectors:en.sectors,err:'no parseable table found'});
     }catch(e){ out.files.push({file:en.file,sectors:en.sectors,err:e.message}); }
   }
@@ -1869,6 +2056,40 @@ const SECTOR_IMPACT=[
  rules:[
   c=>c.sc('FII')<=-1?{p:-2,r:`FII outflows (${c.lab('FII')}) — loss-making platforms are valuation-multiple stocks owned heavily by foreign growth funds; risk-off compresses multiples hardest here.`}:c.sc('FII')>=2?{p:2,r:`FII risk-on (${c.lab('FII')}) — growth-multiple expansion returns; the sector is the highest-beta expression of foreign flows.`}:null,
   c=>c.sc('Liquidity')<=-1?{p:-1,r:`Tight liquidity (${c.lab('Liquidity')}) — funding winters force burn cuts and down-rounds in the unlisted feeder ecosystem; listed platform sentiment follows.`}:null]},
+{name:"Railways",group:"Energy & Infra",icon:"🚆",links:["Govt Rail Capex★","Freight/Economy"],
+ metrics:["Order book / revenue ratio","Execution rate (revenue growth)","EBITDA margin (EPC thin)","Wagon order pipeline","Rail budget allocation trend","Working capital / receivables","Freight volume growth (CONCOR)"],
+ rules:[
+  c=>c.sc('Capex')>=2?{p:2,r:`Govt capex ${c.lab('Capex')} — railway capital outlay is the purest budget-driven order flow: RVNL/IRCON EPC orders, wagon procurement for Jupiter/Texmaco/Titagarh, and IRFC disbursements all track the rail budget directly.`}:c.sc('Capex')<=-1?{p:-2,r:`Capex slowdown (${c.lab('Capex')}) — rail stocks have no private-demand cushion; when budget allocation plateaus, order inflows and execution both stall, and richly-valued PSU rail names de-rate fast.`}:null,
+  c=>c.sc('Earnings')>=1?{p:1,r:`Economic momentum (${c.lab('Earnings')}) — freight volumes (CONCOR, wagon demand) track industrial activity and EXIM trade; passenger monetisation (IRCTC) tracks discretionary travel.`}:null]},
+{name:"Tyres",group:"Auto",icon:"🛞",links:["Crude★ (carbon black/synthetic rubber)","Rural/Replacement Demand","OEM Cycle"],
+ metrics:["Volume growth (replacement vs OEM mix)","Raw material basket cost (natural rubber + crude derivatives)","Gross margin trend","EBITDA margin","Exports share","Capex / capacity additions"],
+ rules:[
+  c=>c.crude>=85?{p:-2,r:`Crude at ${c.crudeTxt} — carbon black, synthetic rubber and chemicals (~45–50% of the raw material basket) are crude derivatives; margins compress with a one-quarter lag as RM contracts reprice. Replacement-market pricing power decides who protects margin.`}:c.crude<=70?{p:2,r:`Crude at ${c.crudeTxt} — falling crude deflates carbon black and synthetic rubber costs; tyre makers historically keep part of the benefit, expanding gross margins.`}:null,
+  c=>c.sc('Monsoon')>=1?{p:1,r:`Good monsoon (${c.lab('Monsoon')}) — rural replacement demand (tractor, 2W, LCV tyres) is the highest-margin segment and tracks farm incomes.`}:c.sc('Monsoon')<=-1?{p:-1,r:`Weak monsoon (${c.lab('Monsoon')}) — tractor and rural replacement volumes soften; OEM demand alone can't carry margins.`}:null,
+  c=>c.inr>=92?{p:0,r:`Rupee at ${c.inrTxt} — two-sided: exporters (notably BKT's off-highway business) gain on USD billing, but imported natural rubber costs more in ₹. Net effect depends on each company's export share.`}:null]},
+{name:"Gold & Jewellery",group:"Consumption & Services",icon:"💍",links:["Gold Price / Inflation★","Rural & Wedding Demand","Global Risk Sentiment"],
+ metrics:["Revenue growth (gold-price effect vs volume)","SSSG","Store additions","Gross margin (making charges)","Studded ratio","Inventory gains / hedging policy","Market share (organised shift)"],
+ rules:[
+  c=>c.sc('Inflation')<=-1?{p:1,r:`Elevated inflation (${c.lab('Inflation')}) — gold is the household inflation hedge; ticket sizes inflate with gold price, lifting reported revenue even when volumes are flat. Watch the volume-vs-price split in results.`}:null,
+  c=>c.sc('Global')<=-2?{p:1,r:`Global risk-off (${c.lab('Global')}) — gold price rallies in uncertainty; jewellers book inventory gains and the organised players gain share. Very high prices can defer discretionary volume, so studded ratio matters.`}:null,
+  c=>c.sc('Monsoon')>=1?{p:1,r:`Good monsoon (${c.lab('Monsoon')}) — rural and wedding-season gold buying tracks farm incomes; tier 2/3 store expansion monetises this directly.`}:c.sc('Monsoon')<=-1?{p:-1,r:`Weak monsoon (${c.lab('Monsoon')}) — rural gold demand, a large share of wedding purchases, softens with farm incomes.`}:null]},
+{name:"Recycling",group:"Manufacturing",icon:"♻️",links:["EPR Policy★","Metal Prices (LME)","Rupee (exports)"],
+ metrics:["Volume growth (tonnage)","Metal spread (realisation vs scrap cost)","EPR credit income","Capacity expansion","Export share","Working capital days"],
+ rules:[
+  c=>c.sc('Capex')>=2?{p:1,r:`Policy momentum (${c.lab('Capex')}) — EPR enforcement and formalisation push volumes from unorganised to organised recyclers; compliance-driven demand is structural, not cyclical.`}:null,
+  c=>c.sc('Global')<=-2?{p:-1,r:`Global weakness (${c.lab('Global')}) — realisations are LME-linked; falling metal prices squeeze the spread and create inventory losses for recyclers holding stock.`}:null,
+  c=>c.inr>=92?{p:1,r:`Rupee at ${c.inrTxt} — export realisations (a meaningful share for lead/PET recyclers) improve in ₹ terms.`}:null]},
+{name:"REITs",group:"Energy & Infra",icon:"🏢",links:["Interest Rates★ (yield product)","Office Leasing / IT-GCC Demand"],
+ metrics:["Distribution per unit growth","Occupancy %","Leasing momentum (mn sq ft)","Rental escalations","Debt cost / refinancing","NDCF payout ratio","GAV growth"],
+ rules:[
+  c=>c.sc('Interest')>=2?{p:2,r:`Rate cuts (${c.lab('Interest')}) — REITs are yield instruments: as bond yields fall, REIT distribution yields re-rate (unit prices rise), and refinancing the large debt books gets cheaper. The single biggest driver for the sector.`}:c.sc('Interest')<=-2?{p:-2,r:`Rate hikes — REIT yields compete with rising bond yields, so unit prices de-rate; debt-heavy trusts also face costlier refinancing.`}:null,
+  c=>c.sc('Global')<=-2?{p:-1,r:`Global tech slowdown (${c.lab('Global')}) — office absorption is driven by IT/GCC leasing; hiring freezes translate to slower leasing momentum with a 2–3 quarter lag.`}:c.sc('Global')>=2?{p:1,r:`Global strength (${c.lab('Global')}) — GCC expansion in India is the structural office-demand engine; leasing momentum and occupancy both benefit.`}:null,
+  c=>c.sc('Earnings')>=1?{p:1,r:`Healthy economy (${c.lab('Earnings')}) — rental escalations get absorbed without churn, and retail-mall REITs ride consumption recovery.`}:null]},
+{name:"Alcobev",group:"Consumption & Services",icon:"🥃",links:["State Excise Policy★","Urban Discretionary","Input Costs (ENA/glass)"],
+ metrics:["Volume growth (P&A vs popular mix)","Premiumisation (P&A salience)","Gross margin (ENA, glass, grain costs)","State policy changes / excise","A&P spend","RTM changes (route-to-market)","Net realisation per case"],
+ rules:[
+  c=>c.sc('Earnings')>=1?{p:1,r:`Urban income growth (${c.lab('Earnings')}) — premiumisation is the sector's engine: P&A (prestige & above) volumes grow faster than popular segment, lifting realisation per case and margins.`}:null,
+  c=>c.sc('Inflation')<=-1?{p:-1,r:`Elevated inflation (${c.lab('Inflation')}) — ENA, grain and glass costs rise while popular-segment consumers downtrade; state governments also tend to hike excise when fiscally stressed.`}:c.sc('Inflation')>=2?{p:1,r:`Input costs easing (${c.lab('Inflation')}) — grain/ENA and glass deflation flows to gross margin; pricing in alcobev is state-controlled, so cost relief matters more than pricing power.`}:null]},
 // ════ PHARMA ════
 {name:"Pharma",group:"Pharma",icon:"💊",links:["USD-INR★ (export bonus)","US Policy/USFDA"],
  metrics:["US generics pricing trend","Domestic (IPM) growth vs market","CDMO order book","Gross margin","R&D spend %","USFDA compliance status","New launches / ANDA pipeline"],
