@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Hospital Sector Intelligence Dashboard Q4 FY26 — Cauvery Business Research. 9 companies: Apollo, Max, Fortis, NH, Medanta, KIMS, Rainbow, Jupiter, Yatharth.">
+<meta property="og:title" content="Hospital Sector Dashboard · Q4 FY26 · CB Research">
+<meta property="og:description" content="Cauvery Business Research — FY26 verified data on 9 Indian hospital stocks. Segments, debt, payor mix, PE exits, valuations.">
+<title>Hospital Sector Intelligence Dashboard · Q4 FY26 | Cauvery Business Research</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f6f2;--surface:#fff;--surface2:#f2f0eb;--border:#e2ddd5;
+  --text:#181511;--muted:#6e6860;
+  --apollo:#1d4ed8;--apollo-soft:#eff6ff;
+  --nh:#0f766e;--nh-soft:#f0fdfa;
+  --max:#7c3aed;--max-soft:#f5f3ff;
+  --rainbow:#dc2626;--rainbow-soft:#fef2f2;
+  --medanta:#b8911e;--medanta-soft:#fdf5e0;
+  --fortis:#166534;--fortis-soft:#f0fdf4;
+  --jupiter:#0e7490;--jupiter-soft:#ecfeff;
+  --yatharth:#9d174d;--yatharth-soft:#fdf2f8;
+  --krishna:#ea580c;--krishna-soft:#fff7ed;
+  --pos:#166534;--neg:#dc2626;--warn:#ea580c;
+  --gold:#b8911e;--gold-soft:#fdf5e0;
+  --shadow:0 1px 8px rgba(24,21,17,.07);--shadow-md:0 4px 20px rgba(24,21,17,.10);
+  --radius:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:13.5px;line-height:1.55;}
+.hdr{background:#181511;color:#fff;padding:0 40px;display:flex;align-items:stretch;justify-content:space-between;min-height:72px;}
+.hdr-left{display:flex;align-items:center;padding:16px 0;}
+.hdr-left h1{font-family:'Playfair Display',serif;font-size:1.6rem;letter-spacing:-.01em;color:#fff;line-height:1.15;}
+.hdr-left .sub{font-size:11px;font-weight:500;color:rgba(255,255,255,.45);letter-spacing:.12em;text-transform:uppercase;margin-top:4px;}
+.hdr-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:16px 0;}
+.chip{padding:4px 11px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+.chip-apollo{background:var(--apollo);color:#fff;}.chip-nh{background:var(--nh);color:#fff;}.chip-max{background:var(--max);color:#fff;}
+.chip-rainbow{background:var(--rainbow);color:#fff;}.chip-medanta{background:var(--medanta);color:#fff;}.chip-fortis{background:var(--fortis);color:#fff;}
+.chip-jupiter{background:var(--jupiter);color:#fff;}.chip-yatharth{background:var(--yatharth);color:#fff;}.chip-kims{background:var(--krishna);color:#fff;}.chip-date{background:rgba(255,255,255,.08);color:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.12);}
+.tab-nav{background:var(--surface);border-bottom:2px solid var(--border);display:flex;align-items:center;padding:0 40px;overflow-x:auto;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(24,21,17,.06);}
+.tab-nav::-webkit-scrollbar{height:0;}
+.tab-btn{padding:14px 15px 12px;font-size:12px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;letter-spacing:.02em;transition:color .18s,border-color .18s;margin-bottom:-2px;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--text);border-bottom-color:var(--apollo);font-weight:700;}
+.main{padding:26px 40px 60px;max-width:1460px;margin:0 auto;isolation:isolate;}
+.panel{display:none;animation:fadeIn .2s ease;position:relative;z-index:1;}
+.panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+.sec-hdr{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--text);letter-spacing:-.01em;margin-bottom:18px;padding-bottom:10px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:12px;}
+.sec-note{font-size:11px;color:var(--muted);font-weight:400;margin-left:4px;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.gap-top{margin-top:22px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);}
+.card-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:14px;}
+.badge-row{margin-top:12px;display:flex;gap:5px;flex-wrap:wrap;}
+.badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:700;font-family:'IBM Plex Mono',monospace;}
+.b-buy{background:#dcfce7;color:#15803d;}.b-hold{background:#fef9c3;color:#a16207;}.b-sell{background:#fee2e2;color:#b91c1c;}
+.b-spec{background:#f3f4f6;color:#4b5563;}.b-pos{background:#dcfce7;color:#15803d;}.b-neg{background:#fee2e2;color:#b91c1c;}.b-warn{background:#fff7ed;color:#c2410c;}
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:22px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow);}
+.kpi.sector-a{border-left:4px solid var(--gold);}
+.kpi .kl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:5px;}
+.kpi .kv{font-size:1.05rem;font-weight:800;color:var(--text);font-family:'IBM Plex Mono',monospace;}
+.kpi .kc{font-size:10px;font-weight:700;margin-top:2px;}
+.pos{color:var(--pos);}.neg{color:var(--neg);}.warn{color:var(--warn);}
+table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+th{background:#181511;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:500;padding:11px 13px;text-align:left;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;}
+td{padding:10px 13px;border-bottom:1px solid var(--border);font-size:12.5px;white-space:nowrap;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:nth-child(even) td{background:#fafaf8;}
+td.num{font-family:'IBM Plex Mono',monospace;}
+td.tpos{color:var(--pos);font-weight:700;font-family:'IBM Plex Mono',monospace;}
+td.tneg{color:var(--neg);font-weight:700;font-family:'IBM Plex Mono',monospace;}
+td.tb{font-weight:700;}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:7px;vertical-align:middle;}
+.val-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);}
+.val-co{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;font-family:'IBM Plex Mono',monospace;}
+.val-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);}
+.val-row:last-child{border-bottom:none;}
+.val-lbl{font-size:11.5px;color:var(--muted);}
+.val-num{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;}
+.seg-block{margin-bottom:16px;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.seg-block-hdr{background:#181511;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;padding:7px 13px;letter-spacing:.07em;text-transform:uppercase;}
+.seg-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:0;border-bottom:1px solid var(--border);}
+.seg-row:last-child{border-bottom:none;}
+.seg-row.hdr-row{background:var(--surface2);}
+.seg-cell{padding:8px 12px;font-size:11.5px;}
+.seg-cell.num{font-family:'IBM Plex Mono',monospace;}
+.seg-cell.pos{color:var(--pos);font-weight:700;font-family:'IBM Plex Mono',monospace;}
+.seg-cell.neg{color:var(--neg);font-weight:700;font-family:'IBM Plex Mono',monospace;}
+.seg-cell.lbl{font-weight:700;font-size:11px;}
+.swot-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1.5px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;}
+.swot-cell{padding:13px 15px;}
+.swot-s{background:#e8f5ee;border-right:1px solid var(--border);border-bottom:1px solid var(--border);}
+.swot-w{background:#fbeee8;border-bottom:1px solid var(--border);}
+.swot-o{background:#f0edf8;border-right:1px solid var(--border);}
+.swot-t{background:var(--gold-soft);}
+.swot-lbl{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.12em;margin-bottom:5px;}
+.sl{color:#166534;}.wl{color:#dc2626;}.ol{color:#7c3aed;}.tl{color:var(--gold);}
+.swot-ul{list-style:none;font-size:11px;line-height:1.65;}
+.swot-ul li::before{content:"• ";color:var(--muted);}
+.co-hdr-swot{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;margin-bottom:10px;padding-bottom:6px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;gap:8px;}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);}
+.chart-card h3{font-size:13px;font-weight:700;margin-bottom:3px;color:var(--text);}
+.chart-card p.sub{font-size:10.5px;color:var(--muted);margin-bottom:14px;}
+.cbassist-chat{background:var(--surface);border:1.5px solid var(--apollo);border-radius:var(--radius);padding:20px 22px;}
+.cbassist-title{font-weight:800;font-size:12.5px;color:var(--apollo);margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;overflow:hidden;}
+.cbassist-sub{font-size:10px;font-weight:400;color:var(--muted);margin-bottom:12px;padding-left:16px;}
+.cbassist-title span{width:8px;height:8px;background:var(--pos);border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.chat-msgs{min-height:120px;max-height:360px;overflow-y:auto;margin-bottom:12px;display:flex;flex-direction:column;gap:10px;padding-right:4px;}
+.chat-msg{padding:10px 14px;border-radius:10px;font-size:12px;max-width:90%;line-height:1.55;}
+.chat-msg.user{background:#181511;color:#fff;align-self:flex-end;border-radius:10px 10px 2px 10px;}
+.chat-msg.bot{background:var(--surface2);border:1px solid var(--border);align-self:flex-start;border-radius:10px 10px 10px 2px;}
+.chat-msg.bot strong{color:var(--apollo);}
+.chat-input-row{display:flex;gap:8px;}
+.chat-input{flex:1;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:12px;font-family:'Inter',sans-serif;background:var(--surface);color:var(--text);outline:none;transition:border-color .2s;}
+.chat-input:focus{border-color:var(--apollo);}
+.chat-send{background:var(--apollo);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:12px;font-weight:700;cursor:pointer;}
+.chat-send:disabled{opacity:.5;cursor:not-allowed;}
+.typing-ind{display:none;align-items:center;gap:5px;padding:8px 12px;}
+.typing-ind span{width:6px;height:6px;background:var(--muted);border-radius:50%;animation:bounce 1.2s infinite;}
+.typing-ind span:nth-child(2){animation-delay:.2s;}.typing-ind span:nth-child(3){animation-delay:.4s;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+.preset-tab{padding:5px 13px;border-radius:20px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);transition:all .15s;margin:2px 2px 6px 0;}
+.preset-tab:hover{border-color:var(--text);color:var(--text);}
+.pt-apollo.active{background:var(--apollo);border-color:var(--apollo);color:#fff;}
+.pt-nh.active{background:var(--nh);border-color:var(--nh);color:#fff;}
+.pt-max.active{background:var(--max);border-color:var(--max);color:#fff;}
+.pt-sector.active{background:#181511;border-color:#181511;color:#fff;}
+.moat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);}
+.moat-co{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;}
+.moat-title{font-size:12.5px;font-weight:700;color:var(--text);margin-bottom:5px;}
+.moat-body{font-size:11px;color:var(--muted);line-height:1.55;}
+.moat-tag{display:inline-block;margin-top:8px;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;text-transform:uppercase;margin-right:4px;}
+.verdict-card{background:var(--surface);border:2px solid var(--gold);border-radius:var(--radius);padding:22px 26px;box-shadow:var(--shadow-md);margin-bottom:18px;}
+.verdict-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;color:var(--gold);margin-bottom:6px;display:flex;align-items:center;gap:10px;}
+.verdict-body{font-size:13px;line-height:1.7;color:var(--text);}
+.debt-bar-wrap{background:var(--surface2);border-radius:20px;height:10px;overflow:hidden;margin-bottom:4px;}
+.debt-bar{height:10px;border-radius:20px;}
+
+/* ── CB WATERMARK BADGE (every tab, fixed bottom-right) ── */
+.cb-wm{position:fixed;bottom:16px;right:16px;z-index:9999;display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.94);border:1.5px solid var(--border);border-radius:30px;padding:7px 15px 7px 8px;box-shadow:0 4px 22px rgba(24,21,17,.13);backdrop-filter:blur(10px);pointer-events:none;}
+.cb-wm-logo{width:30px;height:30px;background:linear-gradient(135deg,#0f766e 0%,#1d4ed8 100%);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:.9rem;font-weight:900;color:#fff;flex-shrink:0;}
+.cb-wm-name{font-size:11.5px;font-weight:800;color:var(--text);letter-spacing:-.01em;}
+.cb-wm-sub{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-top:1px;}
+
+/* ── MOBILE RESPONSIVE ── */
+@media (max-width: 768px) {
+  .hdr{padding:0 16px;flex-direction:column;align-items:flex-start;min-height:auto;padding-bottom:12px;}
+  .hdr-left h1{font-size:1.15rem;}
+  .hdr-right{padding:0 0 10px 0;gap:5px;}
+  .chip{font-size:9px;padding:3px 8px;}
+  .tab-nav{padding:0 8px;}
+  .tab-btn{padding:12px 10px 10px;font-size:11px;}
+  .main{padding:16px 12px 80px;}
+  .g2,.g3,.g4{grid-template-columns:1fr;}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  table{font-size:11px;}
+  th{font-size:9.5px;padding:8px 8px;}
+  td{padding:8px 8px;font-size:11px;}
+  .sec-hdr{font-size:1.05rem;}
+  .verdict-card{padding:16px 14px;}
+  .verdict-title{font-size:1rem;}
+  .cb-wm{bottom:12px;right:10px;padding:5px 10px 5px 6px;}
+  .cb-wm-logo{width:24px;height:24px;font-size:.75rem;}
+  .cb-wm-name{font-size:10px;}
+  .cb-wm-sub{font-size:8px;}
+  .chat-input-row{flex-direction:column;}
+  .chat-send{width:100%;padding:10px;}
+  .seg-row{grid-template-columns:1fr;border-bottom:1px solid var(--border);}
+  .seg-row.hdr-row{display:none;}
+  .seg-cell{padding:6px 12px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid rgba(0,0,0,.05);font-size:11px;}
+  .seg-cell:last-child{border-bottom:none;}
+  .seg-cell::before{content:attr(data-label);font-size:9.5px;font-weight:700;text-transform:uppercase;color:var(--muted);letter-spacing:.07em;margin-right:8px;flex-shrink:0;width:90px;}
+  .seg-cell.lbl{font-size:11.5px;font-weight:700;background:var(--surface2);padding:8px 12px;display:block;}
+  .seg-cell.lbl::before{display:none;}
+  .swot-grid{grid-template-columns:1fr;}
+  .hdr-right{flex-wrap:wrap;}
+}
+@media (max-width: 480px) {
+  .kpi-row{grid-template-columns:1fr;}
+  /* seg-row already 1-col */
+  .hdr-left h1{font-size:1rem;}
+  .tab-btn{font-size:10px;padding:10px 8px 8px;}
+  .main{padding:12px 10px 80px;}
+}
+</style>
+</head>
+<body>
+<div class="hdr">
+  <div class="hdr-left">
+    <div>
+      <div class="sub">Cauvery Business Research · Data: Official Exchange Filings FY26</div>
+      <h1>Hospital Sector Intelligence Dashboard</h1>
+      <div class="sub" style="margin-top:2px;">Q4 FY26 · 9 Companies · Verified Actuals · v2.0 | Build: 20260527-1130 IST</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <span class="chip chip-apollo">Apollo</span>
+    <span class="chip chip-nh">NH</span>
+    <span class="chip chip-max">Max</span>
+    <span class="chip chip-rainbow">Rainbow</span>
+    <span class="chip chip-medanta">Medanta</span>
+    <span class="chip chip-fortis">Fortis</span>
+    <span class="chip chip-kims">KIMS</span>
+    <span class="chip chip-jupiter">Jupiter</span>
+    <span class="chip chip-yatharth">Yatharth</span>
+    <span class="chip chip-date">May 2026 · Verified</span>
+  </div>
+</div>
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('school',this)">🎓 School</button>
+  <button class="tab-btn" onclick="switchTab('overview',this)">📊 Sector Overview</button>
+  <button class="tab-btn" onclick="switchTab('companies',this)">🏥 Companies</button>
+  <button class="tab-btn" onclick="switchTab('segments',this)">🗂️ Business Segments</button>
+  <button class="tab-btn" onclick="switchTab('comparison',this)">⚖️ Peer Comparison</button>
+  <button class="tab-btn" onclick="switchTab('charts',this)">📈 Charts</button>
+  <button class="tab-btn" onclick="switchTab('debtcash',this)">💳 Debt & Cashflow</button>
+  <button class="tab-btn" onclick="switchTab('valuation',this)">💰 Valuations</button>
+  <button class="tab-btn" onclick="switchTab('swot',this)">🔲 SWOT</button>
+  <button class="tab-btn" onclick="switchTab('moat',this)">🏰 Moats</button>
+  <button class="tab-btn" onclick="switchTab('analyst',this)">🎯 Analyst Ratings</button>
+  <button class="tab-btn" onclick="switchTab('verdict',this)">⚖️ Verdict</button>
+  <button class="tab-btn" onclick="switchTab('cb',this)">🤖 CB Assist</button>
+</nav>
+<div class="main">
+<!-- ========== SCHOOL TAB ========== -->
+<div id="tab-school" class="panel active">
+  <div class="sec-hdr">🎓 Hospital Sector School <span class="sec-note">Fundamentals · Metrics · Global Context · NH vs Apollo Contrast</span></div>
+  <div class="g2">
+    <div class="card" style="background:var(--apollo-soft);border-color:var(--apollo);">
+      <div class="card-lbl" style="color:var(--apollo);">🏥 What Makes Hospital Stocks Unique</div>
+      <p style="font-size:12.5px;line-height:1.8;margin-bottom:10px;">Hospitals are <strong>recession-proof, inflation-beneficiary, asset-heavy, and people-intensive</strong>. Sick people don't defer cardiac surgery during recessions. Pricing power compounds as brand builds over decades. A hospital in Mumbai cannot be replicated in Mysore — geography is a permanent moat.</p>
+      <p style="font-size:12px;color:var(--muted);line-height:1.7;">India is in a healthcare golden decade (FY26–FY35): rising income → insurance penetration → more elective procedures → higher ARPOB → margin expansion. This is structural, not cyclical.</p>
+      <div class="badge-row"><span class="badge b-pos">Non-Cyclical</span><span class="badge b-pos">Inflation Beneficiary</span><span class="badge b-warn">High Entry Capex</span><span class="badge b-spec">Asset-Light After Ramp</span></div>
+    </div>
+    <div class="card" style="background:var(--gold-soft);border-color:var(--gold);">
+      <div class="card-lbl" style="color:var(--gold);">📐 5 Core Metrics Every Hospital Investor Must Know</div>
+      <table style="margin-top:4px;">
+        <thead><tr><th>Metric</th><th>Full Form</th><th>Best-in-Class FY26</th></tr></thead>
+        <tbody>
+          <tr><td class="tb">ARPOB</td><td>Avg Revenue Per Occupied Bed/Day</td><td class="tpos">Max ₹77,900/day</td></tr>
+          <tr><td class="tb">Occupancy %</td><td>Occupied beds / Available beds</td><td class="tpos">Max 75%</td></tr>
+          <tr><td class="tb">ALOS</td><td>Avg Length of Stay (days)</td><td class="num">3.5–4.5 days</td></tr>
+          <tr><td class="tb">EBITDA/Bed/yr</td><td>Annual EBITDA per operational bed</td><td class="tpos">Max ₹73L/bed/yr</td></tr>
+          <tr><td class="tb">EV/Bed</td><td>Enterprise Value per bed</td><td class="num">Range ₹40L–₹2.6Cr</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- NH vs Apollo contrast — THE KEY EDUCATIONAL SECTION -->
+  <div class="gap-top" style="border:2px solid #181511;border-radius:var(--radius);overflow:hidden;">
+    <div style="background:#181511;color:#fff;padding:14px 22px;font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;">⚡ Two Business Models — Apollo vs NH: Understanding the Fundamental Difference</div>
+    <div class="g2" style="gap:0;">
+      <div style="padding:20px 22px;border-right:2px solid #181511;">
+        <div style="font-size:11px;font-weight:800;color:var(--apollo);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;">🔵 Apollo — The Integrated Healthcare Ecosystem</div>
+        <p style="font-size:12px;line-height:1.8;margin-bottom:12px;">Apollo is NOT just a hospital chain. It is a <strong>vertically integrated healthcare platform</strong>. Revenue comes from three businesses simultaneously:</p>
+        <div style="margin-bottom:8px;padding:8px 12px;background:var(--apollo-soft);border-radius:6px;border-left:3px solid var(--apollo);">
+          <div style="font-size:11px;font-weight:700;">Seg 1 — Healthcare Services (Hospitals)</div>
+          <div style="font-size:11px;color:var(--muted);">₹12,550 Cr revenue (50% of total) · EBITDA margin 24.4% · 8,131 beds · ARPOB ₹71,206 · Occupancy 68%</div>
+        </div>
+        <div style="margin-bottom:8px;padding:8px 12px;background:var(--apollo-soft);border-radius:6px;border-left:3px solid var(--apollo);">
+          <div style="font-size:11px;font-weight:700;">Seg 2 — Digital Health &amp; Pharmacy (Apollo HealthCo)</div>
+          <div style="font-size:11px;color:var(--muted);">₹10,808 Cr revenue (43% of total) · EBITDA margin 8.8% (improving) · 7,289 pharmacy stores · Apollo 24/7 GMV ₹2,037 Cr FY26</div>
+        </div>
+        <div style="margin-bottom:12px;padding:8px 12px;background:var(--apollo-soft);border-radius:6px;border-left:3px solid var(--apollo);">
+          <div style="font-size:11px;font-weight:700;">Seg 3 — Diagnostics &amp; Retail Health (AHLL)</div>
+          <div style="font-size:11px;color:var(--muted);">₹1,865 Cr revenue (7% of total) · EBITDA margin 11.4% (tripling) · Diagnostics +41% growth</div>
+        </div>
+        <p style="font-size:11.5px;color:var(--muted);line-height:1.65;margin-bottom:8px;"><strong>Why this matters:</strong> Apollo's consolidated EBITDA margin looks "low" at ~15% because it includes the 8.8% pharmacy business. The <em>hospital business alone</em> earns 24.4% EBITDA. As HealthCo matures and pharmacy margins improve, Apollo's blended margin will expand significantly. The composite demerger-merger scheme (approved 2026) will list HealthCo separately — unlocking hidden value.</p>
+        <div class="badge-row"><span class="badge b-pos">Ecosystem Play</span><span class="badge b-spec">Pharmacy Cross-Sell</span><span class="badge b-spec">Proton Therapy Moat</span><span class="badge b-warn">Complex Conglomerate</span></div>
+      </div>
+      <div style="padding:20px 22px;">
+        <div style="font-size:11px;font-weight:800;color:var(--nh);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px;">🟦 NH — The Multi-Geography Pure-Play Hospital Model</div>
+        <p style="font-size:12px;line-height:1.8;margin-bottom:12px;">NH is a <strong>pure hospital operator</strong> with a unique multi-currency, multi-geography structure. FY26 was a landmark year — NH crossed ₹7,896 Cr revenue (44% growth) driven by THREE distinct income streams:</p>
+        <div style="margin-bottom:8px;padding:8px 12px;background:var(--nh-soft);border-radius:6px;border-left:3px solid var(--nh);">
+          <div style="font-size:11px;font-weight:700;">Seg 1 — India Business (INR)</div>
+          <div style="font-size:11px;color:var(--muted);">₹4,797 Cr (61% of total) · +10.3% YoY · EBITDA margin ~16–18% improving · India ARPOB ₹35K/day · Occ 72% · 5,800+ beds · Cardiac cross-subsidy model</div>
+        </div>
+        <div style="margin-bottom:8px;padding:8px 12px;background:var(--nh-soft);border-radius:6px;border-left:3px solid var(--nh);">
+          <div style="font-size:11px;font-weight:700;">Seg 2 — Cayman Islands (USD) 🏝️</div>
+          <div style="font-size:11px;color:var(--muted);">₹1,889 Cr (24% of total) · +59.7% YoY · EBITDA margin ~25–35% · Revenue in USD · Zero corporate tax · Caribbean/US insurance payors · ARPOB 3–4× India</div>
+        </div>
+        <div style="margin-bottom:12px;padding:8px 12px;background:var(--nh-soft);border-radius:6px;border-left:3px solid var(--nh);">
+          <div style="font-size:11px;font-weight:700;">Seg 3 — UK Business (GBP) 🇬🇧 NEW FY26</div>
+          <div style="font-size:11px;color:var(--muted);">₹1,299 Cr (16% of total, only 5 months of FY26) · Acquired Practice Plus Group Nov 2025 · EBITDA margin 10.4% (ramp-up phase) · NHS outsourcing hospital services</div>
+        </div>
+        <p style="font-size:11.5px;color:var(--muted);line-height:1.65;margin-bottom:8px;"><strong>Why this matters:</strong> NH is NOT comparable to any other Indian hospital stock. It is a <em>multi-currency, multi-geography hospital group</em>. India earns INR, Cayman earns USD (natural hedge), UK earns GBP. The UK acquisition is a massive new growth engine — NHS is outsourcing surgical volumes to private operators like NH/PPG. NH now has a £150 Mn GBP debt for the UK acquisition — hence net debt of ₹2,240 Cr. This is investment-grade growth debt, not distress.</p>
+        <div class="badge-row"><span class="badge b-pos">3-Currency Revenue</span><span class="badge b-pos">NHS UK Catalyst</span><span class="badge b-warn">Net Debt Now ₹2,240 Cr</span><span class="badge b-spec">Cardiac Volume Moat</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="gap-top g3">
+    <div class="card" style="border-left:4px solid var(--neg);">
+      <div class="card-lbl" style="color:var(--neg);">🇬🇧 UK NHS Crisis — India's Medical Tourism Engine</div>
+      <p style="font-size:12px;line-height:1.75;margin-bottom:8px;">7.5 Mn patients on NHS waiting lists. Average elective surgery wait: 18–24 months. UK patients flying to India for same procedure at 10–15% of UK private cost.</p>
+      <table>
+        <thead><tr><th>Procedure</th><th>UK Private</th><th>India</th><th>Saving</th></tr></thead>
+        <tbody>
+          <tr><td>Cardiac Bypass</td><td class="num">£30–45K</td><td class="num">₹3–5L</td><td class="tpos">~90%</td></tr>
+          <tr><td>Hip Replacement</td><td class="num">£15–25K</td><td class="num">₹2–3.5L</td><td class="tpos">~87%</td></tr>
+          <tr><td>Kidney Transplant</td><td class="num">£50K+</td><td class="num">₹5–8L</td><td class="tpos">~85%</td></tr>
+          <tr><td>Proton Therapy</td><td class="num">£120K+</td><td class="num">₹30–50L</td><td class="tpos">~75%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card" style="border-left:4px solid var(--nh);">
+      <div class="card-lbl" style="color:var(--nh);">🏝️ Cayman Islands — PE & Tax Architecture</div>
+      <p style="font-size:12px;line-height:1.75;margin-bottom:8px;">Zero corporate tax, zero capital gains tax jurisdiction. KKR (Max), Carlyle (Medanta), NH all use Cayman structures. NH's Cayman health city: 2,000 beds serving Caribbean, Latin America, US insurance patients in USD.</p>
+      <table>
+        <thead><tr><th>Feature</th><th>India NH</th><th>Cayman NH</th></tr></thead>
+        <tbody>
+          <tr><td>Currency</td><td>INR</td><td class="tpos">USD</td></tr>
+          <tr><td>EBITDA Margin</td><td class="num">16–18%</td><td class="tpos">~25–35%</td></tr>
+          <tr><td>Corporate Tax</td><td class="num">25.17%</td><td class="tpos">0%</td></tr>
+          <tr><td>FY26 Revenue</td><td class="num">₹4,797 Cr</td><td class="tpos">₹1,889 Cr</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card" style="border-left:4px solid var(--gold);">
+      <div class="card-lbl" style="color:var(--gold);">📉 The J-Curve — Beds Are Like Factories</div>
+      <p style="font-size:12px;line-height:1.75;margin-bottom:8px;">Every new hospital loses money for 2–3 years. ₹1 Cr/bed capex. Year 1: 30% occupancy = losses. Year 3: 55% = breakeven. Year 5+: 70%+ = ₹12–15L EBITDA/bed/year. KIMS is the clearest example of this in FY26 — revenue surged 28% but PAT fell 42% due to 4 new hospitals in ramp-up. This is NOT a failure — it's the J-curve working.</p>
+      <table>
+        <thead><tr><th>Stage</th><th>Occupancy</th><th>EBITDA/Bed/yr</th></tr></thead>
+        <tbody>
+          <tr><td>Year 1–2</td><td class="num">25–40%</td><td class="tneg">−₹2–4L (loss)</td></tr>
+          <tr><td>Year 3</td><td class="num">45–55%</td><td class="num">~₹0</td></tr>
+          <tr><td>Year 4–5</td><td class="num">60–70%</td><td class="tpos">₹6–10L</td></tr>
+          <tr><td>Mature 5yr+</td><td class="tpos">70–80%</td><td class="tpos">₹13–15L</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- ========== SECTOR OVERVIEW TAB ========== -->
+<div id="tab-overview" class="panel">
+  <div class="sec-hdr">📊 Sector Overview <span class="sec-note">FY26 Actuals — Official Exchange Filings</span></div>
+  <div class="kpi-row">
+    <div class="kpi sector-a"><div class="kl">Apollo Rev (Consol)</div><div class="kv">₹25,229 Cr</div><div class="kc pos">+15.8% YoY</div></div>
+    <div class="kpi sector-a"><div class="kl">NH Rev (Consol incl UK)</div><div class="kv">₹7,896 Cr</div><div class="kc pos">+44% YoY</div></div>
+    <div class="kpi sector-a"><div class="kl">Fortis FY26 Revenue</div><div class="kv">₹9,128 Cr</div><div class="kc pos">+17.3% YoY</div></div>
+    <div class="kpi sector-a"><div class="kl">Max Network Rev</div><div class="kv">₹10,538 Cr</div><div class="kc pos">+16% YoY</div></div>
+    <div class="kpi sector-a"><div class="kl">Medanta Total Income</div><div class="kv">₹4,509 Cr</div><div class="kc pos">+19.6% YoY</div></div>
+  </div>
+  <div style="overflow-x:auto;">
+    <table style="min-width:1200px;">
+      <thead>
+        <tr><th>Company</th><th>FY26 Revenue (₹Cr)</th><th>Rev Growth</th><th>EBITDA (₹Cr)</th><th>EBITDA%</th><th>PAT (₹Cr)</th><th>PAT Growth</th><th>Note</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="dot" style="background:var(--apollo)"></span><strong>Apollo Hospitals</strong></td>
+          <td class="num">25,229</td><td class="tpos">+15.8%</td>
+          <td class="num">3,769</td><td class="num">~15% (consol)</td>
+          <td class="num">2,003</td><td class="tpos">+33.1%</td>
+          <td style="font-size:10.5px;color:var(--muted);">Hospital seg alone: 24.4% margin</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--max)"></span><strong>Max Healthcare</strong></td>
+          <td class="num">10,538*</td><td class="tpos">+16%</td>
+          <td class="num">2,638*</td><td class="tpos">25%* (network)</td>
+          <td class="num">1,631*</td><td class="tpos">+22%</td>
+          <td style="font-size:10.5px;color:var(--muted);">*Network figures. Consol rev ₹8,373 Cr</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--fortis)"></span><strong>Fortis Healthcare</strong></td>
+          <td class="num">9,128</td><td class="tpos">+17.3%</td>
+          <td class="num">2,085</td><td class="tpos">22.8%</td>
+          <td class="num">1,064</td><td class="tpos">+31.5%</td>
+          <td style="font-size:10.5px;color:var(--muted);">Incl Agilus Diagnostics ₹1,527 Cr</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--nh)"></span><strong>Narayana Hrudayalaya</strong></td>
+          <td class="num">7,896</td><td class="tpos">+44%</td>
+          <td class="num">1,793</td><td class="num">22.7%</td>
+          <td class="num">937</td><td class="tpos">+18.7%</td>
+          <td style="font-size:10.5px;color:var(--muted);">India ₹4,797+Cayman ₹1,889+UK ₹1,299 Cr</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--medanta)"></span><strong>Medanta (Global Health)</strong></td>
+          <td class="num">4,509</td><td class="tpos">+19.6%</td>
+          <td class="num">1,056*</td><td class="num">24.2% (incl Noida)</td>
+          <td class="num">554</td><td class="tpos">+15.1%</td>
+          <td style="font-size:10.5px;color:var(--muted);">Ex-Noida EBITDA margin 25.7%</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--krishna)"></span><strong>KIMS</strong></td>
+          <td class="num">3,931</td><td class="tpos">+28.2%</td>
+          <td class="num">828</td><td class="warn">21.1% (↓ from 26.6%)</td>
+          <td class="num">242</td><td class="tneg">−41.7% (J-curve!)</td>
+          <td style="font-size:10.5px;color:var(--muted);">4 new hospitals in ramp-up; mature units fine</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--rainbow)"></span><strong>Rainbow Children's</strong></td>
+          <td class="num">1,703</td><td class="tpos">+12.3%</td>
+          <td class="num">~516</td><td class="tpos">~30%</td>
+          <td class="num">282</td><td class="tpos">+15%</td>
+          <td style="font-size:10.5px;color:var(--muted);">Pure paediatric; Q4 EBITDA 32%</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--jupiter)"></span><strong>Jupiter Hospitals</strong></td>
+          <td class="num">1,500</td><td class="tpos">+15.3%</td>
+          <td class="num">343</td><td class="num">22.9%</td>
+          <td class="num">194</td><td class="num">~0% (flat)</td>
+          <td style="font-size:10.5px;color:var(--muted);">Dombivli hospital opened Feb 2026</td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--yatharth)"></span><strong>Yatharth Hospital</strong></td>
+          <td class="num">1,207</td><td class="tpos">+36%</td>
+          <td class="num">292</td><td class="num">24.2%</td>
+          <td class="num">~160</td><td class="tpos">+15–20%</td>
+          <td style="font-size:10.5px;color:var(--muted);">2,550+ beds; rapid NCR/Delhi acquisition spree</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:10px;color:var(--muted);margin-top:6px;">Sources: Official filings May 2026 · Apollo PAT = ₹2,003 Cr per Ind AS. Max "network" includes all units including managed. Medanta EBITDA includes Noida losses.</p>
+</div>
+
+<!-- ========== BUSINESS SEGMENTS TAB ========== -->
+<div id="tab-segments" class="panel">
+  <div class="sec-hdr">🗂️ Business Segments <span class="sec-note">Consolidated & Standalone · Apollo · NH · Fortis · Max · Medanta · KIMS</span></div>
+
+  <!-- APOLLO SEGMENTS -->
+  <div style="margin-bottom:24px;">
+    <div class="seg-block">
+      <div class="seg-block-hdr" style="background:var(--apollo);">🔵 Apollo Hospitals — 3-Segment Integrated Model (FY26 Consolidated)</div>
+      <div class="seg-row hdr-row"><div class="seg-cell lbl">Segment</div><div class="seg-cell num">Revenue (₹ Cr)</div><div class="seg-cell num">% of Total</div><div class="seg-cell num">EBITDA Margin</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">1. Healthcare Services (Hospitals)</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">12,550</div><div class="seg-cell num" data-label="% Share">50%</div><div class="seg-cell pos" data-label="EBITDA / Margin">24.4%</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">2. Digital Health &amp; Pharmacy (HealthCo)</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">10,808</div><div class="seg-cell num" data-label="% Share">43%</div><div class="seg-cell num" data-label="EBITDA / Margin">8.8% (improving)</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">3. Diagnostics &amp; Retail Health (AHLL)</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">1,865</div><div class="seg-cell num" data-label="% Share">7%</div><div class="seg-cell num" data-label="EBITDA / Margin">11.4% (tripling)</div></div>
+      <div class="seg-row" style="background:var(--apollo-soft);"><div class="seg-cell lbl" style="color:var(--apollo);">TOTAL CONSOLIDATED</div><div class="seg-cell num" style="color:var(--apollo);font-weight:700;" data-label="Revenue (₹ Cr)">25,229</div><div class="seg-cell num" data-label="% Share">100%</div><div class="seg-cell num" data-label="EBITDA / Margin">~15% blended (hosp 24.4%)</div></div>
+    </div>
+    <div class="card" style="margin-top:10px;background:var(--apollo-soft);border-color:var(--apollo);">
+      <div style="font-size:12px;line-height:1.75;">
+        <strong>Key insight:</strong> Apollo's blended EBITDA margin looks "low" at 15% because it includes the HealthCo pharmacy/digital at 8.8%. The hospital business alone earns 24.4%. The upcoming HealthCo demerger-merger (scheme approved Jun 2026) will separately list pharmacy+digital — Apollo's pure-hospital EV/EBITDA will then re-rate sharply upward. Apollo 24/7 GMV: ₹2,037 Cr FY26. 7,289 pharmacy stores. Digital Health segment profit jumped 254% YoY (₹113 Cr → ₹399 Cr). Hospital ARPOB: ₹71,206/day (+12% YoY). Beds: 8,131 at March 2026 (+1,400 added FY26 via 4 new hospitals). Occupancy 68%.
+      </div>
+    </div>
+  </div>
+
+  <!-- NH SEGMENTS -->
+  <div style="margin-bottom:24px;">
+    <div class="seg-block">
+      <div class="seg-block-hdr" style="background:var(--nh);">🟦 Narayana Hrudayalaya — 3-Geography Multi-Currency Model (FY26 Consolidated)</div>
+      <div class="seg-row hdr-row"><div class="seg-cell lbl">Geography</div><div class="seg-cell num">Revenue (₹ Cr)</div><div class="seg-cell num">% of Total</div><div class="seg-cell num">EBITDA Margin</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">1. India Business (INR) — 5,800+ beds</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">4,797</div><div class="seg-cell num" data-label="% Share">61%</div><div class="seg-cell num" data-label="EBITDA / Margin">16–18% improving</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">2. Cayman Islands (USD) — 2,000 beds 🏝️</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">1,889</div><div class="seg-cell num" data-label="% Share">24%</div><div class="seg-cell pos" data-label="EBITDA / Margin">~25–35% (USD revenue)</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">3. UK / Practice Plus Group (GBP) — NEW Nov 2025 🇬🇧</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">1,299</div><div class="seg-cell num" data-label="% Share">16%</div><div class="seg-cell num" data-label="EBITDA / Margin">10.4% (early ramp-up)</div></div>
+      <div class="seg-row" style="background:var(--nh-soft);"><div class="seg-cell lbl" style="color:var(--nh);">TOTAL CONSOLIDATED</div><div class="seg-cell num" style="color:var(--nh);font-weight:700;" data-label="Revenue (₹ Cr)">7,896 (+44%)</div><div class="seg-cell num" data-label="% Share">100%</div><div class="seg-cell num" data-label="EBITDA / Margin">22.7% blended EBITDA</div></div>
+    </div>
+    <div class="card" style="margin-top:10px;background:var(--nh-soft);border-color:var(--nh);">
+      <div style="font-size:12px;line-height:1.75;">
+        <strong>Key insight:</strong> NH's 44% revenue growth is NOT organic — it includes ₹1,299 Cr from UK Practice Plus Group acquired Nov 2025. India grew a modest 10.3%. Cayman grew 59.7% driven by US insurance revenue (+588% YoY as insurance book scales). NH is transforming from India affordable hospital → global multi-currency hospital group. Net debt rose to ₹2,240 Cr (from ₹530 Cr) due to UK acquisition (US$117 Mn + GBP £150 Mn foreign currency debt). UK EBITDA margin at 10.4% will improve as NHS outsourcing volumes scale — management targets 15–18% UK EBITDA in 2–3 years.
+      </div>
+    </div>
+  </div>
+
+  <!-- FORTIS SEGMENTS -->
+  <div style="margin-bottom:24px;">
+    <div class="seg-block">
+      <div class="seg-block-hdr" style="background:var(--fortis);">🟢 Fortis Healthcare — Hospital + Diagnostics (FY26 Consolidated)</div>
+      <div class="seg-row hdr-row"><div class="seg-cell lbl">Segment</div><div class="seg-cell num">Revenue (₹ Cr)</div><div class="seg-cell num">% of Total</div><div class="seg-cell num">EBITDA Margin</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">1. Hospital Business (Core)</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">7,773</div><div class="seg-cell num" data-label="% Share">85%</div><div class="seg-cell pos" data-label="EBITDA / Margin">22.2% (↑ from 20.5%)</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">2. Agilus Diagnostics (formerly SRL)</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">1,527</div><div class="seg-cell num" data-label="% Share">17%</div><div class="seg-cell pos" data-label="EBITDA / Margin">23.6% (↑ from 17.7%)</div></div>
+      <div class="seg-row" style="background:var(--fortis-soft);"><div class="seg-cell lbl" style="color:var(--fortis);">TOTAL CONSOLIDATED</div><div class="seg-cell num" style="color:var(--fortis);font-weight:700;" data-label="Revenue (₹ Cr)">9,128 (+17.3%)</div><div class="seg-cell num" data-label="% Share">100%</div><div class="seg-cell pos" data-label="EBITDA / Margin">22.8% (↑ 240bps)</div></div>
+    </div>
+    <div class="card" style="margin-top:10px;background:var(--fortis-soft);border-color:var(--fortis);">
+      <div style="font-size:12px;line-height:1.75;">
+        <strong>Key insight:</strong> Fortis has been dramatically re-rated. EBITDA margin expanded from 20.4% → 22.8% (+240 bps) in one year. This was the margin improvement thesis playing out. Agilus Diagnostics (rebranded from SRL) saw dramatic margin improvement — from 17.7% → 23.6% (+590 bps). Occupied beds grew 15% YoY — more than ARPOB growth — showing volume is the driver. International patient revenue: ₹639 Cr (+18.5%), 7.8% of hospital revenue. Top 6 specialties (Cardiac, Ortho, Neuro, Gastro, Oncology, Renal) grew 18.9%. Net debt ₹2,334 Cr at 1.09× EBITDA — manageable, mostly acquisition-driven.
+      </div>
+    </div>
+  </div>
+
+  <!-- MAX SEGMENTS -->
+  <div style="margin-bottom:24px;">
+    <div class="seg-block">
+      <div class="seg-block-hdr" style="background:var(--max);">🟣 Max Healthcare — Hospital + Diagnostics + Home Care (FY26 Network)</div>
+      <div class="seg-row hdr-row"><div class="seg-cell lbl">Business Line</div><div class="seg-cell num">Revenue (₹ Cr)</div><div class="seg-cell num">Growth</div><div class="seg-cell num">EBITDA Margin</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">Core Hospital Network (4,966 beds)</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">~9,800</div><div class="seg-cell pos" data-label="% Share">+16%</div><div class="seg-cell pos" data-label="EBITDA / Margin">25.5–26.8%</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">Max Lab (non-captive pathology, 60+ cities)</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">~210</div><div class="seg-cell pos" data-label="% Share">+14%</div><div class="seg-cell num" data-label="EBITDA / Margin">~20%</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">Max@Home (home healthcare services)</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">~280</div><div class="seg-cell pos" data-label="% Share">+30%</div><div class="seg-cell num" data-label="EBITDA / Margin">~18%</div></div>
+      <div class="seg-row" style="background:var(--max-soft);"><div class="seg-cell lbl" style="color:var(--max);">TOTAL NETWORK</div><div class="seg-cell num" style="color:var(--max);font-weight:700;" data-label="Revenue (₹ Cr)">10,538 (+16%)</div><div class="seg-cell pos" data-label="% Share">+16%</div><div class="seg-cell pos" data-label="EBITDA / Margin">25% network EBITDA</div></div>
+    </div>
+    <div class="card" style="margin-top:10px;background:var(--max-soft);border-color:var(--max);">
+      <div style="font-size:12px;line-height:1.75;">
+        <strong>Key insight:</strong> Max reports on "network" basis (all units including managed) AND on "consolidated" basis (Ind AS). Network gross revenue ₹10,538 Cr (+16%), network EBITDA ₹2,638 Cr, network PAT ₹1,631 Cr. Consolidated revenue ₹8,373 Cr (+19.1%), consolidated PAT ₹1,379 Cr. ARPOB: ₹77,900/day (Q4 FY26) — highest in sector. Beds: 4,966 at March 2026. Occupancy: 75%. International revenue: ₹231 Cr (9% of hospital revenue, +25% YoY). Free cash from operations: ₹1,541 Cr FY26. Net debt: ₹1,908 Cr at March 2026 (reduced from ₹2,166 Cr at Dec 2025). Kalinga Hospital Bhubaneswar acquired May 2026 (250 beds, 58.28% stake).
+      </div>
+    </div>
+  </div>
+
+  <!-- MEDANTA SEGMENTS -->
+  <div style="margin-bottom:24px;">
+    <div class="seg-block">
+      <div class="seg-block-hdr" style="background:var(--medanta);">🟡 Medanta (Global Health) — Hospital Network by Maturity (FY26)</div>
+      <div class="seg-row hdr-row"><div class="seg-cell lbl">Unit / Cluster</div><div class="seg-cell num">Revenue (₹ Cr)</div><div class="seg-cell num">Beds</div><div class="seg-cell num">EBITDA Margin</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">Mature Hospitals (Gurugram, Indore, Ranchi)</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">~3,000</div><div class="seg-cell num" data-label="% Share">~1,800</div><div class="seg-cell pos" data-label="EBITDA / Margin">~32% (high maturity)</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">Developing Hospitals (Lucknow, Patna)</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">~600</div><div class="seg-cell num" data-label="% Share">~1,000</div><div class="seg-cell pos" data-label="EBITDA / Margin">32.4% (ex-Noida)</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">Noida (Opened Nov 2025) — J-curve phase</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">91</div><div class="seg-cell num" data-label="% Share">382</div><div class="seg-cell neg" data-label="EBITDA / Margin">EBITDA loss ₹78 Cr</div></div>
+      <div class="seg-row" style="background:var(--medanta-soft);"><div class="seg-cell lbl" style="color:var(--medanta);">TOTAL CONSOLIDATED</div><div class="seg-cell num" style="color:var(--medanta);font-weight:700;" data-label="Revenue (₹ Cr)">4,509 (+19.6%)</div><div class="seg-cell num" data-label="% Share">3,665 beds</div><div class="seg-cell num" data-label="EBITDA / Margin">24.2% incl Noida losses</div></div>
+    </div>
+  </div>
+
+  <!-- KIMS SEGMENTS -->
+  <div style="margin-bottom:24px;">
+    <div class="seg-block">
+      <div class="seg-block-hdr" style="background:var(--krishna);">🟠 KIMS — Hospital by Geography/Maturity Cluster (FY26)</div>
+      <div class="seg-row hdr-row"><div class="seg-cell lbl">Cluster / Region</div><div class="seg-cell num">Status</div><div class="seg-cell num">Revenue Contribution</div><div class="seg-cell num">EBITDA Trend</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">Telangana (Hyderabad anchor — MATURE)</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">Profit centre</div><div class="seg-cell pos" data-label="% Share">~50% of total</div><div class="seg-cell pos" data-label="EBITDA / Margin">Strong margins ~28%+</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">Andhra Pradesh cluster</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">Established</div><div class="seg-cell num" data-label="% Share">~25% of total</div><div class="seg-cell num" data-label="EBITDA / Margin">Good margins</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">Bangalore (2 new units FY26)</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">J-curve ramp</div><div class="seg-cell num" data-label="% Share">~10% of total</div><div class="seg-cell neg" data-label="EBITDA / Margin">EBITDA losses</div></div>
+      <div class="seg-row"><div class="seg-cell lbl">Kerala, Thane, Nashik, Maharashtra (new)</div><div class="seg-cell num" data-label="Revenue (₹ Cr)">J-curve ramp</div><div class="seg-cell num" data-label="% Share">~10% of total</div><div class="seg-cell neg" data-label="EBITDA / Margin">EBITDA losses</div></div>
+      <div class="seg-row" style="background:var(--krishna-soft);"><div class="seg-cell lbl" style="color:var(--krishna);">TOTAL GROUP</div><div class="seg-cell neg" style="color:var(--krishna);" data-label="Revenue (₹ Cr)">7,300+ beds / 26 hospitals</div><div class="seg-cell neg" data-label="% Share">Rev ₹3,931 Cr +28.2%</div><div class="seg-cell neg" data-label="EBITDA / Margin">EBITDA 21.1% ↓ from 26.6%</div></div>
+    </div>
+    <div class="card" style="margin-top:10px;background:var(--krishna-soft);border-color:var(--krishna);">
+      <div style="font-size:12px;line-height:1.75;"><strong>Key insight:</strong> KIMS's PAT declined 42% from ₹415 Cr to ₹242 Cr in FY26 — not because the business is failing, but because 4 new hospitals (Bangalore, Thane, Kerala, Maharashtra) are in heavy J-curve ramp-up. Interest costs more than doubled as KIMS funded expansion via debt (net debt ~₹2,850 Cr). Mature Telangana cluster continues to deliver 28%+ EBITDA. FY27 is expected to be the inflection year as new units break even. QIP planned to reduce debt. Do NOT confuse J-curve pain with business failure.</div>
+    </div>
+  </div>
+</div>
+<!-- ========== PEER COMPARISON TAB ========== -->
+<div id="tab-comparison" class="panel">
+  <div class="sec-hdr">⚖️ Peer Comparison <span class="sec-note">FY26 Verified Actuals — All 9 Hospitals</span></div>
+  <div style="overflow-x:auto;">
+    <table style="min-width:1300px;">
+      <thead>
+        <tr><th>Company</th><th>Rev (₹Cr)</th><th>Rev Gr%</th><th>EBITDA%</th><th>PAT (₹Cr)</th><th>PAT Gr%</th><th>ARPOB/day</th><th>Occ%</th><th>Beds</th><th>Net Debt (₹Cr)</th><th>Debt Flag</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="dot" style="background:var(--apollo)"></span><strong>Apollo</strong></td>
+          <td class="num">25,229</td><td class="tpos">+15.8%</td><td class="num">~15%(c) / 24.4%(h)</td>
+          <td class="num">2,003</td><td class="tpos">+33.1%</td>
+          <td class="num">₹71,206</td><td class="num">68%</td><td class="num">8,131</td>
+          <td class="warn">~3,500 (est)</td><td><span class="badge b-warn">Moderate</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--max)"></span><strong>Max</strong></td>
+          <td class="num">10,538*</td><td class="tpos">+16%</td><td class="tpos">25–26.8%</td>
+          <td class="num">1,631*</td><td class="tpos">+22%</td>
+          <td class="tpos">₹77,900</td><td class="tpos">75%</td><td class="num">4,966</td>
+          <td class="tpos">1,908</td><td><span class="badge b-pos">Low Debt</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--fortis)"></span><strong>Fortis</strong></td>
+          <td class="num">9,128</td><td class="tpos">+17.3%</td><td class="tpos">22.8% (↑240bps)</td>
+          <td class="num">1,064</td><td class="tpos">+31.5%</td>
+          <td class="num">₹55,000~</td><td class="num">68%</td><td class="num">4,000+</td>
+          <td class="warn">2,334</td><td><span class="badge b-warn">Acq-driven</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--nh)"></span><strong>NH</strong></td>
+          <td class="num">7,896</td><td class="tpos">+44%</td><td class="num">22.7%</td>
+          <td class="num">937</td><td class="tpos">+18.7%</td>
+          <td class="num">₹35K(India)</td><td class="tpos">72%</td><td class="num">5,800+</td>
+          <td class="neg">2,240</td><td><span class="badge b-neg">UK acq debt</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--medanta)"></span><strong>Medanta</strong></td>
+          <td class="num">4,509</td><td class="tpos">+19.6%</td><td class="num">24.2%(incl Noida)</td>
+          <td class="num">554</td><td class="tpos">+15.1%</td>
+          <td class="tpos">₹67,000~</td><td class="tpos">74%</td><td class="num">3,665</td>
+          <td class="tpos">Net Cash ₹590</td><td><span class="badge b-pos">Net Cash</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--krishna)"></span><strong>KIMS</strong></td>
+          <td class="num">3,931</td><td class="tpos">+28.2%</td><td class="warn">21.1% (↓560bps)</td>
+          <td class="tneg">242</td><td class="tneg">−41.7%</td>
+          <td class="num">₹43,000~</td><td class="num">~52%</td><td class="num">7,300+</td>
+          <td class="neg">~2,850</td><td><span class="badge b-neg">Expansion debt</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--rainbow)"></span><strong>Rainbow</strong></td>
+          <td class="num">1,703</td><td class="tpos">+12.3%</td><td class="tpos">~30% (Q4:32%)</td>
+          <td class="num">282</td><td class="tpos">+15%</td>
+          <td class="num">₹56,000~</td><td class="num">~55%</td><td class="num">~1,700</td>
+          <td class="tpos">Net Cash</td><td><span class="badge b-pos">Net Cash</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--jupiter)"></span><strong>Jupiter</strong></td>
+          <td class="num">1,500</td><td class="tpos">+15.3%</td><td class="num">22.9%</td>
+          <td class="num">194</td><td class="warn">~0% (flat)</td>
+          <td class="num">₹67,700~</td><td class="num">61.2%</td><td class="num">1,200+</td>
+          <td class="tpos">Net Cash 45</td><td><span class="badge b-pos">Cash>Debt</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--yatharth)"></span><strong>Yatharth</strong></td>
+          <td class="num">1,207</td><td class="tpos">+36%</td><td class="num">24.2%</td>
+          <td class="num">~160</td><td class="tpos">+15–20%</td>
+          <td class="num">₹33,744~</td><td class="num">67%</td><td class="num">2,550+</td>
+          <td class="warn">Moderate</td><td><span class="badge b-warn">Acq funded</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p style="font-size:10px;color:var(--muted);margin-top:6px;">*Max Healthcare "network" figures per management reporting. Consolidates managed hospitals. Consol PAT: ₹1,379 Cr. (c) = consolidated EBITDA including pharmacy; (h) = hospital segment only.</p>
+  <div class="gap-top g3">
+    <div class="card" style="background:var(--apollo-soft);border-color:var(--apollo);">
+      <div class="card-lbl" style="color:var(--apollo);">🔑 Why EBITDA % Comparisons Are Misleading</div>
+      <p style="font-size:12px;line-height:1.75;">Apollo consolidated EBITDA ~15% includes the pharmacy business (8.8% margin). Hospital business alone: 24.4%. Max consolidated EBITDA: 25–26.8% — apples to oranges vs Apollo. To compare hospitals fairly, use the <em>hospital segment EBITDA</em>: Apollo 24.4% vs Max 25–26.8% — now they're nearly equal. Fortis hospital margin 22.2% and improving. NH blended 22.7% but Cayman alone is 25–35%.</p>
+    </div>
+    <div class="card" style="background:var(--krishna-soft);border-color:var(--krishna);">
+      <div class="card-lbl" style="color:var(--krishna);">⚠️ KIMS — J-Curve or Fundamental Problem?</div>
+      <p style="font-size:12px;line-height:1.75;">PAT fell 42% in FY26. Is KIMS broken? NO. Mature Telangana cluster: EBITDA margin ~28%+. Revenue grew 28.2%. The losses are from 4 new hospitals in Bangalore, Kerala, Thane, Maharashtra — all in J-curve Year 1-2. Interest costs doubled from expansion debt. When these hospitals reach 55%+ occupancy (FY27–28), KIMS PAT will more than double. Net debt ~₹2,850 Cr is high but QIP planned.</p>
+    </div>
+    <div class="card" style="background:var(--nh-soft);border-color:var(--nh);">
+      <div class="card-lbl" style="color:var(--nh);">🌐 NH's 44% Revenue Jump — What's Real?</div>
+      <p style="font-size:12px;line-height:1.75;">NH India grew only 10.3% organically. The 44% headline includes: (1) Cayman +59.7% driven by insurance revenue explosion (+588% YoY — Cayman now has insurance business generating USD revenue). (2) UK acquired Nov 2025 — ₹1,299 Cr in just 5 months. The UK NHS outsourcing thesis is working. By FY27, UK will contribute 12 full months (vs 5 months FY26), adding another ₹1,800+ Cr revenue boost.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== CHARTS TAB ========== -->
+<div id="tab-charts" class="panel">
+  <div class="sec-hdr">📈 Visual Analytics <span class="sec-note">FY26 Verified Data · Chart.js</span></div>
+  <div class="g2">
+    <div class="chart-card">
+      <h3>FY26 Revenue — All 9 Hospitals (₹ Cr)</h3>
+      <p class="sub">Verified actuals · Apollo dominates at ₹25,229 Cr</p>
+      <canvas id="chartRev" height="200"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>EBITDA Margin % — FY26</h3>
+      <p class="sub">Hospital-segment margin used for Apollo · Rainbow leads pure-play at ~30%</p>
+      <canvas id="chartMargin" height="200"></canvas>
+    </div>
+  </div>
+  <div class="gap-top g2">
+    <div class="chart-card">
+      <h3>Revenue Growth % YoY — FY26</h3>
+      <p class="sub">NH 44% includes UK acquisition; Yatharth 36% organic+acquisitions</p>
+      <canvas id="chartGrowth" height="220"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>PAT Growth % — FY26</h3>
+      <p class="sub">KIMS PAT −42% (J-curve); Jupiter PAT flat; Apollo +33%</p>
+      <canvas id="chartPAT" height="220"></canvas>
+    </div>
+  </div>
+  <div class="gap-top g2">
+    <div class="chart-card">
+      <h3>ARPOB (₹/day) — FY26</h3>
+      <p class="sub">Max leads at ₹77,900 · NH India lowest at ₹35,000 (by design — affordable model)</p>
+      <canvas id="chartARPOB" height="200"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Occupancy % — FY26</h3>
+      <p class="sub">Max 75% best · KIMS ~52% weighed down by new hospitals in ramp-up</p>
+      <canvas id="chartOcc" height="200"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- ========== DEBT & CASHFLOW TAB ========== -->
+<div id="tab-debtcash" class="panel">
+  <div class="sec-hdr">💳 Debt &amp; Cashflow Positioning <span class="sec-note">FY26 Balance Sheet · Net Debt · Operating Cashflow · Leverage</span></div>
+
+  <!-- Debt chart cards -->
+  <div class="g2" style="margin-bottom:22px;">
+    <div class="chart-card">
+      <h3>Net Debt Position — FY26 (₹ Cr)</h3>
+      <p class="sub">Negative = Net Cash · Positive = Net Debt · KIMS most leveraged</p>
+      <canvas id="chartDebt" height="260"></canvas>
+    </div>
+    <div class="chart-card">
+      <h3>Net Debt / EBITDA Ratio — FY26</h3>
+      <p class="sub">Below 2× = manageable · Above 3× = high risk · KIMS at ~3.4×</p>
+      <canvas id="chartLeverage" height="260"></canvas>
+    </div>
+  </div>
+
+  <!-- Debt detail table -->
+  <div style="overflow-x:auto;margin-bottom:22px;">
+    <table style="min-width:1100px;">
+      <thead>
+        <tr><th>Company</th><th>Net Debt (₹Cr)</th><th>Net D/EBITDA</th><th>Net D/Equity</th><th>Op Cashflow (₹Cr)</th><th>Free Cashflow</th><th>Debt Driver</th><th>Risk</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="dot" style="background:var(--apollo)"></span><strong>Apollo</strong></td>
+          <td class="warn">~3,500 est</td><td class="warn">~0.9×</td><td class="num">~0.4×</td>
+          <td class="tpos">2,856</td><td class="tpos">~894</td>
+          <td>Capex — 4 new hospitals + HealthCo build</td>
+          <td><span class="badge b-warn">LOW</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--max)"></span><strong>Max Healthcare</strong></td>
+          <td class="tpos">1,908</td><td class="tpos">0.7×</td><td class="tpos">0.18×</td>
+          <td class="tpos">1,541</td><td class="tpos">581 (Q4 alone)</td>
+          <td>Managed — reducing despite Kalinga acquisition</td>
+          <td><span class="badge b-pos">VERY LOW</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--fortis)"></span><strong>Fortis</strong></td>
+          <td class="warn">2,334</td><td class="warn">1.09×</td><td class="num">0.23×</td>
+          <td class="num">~1,400</td><td class="num">~700 (est)</td>
+          <td>People Tree + Shrimann acquisitions</td>
+          <td><span class="badge b-warn">LOW</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--nh)"></span><strong>NH</strong></td>
+          <td class="neg">2,240</td><td class="neg">1.25×</td><td class="neg">0.49×</td>
+          <td class="tpos">1,620</td><td class="num">~900 (est)</td>
+          <td>UK Practice Plus Group — USD117M + GBP£150M forex debt</td>
+          <td><span class="badge b-warn">MODERATE (strategic)</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--medanta)"></span><strong>Medanta</strong></td>
+          <td class="tpos">Net Cash ₹590</td><td class="tpos">N/A (net cash)</td><td class="tpos">Negative</td>
+          <td class="tpos">~714</td><td class="tpos">~400 (est)</td>
+          <td>No debt — Noida funded from internal accruals</td>
+          <td><span class="badge b-pos">NONE</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--krishna)"></span><strong>KIMS</strong></td>
+          <td class="neg">~2,850</td><td class="neg">~3.4×</td><td class="neg">~1.4×</td>
+          <td class="tpos">~581 (Q3)</td><td class="neg">Negative (expansion)</td>
+          <td>4 new hospitals Blore/Kerala/Thane — QIP planned</td>
+          <td><span class="badge b-neg">HIGH (expansion risk)</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--rainbow)"></span><strong>Rainbow</strong></td>
+          <td class="tpos">Net Cash</td><td class="tpos">N/A</td><td class="tpos">Low</td>
+          <td class="tpos">~320</td><td class="tpos">Positive</td>
+          <td>Net cash despite expansion — self-funding</td>
+          <td><span class="badge b-pos">NONE</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--jupiter)"></span><strong>Jupiter</strong></td>
+          <td class="tpos">Net Cash ~45 (cash ₹545, debt ₹500)</td><td class="tpos">~1.5×</td><td class="num">~0.3×</td>
+          <td class="num">~200</td><td class="num">Slight positive</td>
+          <td>Dombivli + BKC project capex</td>
+          <td><span class="badge b-warn">LOW</span></td>
+        </tr>
+        <tr>
+          <td><span class="dot" style="background:var(--yatharth)"></span><strong>Yatharth</strong></td>
+          <td class="warn">Moderate</td><td class="warn">~2×</td><td class="num">~0.5×</td>
+          <td class="tpos">287</td><td class="tpos">Positive (98% conversion)</td>
+          <td>Model Town Delhi + Faridabad + Agra acquisitions</td>
+          <td><span class="badge b-warn">MODERATE</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Debt narrative -->
+  <div class="g3">
+    <div class="card" style="border-left:4px solid var(--krishna);">
+      <div class="card-lbl" style="color:var(--krishna);">🔴 KIMS — Debt Is the #1 Risk</div>
+      <p style="font-size:12px;line-height:1.75;">Net debt ~₹2,850 Cr on EBITDA of ₹828 Cr = 3.4× leverage. This is the highest in the peer group. Interest costs more than doubled YoY (₹19 Cr → ₹45 Cr/quarter). KIMS is planning a QIP to raise equity capital to reduce debt. Until QIP happens and new hospitals hit breakeven (~FY27–28), the earnings trajectory will remain under pressure. Do NOT compare KIMS's current P/E to peers — use EV/mature-bed instead.</p>
+    </div>
+    <div class="card" style="border-left:4px solid var(--nh);">
+      <div class="card-lbl" style="color:var(--nh);">🟡 NH — Strategic Debt, Not Distress</div>
+      <p style="font-size:12px;line-height:1.75;">NH's net debt of ₹2,240 Cr rose sharply from ₹530 Cr in FY25. This is entirely from the UK Practice Plus Group acquisition (US$117 Mn + GBP £150 Mn). The UK business generated ₹1,299 Cr revenue in just 5 months (annualised ₹3,100 Cr). EBITDA at 10.4% = ₹322 Cr annualised. If UK EBITDA improves to 15–18% (management target), the debt pays for itself in 5–6 years. Operating cash flow strong at ₹1,620 Cr. This is investment-grade growth debt.</p>
+    </div>
+    <div class="card" style="border-left:4px solid var(--pos);">
+      <div class="card-lbl" style="color:var(--pos);">🟢 Max + Rainbow + Medanta — Fortress Balance Sheets</div>
+      <p style="font-size:12px;line-height:1.75;">Max net debt just ₹1,908 Cr on EBITDA ₹2,638 Cr = 0.7× — near net-cash. Free cash from operations ₹1,541 Cr FY26. Medanta net cash ₹590 Cr — self-funds Noida losses from internal accruals. Rainbow net cash despite active expansion (Bengaluru, Rajahmundry, Gurugram). These three companies have financial firepower to accelerate M&amp;A at any time. Max recently acquired Kalinga Hospital Bhubaneswar (May 2026) without straining balance sheet.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ========== VALUATIONS TAB ========== -->
+<div id="tab-valuation" class="panel">
+  <div class="sec-hdr">💰 Valuations <span class="sec-note">FY26 Actuals Based · EV/EBITDA · EV/Bed · P/E</span></div>
+  <div class="g3">
+    <div class="val-card" style="border-top:4px solid var(--apollo);">
+      <div class="val-co" style="color:var(--apollo);">APOLLO HOSPITALS</div>
+      <div class="val-row"><span class="val-lbl">FY26 Revenue (Consol)</span><span class="val-num">₹25,229 Cr</span></div>
+      <div class="val-row"><span class="val-lbl">Consol EBITDA</span><span class="val-num">₹3,769 Cr (~15%)</span></div>
+      <div class="val-row"><span class="val-lbl">Hospital Seg EBITDA</span><span class="val-num">₹3,062 Cr (24.4%)</span></div>
+      <div class="val-row"><span class="val-lbl">PAT (Ind AS)</span><span class="val-num">₹2,003 Cr (+33%)</span></div>
+      <div class="val-row"><span class="val-lbl">ARPOB / Occupancy</span><span class="val-num">₹71,206 / 68%</span></div>
+      <div class="val-row"><span class="val-lbl">Beds (March 2026)</span><span class="val-num">8,131</span></div>
+      <div class="val-row"><span class="val-lbl">EV/Hospital EBITDA</span><span class="val-num">~21× (reasonable)</span></div>
+      <div class="val-row"><span class="val-lbl">Analyst consensus</span><span class="val-num pos">18 BUY · TP ₹8,500–9,300</span></div>
+    </div>
+    <div class="val-card" style="border-top:4px solid var(--max);">
+      <div class="val-co" style="color:var(--max);">MAX HEALTHCARE</div>
+      <div class="val-row"><span class="val-lbl">Network Gross Revenue</span><span class="val-num">₹10,538 Cr (+16%)</span></div>
+      <div class="val-row"><span class="val-lbl">Consol Revenue</span><span class="val-num">₹8,373 Cr (+19.1%)</span></div>
+      <div class="val-row"><span class="val-lbl">Network EBITDA</span><span class="val-num">₹2,638 Cr (25%)</span></div>
+      <div class="val-row"><span class="val-lbl">Network PAT</span><span class="val-num">₹1,631 Cr (+22%)</span></div>
+      <div class="val-row"><span class="val-lbl">ARPOB / Occupancy</span><span class="val-num pos">₹77,900 / 75%</span></div>
+      <div class="val-row"><span class="val-lbl">Beds (March 2026)</span><span class="val-num">4,966</span></div>
+      <div class="val-row"><span class="val-lbl">EV/Network EBITDA</span><span class="val-num warn">~38× (premium)</span></div>
+      <div class="val-row"><span class="val-lbl">Analyst consensus</span><span class="val-num">10 BUY / 8 HOLD</span></div>
+    </div>
+    <div class="val-card" style="border-top:4px solid var(--fortis);">
+      <div class="val-co" style="color:var(--fortis);">FORTIS HEALTHCARE</div>
+      <div class="val-row"><span class="val-lbl">FY26 Revenue</span><span class="val-num">₹9,128 Cr (+17.3%)</span></div>
+      <div class="val-row"><span class="val-lbl">EBITDA</span><span class="val-num pos">₹2,085 Cr (22.8% ↑240bps)</span></div>
+      <div class="val-row"><span class="val-lbl">Hospital seg EBITDA</span><span class="val-num pos">22.2% (+170bps)</span></div>
+      <div class="val-row"><span class="val-lbl">PAT</span><span class="val-num">₹1,064 Cr (+31.5%)</span></div>
+      <div class="val-row"><span class="val-lbl">Agilus Diagnostics</span><span class="val-num pos">₹1,527 Cr; 23.6% EBITDA</span></div>
+      <div class="val-row"><span class="val-lbl">EV/EBITDA</span><span class="val-num">~24× (fair)</span></div>
+      <div class="val-row"><span class="val-lbl">Net Debt</span><span class="val-num warn">₹2,334 Cr / 1.09× EBITDA</span></div>
+      <div class="val-row"><span class="val-lbl">Analyst consensus</span><span class="val-num">8 BUY / 6 HOLD</span></div>
+    </div>
+    <div class="val-card" style="border-top:4px solid var(--nh);">
+      <div class="val-co" style="color:var(--nh);">NARAYANA HRUDAYALAYA</div>
+      <div class="val-row"><span class="val-lbl">FY26 Revenue (Consol)</span><span class="val-num">₹7,896 Cr (+44%)</span></div>
+      <div class="val-row"><span class="val-lbl">India Revenue</span><span class="val-num">₹4,797 Cr (+10.3%)</span></div>
+      <div class="val-row"><span class="val-lbl">Cayman Revenue (USD)</span><span class="val-num pos">₹1,889 Cr (+59.7%)</span></div>
+      <div class="val-row"><span class="val-lbl">UK Revenue (GBP, 5mo)</span><span class="val-num">₹1,299 Cr (new FY26)</span></div>
+      <div class="val-row"><span class="val-lbl">EBITDA / PAT</span><span class="val-num">₹1,793 Cr / ₹937 Cr</span></div>
+      <div class="val-row"><span class="val-lbl">Net Debt (UK acquisition)</span><span class="val-num neg">₹2,240 Cr</span></div>
+      <div class="val-row"><span class="val-lbl">EV/EBITDA</span><span class="val-num">~22–24× (fair for 3-geo)</span></div>
+      <div class="val-row"><span class="val-lbl">Analyst consensus</span><span class="val-num pos">14 BUY · TP ₹1,700–2,000</span></div>
+    </div>
+    <div class="val-card" style="border-top:4px solid var(--medanta);">
+      <div class="val-co" style="color:var(--medanta);">MEDANTA (GLOBAL HEALTH)</div>
+      <div class="val-row"><span class="val-lbl">FY26 Total Income</span><span class="val-num">₹4,509 Cr (+19.6%)</span></div>
+      <div class="val-row"><span class="val-lbl">EBITDA (ex-Noida)</span><span class="val-num pos">₹1,134 Cr (25.7%)</span></div>
+      <div class="val-row"><span class="val-lbl">EBITDA (incl Noida)</span><span class="val-num">₹1,056 Cr (24.2%)</span></div>
+      <div class="val-row"><span class="val-lbl">PAT</span><span class="val-num">₹554 Cr (+15.1%)</span></div>
+      <div class="val-row"><span class="val-lbl">Noida losses FY26</span><span class="val-num warn">EBITDA −₹78 Cr (ramp-up)</span></div>
+      <div class="val-row"><span class="val-lbl">Beds</span><span class="val-num">3,665 (+20.5% YoY)</span></div>
+      <div class="val-row"><span class="val-lbl">Net Cash</span><span class="val-num pos">₹590 Cr</span></div>
+      <div class="val-row"><span class="val-lbl">Analyst consensus</span><span class="val-num pos">12 BUY · TP ₹1,400</span></div>
+    </div>
+    <div class="val-card" style="border-top:4px solid var(--krishna);">
+      <div class="val-co" style="color:var(--krishna);">KIMS</div>
+      <div class="val-row"><span class="val-lbl">FY26 Revenue</span><span class="val-num">₹3,931 Cr (+28.2%)</span></div>
+      <div class="val-row"><span class="val-lbl">EBITDA</span><span class="val-num warn">₹828 Cr (21.1% ↓560bps)</span></div>
+      <div class="val-row"><span class="val-lbl">PAT</span><span class="val-num neg">₹242 Cr (−41.7%)</span></div>
+      <div class="val-row"><span class="val-lbl">Beds (26 hospitals)</span><span class="val-num">7,300+</span></div>
+      <div class="val-row"><span class="val-lbl">Net Debt</span><span class="val-num neg">~₹2,850 Cr (3.4× EBITDA)</span></div>
+      <div class="val-row"><span class="val-lbl">New units status</span><span class="val-num warn">Bangalore/Kerala/Thane ramp-up</span></div>
+      <div class="val-row"><span class="val-lbl">Valuation lens</span><span class="val-num">Use EV/mature-bed NOT P/E</span></div>
+      <div class="val-row"><span class="val-lbl">Analyst consensus</span><span class="val-num">12 BUY · TP ₹780</span></div>
+    </div>
+    <div class="val-card" style="border-top:4px solid var(--rainbow);">
+      <div class="val-co" style="color:var(--rainbow);">RAINBOW CHILDREN'S</div>
+      <div class="val-row"><span class="val-lbl">FY26 Revenue</span><span class="val-num">₹1,703 Cr (+12.3%)</span></div>
+      <div class="val-row"><span class="val-lbl">EBITDA Margin</span><span class="val-num pos">~30% (Q4: 32%)</span></div>
+      <div class="val-row"><span class="val-lbl">PAT</span><span class="val-num">₹282 Cr (+15%)</span></div>
+      <div class="val-row"><span class="val-lbl">ARPOB</span><span class="val-num">₹56,000~</span></div>
+      <div class="val-row"><span class="val-lbl">Net Cash</span><span class="val-num pos">Net Cash (self-funded)</span></div>
+      <div class="val-row"><span class="val-lbl">Unique positioning</span><span class="val-num">Only listed paediatric chain</span></div>
+      <div class="val-row"><span class="val-lbl">Analyst consensus</span><span class="val-num pos">9 BUY · TP ₹1,400–1,750</span></div>
+    </div>
+    <div class="val-card" style="border-top:4px solid var(--jupiter);">
+      <div class="val-co" style="color:var(--jupiter);">JUPITER HOSPITALS</div>
+      <div class="val-row"><span class="val-lbl">FY26 Total Income</span><span class="val-num">₹1,500 Cr (+15.2%)</span></div>
+      <div class="val-row"><span class="val-lbl">EBITDA / Margin</span><span class="val-num">₹343 Cr / 22.9%</span></div>
+      <div class="val-row"><span class="val-lbl">PAT</span><span class="val-num warn">₹194 Cr (~flat YoY)</span></div>
+      <div class="val-row"><span class="val-lbl">ARPOB / Occupancy</span><span class="val-num">₹67,700 / 61.2%</span></div>
+      <div class="val-row"><span class="val-lbl">Dombivli hospital</span><span class="val-num">Opened Feb 25, 2026</span></div>
+      <div class="val-row"><span class="val-lbl">Cash vs Debt</span><span class="val-num pos">Cash ₹545 Cr > Debt ₹500 Cr</span></div>
+      <div class="val-row"><span class="val-lbl">Analyst consensus</span><span class="val-num">7 BUY / 4 HOLD</span></div>
+    </div>
+    <div class="val-card" style="border-top:4px solid var(--yatharth);">
+      <div class="val-co" style="color:var(--yatharth);">YATHARTH HOSPITAL</div>
+      <div class="val-row"><span class="val-lbl">FY26 Revenue</span><span class="val-num">₹1,207 Cr (+36%)</span></div>
+      <div class="val-row"><span class="val-lbl">EBITDA / Margin</span><span class="val-num">₹292 Cr / 24.2%</span></div>
+      <div class="val-row"><span class="val-lbl">PAT</span><span class="val-num">~₹160 Cr</span></div>
+      <div class="val-row"><span class="val-lbl">Beds</span><span class="val-num">2,550+</span></div>
+      <div class="val-row"><span class="val-lbl">ARPOB / Occupancy</span><span class="val-num">₹33,744 / 67%</span></div>
+      <div class="val-row"><span class="val-lbl">Op Cashflow</span><span class="val-num pos">₹287 Cr (98% conversion)</span></div>
+      <div class="val-row"><span class="val-lbl">Key risk</span><span class="val-num warn">Integration of multiple acq</span></div>
+    </div>
+  </div>
+</div>
+<!-- ========== COMPANIES TAB ========== -->
+<div id="tab-companies" class="panel">
+  <div class="sec-hdr">🏥 Company Profiles <span class="sec-note">FY26 Verified · Locations · Payor Mix · PE Ownership · Debt</span></div>
+
+  <!-- APOLLO -->
+  <div style="margin-bottom:26px;border:1.5px solid var(--apollo);border-radius:var(--radius);overflow:hidden;">
+    <div style="background:var(--apollo);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;">🔵 Apollo Hospitals Enterprise</div>
+      <div style="font-size:10px;opacity:.8;">India's Largest Integrated Healthcare Platform · Founded 1983 Chennai</div>
+    </div>
+    <div class="g3" style="padding:16px;gap:12px;">
+      <div>
+        <div class="card-lbl">📍 Locations</div>
+        <p style="font-size:11.5px;line-height:1.7;"><strong>74 hospitals, 10,400+ beds across India.</strong> Anchor cities: Chennai (3 hospitals incl. Proton Cancer Centre Tharamani), Hyderabad (3), Delhi/NCR (Indraprastha, Sarita Vihar), Bangalore (2), Kolkata, Ahmedabad, Pune, Mumbai, Vizag, Bhubaneswar, Lucknow, Indore, Raipur. International: Dhaka (Bangladesh). 4 new hospitals commissioned FY26.</p>
+        <div class="card-lbl" style="margin-top:10px;">💳 Payor Mix (Hospital Segment)</div>
+        <p style="font-size:11.5px;line-height:1.7;">~45% Private Insurance (Mediclaim/group health), ~20% Corporate/TPA, ~15% Cash/OOP, ~12% International patients (8–10% of hospital revenue), ~8% CGHS/Govt schemes. Mix shift: International revenue growing fastest at +12% YoY; CGHS benefits from Oct 2025 rate revision.</p>
+      </div>
+      <div>
+        <div class="card-lbl">💰 FY26 Financials</div>
+        <div style="font-size:11.5px;line-height:1.8;">
+          Rev: ₹25,229 Cr (+15.8%)<br>
+          Hospital Seg Rev: ₹12,550 Cr (+13.6%)<br>
+          Hospital EBITDA Margin: <strong>24.4%</strong><br>
+          Consol EBITDA: ₹3,769 Cr (15% blended)<br>
+          PAT: ₹2,003 Cr (+33.1%)<br>
+          ARPOB: ₹71,206/day (+12% YoY)<br>
+          Occupancy: 68% · Beds: 8,131<br>
+          Op Cashflow: ₹2,856 Cr
+        </div>
+        <div class="card-lbl" style="margin-top:10px;">💳 Debt Position</div>
+        <p style="font-size:11.5px;"><strong>Net Debt ~₹3,500 Cr · Net D/EBITDA ~0.9× · LOW RISK.</strong> Long-term debt reduced from ₹4,417 Cr to ₹2,430 Cr. Current borrowings spiked to ₹3,228 Cr (short-term refinancing — watch). FCF ~₹894 Cr. Self-funding expansion from operations.</p>
+      </div>
+      <div>
+        <div class="card-lbl">🏦 PE / Strategic Ownership</div>
+        <p style="font-size:11.5px;line-height:1.7;margin-bottom:8px;"><strong>No PE overhang.</strong> Promoters (Reddy family): 31.5%. LIC: ~4%. Singapore Life: ~5%. Domestic MF: ~15%. FIIs: ~25%. Apollo is founder-led with no PE exit risk. Demerger-merger scheme for HealthCo approved Jun 2026 — will list pharmacy+digital as separate entity, unlocking hidden value for hospital investors.</p>
+        <div class="badge-row"><span class="badge b-pos">Founder-Led</span><span class="badge b-spec">HealthCo Demerger FY27</span><span class="badge b-pos">Proton Therapy Moat</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAX -->
+  <div style="margin-bottom:26px;border:1.5px solid var(--max);border-radius:var(--radius);overflow:hidden;">
+    <div style="background:var(--max);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;">🟣 Max Healthcare Institute</div>
+      <div style="font-size:10px;opacity:.8;">North India Multi-Specialty Leader · Best-in-class EBITDA margins</div>
+    </div>
+    <div class="g3" style="padding:16px;gap:12px;">
+      <div>
+        <div class="card-lbl">📍 Locations</div>
+        <p style="font-size:11.5px;line-height:1.7;"><strong>4,966 beds across 17+ hospitals.</strong> Delhi NCR dominance: Saket (2 hospitals), Patparganj, Shalimar Bagh, Vaishali, Gurugram, Noida. Mumbai: Nanavati Max (Vile Parle). Mohali, Dehradun, Bathinda. New FY26 additions: Mohali brownfield 160 beds, Mumbai brownfield. Bhubaneswar (Kalinga Hospital, May 2026 acquisition, 250 beds). BKC Mumbai 400-bed greenfield approved.</p>
+        <div class="card-lbl" style="margin-top:10px;">💳 Payor Mix</div>
+        <p style="font-size:11.5px;line-height:1.7;">~50% Private Insurance, ~20% Corporate/TPA, ~12% International patients (9% of hospital revenue, +25% YoY), ~10% CGHS/PSU, ~8% Cash. CGHS rate revision (Oct 2025) adds ₹140 Cr annual revenue tailwind. Q3 FY26 saw temporary dip due to health insurer service disruption — now resolved.</p>
+      </div>
+      <div>
+        <div class="card-lbl">💰 FY26 Financials (Network)</div>
+        <div style="font-size:11.5px;line-height:1.8;">
+          Network Gross Rev: ₹10,538 Cr (+16%)<br>
+          Consol Revenue: ₹8,373 Cr (+19.1%)<br>
+          Network EBITDA: ₹2,638 Cr (<strong>25%</strong>)<br>
+          Q4 EBITDA Margin: 26.8%<br>
+          Network PAT: ₹1,631 Cr (+22%)<br>
+          ARPOB: <strong>₹77,900/day</strong> (sector best)<br>
+          Occupancy: <strong>75%</strong> · Beds: 4,966<br>
+          FCF from Ops: ₹1,541 Cr
+        </div>
+        <div class="card-lbl" style="margin-top:10px;">💳 Debt Position</div>
+        <p style="font-size:11.5px;"><strong>Net Debt ₹1,908 Cr · Net D/EBITDA 0.7× · VERY LOW.</strong> Debt reducing despite acquisitions. Free cash ₹581 Cr in Q4 alone. Kalinga acquisition (₹250 Cr est) fully absorbed. Balance sheet can fund ₹3,000–5,000 Cr more capex without stress.</p>
+      </div>
+      <div>
+        <div class="card-lbl">🏦 PE / Strategic Ownership</div>
+        <p style="font-size:11.5px;line-height:1.7;margin-bottom:8px;"><strong>KKR fully exited Jan 2026</strong> — sold remaining 26.83% stake via block deal at ₹350–362/share for ₹9,416 Cr, achieving 5× return on its 2018 investment. This is the largest PE exit in Indian healthcare history. Post-exit, Max is now <em>promoter and institution-owned</em> with no PE overhang. Abhay Soi (CMD) and promoter group hold ~23.3%. The KKR exit is structurally positive — removes block deal risk permanently.</p>
+        <div class="badge-row"><span class="badge b-pos">KKR Fully Exited (5× return)</span><span class="badge b-spec">Clean Ownership</span><span class="badge b-pos">Highest ARPOB Sector</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORTIS -->
+  <div style="margin-bottom:26px;border:1.5px solid var(--fortis);border-radius:var(--radius);overflow:hidden;">
+    <div style="background:var(--fortis);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;">🟢 Fortis Healthcare</div>
+      <div style="font-size:10px;opacity:.8;">IHH Malaysia Parent · Hospital + Agilus Diagnostics · Margin Improvement Story</div>
+    </div>
+    <div class="g3" style="padding:16px;gap:12px;">
+      <div>
+        <div class="card-lbl">📍 Locations</div>
+        <p style="font-size:11.5px;line-height:1.7;"><strong>4,000+ beds, pan-India presence.</strong> Key: FMRI Gurugram, Vasant Kunj Delhi, Shalimar Bagh Delhi, Mulund Mumbai, Kalyan Mumbai, Bannerghatta Bangalore, Cunningham Road Bangalore. Recent acquisitions: People Tree Hospital Bengaluru, Shrimann Hospital Jalandhar. Agilus Diagnostics: 400+ labs nationally.</p>
+        <div class="card-lbl" style="margin-top:10px;">💳 Payor Mix</div>
+        <p style="font-size:11.5px;line-height:1.7;">~40% Private Insurance, ~25% Corporate/TPA, ~15% CGHS/Govt, ~12% International (7.8% of hospital revenue +18.5%), ~8% Cash. Highest CGHS exposure among large-cap peers — Oct 2025 CGHS rate revision most beneficial for Fortis given volume. Preventive diagnostics portfolio grew to 13% of Agilus revenue.</p>
+      </div>
+      <div>
+        <div class="card-lbl">💰 FY26 Financials</div>
+        <div style="font-size:11.5px;line-height:1.8;">
+          Revenue: ₹9,128 Cr (+17.3%)<br>
+          Hospital Rev: ₹7,773 Cr (+19.1%)<br>
+          Agilus Diagnostics: ₹1,527 Cr (+8.5%)<br>
+          EBITDA: ₹2,085 Cr (<strong>22.8%</strong> ↑240bps)<br>
+          Hospital EBITDA: 22.2% (↑170bps)<br>
+          Agilus EBITDA: 23.6% (↑590bps!)<br>
+          PAT: ₹1,064 Cr (+31.5%)<br>
+          Occupied beds: +15% YoY
+        </div>
+        <div class="card-lbl" style="margin-top:10px;">💳 Debt Position</div>
+        <p style="font-size:11.5px;"><strong>Net Debt ₹2,334 Cr · Net D/EBITDA 1.09× · LOW-MODERATE.</strong> Debt rose from ₹1,850 Cr due to People Tree (Bengaluru) and Shrimann (Jalandhar) acquisitions. Manageable at 1.09× EBITDA. Operating cash covers interest 8× comfortably.</p>
+      </div>
+      <div>
+        <div class="card-lbl">🏦 PE / Strategic Ownership</div>
+        <p style="font-size:11.5px;line-height:1.7;margin-bottom:8px;"><strong>IHH Healthcare Malaysia</strong> holds 31.7% — this is strategic, not PE. IHH (mkt cap ~$8 Bn) operates 80+ hospitals in 10 countries: Parkway Singapore, Acibadem Turkey, plus India via Fortis. IHH provides Fortis with international patient referral networks (Middle East, ASEAN), clinical protocol standardization, and global procurement synergies. IHH is a long-term strategic owner — no exit plans. This is a structural advantage, not overhang.</p>
+        <div class="badge-row"><span class="badge b-spec">IHH Malaysia 31.7%</span><span class="badge b-spec">Global Referral Network</span><span class="badge b-pos">Agilus 590bps Margin Jump</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NH -->
+  <div style="margin-bottom:26px;border:1.5px solid var(--nh);border-radius:var(--radius);overflow:hidden;">
+    <div style="background:var(--nh);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;">🟦 Narayana Hrudayalaya</div>
+      <div style="font-size:10px;opacity:.8;">India + Cayman Islands + UK · 3-Geography Multi-Currency Group</div>
+    </div>
+    <div class="g3" style="padding:16px;gap:12px;">
+      <div>
+        <div class="card-lbl">📍 Locations — 3 Geographies</div>
+        <p style="font-size:11.5px;line-height:1.7;"><strong>India (5,800+ beds):</strong> Bangalore (NH Institute of Cardiac Sciences — 30+ open heart surgeries/day), Kolkata (Rabindranath Tagore Heart), Jaipur, Raipur, Mysore, Howrah, Hubli, Cayman Islands, Ahmedabad. <strong>Cayman Islands:</strong> Health City Cayman Islands (~2,000 beds, Caribbean/US patients). <strong>UK:</strong> Practice Plus Group (acquired Nov 2025) — NHS-contracted surgical hospitals across England.</p>
+        <div class="card-lbl" style="margin-top:10px;">💳 Payor Mix by Geography</div>
+        <p style="font-size:11.5px;line-height:1.7;"><strong>India:</strong> ~40% Cash/OOP (affordable model), ~30% Ayushman Bharat/Govt, ~20% Insurance, ~10% Corporate. <strong>Cayman:</strong> ~77% US private insurance (+588% growth), ~23% out-of-pocket. <strong>UK:</strong> ~85% NHS contracts, ~15% private.</p>
+      </div>
+      <div>
+        <div class="card-lbl">💰 FY26 Financials (by Geography)</div>
+        <div style="font-size:11.5px;line-height:1.8;">
+          Total Consol Rev: ₹7,896 Cr (+44%)<br>
+          India: ₹4,797 Cr (+10.3%)<br>
+          Cayman: ₹1,889 Cr (+59.7%) USD<br>
+          UK (5 months): ₹1,299 Cr (new!)<br>
+          EBITDA: ₹1,793 Cr (22.7%)<br>
+          Adj PAT: ₹937 Cr (+18.7%)<br>
+          India ARPOB: ~₹35K/day<br>
+          Op Cashflow: ₹1,620 Cr (+63%)
+        </div>
+        <div class="card-lbl" style="margin-top:10px;">💳 Debt Position</div>
+        <p style="font-size:11.5px;"><strong>Net Debt ₹2,240 Cr · Net D/EBITDA 1.25× · MODERATE (strategic).</strong> Rose sharply from ₹530 Cr in FY25 due to UK Practice Plus Group acquisition (US$117 Mn + GBP £150 Mn forex-denominated debt). UK annualised EBITDA ~₹500+ Cr makes this self-servicing. Target: Net D/EBITDA below 2.5×.</p>
+      </div>
+      <div>
+        <div class="card-lbl">🏦 PE / Strategic Ownership</div>
+        <p style="font-size:11.5px;line-height:1.7;margin-bottom:8px;"><strong>Founder-controlled.</strong> Dr. Devi Prasad Shetty family holds ~62%. No PE overhang. JP Morgan, Mirae, domestic MFs hold the balance. NH is founder-driven — Dr. Shetty's mission is affordable cardiac care for all Indians and now global healthcare. The Cayman and UK acquisitions are strategic bets, not PE-driven. Son Dr. Anesh Shetty (Cayman CEO) leading international expansion. No exit pressure anywhere in the cap table.</p>
+        <div class="badge-row"><span class="badge b-pos">Founder 62%</span><span class="badge b-spec">UK NHS Play</span><span class="badge b-warn">FX Debt Risk (GBP+USD)</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEDANTA + KIMS + RAINBOW side by side -->
+  <div class="g3" style="margin-bottom:26px;">
+    <div style="border:1.5px solid var(--medanta);border-radius:var(--radius);overflow:hidden;">
+      <div style="background:var(--medanta);color:#fff;padding:10px 16px;font-weight:700;font-family:'Playfair Display',serif;">🟡 Medanta (Global Health)</div>
+      <div style="padding:14px;">
+        <div class="card-lbl">📍 Locations</div>
+        <p style="font-size:11px;line-height:1.65;margin-bottom:8px;">3,665 beds. Gurugram (anchor, 2,500+ beds), Indore, Ranchi, Lucknow, Patna, Noida (382 beds, opened Nov 2025). Expansion: +2,700 beds planned across 5 new greenfields over 3–4 years.</p>
+        <div class="card-lbl">💳 Payor Mix</div>
+        <p style="font-size:11px;line-height:1.65;margin-bottom:8px;">~35% Cash/OOP (premium patients), ~30% Private Insurance, ~20% International (₹278 Cr, +2% YoY), ~15% Corporate/TPA. Premium positioning = higher cash payor share.</p>
+        <div class="card-lbl">💰 Financials · 💳 Debt</div>
+        <p style="font-size:11px;line-height:1.65;margin-bottom:8px;">Rev ₹4,509 Cr (+19.6%). EBITDA 24.2% (ex-Noida 25.7%). PAT ₹554 Cr (+15.1%). Noida EBITDA loss ₹78 Cr (J-curve). <strong>Net Cash ₹590 Cr · ZERO DEBT RISK.</strong> Noida funded from internal accruals.</p>
+        <div class="card-lbl">🏦 PE Role</div>
+        <p style="font-size:11px;line-height:1.65;"><strong>Carlyle Group ~62% via Cayman entity.</strong> Carlyle entered 2013 at ₹960 Cr for 26%. Has since increased to ~62%. Current Medanta mkt cap ~₹35,000 Cr — Carlyle's stake worth ~₹21,700 Cr vs initial ~₹2,000 Cr — 10× paper return. Carlyle has NOT yet exited publicly. When Carlyle exits (expected FY27–28), market will absorb a large block — short-term price risk but long-term promoter concentration reduces.</p>
+      </div>
+    </div>
+    <div style="border:1.5px solid var(--krishna);border-radius:var(--radius);overflow:hidden;">
+      <div style="background:var(--krishna);color:#fff;padding:10px 16px;font-weight:700;font-family:'Playfair Display',serif;">🟠 KIMS</div>
+      <div style="padding:14px;">
+        <div class="card-lbl">📍 Locations</div>
+        <p style="font-size:11px;line-height:1.65;margin-bottom:8px;">26 hospitals, 7,300+ beds. Core: Secunderabad (anchor), Nellore, Vizag, Kondapur, Kukatpally (Telangana/AP). Expansion FY26: 2 new Bangalore hospitals (Electronic City, Whitefield), Thane (Mumbai), Nashik, Kerala (Kozhikode), Seethammadhara Vizag, Guntur. Planning Amaravati (500-bed, 60yr lease signed).</p>
+        <div class="card-lbl">💳 Payor Mix</div>
+        <p style="font-size:11px;line-height:1.65;margin-bottom:8px;">~35% Insurance (TGMC/APVMS/Aarogyasri state schemes dominate), ~30% Cash, ~20% Corporate, ~10% CGHS, ~5% International. High Govt scheme exposure = volume driver but lower ARPOB.</p>
+        <div class="card-lbl">💰 Financials · 💳 Debt</div>
+        <p style="font-size:11px;line-height:1.65;margin-bottom:8px;">Rev ₹3,931 Cr (+28.2%). EBITDA ₹828 Cr (21.1% ↓560bps). PAT ₹242 Cr (−41.7%). <strong>Net Debt ~₹2,850 Cr · Net D/EBITDA ~3.4× · HIGH RISK — QIP planned.</strong> Interest costs doubled YoY. Mature Telangana cluster EBITDA: ~28%+ — new hospitals dragging blended figure.</p>
+        <div class="card-lbl">🏦 PE Role</div>
+        <p style="font-size:11px;line-height:1.65;"><strong>No PE — Promoter (Bollineni family) ~55%.</strong> Clean founder ownership. Post-QIP, promoter dilution will happen but debt reduction will be the trade-off. KIMS expansion is entirely founder-funded via debt — high conviction but high risk execution play.</p>
+      </div>
+    </div>
+    <div style="border:1.5px solid var(--rainbow);border-radius:var(--radius);overflow:hidden;">
+      <div style="background:var(--rainbow);color:#fff;padding:10px 16px;font-weight:700;font-family:'Playfair Display',serif;">🔴 Rainbow Children's</div>
+      <div style="padding:14px;">
+        <div class="card-lbl">📍 Locations</div>
+        <p style="font-size:11px;line-height:1.65;margin-bottom:8px;">~1,700 beds. Hyderabad (Banjara Hills, Hyderguda — anchor), Bangalore (4 hospitals incl HRBR Layout, Mahadevapura, Hennur, Electronic City), Chennai (1), Vizag, Rajahmundry, Delhi (Madhukar — NCR expansion). New: Gurugram (100 beds FY26, 300 beds FY27).</p>
+        <div class="card-lbl">💳 Payor Mix</div>
+        <p style="font-size:11px;line-height:1.65;margin-bottom:8px;">~40% Cash/OOP (parents pay for children regardless of cost), ~35% Private Insurance, ~15% Corporate, ~10% Govt (lower — premium positioning). Price-inelastic demand: parents in upper-income bracket. Insurance revenue from Q2 growing as NICU insurance coverage improves.</p>
+        <div class="card-lbl">💰 Financials · 💳 Debt</div>
+        <p style="font-size:11px;line-height:1.65;margin-bottom:8px;">Rev ₹1,703 Cr (+12.3%). EBITDA ~30% (Q4: 32%). PAT ₹282 Cr (+15%). <strong>Net Cash · ZERO DEBT RISK.</strong> Self-funds all expansion from strong operating cashflow.</p>
+        <div class="card-lbl">🏦 PE Role</div>
+        <p style="font-size:11px;line-height:1.65;"><strong>No PE — Dr. Ramesh Kancharla (founder) ~70% post-IPO.</strong> IPO 2022. ICICI Prudential MF recently crossed 5% threshold. Pure founder-driven with no PE exit risk. Kancharla re-appointed MD for 5 years (FY26 AGM).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- JUPITER + YATHARTH -->
+  <div class="g2">
+    <div style="border:1.5px solid var(--jupiter);border-radius:var(--radius);overflow:hidden;">
+      <div style="background:var(--jupiter);color:#fff;padding:10px 16px;font-weight:700;font-family:'Playfair Display',serif;">🔷 Jupiter Life Line Hospitals</div>
+      <div class="g2" style="padding:14px;gap:12px;">
+        <div>
+          <div class="card-lbl">📍 Locations</div>
+          <p style="font-size:11px;line-height:1.65;margin-bottom:8px;"><strong>Thane (main 550-bed anchor)</strong>, Pune (550 beds), Indore (100 beds). New FY26: <strong>Dombivli</strong> (commissioned Feb 25, 2026 — ahead of schedule). Upcoming: BKC Mumbai 400-bed greenfield (land acquired). Total beds: ~1,200 currently. Target 2,900 beds.</p>
+          <div class="card-lbl">💳 Payor Mix</div>
+          <p style="font-size:11px;line-height:1.65;">55.4% Insurance, ~25% Cash, ~15% Corporate, ~5% Other. IPD 77.62% of revenue. High insurance mix → steady revenue base.</p>
+        </div>
+        <div>
+          <div class="card-lbl">💰 Financials · 💳 Debt</div>
+          <p style="font-size:11px;line-height:1.65;margin-bottom:8px;">Rev ₹1,500 Cr (+15.2%). EBITDA ₹343 Cr (22.9%). PAT ₹194 Cr (flat). ARPOB ₹67,700. Occ 61.2% (Thane+Pune+Indore). <strong>Cash ₹545 Cr > Gross Debt ₹500 Cr = NET CASH POSITIVE. LOW RISK.</strong> Interest costs rising (₹9 Cr/Q) as expansion debt kicks in.</p>
+          <div class="card-lbl">🏦 PE Role</div>
+          <p style="font-size:11px;line-height:1.65;"><strong>No PE — Dr. Ankit Thakker (founder/CEO) ~60%.</strong> IPO Sep 2023. Institution-clean. MMR region hospital moat with BKC mega-expansion as FY28–30 growth engine.</p>
+        </div>
+      </div>
+    </div>
+    <div style="border:1.5px solid var(--yatharth);border-radius:var(--radius);overflow:hidden;">
+      <div style="background:var(--yatharth);color:#fff;padding:10px 16px;font-weight:700;font-family:'Playfair Display',serif;">🟣 Yatharth Hospital &amp; Trauma Care</div>
+      <div class="g2" style="padding:14px;gap:12px;">
+        <div>
+          <div class="card-lbl">📍 Locations</div>
+          <p style="font-size:11px;line-height:1.65;margin-bottom:8px;"><strong>Greater Noida (main, 600-bed anchor)</strong>, Noida Sector-110 (400 beds), Model Town New Delhi (acquired FY26), Faridabad Sector-20 (acquired FY26), Agra (250 beds, acquired Feb 2026). 2,550+ total beds. Rapid NCR consolidation strategy — acquiring and scaling distressed assets.</p>
+          <div class="card-lbl">💳 Payor Mix</div>
+          <p style="font-size:11px;line-height:1.65;">~35% Insurance, ~35% Cash, ~20% CGHS/Govt, ~10% Corporate. NCR lower-middle income focus → higher cash and govt scheme share. ARPOB ₹33,744 — value positioning.</p>
+        </div>
+        <div>
+          <div class="card-lbl">💰 Financials · 💳 Debt</div>
+          <p style="font-size:11px;line-height:1.65;margin-bottom:8px;">Rev ₹1,207 Cr (+36%). EBITDA ₹292 Cr (24.2%). PAT ~₹160 Cr (+15–20%). Occ 67%. ARPOB ₹33,744. <strong>Moderate debt · Net D/EBITDA ~2× · MANAGEABLE.</strong> Operating cashflow ₹287 Cr (98% conversion — exceptional). FY26: 3 acquisitions funded via mix of debt and internal accruals.</p>
+          <div class="card-lbl">🏦 PE Role</div>
+          <p style="font-size:11px;line-height:1.65;"><strong>No PE — Yatharth Tyagi (promoter family) ~65%.</strong> IPO FY23. Fastest revenue grower in sector (+36% FY26) via serial acquisition playbook. High execution risk — integrating 3 new hospitals simultaneously.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ========== SWOT TAB ========== -->
+<div id="tab-swot" class="panel">
+  <div class="sec-hdr">🔲 SWOT Analysis <span class="sec-note">Six Key Companies</span></div>
+  <div class="g2">
+    <div>
+      <div class="co-hdr-swot"><span class="dot" style="background:var(--apollo)"></span>Apollo Hospitals</div>
+      <div class="swot-grid">
+        <div class="swot-cell swot-s"><div class="swot-lbl sl">Strengths</div><ul class="swot-ul"><li>Only proton therapy centre in South Asia</li><li>Largest network — 74 hospitals, 10,400+ beds</li><li>Hospital EBITDA margin 24.4% despite pharmacy drag</li><li>Digital ecosystem Apollo 24/7 turning profitable</li></ul></div>
+        <div class="swot-cell swot-w"><div class="swot-lbl wl">Weaknesses</div><ul class="swot-ul"><li>Blended 15% EBITDA misleads vs pure-play peers</li><li>Complex conglomerate — 3 separate businesses</li><li>Short-term debt spike (₹3,228 Cr current borrowings)</li><li>Bangladesh patient flow disruptions recurring</li></ul></div>
+        <div class="swot-cell swot-o"><div class="swot-lbl ol">Opportunities</div><ul class="swot-ul"><li>HealthCo demerger-listing (FY27) — significant value unlock</li><li>Proton therapy: UK, ME medical tourism scaling</li><li>7,289 pharmacy stores → largest private network</li><li>4,444-bed addition planned over 3 years</li></ul></div>
+        <div class="swot-cell swot-t"><div class="swot-lbl tl">Threats</div><ul class="swot-ul"><li>NPPA/regulatory procedure pricing caps</li><li>Pharmacy margin pressure as competition intensifies</li><li>Doctor cost inflation squeezing hospital margins</li><li>HealthCo demerger execution risk</li></ul></div>
+      </div>
+    </div>
+    <div>
+      <div class="co-hdr-swot"><span class="dot" style="background:var(--max)"></span>Max Healthcare</div>
+      <div class="swot-grid">
+        <div class="swot-cell swot-s"><div class="swot-lbl sl">Strengths</div><ul class="swot-ul"><li>Sector-best ARPOB ₹77,900/day</li><li>Best-in-class 75% occupancy among large-caps</li><li>Net Debt just ₹1,908 Cr — strong FCF ₹1,541 Cr</li><li>KKR fully exited — no PE overhang</li></ul></div>
+        <div class="swot-cell swot-w"><div class="swot-lbl wl">Weaknesses</div><ul class="swot-ul"><li>Delhi NCR concentration (~70% revenue)</li><li>Limited international brand vs Apollo</li><li>PAT growth +22% slowing as base gets larger</li><li>EV/EBITDA premium demands perfect execution</li></ul></div>
+        <div class="swot-cell swot-o"><div class="swot-lbl ol">Opportunities</div><ul class="swot-ul"><li>Brownfield ramp-up: Mohali, Nanavati, Max Smart</li><li>BKC Mumbai greenfield (400 beds, FY29+)</li><li>Bhubaneswar acquisition (Kalinga, May 2026)</li><li>International revenue at 9% — room to reach 15%</li></ul></div>
+        <div class="swot-cell swot-t"><div class="swot-lbl tl">Threats</div><ul class="swot-ul"><li>Clinician cost inflation (+230bps in Q4 FY26)</li><li>Apollo entering NCR more aggressively</li><li>Insurance payer disruptions (Q3 FY26 precedent)</li><li>Valuation premium = zero margin for error</li></ul></div>
+      </div>
+    </div>
+    <div>
+      <div class="co-hdr-swot"><span class="dot" style="background:var(--nh)"></span>Narayana Hrudayalaya</div>
+      <div class="swot-grid">
+        <div class="swot-cell swot-s"><div class="swot-lbl sl">Strengths</div><ul class="swot-ul"><li>3-currency revenue: INR + USD (Cayman) + GBP (UK)</li><li>Cayman insurance business scaling 5.88× YoY</li><li>India cardiac volume moat — 30+ surgeries/day Bangalore</li><li>Operating cashflow ₹1,620 Cr (+63%) — strong</li></ul></div>
+        <div class="swot-cell swot-w"><div class="swot-lbl wl">Weaknesses</div><ul class="swot-ul"><li>India organic growth only 10.3% — modest</li><li>Net Debt now ₹2,240 Cr (was ₹530 Cr in FY25)</li><li>UK EBITDA margin only 10.4% — early stage</li><li>FX risk: GBP and USD debt exposure</li></ul></div>
+        <div class="swot-cell swot-o"><div class="swot-lbl ol">Opportunities</div><ul class="swot-ul"><li>UK: 12 full months FY27 vs 5 months FY26 = +₹1,800 Cr</li><li>NHS outsourcing volumes to PPG growing structurally</li><li>Cayman insurance book nearly complete — profitability ahead</li><li>India margin expansion as beds mature</li></ul></div>
+        <div class="swot-cell swot-t"><div class="swot-lbl tl">Threats</div><ul class="swot-ul"><li>UK NHS political risk — policy changes in NHS outsourcing</li><li>GBP/USD currency volatility on ₹2,240 Cr debt</li><li>Cayman large-claim insurance losses (FY26 saw this)</li><li>India affordable model — limited pricing power</li></ul></div>
+      </div>
+    </div>
+    <div>
+      <div class="co-hdr-swot"><span class="dot" style="background:var(--fortis)"></span>Fortis Healthcare</div>
+      <div class="swot-grid">
+        <div class="swot-cell swot-s"><div class="swot-lbl sl">Strengths</div><ul class="swot-ul"><li>EBITDA margin expanded 240bps to 22.8% in one year</li><li>Agilus Diagnostics margin jumped 590bps to 23.6%</li><li>IHH parent: global referral network for international patients</li><li>Occupied beds grew 15% — volume-led growth</li></ul></div>
+        <div class="swot-cell swot-w"><div class="swot-lbl wl">Weaknesses</div><ul class="swot-ul"><li>Net Debt ₹2,334 Cr rising from acquisitions</li><li>Still 860bps EBITDA gap vs Max (22.2% vs 26.8%)</li><li>Historical governance issues under Malvinder Singh era linger</li><li>Complex IHH-Fortis governance structure</li></ul></div>
+        <div class="swot-cell swot-o"><div class="swot-lbl ol">Opportunities</div><ul class="swot-ul"><li>Margin from 22.8% → 25%+ = massive EV re-rating</li><li>CGHS rate revision (Oct 2025) tailwind largest for Fortis</li><li>Oncology + robotic surgery expansion</li><li>Agilus B2C premium diagnostics growing 21%</li></ul></div>
+        <div class="swot-cell swot-t"><div class="swot-lbl tl">Threats</div><ul class="swot-ul"><li>IHH may reprioritize SEA markets over India</li><li>Apollo/Max taking high-value cases from NCR/Mumbai</li><li>Debt rising further if more acquisitions planned</li><li>IHH corporate governance oversight</li></ul></div>
+      </div>
+    </div>
+    <div>
+      <div class="co-hdr-swot"><span class="dot" style="background:var(--krishna)"></span>KIMS</div>
+      <div class="swot-grid">
+        <div class="swot-cell swot-s"><div class="swot-lbl sl">Strengths</div><ul class="swot-ul"><li>Telangana mature cluster: ~28%+ EBITDA margins</li><li>Revenue grew 28.2% — highest among large hospitals</li><li>10,000 successful brain tumour surgeries milestone</li><li>Strong AP/TG regional brand with no credible challenger</li></ul></div>
+        <div class="swot-cell swot-w"><div class="swot-lbl wl">Weaknesses</div><ul class="swot-ul"><li>Net Debt ~₹2,850 Cr — highest leverage at 3.4× EBITDA</li><li>PAT declined 42% — J-curve pain from 4 new hospitals</li><li>Occupancy ~52% weighed down by new hospitals</li><li>Interest costs more than doubled — profit pressure continues FY27</li></ul></div>
+        <div class="swot-cell swot-o"><div class="swot-lbl ol">Opportunities</div><ul class="swot-ul"><li>QIP planned to reduce debt — catalytic for re-rating</li><li>Bangalore and Thane hospital ramp-up by FY27</li><li>Amaravati 500-bed hospital (AP capital growth)</li><li>Adjacent Karnataka/Maharashtra expansion</li></ul></div>
+        <div class="swot-cell swot-t"><div class="swot-lbl tl">Threats</div><ul class="swot-ul"><li>High debt with rising rates = significant interest burden</li><li>QIP pricing dilutive if done at current compressed earnings</li><li>Bangalore/Thane competitive markets — harder than AP/TG</li><li>If ramp-up delayed, debt servicing becomes stressful</li></ul></div>
+      </div>
+    </div>
+    <div>
+      <div class="co-hdr-swot"><span class="dot" style="background:var(--medanta)"></span>Medanta</div>
+      <div class="swot-grid">
+        <div class="swot-cell swot-s"><div class="swot-lbl sl">Strengths</div><ul class="swot-ul"><li>Net Cash ₹590 Cr — strongest balance sheet among mid-caps</li><li>Mature hospital EBITDA: 32.4% (ex-Noida developing)</li><li>India's highest heart transplant volumes</li><li>ARPOB ~₹67,000+ — premium positioning validated</li></ul></div>
+        <div class="swot-cell swot-w"><div class="swot-lbl wl">Weaknesses</div><ul class="swot-ul"><li>Carlyle ~62% stake — PE exit overhang</li><li>Noida EBITDA loss ₹78 Cr dragging FY26 margins</li><li>PAT growth only +15.1% — slowest among quality mid-caps</li><li>Gurugram concentration — one city dominates</li></ul></div>
+        <div class="swot-cell swot-o"><div class="swot-lbl ol">Opportunities</div><ul class="swot-ul"><li>Noida ramp-up: J-curve → breakeven FY27 → profit FY28</li><li>+2,700 beds in 5 greenfields over 3–4 years</li><li>Post-Carlyle exit: cleaner ownership structure</li><li>Bangladesh/Africa international patient growth</li></ul></div>
+        <div class="swot-cell swot-t"><div class="swot-lbl tl">Threats</div><ul class="swot-ul"><li>Carlyle block deal risk — 62% stake is large</li><li>New Delhi/NCR hospital glut — competition intensifying</li><li>Greenfield execution risk: 2,700 beds in 3–4 years</li><li>Dr. Naresh Trehan succession planning</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== MOATS TAB ========== -->
+<div id="tab-moat" class="panel">
+  <div class="sec-hdr">🏰 Economic Moats <span class="sec-note">Durable Competitive Advantages</span></div>
+  <div class="g3">
+    <div class="moat-card" style="border-left:4px solid var(--apollo);">
+      <div class="moat-co" style="color:var(--apollo);">Apollo</div>
+      <div class="moat-title">🔬 Only Proton Therapy in South Asia</div>
+      <div class="moat-body">$100–150 Mn machine. Cyclotron + shielded bunker. Zero replication in 5–7 years. ₹30–50 L per treatment. UK, ME, Bangladesh patients fly to Chennai Tharamani. Unassailable structural moat.</div>
+      <div><span class="moat-tag" style="background:var(--apollo-soft);color:var(--apollo);">Capital Moat</span></div>
+    </div>
+    <div class="moat-card" style="border-left:4px solid var(--apollo);">
+      <div class="moat-co" style="color:var(--apollo);">Apollo HealthCo</div>
+      <div class="moat-title">💊 Pharmacy + Digital Ecosystem</div>
+      <div class="moat-body">7,289 pharmacy stores cross-sell to hospital patients. Apollo 24/7 — 80 Mn+ users, GMV ₹2,037 Cr. Hospital → pharmacy prescription → repeat app visit → repeat hospital. No other hospital owns all 3 layers.</div>
+      <div><span class="moat-tag" style="background:var(--gold-soft);color:var(--gold);">Ecosystem</span></div>
+    </div>
+    <div class="moat-card" style="border-left:4px solid var(--max);">
+      <div class="moat-co" style="color:var(--max);">Max Healthcare</div>
+      <div class="moat-title">🫀 Transplant Volume + ARPOB Leadership</div>
+      <div class="moat-body">4,458 liver + 5,748 kidney + 2,248 bone marrow transplants to date. Patients don't shop on price for transplants — they shop on survival rates. Max brand = transplant safety = referral moat. ARPOB ₹77,900 sector-best.</div>
+      <div><span class="moat-tag" style="background:var(--max-soft);color:var(--max);">Clinical Excellence</span></div>
+    </div>
+    <div class="moat-card" style="border-left:4px solid var(--nh);">
+      <div class="moat-co" style="color:var(--nh);">NH</div>
+      <div class="moat-title">🌐 3-Currency Revenue Hedge</div>
+      <div class="moat-body">Only Indian hospital with INR + USD + GBP revenue streams simultaneously. Natural forex hedge. INR depreciation = Cayman+UK earnings grow in INR terms. No other listed Indian hospital replicates this structure.</div>
+      <div><span class="moat-tag" style="background:var(--nh-soft);color:var(--nh);">Currency Diversification</span></div>
+    </div>
+    <div class="moat-card" style="border-left:4px solid var(--nh);">
+      <div class="moat-co" style="color:var(--nh);">NH Bangalore</div>
+      <div class="moat-title">❤️ Cardiac Volume Moat</div>
+      <div class="moat-body">30–35 open heart surgeries/day at Bangalore = highest in Asia. 20,000/year → surgeons in top 1% globally. Learning curve: better outcomes → more referrals → more volume. Impossible to replicate without decades of volume.</div>
+      <div><span class="moat-tag" style="background:var(--nh-soft);color:var(--nh);">Learning Curve</span></div>
+    </div>
+    <div class="moat-card" style="border-left:4px solid var(--fortis);">
+      <div class="moat-co" style="color:var(--fortis);">Fortis</div>
+      <div class="moat-title">🌐 IHH Global Referral Network</div>
+      <div class="moat-body">IHH operates 80+ hospitals in 10 countries. Fortis gains access to Singapore Parkway, Turkey Acibadem, and Pan-Asia patient referral networks. Structural advantage no other India chain can replicate without a similar global parent.</div>
+      <div><span class="moat-tag" style="background:var(--fortis-soft);color:var(--fortis);">Network Access</span></div>
+    </div>
+    <div class="moat-card" style="border-left:4px solid var(--krishna);">
+      <div class="moat-co" style="color:var(--krishna);">KIMS</div>
+      <div class="moat-title">🗺️ AP/Telangana Regional Oligopoly</div>
+      <div class="moat-body">Serves 80 Mn people as de facto quaternary referral centre for AP+TG. To displace: ₹3,000 Cr capex + 5 years brand building + doctor recruitment. Economically irrational for any entrant. KIMS is the default choice.</div>
+      <div><span class="moat-tag" style="background:var(--krishna-soft);color:var(--krishna);">Regional Oligopoly</span></div>
+    </div>
+    <div class="moat-card" style="border-left:4px solid var(--rainbow);">
+      <div class="moat-co" style="color:var(--rainbow);">Rainbow</div>
+      <div class="moat-title">🍼 India's Only Listed Paediatric Chain</div>
+      <div class="moat-body">No competitor in listed space. 600+ NICU beds. Parents in upper-income bracket pay ANY price for sick child. Rainbow NICU mortality rate is consistently best in AP/TG. 25 years of paediatric clinical protocols. Price-inelastic demand.</div>
+      <div><span class="moat-tag" style="background:var(--rainbow-soft);color:var(--rainbow);">Niche Monopoly</span></div>
+    </div>
+    <div class="moat-card" style="border-left:4px solid var(--medanta);">
+      <div class="moat-co" style="color:var(--medanta);">Medanta</div>
+      <div class="moat-title">🏛️ India's Mayo Clinic Brand</div>
+      <div class="moat-body">India's highest heart transplant volumes. 30-acre Gurugram campus designed as India's referral centre for top 5% and international patients. Carlyle brought Mayo/Cleveland Clinic-level operational protocols. 20–30% ARPOB premium vs local hospitals.</div>
+      <div><span class="moat-tag" style="background:var(--medanta-soft);color:var(--medanta);">Brand Premium</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ANALYST TAB ========== -->
+<div id="tab-analyst" class="panel">
+  <div class="sec-hdr">🎯 Analyst Ratings <span class="sec-note">Q4 FY26 · Street Consensus · May 2026</span></div>
+  <div style="overflow-x:auto;">
+    <table style="min-width:1000px;">
+      <thead>
+        <tr><th>Company</th><th>CMP (May 26)</th><th>BUY</th><th>HOLD</th><th>SELL</th><th>Avg Target</th><th>Upside</th><th>Key Analyst Call</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="dot" style="background:var(--apollo)"></span><strong>Apollo</strong></td><td class="num">~₹7,400</td><td><span class="badge b-buy">18 BUY</span></td><td><span class="badge b-hold">4</span></td><td>—</td><td class="num">₹8,500–9,300</td><td class="tpos">+15–25%</td><td style="font-size:10.5px;">Kotak TP ₹9,300 — HealthCo demerger catalyst</td></tr>
+        <tr><td><span class="dot" style="background:var(--max)"></span><strong>Max</strong></td><td class="num">~₹1,115</td><td><span class="badge b-buy">10 BUY</span></td><td><span class="badge b-hold">8</span></td><td><span class="badge b-sell">2</span></td><td class="num">₹1,200–1,350</td><td class="tpos">+8–21%</td><td style="font-size:10.5px;">HSBC UPGRADE to BUY; Emkay cautious on valuation</td></tr>
+        <tr><td><span class="dot" style="background:var(--nh)"></span><strong>NH</strong></td><td class="num">~₹1,856</td><td><span class="badge b-buy">14 BUY</span></td><td><span class="badge b-hold">3</span></td><td><span class="badge b-sell">1</span></td><td class="num">₹2,000–2,200</td><td class="tpos">+8–19%</td><td style="font-size:10.5px;">Morgan Stanley OW — UK NHS FY27 full-year catalyst</td></tr>
+        <tr><td><span class="dot" style="background:var(--fortis)"></span><strong>Fortis</strong></td><td class="num">~₹970</td><td><span class="badge b-buy">8 BUY</span></td><td><span class="badge b-hold">6</span></td><td><span class="badge b-sell">2</span></td><td class="num">₹1,050–1,150</td><td class="tpos">+8–18%</td><td style="font-size:10.5px;">JM Financial: margin improvement thesis playing out</td></tr>
+        <tr><td><span class="dot" style="background:var(--medanta)"></span><strong>Medanta</strong></td><td class="num">~₹1,314</td><td><span class="badge b-buy">12 BUY</span></td><td><span class="badge b-hold">4</span></td><td>—</td><td class="num">₹1,400–1,550</td><td class="tpos">+6–18%</td><td style="font-size:10.5px;">Anand Rathi BUY TP ₹1,400 — Noida ramp-up imminent</td></tr>
+        <tr><td><span class="dot" style="background:var(--krishna)"></span><strong>KIMS</strong></td><td class="num">~₹620</td><td><span class="badge b-buy">12 BUY</span></td><td><span class="badge b-hold">3</span></td><td>—</td><td class="num">₹780–850</td><td class="tpos">+26–37%</td><td style="font-size:10.5px;">HSBC TP ₹780 — QIP + ramp-up inflection FY27</td></tr>
+        <tr><td><span class="dot" style="background:var(--rainbow)"></span><strong>Rainbow</strong></td><td class="num">~₹1,290</td><td><span class="badge b-buy">9 BUY</span></td><td><span class="badge b-hold">3</span></td><td>—</td><td class="num">₹1,400–1,750</td><td class="tpos">+8–35%</td><td style="font-size:10.5px;">HSBC BUY ₹1,400 — NICU + Gurugram expansion</td></tr>
+        <tr><td><span class="dot" style="background:var(--jupiter)"></span><strong>Jupiter</strong></td><td class="num">~₹1,332</td><td><span class="badge b-buy">7 BUY</span></td><td><span class="badge b-hold">4</span></td><td><span class="badge b-sell">1</span></td><td class="num">₹1,450–1,600</td><td class="tpos">+9–20%</td><td style="font-size:10.5px;">BKC Mumbai greenfield is 5-year re-rating story</td></tr>
+        <tr><td><span class="dot" style="background:var(--yatharth)"></span><strong>Yatharth</strong></td><td class="num">~₹801</td><td><span class="badge b-buy">5 BUY</span></td><td><span class="badge b-hold">3</span></td><td><span class="badge b-sell">1</span></td><td class="num">₹900–1,000</td><td class="tpos">+12–25%</td><td style="font-size:10.5px;">Acquisition integration risk cited by bears</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="gap-top g3">
+    <div class="card" style="background:var(--gold-soft);">
+      <div class="card-lbl" style="color:var(--gold);">⚠️ Sector-Wide Risks</div>
+      <div style="font-size:12px;line-height:1.8;">
+        <div style="margin-bottom:6px;">🔴 <strong>NPPA/CGHS price caps:</strong> Government may cap procedure pricing. Oct 2025 CGHS revision was positive but future caps possible.</div>
+        <div style="margin-bottom:6px;">🟡 <strong>Clinician cost inflation:</strong> Senior surgeons demanding 30–40% hikes. Max saw +230bps in Q4. Structural pressure.</div>
+        <div style="margin-bottom:6px;">🟡 <strong>Insurance payer delays:</strong> Health insurer system disruptions impacted Max Q3 FY26. Regulatory risk.</div>
+        <div>🟢 <strong>PE exits:</strong> Carlyle (Medanta) expected FY27–28. Block deal risk short-term = buying opportunity.</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">🏦 PE Exit Tracker</div>
+      <table>
+        <thead><tr><th>PE Firm</th><th>Company</th><th>Stake</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td><strong>KKR</strong></td><td>Max Healthcare</td><td class="tpos">0% (fully exited)</td><td class="tpos">DONE — Jan 2026 · 5× return</td></tr>
+          <tr><td><strong>Carlyle</strong></td><td>Medanta</td><td class="warn">~62%</td><td class="warn">PENDING — FY27–28 expected</td></tr>
+          <tr><td><strong>IHH Malaysia</strong></td><td>Fortis</td><td class="num">31.7%</td><td class="num">STRATEGIC — no exit planned</td></tr>
+          <tr><td><strong>Devi Shetty Family</strong></td><td>NH</td><td class="num">~62%</td><td class="tpos">PERMANENT — founder holding</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card" style="background:var(--apollo-soft);">
+      <div class="card-lbl" style="color:var(--apollo);">📊 Key Institutional Holdings</div>
+      <table>
+        <thead><tr><th>Fund</th><th>Company</th><th>Position</th></tr></thead>
+        <tbody>
+          <tr><td>ICICI Pru MF</td><td>Rainbow</td><td class="tpos">Crossed 5% (March 2026)</td></tr>
+          <tr><td>Morgan Stanley</td><td>NH</td><td class="tpos">OW · TP ₹2,200</td></tr>
+          <tr><td>HDFC MF / SBI MF</td><td>Max</td><td class="num">Absorbed KKR block deals</td></tr>
+          <tr><td>Kotak Inst.</td><td>Apollo</td><td class="tpos">BUY · TP ₹9,300</td></tr>
+          <tr><td>HSBC</td><td>KIMS / Rainbow</td><td class="tpos">TP ₹780 / ₹1,400</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<!-- ========== VERDICT TAB ========== -->
+<div id="tab-verdict" class="panel">
+  <div class="sec-hdr">⚖️ CB Research Verdict <span class="sec-note">Q4 FY26 · Cauvery Business Research · Not Investment Advice</span></div>
+
+  <div class="g3" style="margin-bottom:22px;">
+    <div style="background:linear-gradient(135deg,#1e3a5f 0%,#0f2440 100%);border-radius:var(--radius);padding:22px;color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:#93c5fd;margin-bottom:10px;">🔵 Apollo — The Ecosystem Architecture Story</div>
+      <p style="font-size:12px;line-height:1.75;color:rgba(255,255,255,.85);">Apollo is the only hospital stock where the headline EBITDA margin (15%) understates the actual quality of the hospital business (24.4%). The integrated pharmacy + digital layer is a strategic bet that is now delivering — HealthCo digital profit up 254% YoY. The upcoming HealthCo demerger-listing in FY27 is the single biggest potential catalyst in Indian healthcare — it will allow the market to value the hospital business (currently blended and obscured) at its true 24.4% EBITDA quality. Proton therapy remains a decade-long structural moat. Balance sheet at 0.9× EBITDA is comfortable. The story here is complexity turning into clarity.</p>
+    </div>
+    <div style="background:linear-gradient(135deg,#2d1b5e 0%,#1a0f38 100%);border-radius:var(--radius);padding:22px;color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:#d8b4fe;margin-bottom:10px;">🟣 Max Healthcare — The Operational Excellence Benchmark</div>
+      <p style="font-size:12px;line-height:1.75;color:rgba(255,255,255,.85);">Max is India's operationally finest hospital company — ARPOB ₹77,900 (sector best), 75% occupancy (sector best), 26.8% Q4 EBITDA margin, net debt only ₹1,908 Cr on ₹2,638 Cr EBITDA. KKR's complete exit in January 2026 at 5× return is now permanently behind the stock. The business is exceptionally well-run. The central question for any investor is whether the current multiple (EV/network EBITDA ~38×) already reflects all the good news or whether brownfield additions (Mohali, Nanavati, BKC) represent incremental earnings not yet in the price. The clinician cost inflation (+230bps Q4) is the one variable to watch carefully.</p>
+    </div>
+    <div style="background:linear-gradient(135deg,#0c4a3e 0%,#062e27 100%);border-radius:var(--radius);padding:22px;color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:#6ee7b7;margin-bottom:10px;">🟦 NH — The Multi-Geography Transformation</div>
+      <p style="font-size:12px;line-height:1.75;color:rgba(255,255,255,.85);">NH in FY26 is no longer the company it was even two years ago. It now earns in three currencies, operates hospitals on three continents, and has a Cayman insurance business scaling at 5.88× YoY. The UK Practice Plus Group acquisition (Nov 2025) adds ₹1,800+ Cr annualised revenue — FY27 will be the first year showing 12 full months vs 5 months in FY26. The debt (₹2,240 Cr, 1.25× EBITDA) is foreign-currency denominated acquisition debt that the UK business itself will service. India organic growth at only 10.3% is the one modest note. NH is now fundamentally a global healthcare group that happens to be listed in India — and the market hasn't fully priced that yet.</p>
+    </div>
+  </div>
+
+  <div class="g3" style="margin-bottom:22px;">
+    <div style="background:linear-gradient(135deg,#0d3d20 0%,#072513 100%);border-radius:var(--radius);padding:22px;color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:#86efac;margin-bottom:10px;">🟢 Fortis — The Margin Inflection Story</div>
+      <p style="font-size:12px;line-height:1.75;color:rgba(255,255,255,.85);">Fortis's FY26 numbers tell a simple story: EBITDA margin went from 20.4% to 22.8% (+240bps) in one year. Agilus Diagnostics margin went from 17.7% to 23.6% (+590bps). Hospital occupancy: 68%, beds occupied +15% YoY. The IHH strategic relationship is delivering on international patient flow (₹639 Cr, +18.5%). The question is: can Fortis close the remaining gap to Max (22.8% vs 26.8%)? Every 100bps of further improvement adds significant PAT and stock re-rating. Net debt at 1.09× EBITDA from acquisitions is the constraint — if Fortis maintains EBITDA growth at 20%+ without further debt, the trajectory is very compelling.</p>
+    </div>
+    <div style="background:linear-gradient(135deg,#4a2500 0%,#2d1600 100%);border-radius:var(--radius);padding:22px;color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:#fdba74;margin-bottom:10px;">🟠 KIMS — The J-Curve Patience Test</div>
+      <p style="font-size:12px;line-height:1.75;color:rgba(255,255,255,.85);">KIMS's FY26 numbers are the most deceptive in the sector. PAT down 42%. Interest costs doubled. Margins fell 560bps. And yet: revenue grew 28.2%, the mature Telangana cluster still earns 28%+ EBITDA, and the company just opened 4 hospitals across Bangalore, Kerala, Thane, and Maharashtra — high-ARPOB markets where KIMS had zero presence before. Every one of those new hospitals is in J-curve Year 1–2 and dragging blended margins. The planned QIP to reduce debt is the key near-term event. Investors assessing KIMS today are essentially betting on whether: (a) the new hospitals ramp as KIMS's historical hospitals have, and (b) QIP happens at fair pricing. The debt position at ₹2,850 Cr / 3.4× EBITDA is real and demands respect.</p>
+    </div>
+    <div style="background:linear-gradient(135deg,#5c1010 0%,#3b0808 100%);border-radius:var(--radius);padding:22px;color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:#fca5a5;margin-bottom:10px;">🔴 Rainbow — The NICU Compounder</div>
+      <p style="font-size:12px;line-height:1.75;color:rgba(255,255,255,.85);">Rainbow's 12.3% revenue growth in FY26 looks modest but deserves context: the paediatric business is inherently seasonal (Q2 best) and Rainbow was simultaneously ramping 3 new hospitals in Bangalore and adding Gurugram. EBITDA margin at ~30% (Q4: 32%) is among the highest in the sector for a pure-play hospital. Net cash balance sheet. Founder-led with no PE overhang. The NICU insurance coverage expansion is a structural tailwind — as health insurance policies increasingly cover neonatal ICU stays, Rainbow's payor mix will shift from 40% cash to more insurance, smoothing revenue seasonality. Gurugram (400 beds over FY26–27) is the medium-term growth story.</p>
+    </div>
+  </div>
+
+  <div class="g3">
+    <div style="background:linear-gradient(135deg,#4a3200 0%,#2d1e00 100%);border-radius:var(--radius);padding:22px;color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:#fde68a;margin-bottom:10px;">🟡 Medanta — The Carlyle Overhang vs Noida Opportunity</div>
+      <p style="font-size:12px;line-height:1.75;color:rgba(255,255,255,.85);">Medanta has the cleanest balance sheet in the mid-cap hospital space (net cash ₹590 Cr) and the highest mature hospital EBITDA margins (32.4% ex-Noida developing units). The Noida hospital (382 beds, ₹78 Cr EBITDA loss in FY26) is a temporary drag that will reverse — when Noida hits 55%+ occupancy by FY28, it will contribute ₹250+ Cr EBITDA annually. The Carlyle ~62% overhang is the key structural concern: when Carlyle exits, the market will absorb a large block. Historical precedent (KKR-Max): large PE exits create short-term volatility followed by re-rating as ownership diversifies. Medanta is on the same trajectory.</p>
+    </div>
+    <div style="background:linear-gradient(135deg,#0c3340 0%,#061f28 100%);border-radius:var(--radius);padding:22px;color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:#67e8f9;margin-bottom:10px;">🔷 Jupiter — The MMR Long Game</div>
+      <p style="font-size:12px;line-height:1.75;color:rgba(255,255,255,.85);">Jupiter's PAT was essentially flat in FY26 (₹194 Cr vs ₹194 Cr) despite 15.2% revenue growth — because the Dombivli hospital opened Feb 2026 and started contributing interest costs. This is precisely the J-curve working. Jupiter's strategic position in Mumbai Metropolitan Region (Thane anchor, Dombivli new, BKC approved) gives it access to India's most valuable healthcare catchment: 25 Mn urban, high-income population. The BKC 400-bed hospital (near India's financial hub — Nifty company HR offices, international banks) will be a very high ARPOB asset when operational (FY29–30). Today, Jupiter is a Thane-focused hospital growing steadily.</p>
+    </div>
+    <div style="background:linear-gradient(135deg,#3b0d4a 0%,#220730 100%);border-radius:var(--radius);padding:22px;color:#fff;">
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:#f0abfc;margin-bottom:10px;">🟣 Yatharth — The Serial Acquirer</div>
+      <p style="font-size:12px;line-height:1.75;color:rgba(255,255,255,.85);">Yatharth is doing something unusual in Indian healthcare: buying distressed mid-size hospitals in NCR, integrating clinical protocols rapidly, and turning them profitable quickly. Model Town Delhi and Faridabad were acquired and contributing revenue within the same FY26. The Agra acquisition (Feb 2026) was profitable from Day 1. Revenue grew 36% and operating cashflow conversion was 98% — exceptionally strong for an acquisitive company. The risk is clear: integrating 3 new hospitals simultaneously while managing existing debt is execution-intensive. If any one integration goes wrong, the consolidated numbers will show it quickly given the smaller base.</p>
+    </div>
+  </div>
+
+  <div class="gap-top" style="background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 22px;">
+    <div style="font-size:11px;color:var(--muted);line-height:1.8;"><strong>CB Research Note:</strong> This dashboard is prepared by Cauvery Business Research for educational and analytical purposes only. All financial data sourced from official exchange filings, May 2026. This is not investment advice and does not constitute a recommendation to buy, sell, or hold any security. Investors should conduct their own due diligence and consult a SEBI-registered investment advisor before making any investment decisions. Hospital sector investing involves sector-specific risks including regulatory price caps, clinical liability, and capital-intensive expansion.</div>
+  </div>
+</div>
+
+<!-- ========== CB ASSIST TAB ========== -->
+<div id="tab-cb" class="panel">
+  <div class="sec-hdr">🤖 CB Assist <span class="sec-note">AI Research Analyst · Hospital Sector Intelligence · Cauvery Business</span></div>
+  <div class="g2">
+    <div>
+      <div class="cbassist-chat">
+        <div class="cbassist-title"><span></span>CB Assist — Hospital Sector Analyst</div>
+        <div class="cbassist-sub">Cauvery Business Research · Offline · Answers from Q4 FY26 data in this file · No internet required</div>
+        <div class="chat-msgs" id="chatMsgs">
+          <div class="chat-msg bot"><strong>CB Assist:</strong> Ready. Answers drawn entirely from Q4 FY26 data embedded in this dashboard — no internet, no API key needed. Ask about any of the 9 companies, valuations, debt, payor mix, PE exits, or sector dynamics. Tamil கேள்விகளும் welcome.</div>
+        </div>
+        <div class="typing-ind" id="typingInd"><span></span><span></span><span></span></div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chatInput" placeholder="e.g. Compare KIMS debt risk vs Medanta balance sheet" onkeydown="if(event.key==='Enter')sendHospitalChat()">
+          <button class="chat-send" id="chatSend" onclick="sendHospitalChat()">Ask</button>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="card-lbl">💡 Investment-Grade Questions — Ask CB Assist</div>
+
+        <div style="margin-bottom:12px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--apollo);margin-bottom:6px;">🔵 Apollo — Valuation &amp; Structure</div>
+          <button class="preset-tab pt-apollo" onclick="askPreset(this,'Apollo trades at 21x hospital EV/EBITDA but the market prices it lower because pharmacy drags blended margin to 15%. What is the intrinsic EV/EBITDA of the Apollo hospital business standalone, and how does the HealthCo demerger in FY27 change that valuation calculus?')">HealthCo demerger → valuation re-rating</button>
+          <button class="preset-tab pt-apollo" onclick="askPreset(this,'Apollo added 1,400 beds in FY26 and plans 4,444 more over 3 years. Model the incremental EBITDA when those beds reach 65% occupancy at ₹71,000 ARPOB — does the capex cycle of ₹8,000-10,000 Cr justify the current enterprise value?')">Bed expansion → EBITDA bridge</button>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--nh);margin-bottom:6px;">🟦 NH — Multi-Geography Risk/Return</div>
+          <button class="preset-tab pt-nh" onclick="askPreset(this,'NH acquired UK Practice Plus Group for US$117M plus GBP £150M. UK EBITDA margin is currently 10.4% on annualised ₹3,100 Cr revenue. At what UK margin does the acquisition become value-accretive on an IRR basis, and what is the downside if NHS outsourcing volumes disappoint?')">UK acquisition IRR — margin sensitivity</button>
+          <button class="preset-tab pt-nh" onclick="askPreset(this,'NH Cayman insurance revenue exploded 588% YoY as the book scaled. Q4 FY26 Cayman EBITDA margin compressed to 25.7% from 35%+ earlier due to large-claim volatility. Is Cayman insurance structurally accretive to consolidated ROE, or is the volatility risk asymmetric enough to materially impair NH PAT in a bad year?')">Cayman insurance — durable ROE or fat-tail risk?</button>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--max);margin-bottom:6px;">🟣 Max Healthcare — Margin Sustainability</div>
+          <button class="preset-tab pt-max" onclick="askPreset(this,'Max EBITDA margin was 26.8% in Q4 FY26 but clinician costs rose 230bps YoY from aggressive hiring for brownfield expansion. With 1,500 new beds commissioning across Mohali, Nanavati and Max Smart, model the 2-year EBITDA margin path — does expansion drag fully offset operating leverage from ramp-up beds, and when does margin recover to 27%+?')">Clinician cost inflation vs ramp-up leverage — margin path</button>
+          <button class="preset-tab pt-max" onclick="askPreset(this,'Max trades at EV/network EBITDA 38x vs Apollo hospital segment at 21x despite comparable 25-26% margins. Decompose the valuation gap: is the 17x premium explained by ARPOB differential, FCF generation quality, capital efficiency, or pure sentiment — and at what conditions is that premium sustainable versus vulnerable to compression?')">Max vs Apollo 17x valuation gap — structural or sentiment?</button>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--krishna);margin-bottom:6px;">🟠 KIMS + Fortis — Debt &amp; Margin</div>
+          <button class="preset-tab pt-sector" onclick="askPreset(this,'KIMS net debt is ₹2,850 Cr at 3.4x EBITDA — highest in the peer group. Stress-test the balance sheet: if new hospital ramp-up in Bangalore and Thane takes 3 years not 2, interest costs stay at ₹180 Cr per year, and no QIP materialises — what is the interest coverage ratio trajectory and at what EBITDA level does KIMS face debt covenant risk?')">KIMS debt stress test — covenant risk scenario</button>
+          <button class="preset-tab pt-sector" onclick="askPreset(this,'Fortis EBITDA margin expanded 240bps to 22.8% in FY26 and Agilus diagnostics margin jumped 590bps to 23.6%. If hospital margins reach 25% and diagnostics sustain 23%+ over FY27-28, build the PAT uplift and EV/EBITDA compression at current market cap. Is the margin convergence thesis fully priced in the stock?')">Fortis margin convergence — PAT uplift and re-rating model</button>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--medanta);margin-bottom:6px;">🟡 Medanta + Rainbow — Special Situations</div>
+          <button class="preset-tab pt-sector" onclick="askPreset(this,'Carlyle holds ~62% of Medanta and has a theoretical 10x paper return but has not exited. Medanta Noida at 382 beds is still in EBITDA losses of ₹78 Cr. When Carlyle exits via block deal, how should an investor frame the magnitude of price impact — historically what has happened to hospital stocks post large PE block deals (reference KKR-Max Jan 2026) and how does Noida ramp-up catalyst offset the overhang?')">Carlyle block deal risk vs Noida catalyst — Medanta price framework</button>
+          <button class="preset-tab pt-sector" onclick="askPreset(this,'Rainbow EBITDA margin is ~30%, net cash, only listed paediatric chain — yet revenue grew only 12.3% in FY26. The Gurugram 400-bed expansion (FY26-27) targets high-income NCR families. At what revenue run-rate and occupancy level does Rainbow Gurugram become EBITDA-accretive, and how does this change the FY28 earnings per share trajectory?')">Rainbow Gurugram — when does expansion turn accretive?</button>
+        </div>
+
+        <div>
+          <div style="font-size:10px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">📊 Sector-Level</div>
+          <button class="preset-tab pt-sector" onclick="askPreset(this,'CGHS rate revision in October 2025 was the first in 15 years, covering 2,000 procedures with tiered pricing by accreditation. Fortis gets ₹140 Cr tailwind, Max ₹140 Cr. Rank all 9 hospitals by CGHS exposure — which has maximum incremental revenue-to-EBITDA flowthrough, and is this a 1-year benefit or a structural ARPOB re-basing that compounds?')">CGHS revision — differential impact and compounding effect</button>
+          <button class="preset-tab pt-sector" onclick="askPreset(this,'Insurance penetration rising from 42% to 70%+ means 300 million newly-insured patients enter the system over a decade. But insured patients generate LOWER ARPOB than cash patients in premium hospitals. For which hospital — Apollo, Max, Fortis, NH, Rainbow, KIMS — does this shift in payor mix actually hurt blended ARPOB, and which benefits structurally from the volume uplift more than it loses on price?')">Insurance penetration — ARPOB dilution vs volume uplift trade-off</button>
+          <button class="preset-tab pt-sector" onclick="askPreset(this,'ஆஸ்பத்திரி sector-ல் Apollo, Max, Fortis மூன்றும் ஒரே மாதிரி margin தருகின்றன. ஆனால் valuation-ல் பெரிய வித்தியாசம் இருக்கிறது. Institutional investors இந்த premium-ஐ எதனால் justify பண்றார்கள் — payor mix quality, FCF conversion, management execution, அல்லது market position? Retail investor-க்கு எது அதிக risk-adjusted return தரும்?')">Tamil: Apollo vs Max vs Fortis — institutional premium justified?</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- FLOATING FOOTER -->
+
+
+<script>
+// Tab switching
+function switchTab(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(id==='charts'||id==='debtcash') setTimeout(initCharts,100);
+}
+
+// Charts
+let chartsInited=false;
+function initCharts(){
+  if(chartsInited) return; chartsInited=true;
+  const hospitals=['Apollo','Max*','Fortis','NH','Medanta','KIMS','Rainbow','Jupiter','Yatharth'];
+  const colors=['#1d4ed8','#7c3aed','#166534','#0f766e','#b8911e','#ea580c','#dc2626','#0e7490','#9d174d'];
+  const opts=(yFmt)=>({responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>yFmt?v+yFmt:v.toLocaleString('en-IN')}}}});
+
+  new Chart(document.getElementById('chartRev'),{type:'bar',data:{labels:hospitals,datasets:[{label:'Revenue (₹ Cr)',data:[25229,10538,9128,7896,4509,3931,1703,1500,1207],backgroundColor:colors}]},options:opts()});
+  new Chart(document.getElementById('chartMargin'),{type:'bar',data:{labels:hospitals,datasets:[{label:'EBITDA Margin %',data:[24.4,25,22.8,22.7,24.2,21.1,30,22.9,24.2],backgroundColor:colors}]},options:{...opts('%'),scales:{y:{ticks:{callback:v=>v+'%'},max:35}}}});
+  new Chart(document.getElementById('chartGrowth'),{type:'bar',data:{labels:hospitals,datasets:[{label:'Revenue Growth %',data:[15.8,16,17.3,44,19.6,28.2,12.3,15.3,36],backgroundColor:colors}]},options:{...opts('%'),scales:{y:{ticks:{callback:v=>v+'%'}}}}});
+  new Chart(document.getElementById('chartPAT'),{type:'bar',data:{labels:hospitals,datasets:[{label:'PAT Growth %',data:[33.1,22,31.5,18.7,15.1,-41.7,15,0.2,17],backgroundColor:hospitals.map((_,i)=>[0,22,31.5,18.7,15.1,-41.7,15,0.2,17][i]>=0?colors[i]:'#dc2626')}]},options:{...opts('%'),scales:{y:{ticks:{callback:v=>v+'%'}}}}});
+  new Chart(document.getElementById('chartARPOB'),{type:'bar',data:{labels:hospitals,datasets:[{label:'ARPOB ₹/day',data:[71206,77900,55000,35000,67000,43000,56000,67700,33744],backgroundColor:colors}]},options:opts()});
+  new Chart(document.getElementById('chartOcc'),{type:'bar',data:{labels:hospitals,datasets:[{label:'Occupancy %',data:[68,75,68,72,74,52,55,61.2,67],backgroundColor:colors}]},options:{...opts('%'),scales:{y:{ticks:{callback:v=>v+'%'},max:90}}}});
+
+  // Debt charts
+  new Chart(document.getElementById('chartDebt'),{type:'bar',data:{labels:hospitals,datasets:[{label:'Net Debt (₹ Cr)',data:[3500,1908,2334,2240,-590,2850,0,0,600],backgroundColor:hospitals.map((_,i)=>[3500,1908,2334,2240,-590,2850,0,0,600][i]<=0?'#166534':'#ea580c')}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v<0?'Cash ₹'+(Math.abs(v)):'₹'+v}}}}});
+  new Chart(document.getElementById('chartLeverage'),{type:'bar',data:{labels:hospitals,datasets:[{label:'Net Debt/EBITDA',data:[0.9,0.7,1.09,1.25,-0.5,3.4,-0.5,-0.1,2],backgroundColor:hospitals.map((_,i)=>[0.9,0.7,1.09,1.25,-0.5,3.4,-0.5,-0.1,2][i]<=0?'#166534':i===5?'#dc2626':'#ea580c')}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v+'×'}}}}});
+}
+
+// ─── CB ASSIST — OFFLINE LOCAL KNOWLEDGE ENGINE ───────────────────────────
+// No API key. All answers derived from the FY26 data embedded in this file.
+
+const KB = {
+  apollo: {
+    name:"Apollo Hospitals",
+    rev:"₹25,229 Cr", revGr:"+15.8%",
+    hospEBITDA:"24.4%", conEBITDA:"~15% blended",
+    pat:"₹2,003 Cr", patGr:"+33.1%",
+    arpob:"₹71,206/day", occ:"68%", beds:"8,131",
+    netDebt:"~₹3,500 Cr", leverage:"0.9× EBITDA", debtRisk:"LOW",
+    segments:["Hospital 50% rev, 24.4% EBITDA","HealthCo Digital+Pharmacy 43% rev, 8.8% EBITDA","AHLL Diagnostics 7% rev, 11.4% EBITDA"],
+    pe:"No PE — Reddy family 31.5%, no exit risk",
+    catalyst:"HealthCo demerger-listing FY27 — hospital business will be valued standalone at 24.4% EBITDA, removing pharmacy drag",
+    payor:"45% private insurance, 20% corporate/TPA, 15% cash, 12% international (8-10% of hospital rev), 8% CGHS",
+    locations:"74 hospitals: Chennai (Proton Centre Tharamani, Greams Rd), Delhi (Indraprastha), Hyderabad (Jubilee Hills), Bangalore, Kolkata, Ahmedabad, Pune, Mumbai, Vizag, Lucknow",
+    moat:"South Asia's only proton therapy centre (₹30-50L/treatment) + 7,289 pharmacy stores + Apollo 24/7 GMV ₹2,037 Cr",
+    risk:"Blended margin optics confuse investors; HealthCo demerger execution risk; short-term debt spike"
+  },
+  max: {
+    name:"Max Healthcare",
+    rev:"₹10,538 Cr (network)", revGr:"+16%",
+    hospEBITDA:"25-26.8%", conEBITDA:"25% network",
+    pat:"₹1,631 Cr (network)", patGr:"+22%",
+    arpob:"₹77,900/day", occ:"75%", beds:"4,966",
+    netDebt:"₹1,908 Cr", leverage:"0.7× EBITDA", debtRisk:"VERY LOW",
+    segments:["Core Hospital ~₹9,800 Cr, 25-26.8% EBITDA","Max Lab 60+ cities, +14% growth","Max@Home +30% growth"],
+    pe:"KKR FULLY EXITED January 2026 — sold 26.83% at ₹350-362/share for ₹9,416 Cr, 5× return on 2018 investment. No PE overhang. Abhay Soi (CMD) promoter 23.3%.",
+    catalyst:"Brownfield ramp-up Mohali+Nanavati+Max Smart; BKC Mumbai 400-bed greenfield approved; Bhubaneswar Kalinga acquired May 2026",
+    payor:"50% private insurance, 20% corporate, 12% international (9% of hospital rev, +25% YoY), 10% CGHS, 8% cash",
+    locations:"Delhi NCR: Saket (2), Patparganj, Shalimar Bagh, Vaishali, Gurugram, Noida. Mumbai: Nanavati. Mohali, Dehradun, Bathinda. New: Bhubaneswar.",
+    moat:"Sector-best ARPOB ₹77,900 + 75% occupancy + India's highest transplant volumes (4,458 liver, 5,748 kidney)",
+    risk:"Clinician costs rose 230bps Q4 FY26 from aggressive hiring; valuation 38× EV/EBITDA priced for perfection"
+  },
+  fortis: {
+    name:"Fortis Healthcare",
+    rev:"₹9,128 Cr", revGr:"+17.3%",
+    hospEBITDA:"22.2%", conEBITDA:"22.8%",
+    pat:"₹1,064 Cr", patGr:"+31.5%",
+    arpob:"~₹55,000/day", occ:"68%", beds:"4,000+",
+    netDebt:"₹2,334 Cr", leverage:"1.09× EBITDA", debtRisk:"LOW-MODERATE",
+    segments:["Hospital Business ₹7,773 Cr (+19.1%), margin 22.2% ↑170bps","Agilus Diagnostics ₹1,527 Cr (+8.5%), margin 23.6% ↑590bps"],
+    pe:"IHH Healthcare Malaysia 31.7% — STRATEGIC parent, not PE. IHH runs 80+ hospitals in 10 countries (Parkway Singapore, Acibadem Turkey). Long-term strategic, no exit. Provides international patient referrals.",
+    catalyst:"Margin gap vs Max (22.2% vs 26.8%) — every 100bps improvement is significant PAT uplift. Agilus diagnostics 590bps margin jump is real inflection.",
+    payor:"40% private insurance, 25% corporate, 15% CGHS/Govt, 12% international (7.8% hospital rev, +18.5%), 8% cash",
+    locations:"FMRI Gurugram, Vasant Kunj Delhi, Shalimar Bagh, Mulund Mumbai, Kalyan, Bannerghatta Bangalore, Cunningham Rd Bangalore. New: People Tree Bengaluru, Shrimann Jalandhar.",
+    moat:"IHH global referral network + Agilus 400+ diagnostics labs nationwide",
+    risk:"Net debt ₹2,334 Cr rising from acquisitions; IHH may prioritise SEA over India; historical governance legacy"
+  },
+  nh: {
+    name:"Narayana Hrudayalaya",
+    rev:"₹7,896 Cr (consol)", revGr:"+44% (incl UK acq)",
+    hospEBITDA:"22.7% blended", conEBITDA:"22.7%",
+    pat:"₹937 Cr (adj)", patGr:"+18.7%",
+    arpob:"₹35,000/day (India)", occ:"72%", beds:"5,800+ India",
+    netDebt:"₹2,240 Cr", leverage:"1.25× EBITDA", debtRisk:"MODERATE-STRATEGIC",
+    segments:[
+      "India ₹4,797 Cr (+10.3%), margin 16-18%, 5,800+ beds",
+      "Cayman Islands ₹1,889 Cr (+59.7%), margin ~25-35%, USD revenue, zero tax",
+      "UK / Practice Plus Group ₹1,299 Cr (5 months only, acquired Nov 2025), margin 10.4%, GBP revenue, NHS contracts"
+    ],
+    pe:"Founder-controlled — Dr. Devi Shetty family 62%. No PE. Son Dr. Anesh Shetty leads Cayman. No exit pressure.",
+    catalyst:"UK FY27 = 12 full months vs 5 months in FY26 = +₹1,800 Cr revenue boost. Cayman insurance book near complete → profitability phase.",
+    payor:"India: 40% cash/OOP, 30% Ayushman Bharat/Govt, 20% insurance, 10% corporate. Cayman: 77% US private insurance (+588%). UK: 85% NHS contracts.",
+    locations:"India: Bangalore (NH Institute Cardiac Sciences — 30+ open heart surgeries/day), Kolkata (Rabindranath Tagore Heart), Jaipur, Raipur, Mysore, Howrah. Cayman: Health City Grand Cayman. UK: Practice Plus Group hospitals across England.",
+    moat:"3-currency revenue (INR+USD+GBP) = natural forex hedge. Cardiac volume moat — 30+ OHS/day Bangalore = highest in Asia.",
+    risk:"Net debt rose from ₹530 Cr to ₹2,240 Cr for UK acquisition — USD+GBP forex risk. UK EBITDA only 10.4%, India organic growth modest 10.3%."
+  },
+  medanta: {
+    name:"Medanta (Global Health)",
+    rev:"₹4,509 Cr", revGr:"+19.6%",
+    hospEBITDA:"25.7% ex-Noida / 24.2% incl Noida", conEBITDA:"24.2%",
+    pat:"₹554 Cr", patGr:"+15.1%",
+    arpob:"~₹67,000/day", occ:"74% mature", beds:"3,665",
+    netDebt:"Net Cash ₹590 Cr", leverage:"N/A (net cash)", debtRisk:"NONE",
+    segments:[
+      "Mature hospitals (Gurugram, Indore, Ranchi) ~₹3,000 Cr, margin ~32%",
+      "Developing hospitals (Lucknow, Patna) ~₹600 Cr, margin 32.4%",
+      "Noida (opened Nov 2025, 382 beds) ₹91 Cr, EBITDA LOSS ₹78 Cr — J-curve"
+    ],
+    pe:"Carlyle Group ~62% via Cayman entity. Carlyle entered 2013 at ₹960 Cr for 26%, now ~62% stake worth ~₹21,700 Cr. 10× paper return. HAS NOT exited yet. Expected FY27-28. Block deal risk when exit happens.",
+    catalyst:"Noida ramp-up: EBITDA loss ₹78 Cr → breakeven FY27 → ₹250 Cr+ profit FY28. +2,700 beds across 5 new greenfields planned.",
+    payor:"35% cash/OOP premium, 30% private insurance, 20% international (₹278 Cr, +2%), 15% corporate",
+    locations:"Gurugram (30-acre campus, anchor), Indore, Ranchi, Lucknow, Patna, Noida (opened Nov 2025). Future: +2,700 beds across 5 greenfields.",
+    moat:"India's highest heart transplant volumes. Net cash balance sheet. 32.4% mature hospital EBITDA. India's Mayo Clinic brand.",
+    risk:"Carlyle 62% overhang — block deal when exit comes. Noida losses drag FY26 margins. Gurugram concentration."
+  },
+  kims: {
+    name:"KIMS (Krishna Institute of Medical Sciences)",
+    rev:"₹3,931 Cr", revGr:"+28.2%",
+    hospEBITDA:"21.1% (down from 26.6%)", conEBITDA:"21.1%",
+    pat:"₹242 Cr", patGr:"-41.7% (J-curve expansion pain)",
+    arpob:"~₹43,000/day", occ:"~52% blended", beds:"7,300+",
+    netDebt:"~₹2,850 Cr", leverage:"3.4× EBITDA", debtRisk:"HIGH — QIP planned",
+    segments:[
+      "Telangana mature cluster ~₹1,960 Cr, margin ~28%+ (profit centre)",
+      "Andhra Pradesh cluster ~₹980 Cr, good margins",
+      "Bangalore (2 new units FY26) — J-curve losses",
+      "Kerala, Thane, Nashik, Maharashtra (new) — J-curve losses"
+    ],
+    pe:"No PE — Bollineni family promoter ~55%. Founder-driven expansion. QIP planned to reduce ₹2,850 Cr debt.",
+    catalyst:"QIP to reduce debt + new hospitals reach 55%+ occupancy FY27-28. Amaravati 500-bed (AP new capital). Bangalore high-ARPOB markets ramp-up.",
+    payor:"35% state insurance (Aarogyasri/APVMS/TGMC), 30% cash, 20% corporate, 10% CGHS, 5% international. High govt scheme share = volume driver but lower ARPOB.",
+    locations:"26 hospitals. Core: Secunderabad, Nellore, Vizag, Kondapur, Kukatpally. Expansion: 2× Bangalore, Thane, Nashik, Kozhikode Kerala, Guntur, Seethammadhara Vizag. Planned: Amaravati.",
+    moat:"AP/Telangana regional oligopoly — 80 Mn people, no credible challenger. 10,000+ successful brain tumour surgeries milestone.",
+    risk:"HIGHEST LEVERAGE in sector: ₹2,850 Cr net debt at 3.4× EBITDA. Interest costs doubled YoY. PAT fell 42%. If ramp-up delayed, covenant risk."
+  },
+  rainbow: {
+    name:"Rainbow Children's Medicare",
+    rev:"₹1,703 Cr", revGr:"+12.3%",
+    hospEBITDA:"~30% (Q4: 32%)", conEBITDA:"~30%",
+    pat:"₹282 Cr", patGr:"+15%",
+    arpob:"~₹56,000/day", occ:"~55%", beds:"~1,700",
+    netDebt:"Net Cash", leverage:"N/A (net cash)", debtRisk:"NONE",
+    segments:["Single segment: Paediatric + Perinatal hospitals. 600+ NICU beds. Only listed pure-play paediatric chain in India."],
+    pe:"No PE — Dr. Ramesh Kancharla founder ~70%. IPO 2022. Re-appointed MD for 5 years FY26 AGM. ICICI Pru MF crossed 5% March 2026.",
+    catalyst:"Gurugram 400 beds (100 FY26, 300 FY27) — NCR high-income catchment. Rajahmundry operational. Bengaluru multi-hospital expansion.",
+    payor:"40% cash/OOP (parents pay any price for sick child), 35% private insurance, 15% corporate, 10% govt. Price-inelastic demand.",
+    locations:"Hyderabad (Banjara Hills, Hyderguda — anchor), Bangalore (4 hospitals), Chennai, Vizag, Rajahmundry, Delhi (Madhukar), Gurugram (new).",
+    moat:"Only listed paediatric chain. 600+ NICU beds — India's best neonatal outcomes. Price-inelastic: parents pay any amount. 25yr clinical protocols.",
+    risk:"Revenue growth 12.3% slower than peers — new hospital ramp-up drag. Seasonal Q3 always weakest."
+  },
+  jupiter: {
+    name:"Jupiter Life Line Hospitals",
+    rev:"₹1,500 Cr", revGr:"+15.2%",
+    hospEBITDA:"22.9%", conEBITDA:"22.9%",
+    pat:"₹194 Cr", patGr:"~flat (expansion costs)",
+    arpob:"₹67,700/day", occ:"61.2%", beds:"1,200+",
+    netDebt:"Net cash positive (Cash ₹545 Cr > Debt ₹500 Cr)", leverage:"~1.5×", debtRisk:"LOW",
+    segments:["Single hospital network: Thane anchor 550 beds, Pune 550, Indore 100, Dombivli new (Feb 2026)"],
+    pe:"No PE — Dr. Ankit Thakker founder ~60%. IPO Sep 2023.",
+    catalyst:"Dombivli hospital (opened Feb 25, 2026) ramp-up. BKC Mumbai 400-bed greenfield approved — near India's financial hub.",
+    payor:"55.4% insurance (largest share in sector), 25% cash, 15% corporate, 5% other. IPD 77.62% of revenue.",
+    locations:"Thane (main, 550 beds), Pune (550), Indore (100), Dombivli (new Feb 2026). BKC Mumbai 400-bed approved.",
+    moat:"Mumbai Metropolitan Region (25 Mn population) hospital cluster. High insurance mix = stable revenue. BKC future asset near corporate HQs.",
+    risk:"PAT flat despite 15% revenue growth — Dombivli interest costs kicking in. Two large capital projects simultaneously."
+  },
+  yatharth: {
+    name:"Yatharth Hospital",
+    rev:"₹1,207 Cr", revGr:"+36%",
+    hospEBITDA:"24.2%", conEBITDA:"24.2%",
+    pat:"~₹160 Cr", patGr:"+15-20%",
+    arpob:"₹33,744/day", occ:"67%", beds:"2,550+",
+    netDebt:"Moderate (~₹600 Cr)", leverage:"~2×", debtRisk:"MODERATE",
+    segments:["Greater Noida anchor 600 beds, Noida Sec-110 400 beds, Model Town Delhi (acq FY26), Faridabad Sec-20 (acq FY26), Agra 250 beds (acq Feb 2026)"],
+    pe:"No PE — Yatharth Tyagi promoter family ~65%. IPO FY23. Serial acquirer model.",
+    catalyst:"3 new hospitals integrating — Agra profitable from Day 1. Operating cashflow conversion 98%. NCR healthcare consolidation play.",
+    payor:"35% insurance, 35% cash, 20% CGHS/Govt, 10% corporate. NCR lower-middle income focus = higher govt share.",
+    locations:"Greater Noida, Noida, Model Town Delhi, Faridabad, Agra. Pure NCR/UP-western focus.",
+    moat:"Serial acquisition playbook — buying distressed NCR hospitals, integrating rapidly, turning profitable. Fastest revenue grower +36%.",
+    risk:"Integrating 3 acquisitions simultaneously — execution risk. Moderate debt. ARPOB ₹33,744 lowest in sector = limited pricing power."
+  }
+};
+
+// Sector level facts
+const SECTOR = {
+  cghs:"CGHS rate revision October 2025 — first in 15 years, covers 2,000 procedures. Fortis +₹140 Cr tailwind, Max +₹140 Cr. Highest CGHS exposure: Fortis and NH India. New tiered pricing favours accredited hospitals.",
+  insurance:"India health insurance penetration rising from 42% towards 70%+. 300 Mn newly-insured patients entering system. BUT insured patients have LOWER ARPOB than cash patients at premium hospitals (Max, Medanta, Apollo). Volume uplift benefits KIMS/NH/Yatharth (volume players). Margin benefit goes to volume hospitals, not premium ARPOB hospitals.",
+  jcurve:"J-curve: Every new hospital loses money for 2-3 years. Year 1: 25-35% occupancy = EBITDA losses. Year 3: 55% = breakeven. Year 5+: 70%+ occupancy = ₹13-15L EBITDA/bed/year. KIMS, Medanta (Noida), Jupiter (Dombivli) are all in J-curve phases FY26.",
+  pe_exits:"KKR exited Max Jan 2026 — 5× return. Carlyle holds 62% Medanta, 10× paper return, expected exit FY27-28. IHH Malaysia holds 31.7% Fortis — strategic, not PE, no exit planned.",
+  debt_rank:"Debt risk ranking: KIMS HIGHEST (₹2,850 Cr, 3.4× EBITDA). NH MODERATE (₹2,240 Cr, 1.25×, strategic UK acquisition). Fortis LOW-MODERATE (₹2,334 Cr, 1.09×). Apollo LOW (₹3,500 Cr est, 0.9×). Max VERY LOW (₹1,908 Cr, 0.7×). Jupiter NET CASH POSITIVE. Medanta NET CASH ₹590 Cr. Rainbow NET CASH.",
+  arpob_rank:"ARPOB ranking: Max ₹77,900 > Apollo ₹71,206 > Jupiter ₹67,700 > Medanta ~₹67,000 > Fortis ~₹55,000 > Rainbow ~₹56,000 > KIMS ~₹43,000 > Yatharth ₹33,744 > NH India ₹35,000.",
+  margin_rank:"EBITDA margin (hospital segment): Rainbow ~30% > Max 25-26.8% > Medanta 24.2-25.7% > Apollo hospital 24.4% > Yatharth 24.2% > Fortis hospital 22.2% > KIMS 21.1% (J-curve drag) > Jupiter 22.9% > NH blended 22.7%.",
+  uk_nhs:"UK NHS crisis: 7.5 Mn patients on waiting lists, 18-24 month average elective surgery wait. India cost 10-15% of UK private: Cardiac bypass UK £30-45K vs India ₹3-5L. NH acquired UK Practice Plus Group (NHS outsourcing operator) Nov 2025 for US$117M + GBP £150M.",
+  cayman:"Cayman Islands — zero corporate tax, zero capital gains tax. NH Health City Cayman: 2,000 beds, USD revenue, 25-35% EBITDA margin vs India 16-18%. Cayman insurance revenue +588% YoY Q4 FY26 but margin compressed to 25.7% from large-claim volatility."
+};
+
+function findCompany(q) {
+  const ql = q.toLowerCase();
+  if (/\bapollo\b/.test(ql)) return 'apollo';
+  if (/\bmax\b/.test(ql)) return 'max';
+  if (/\bfortis\b/.test(ql)) return 'fortis';
+  if (/\bnh\b|\bnarayana\b|\bhrudayalaya\b/.test(ql)) return 'nh';
+  if (/\bmedanta\b|\bglobal health\b/.test(ql)) return 'medanta';
+  if (/\bkims\b|\bkrishna institute\b/.test(ql)) return 'kims';
+  if (/\brainbow\b/.test(ql)) return 'rainbow';
+  if (/\bjupiter\b/.test(ql)) return 'jupiter';
+  if (/\byatharth\b/.test(ql)) return 'yatharth';
+  return null;
+}
+
+function findTopic(q) {
+  const ql = q.toLowerCase();
+  if (/revenue|topline|sales|growth/.test(ql)) return 'rev';
+  if (/ebitda|margin|profit/.test(ql)) return 'hospEBITDA';
+  if (/pat|net profit|bottom/.test(ql)) return 'pat';
+  if (/arpob|revenue per bed|bed day/.test(ql)) return 'arpob';
+  if (/occupancy|occupied/.test(ql)) return 'occ';
+  if (/debt|leverage|borrow|cash|balance sheet/.test(ql)) return 'netDebt';
+  if (/segment|business|division|breakdown/.test(ql)) return 'segments';
+  if (/pe |private equity|kkr|carlyle|ihh|temasek|exit|overhang/.test(ql)) return 'pe';
+  if (/catalyst|trigger|re.?rat|upcoming/.test(ql)) return 'catalyst';
+  if (/payor|insurance|cghs|cash patient|government scheme/.test(ql)) return 'payor';
+  if (/location|city|hospital|where/.test(ql)) return 'locations';
+  if (/moat|advantage|competitive|barrier/.test(ql)) return 'moat';
+  if (/risk|threat|downside|concern/.test(ql)) return 'risk';
+  return null;
+}
+
+function findSectorTopic(q) {
+  const ql = q.toLowerCase();
+  if (/cghs|government scheme|rate revision/.test(ql)) return 'cghs';
+  if (/insurance penetration|ayushman|mediclaim/.test(ql)) return 'insurance';
+  if (/j.curve|ramp.up|new hospital|breakeven/.test(ql)) return 'jcurve';
+  if (/pe exit|kkr|carlyle|block deal|overhang/.test(ql)) return 'pe_exits';
+  if (/debt rank|most leveraged|safest balance/.test(ql)) return 'debt_rank';
+  if (/arpob rank|highest arpob|compare arpob/.test(ql)) return 'arpob_rank';
+  if (/margin rank|best margin|ebitda compare/.test(ql)) return 'margin_rank';
+  if (/uk|nhs|britain|england|practice plus/.test(ql)) return 'uk_nhs';
+  if (/cayman|island|usd|caribbean/.test(ql)) return 'cayman';
+  return null;
+}
+
+function isTamil(q) { return /[\u0B80-\u0BFF]/.test(q); }
+
+function buildAnswer(q) {
+  const co = findCompany(q);
+  const topic = findTopic(q);
+  const sectorTopic = findSectorTopic(q);
+  const tamil = isTamil(q);
+  const ql = q.toLowerCase();
+
+  // Multi-company comparison
+  const isCompare = (ql.includes(' vs ') || ql.includes(' versus ') || ql.includes('compare') || ql.includes('between'));
+  
+  if (isCompare) {
+    const cos = ['apollo','max','fortis','nh','medanta','kims','rainbow','jupiter','yatharth'].filter(c => ql.includes(c) || (c==='nh' && (ql.includes('narayana') || ql.includes('nh'))));
+    if (cos.length >= 2) {
+      const lines = cos.slice(0,3).map(c => {
+        const d = KB[c];
+        if (topic === 'netDebt' || ql.includes('debt') || ql.includes('balance')) return `• ${d.name}: Net Debt ${d.netDebt} · ${d.leverage} · ${d.debtRisk}`;
+        if (topic === 'hospEBITDA' || ql.includes('margin')) return `• ${d.name}: EBITDA ${d.hospEBITDA} · Rev ${d.rev} · Occ ${d.occ}`;
+        if (topic === 'arpob') return `• ${d.name}: ARPOB ${d.arpob} · Occ ${d.occ} · Margin ${d.hospEBITDA}`;
+        if (topic === 'pe') return `• ${d.name}: ${d.pe}`;
+        if (ql.includes('valuat') || ql.includes('multiple')) return `• ${d.name}: Rev ${d.rev} (${d.revGr}) · EBITDA ${d.hospEBITDA} · Debt: ${d.debtRisk}`;
+        return `• ${d.name}: Rev ${d.rev} (${d.revGr}) · EBITDA ${d.hospEBITDA} · PAT ${d.pat} (${d.patGr})`;
+      });
+      return lines.join('\n');
+    }
+  }
+
+  // Single company deep dive
+  if (co) {
+    const d = KB[co];
+    if (topic === 'segments') {
+      return `• Segment breakdown for ${d.name}:\n` + d.segments.map(s => `  — ${s}`).join('\n');
+    }
+    if (topic === 'netDebt') {
+      return `• ${d.name} net debt: ${d.netDebt}\n• Leverage: ${d.leverage} — classified ${d.debtRisk}\n• Context: ${d.risk.split(';')[0]}`;
+    }
+    if (topic === 'pe') {
+      return `• PE/ownership — ${d.name}:\n  ${d.pe}\n• Key implication: ${d.catalyst.split(';')[0]}`;
+    }
+    if (topic === 'payor') {
+      return `• ${d.name} payor mix:\n  ${d.payor}\n• Implication: High govt/Ayushman share = volume driven, lower ARPOB. High cash/intl = premium ARPOB.`;
+    }
+    if (topic === 'catalyst') {
+      return `• Key catalyst — ${d.name}: ${d.catalyst}\n• Moat supporting thesis: ${d.moat}\n• Risk to watch: ${d.risk.split(';')[0]}`;
+    }
+    if (topic === 'locations') {
+      return `• ${d.name} locations: ${d.locations}`;
+    }
+    if (topic === 'moat') {
+      return `• ${d.name} moat: ${d.moat}\n• Financial proof: Rev ${d.rev} (${d.revGr}), EBITDA ${d.hospEBITDA}, ARPOB ${d.arpob}`;
+    }
+    if (topic === 'risk') {
+      return `• ${d.name} key risks: ${d.risk}\n• Debt position: ${d.netDebt} · ${d.debtRisk}`;
+    }
+    // General company overview
+    const isTamilQ = isTamil(q);
+    if (isTamilQ) {
+      return `• ${d.name}: வருவாய் ${d.rev} (${d.revGr}), EBITDA margin ${d.hospEBITDA}\n• நிகர கடன்: ${d.netDebt} — ${d.debtRisk}\n• முக்கிய catalyst: ${d.catalyst.split(';')[0]}`;
+    }
+    return `• ${d.name}: Rev ${d.rev} (${d.revGr}) · EBITDA ${d.hospEBITDA} · PAT ${d.pat} (${d.patGr})\n• ARPOB ${d.arpob} · Occ ${d.occ} · Debt: ${d.netDebt} [${d.debtRisk}]\n• Catalyst: ${d.catalyst.split(';')[0]}`;
+  }
+
+  // Sector-level topic
+  if (sectorTopic) {
+    const fact = SECTOR[sectorTopic];
+    // Break into 3 bullets at sentence boundaries
+    const sentences = fact.split('. ').filter(s => s.trim().length > 10);
+    if (sentences.length >= 3) {
+      return '• ' + sentences[0].trim() + '.\n• ' + sentences[1].trim() + '.\n• ' + sentences[2].trim() + '.';
+    }
+    return '• ' + fact;
+  }
+
+  // Fallback — scan for any keyword match in KB
+  for (const [key, d] of Object.entries(KB)) {
+    const searchText = (d.moat + ' ' + d.catalyst + ' ' + d.risk).toLowerCase();
+    const words = ql.split(/\s+/).filter(w => w.length > 4);
+    const hits = words.filter(w => searchText.includes(w)).length;
+    if (hits >= 2) {
+      return `• ${d.name}: Rev ${d.rev} (${d.revGr}) · EBITDA ${d.hospEBITDA}\n• ${d.catalyst.split(';')[0]}\n• Risk: ${d.risk.split(';')[0]}`;
+    }
+  }
+
+  // Generic fallback
+  return `• This dashboard covers 9 hospitals: Apollo, Max, Fortis, NH, Medanta, KIMS, Rainbow, Jupiter, Yatharth\n• Ask about: revenue, margins, debt, payor mix, PE ownership, locations, catalysts, or risks\n• Try: "Apollo vs Max debt" or "NH segments" or "KIMS risk" or use the preset questions above`;
+}
+
+function askPreset(btn, q) {
+  document.querySelectorAll('.preset-tab').forEach(b => b.className = b.className.replace(/\bactive\b/, '').trim());
+  btn.classList.add('active');
+  document.getElementById('chatInput').value = q;
+  sendHospitalChat();
+}
+
+function sendHospitalChat() {
+  const input = document.getElementById('chatInput');
+  const q = input.value.trim();
+  if (!q) return;
+  addMsg('user', q);
+  input.value = '';
+
+  // Simulate brief thinking pause
+  document.getElementById('typingInd').style.display = 'flex';
+  scrollChat();
+  setTimeout(() => {
+    const answer = buildAnswer(q);
+    document.getElementById('typingInd').style.display = 'none';
+    addMsg('bot', answer);
+  }, 420);
+}
+
+function addMsg(t, text) {
+  const d = document.createElement('div');
+  d.className = 'chat-msg ' + t;
+  d.innerHTML = t === 'bot'
+    ? '<strong>CB Assist:</strong> ' + text.replace(/\n/g, '<br>')
+    : text;
+  document.getElementById('chatMsgs').appendChild(d);
+  scrollChat();
+}
+function scrollChat() { const m = document.getElementById('chatMsgs'); m.scrollTop = m.scrollHeight; }
+</script>
+
+<!-- ── CB WATERMARK BADGE ── -->
+<div class="cb-wm">
+  <div class="cb-wm-logo">CB</div>
+  <div>
+    <div class="cb-wm-name">Cauvery Business</div>
+    <div class="cb-wm-sub">Hospital Sector · Q4 FY26</div>
+  </div>
+</div>
+
+</body>
+</html>
