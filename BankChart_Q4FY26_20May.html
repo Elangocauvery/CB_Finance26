@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Banking Sector Q4 FY26 — Interactive Chart</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #F7F9FC;
+    --surface: #EEF2F7;
+    --card: #FFFFFF;
+    --border: #D0D9E8;
+    --text: #1A2744;
+    --muted: #5A6A8A;
+    --accent: #1A56DB;
+    --gold: #B45309;
+    --green: #166534;
+    --red: #991B1B;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  header { margin-bottom: 24px; border-bottom: 1px solid var(--border); padding-bottom: 18px; }
+  .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  h1 { font-family: 'DM Serif Display', serif; font-size: 26px; line-height: 1.2; color: var(--text); letter-spacing: -0.5px; }
+  h1 span { color: var(--accent); }
+  .badge { background: var(--accent); color: white; font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 20px; letter-spacing: 1px; text-transform: uppercase; white-space: nowrap; margin-top: 4px; display: inline-block; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-top: 6px; font-family: 'DM Mono', monospace; }
+
+  /* CONTROLS */
+  .controls {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr 1fr auto;
+    gap: 14px;
+    margin-bottom: 20px;
+    align-items: end;
+  }
+  .control-group label { display: block; font-size: 10px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  select { width: 100%; background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 14px; font-family: 'DM Sans', sans-serif; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237D8590' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; transition: border-color 0.2s; }
+  select:focus { outline: none; border-color: var(--accent); }
+
+  .sort-btn { background: var(--card); color: var(--text); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: 'DM Sans', sans-serif; }
+  .sort-btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+  .sort-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+  /* QUARTER TOGGLE */
+  .qtr-toggle { display: flex; gap: 6px; margin-bottom: 20px; flex-wrap: wrap; }
+  .qtr-btn { padding: 7px 14px; border-radius: 6px; border: 1.5px solid var(--border); background: var(--card); color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'DM Sans'; letter-spacing: 0.5px; }
+  .qtr-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .qtr-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
+  .qtr-btn.q3 { }
+  .qtr-btn.q4py { }
+  .qtr-group-label { font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; margin-right: 4px; }
+  .compare-label { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; margin-left: 10px; font-family: 'DM Mono', monospace; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+  /* STATS */
+  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; position: relative; overflow: hidden; }
+  .stat-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--accent); }
+  .stat-card.best::before { background: #22C55E; }
+  .stat-card.worst::before { background: #F85149; }
+  .stat-label { font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .stat-value { font-family: 'DM Mono', monospace; font-size: 15px; font-weight: 500; color: var(--text); }
+  .stat-bank { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* CHART */
+  .chart-area { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 20px; }
+  .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .chart-title { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--text); }
+  .unit-tag { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); background: var(--surface); padding: 2px 8px; border-radius: 4px; margin-left: 10px; }
+  .chart-meta { font-size: 12px; color: var(--muted); font-family: 'DM Mono', monospace; }
+
+  #chart-container { position: relative; width: 100%; overflow-x: auto; overflow-y: visible; }
+  #chart-container canvas { min-width: 1000px; height: 430px !important; }
+
+  /* QTR COMPARE panel */
+  .qtr-compare-panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; }
+  .qtr-compare-title { font-family: 'DM Serif Display', serif; font-size: 15px; color: var(--text); margin-bottom: 12px; }
+  .delta-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  .delta-card { background: var(--surface); border-radius: 8px; padding: 10px 12px; }
+  .delta-bank { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .delta-vals { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); }
+  .delta-pct { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 600; margin-top: 2px; }
+  .delta-pos { color: #16a34a; }
+  .delta-neg { color: #dc2626; }
+
+  /* TABLE */
+  .data-table-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .table-header-row { background: var(--surface); padding: 12px 20px; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { background: var(--surface); padding: 9px 12px; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; color: var(--muted); text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  th:first-child { text-align: left; }
+  td { padding: 9px 12px; font-family: 'DM Mono', monospace; text-align: right; border-bottom: 1px solid var(--border); transition: background 0.15s; white-space: nowrap; }
+  td:first-child { text-align: left; font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 12px; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #EEF2F7; }
+  .best-cell { color: #166534; font-weight: 600; background: #f0fdf4; }
+  .worst-cell { color: #991B1B; font-weight: 600; background: #fef2f2; }
+  .active-row td:first-child { color: var(--gold); font-weight: 600; }
+  .ib-col { background: #fffbeb !important; }
+
+  footer { text-align: center; color: var(--muted); font-size: 11px; margin-top: 20px; font-family: 'DM Mono', monospace; line-height: 1.6; }
+
+  /* ── HAMBURGER PANELS ── */
+  .ham-section { margin-top: 28px; margin-bottom: 28px; }
+  .ham-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-radius: 10px; cursor: pointer;
+    user-select: none; transition: opacity 0.15s; border: none; width: 100%; text-align: left;
+  }
+  .ham-header:hover { opacity: 0.92; }
+  .ham-header-moats  { background: linear-gradient(135deg,#166534 0%,#15803D 100%); }
+  .ham-header-assist { background: linear-gradient(135deg,#1A2744 0%,#1A56DB 100%); }
+  .ham-header-left { display:flex; align-items:center; gap:14px; }
+  .ham-header-icon  { font-size:22px; }
+  .ham-header-title { font-family:'DM Serif Display',serif; font-size:20px; color:white; letter-spacing:-0.3px; }
+  .ham-header-sub   { font-family:'DM Mono',monospace; font-size:10px; color:rgba(255,255,255,0.7); margin-top:2px; letter-spacing:0.8px; }
+  .ham-toggle-btn {
+    background:rgba(255,255,255,0.18); border:1.5px solid rgba(255,255,255,0.4);
+    border-radius:6px; color:white; font-size:18px; width:36px; height:36px;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:background 0.2s; flex-shrink:0;
+  }
+  .ham-toggle-btn:hover { background:rgba(255,255,255,0.3); }
+  .ham-body { background:var(--bg); border:1px solid var(--border); border-top:none; border-radius:0 0 10px 10px; overflow:hidden; }
+  .ham-body-pad { padding:18px; }
+  .usp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px; }
+  .usp-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 18px; position:relative; overflow:hidden; transition:box-shadow 0.2s; }
+  .usp-card:hover { box-shadow:0 4px 18px rgba(26,86,219,0.08); }
+  .usp-card-accent { position:absolute; left:0; top:0; bottom:0; width:4px; border-radius:12px 0 0 12px; }
+  .usp-bank-name { font-size:13px; font-weight:700; margin-bottom:2px; padding-left:8px; }
+  .usp-tag { display:inline-block; font-size:9px; font-weight:600; letter-spacing:1px; text-transform:uppercase; padding:2px 7px; border-radius:10px; margin-left:6px; vertical-align:middle; }
+  .usp-tag.private { background:#EEF6FF; color:#1A56DB; }
+  .usp-tag.psu     { background:#FFF4E6; color:#B45309; }
+  .usp-moat { font-size:11px; font-weight:700; color:var(--muted); letter-spacing:0.8px; text-transform:uppercase; padding-left:8px; margin-top:8px; margin-bottom:4px; }
+  .usp-text { font-size:12px; color:var(--text); line-height:1.55; padding-left:8px; }
+  .usp-pill-row { display:flex; flex-wrap:wrap; gap:5px; padding-left:8px; margin-top:8px; }
+  .usp-pill { font-size:10px; background:var(--surface); color:var(--muted); border-radius:20px; padding:2px 9px; font-family:'DM Mono',monospace; }
+  .lang-toggle { display:flex; gap:4px; }
+  .lang-btn { padding:5px 14px; border-radius:6px; border:1.5px solid rgba(255,255,255,0.4); background:transparent; color:white; font-size:11px; font-weight:600; cursor:pointer; transition:all 0.2s; font-family:'DM Sans',sans-serif; }
+  .lang-btn.active { background:white; color:#1A2744; border-color:white; }
+  .cba-subbar { background:var(--surface); border-bottom:1px solid var(--border); padding:10px 24px; font-family:'DM Mono',monospace; font-size:10px; font-weight:700; color:var(--muted); letter-spacing:1px; }
+  .qa-list {}
+  .qa-item { border-bottom:1px solid var(--border); overflow:hidden; }
+  .qa-item:last-child { border-bottom:none; }
+  .qa-question { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:16px 24px; cursor:pointer; font-size:13px; font-weight:600; color:var(--text); line-height:1.45; transition:background 0.15s; }
+  .qa-question:hover { background:var(--surface); }
+  .qa-question.open  { background:#EEF6FF; color:#1A56DB; }
+  .qa-num { font-family:'DM Mono',monospace; font-size:10px; color:var(--muted); min-width:22px; margin-top:2px; }
+  .qa-chevron { font-size:12px; min-width:16px; transition:transform 0.25s; color:var(--muted); }
+  .qa-question.open .qa-chevron { transform:rotate(180deg); color:#1A56DB; }
+  .qa-answer { max-height:0; overflow:hidden; transition:max-height 0.35s ease,padding 0.2s; background:#FAFBFF; font-size:12.5px; color:var(--text); line-height:1.7; }
+  .qa-answer.open { max-height:600px; padding:14px 24px 18px 46px; }
+  .qa-answer p { margin-bottom:8px; }
+  .qa-answer p:last-child { margin-bottom:0; }
+  .qa-answer strong { color:var(--accent); }
+  .qa-category { font-size:9px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--muted); padding:10px 24px 4px; background:var(--surface); border-bottom:1px solid var(--border); }
+  .user-ask-box { background:#F0F4FF; border-top:2px solid var(--accent); padding:16px 24px; display:flex; flex-direction:column; gap:10px; }
+  .user-ask-label { font-size:10px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:var(--accent); }
+  .user-ask-row { display:flex; gap:10px; }
+  .user-ask-input { flex:1; background:white; border:1.5px solid var(--border); border-radius:8px; padding:10px 14px; font-size:13px; font-family:'DM Sans',sans-serif; color:var(--text); outline:none; transition:border-color 0.2s; min-width:0; }
+  .user-ask-input:focus { border-color:var(--accent); }
+  .user-ask-input::placeholder { color:var(--muted); font-size:12px; }
+  .user-ask-btn { background:var(--accent); color:white; border:none; border-radius:8px; padding:10px 20px; font-size:13px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; flex-shrink:0; transition:background 0.2s; }
+  .user-ask-btn:hover { background:#1244b8; }
+  .user-ask-btn:disabled { background:var(--muted); cursor:not-allowed; }
+  .suggest-chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .suggest-chip { font-size:11px; background:white; border:1px solid var(--border); border-radius:20px; padding:4px 12px; cursor:pointer; color:var(--text); transition:all 0.15s; font-family:'DM Sans',sans-serif; }
+  .suggest-chip:hover { background:#EEF6FF; border-color:var(--accent); color:var(--accent); }
+  .user-response-area { background:white; border:1px solid var(--border); border-radius:8px; padding:14px 16px; font-size:13px; color:var(--text); line-height:1.7; display:none; }
+  .user-response-area.visible { display:block; }
+  .user-response-area p { margin-bottom:8px; }
+  .user-response-area p:last-child { margin-bottom:0; }
+  .user-response-area strong { color:var(--accent); }
+  @media (max-width:700px) {
+    .controls { grid-template-columns:1fr 1fr; }
+    .sort-btn { grid-column:1/-1; }
+    body { padding:14px; }
+    h1 { font-size:20px; }
+    .usp-grid { grid-template-columns:1fr; }
+    .qa-answer.open { padding-left:24px; }
+    .user-ask-row { flex-direction:column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <div>
+      <h1>Banking Sector <span>Q4 FY26</span> Dashboard</h1>
+      <div class="subtitle">12 Banks · 23 Metrics · Q4 FY26 vs Q3 FY26 vs Q4 FY25 · Karnataka Bank &amp; SIB Added 20 May 2026</div>
+    </div>
+    <span class="badge">v3 · 12 Banks</span>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="control-group">
+    <label>📊 Select Metric</label>
+    <select id="metricSelect" onchange="updateChart()"></select>
+  </div>
+  <div class="control-group">
+    <label>🏦 Filter Banks</label>
+    <select id="bankFilter" onchange="updateChart()">
+      <option value="all">All 12 Banks</option>
+      <option value="private">Private Banks Only</option>
+      <option value="psu">PSU Banks Only</option>
+      <option value="top5">Top 5 by Deposits</option>
+      <option value="ib">Indian Bank Only</option>
+      <option value="south">South Indian Banks</option>
+    </select>
+  </div>
+  <div class="control-group">
+    <label>📅 Quarter View</label>
+    <select id="quarterSelect" onchange="updateChart()">
+      <option value="Q4FY26">Q4 FY26 (Current)</option>
+      <option value="Q3FY26">Q3 FY26 (Previous Qtr)</option>
+      <option value="Q4FY25">Q4 FY25 (Same Qtr Last Year)</option>
+      <option value="compare">All 3 Quarters (Compare)</option>
+    </select>
+  </div>
+  <button class="sort-btn" id="sortBtn" onclick="toggleSort()">⇅ Sort by Value</button>
+</div>
+
+<div class="stats-row" id="statsRow"></div>
+
+<div class="chart-area">
+  <div class="chart-header">
+    <div>
+      <span class="chart-title" id="chartTitle">Net Profit (PAT)</span>
+      <span class="unit-tag" id="unitTag">₹ Cr</span>
+    </div>
+    <span class="chart-meta" id="chartMeta">Q4 FY26 · 10 Banks</span>
+  </div>
+  <div id="chart-container">
+    <canvas id="barChart"></canvas>
+  </div>
+</div>
+
+<div class="qtr-compare-panel" id="deltaPanel" style="display:none;">
+  <div class="qtr-compare-title" id="deltaTitle">Quarter-on-Quarter Change</div>
+  <div class="delta-grid" id="deltaGrid"></div>
+</div>
+
+<div class="data-table-wrap">
+  <div class="table-header-row">
+    <span>📋 Full Data Table — All 12 Banks × All Metrics × 3 Quarters</span>
+    <span id="tableQtrLabel" style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);">Showing: Q4 FY26</span>
+  </div>
+  <div style="overflow-x:auto; min-width:100%;">
+    <table id="fullTable"></table>
+  </div>
+</div>
+
+<!-- ═════════════════════ BANK MOATS ═════════════════════ -->
+<div class="ham-section">
+  <div class="ham-header ham-header-moats" onclick="togglePanel('moats-body')">
+    <div class="ham-header-left">
+      <span class="ham-header-icon">🏛</span>
+      <div>
+        <div class="ham-header-title">Bank Profiles &amp; Competitive Moats</div>
+        <div class="ham-header-sub">Q4 FY26 · 12 BANKS · STRATEGIC DIFFERENTIATORS</div>
+      </div>
+    </div>
+    <button class="ham-toggle-btn" id="btn-moats-body">☰</button>
+  </div>
+  <div class="ham-body" id="moats-body" style="display:none;">
+    <div class="ham-body-pad">
+      <div class="usp-grid" id="uspGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════════════════ CB ASSIST ══════════════════════ -->
+<div class="ham-section">
+  <div class="ham-header ham-header-assist" onclick="togglePanel('assist-body')">
+    <div class="ham-header-left">
+      <span class="ham-header-icon">🤖</span>
+      <div>
+        <div class="ham-header-title">CB Assist — Banking Intelligence</div>
+        <div class="ham-header-sub">CAUVERY BUSINESS · Q4 FY26 · Q&amp;A + ASK YOUR OWN QUESTION</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;" onclick="event.stopPropagation()">
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('en')" id="btnEn">EN</button>
+        <button class="lang-btn" onclick="setLang('ta')" id="btnTa">&#2980;&#2990;&#3007;&#2996;&#3021;</button>
+      </div>
+      <button class="ham-toggle-btn" id="btn-assist-body" onclick="togglePanel('assist-body')">☰</button>
+    </div>
+  </div>
+  <div class="ham-body" id="assist-body" style="display:none;">
+    <div class="cba-subbar">&#9660; CURATED DEEP-DIVE QUESTIONS &#8212; CLICK TO EXPAND</div>
+    <div class="qa-list" id="qaList"></div>
+    <div class="user-ask-box">
+      <div class="user-ask-label" id="askLabel">Ask your question about banking or this data</div>
+      <div class="user-ask-row">
+        <input type="text" class="user-ask-input" id="userQuestion"
+          placeholder="e.g. What is NIM? Which bank has best ROA? Why is IndusInd in trouble?"
+          onkeydown="if(event.key==='Enter'){handleUserQuestion();}" />
+        <button class="user-ask-btn" id="askBtn" onclick="handleUserQuestion()">Ask</button>
+      </div>
+      <div class="suggest-chips" id="suggestChips"></div>
+      <div class="user-response-area" id="userResponseArea"></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Elango Industries Limited · Q4 FY26 Banking Analysis · Updated 20 May 2026<br>
+  Karnataka Bank: BSE Filing HO:SEC:35:2026-27 dated 19.05.2026 · South Indian Bank: BSE Filing dated 06.05.2026<br>
+  All other banks: BSE/NSE Filings Apr–May 2026
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script>
+const BANKS = {
+  'HDFC Bank':     { type: 'private', color: '#2979FF' },
+  'ICICI Bank':    { type: 'private', color: '#22C55E' },
+  'Axis Bank':     { type: 'private', color: '#FF6A00' },
+  'Union Bank':    { type: 'psu',     color: '#A371F7' },
+  'IndusInd Bank': { type: 'private', color: '#F0A500' },
+  'YES Bank':      { type: 'private', color: '#58A6FF' },
+  'RBL Bank':      { type: 'private', color: '#56D364' },
+  'CUB':           { type: 'private', color: '#FFB74D' },
+  'TMB':           { type: 'private', color: '#FF7B72' },
+  'Indian Bank':   { type: 'psu',     color: '#E11D48' },
+  'Karnataka Bank':{ type: 'private', color: '#7C3AED' },
+  'SIB':           { type: 'private', color: '#0D9488' },
+};
+
+const METRICS = {
+  'Deposits':         { unit: '₹ Cr', lowerBetter: false },
+  'Advances':         { unit: '₹ Cr', lowerBetter: false },
+  'Credit/Deposit':   { unit: '%',    lowerBetter: false },
+  'NII':              { unit: '₹ Cr', lowerBetter: false },
+  'NIM':              { unit: '%',    lowerBetter: false },
+  'Other Income':     { unit: '₹ Cr', lowerBetter: false },
+  'Provisions':       { unit: '₹ Cr', lowerBetter: true  },
+  'Net Profit (PAT)': { unit: '₹ Cr', lowerBetter: false },
+  'CASA':             { unit: '%',    lowerBetter: false },
+  'GNPA':             { unit: '%',    lowerBetter: true  },
+  'NNPA':             { unit: '%',    lowerBetter: true  },
+  'PCR':              { unit: '%',    lowerBetter: false },
+  'CTI':              { unit: '%',    lowerBetter: true  },
+  'CRAR':             { unit: '%',    lowerBetter: false },
+  'CET 1':            { unit: '%',    lowerBetter: false },
+  'ROE':              { unit: '%',    lowerBetter: false },
+  'ROA':              { unit: '%',    lowerBetter: false },
+  'Yield on Adv':     { unit: '%',    lowerBetter: false },
+  'Cost of Deposits': { unit: '%',    lowerBetter: true  },
+  'LCR':              { unit: 'x',    lowerBetter: false },
+  'BVPS':             { unit: '₹',    lowerBetter: false },
+  'Market Price':     { unit: '₹',    lowerBetter: false },
+  'P/BV':             { unit: 'x',    lowerBetter: false },
+};
+
+// DATA[metric][bank] = { Q4FY26, Q3FY26, Q4FY25 }
+// Percentage metrics stored as display values (e.g. 3.38 for 3.38%)
+const DATA = {
+  'Deposits': {
+    'HDFC Bank':     { Q4FY26:3105250, Q3FY26:2847500, Q4FY25:2715850 },
+    'ICICI Bank':    { Q4FY26:1794625, Q3FY26:1659611, Q4FY25:1610000 },
+    'Axis Bank':     { Q4FY26:1335834, Q3FY26:1258792, Q4FY25:1171748 },
+    'Union Bank':    { Q4FY26:1306891, Q3FY26:1222087, Q4FY25:1272245 },
+    'Indian Bank':   { Q4FY26:827726,  Q3FY26:790923,  Q4FY25:737154  },
+    'IndusInd Bank': { Q4FY26:399931,  Q3FY26:388000,  Q4FY25:364721  },
+    'YES Bank':      { Q4FY26:318970,  Q3FY26:292000,  Q4FY25:284500  },
+    'RBL Bank':      { Q4FY26:138922,  Q3FY26:119721,  Q4FY25:111049  },
+    'CUB':           { Q4FY26:78308,   Q3FY26:70516,   Q4FY25:63526   },
+    'TMB':           { Q4FY26:61712,   Q3FY26:59009,   Q4FY25:53689   },
+    'Karnataka Bank':{ Q4FY26:108779,  Q3FY26:104112,  Q4FY25:104807  },
+    'SIB':           { Q4FY26:123346,  Q3FY26:118211,  Q4FY25:107525  },
+  },
+  'Advances': {
+    'HDFC Bank':     { Q4FY26:2960000, Q3FY26:2844600, Q4FY25:2643500 },
+    'ICICI Bank':    { Q4FY26:1553893, Q3FY26:1465000, Q4FY25:1341500 },
+    'Axis Bank':     { Q4FY26:1233570, Q3FY26:1164100, Q4FY25:1036400 },
+    'Union Bank':    { Q4FY26:1078611, Q3FY26:1016524, Q4FY25:982706  },
+    'Indian Bank':   { Q4FY26:667113,  Q3FY26:638848,  Q4FY25:588140  },
+    'IndusInd Bank': { Q4FY26:315871,  Q3FY26:306000,  Q4FY25:293300  },
+    'YES Bank':      { Q4FY26:272454,  Q3FY26:261000,  Q4FY25:246188  },
+    'RBL Bank':      { Q4FY26:114232,  Q3FY26:103086,  Q4FY25:92618   },
+    'CUB':           { Q4FY26:66699,   Q3FY26:60892,   Q4FY25:53066   },
+    'TMB':           { Q4FY26:53379,   Q3FY26:50585,   Q4FY25:44366   },
+    'Karnataka Bank':{ Q4FY26:83340,   Q3FY26:77283,   Q4FY25:77959   },
+    'SIB':           { Q4FY26:100274,  Q3FY26:96764,   Q4FY25:87579   },
+  },
+  'Credit/Deposit': {
+    'HDFC Bank':     { Q4FY26:95.32, Q3FY26:99.91, Q4FY25:97.33 },
+    'ICICI Bank':    { Q4FY26:86.60, Q3FY26:88.30, Q4FY25:83.30 },
+    'Axis Bank':     { Q4FY26:92.32, Q3FY26:92.44, Q4FY25:88.46 },
+    'Union Bank':    { Q4FY26:73.80, Q3FY26:73.50, Q4FY25:77.20 },
+    'Indian Bank':   { Q4FY26:80.61, Q3FY26:80.77, Q4FY25:79.80 },
+    'IndusInd Bank': { Q4FY26:78.98, Q3FY26:78.87, Q4FY25:80.42 },
+    'YES Bank':      { Q4FY26:85.40, Q3FY26:89.40, Q4FY25:86.50 },
+    'RBL Bank':      { Q4FY26:82.20, Q3FY26:86.10, Q4FY25:83.40 },
+    'CUB':           { Q4FY26:85.20, Q3FY26:86.40, Q4FY25:83.50 },
+    'TMB':           { Q4FY26:86.50, Q3FY26:85.70, Q4FY25:82.60 },
+    'Karnataka Bank':{ Q4FY26:76.61, Q3FY26:74.23, Q4FY25:74.38 },
+    'SIB':           { Q4FY26:81.30, Q3FY26:81.85, Q4FY25:81.45 },
+  },
+  'NII': {
+    'HDFC Bank':     { Q4FY26:33081, Q3FY26:31057, Q4FY25:32006 },
+    'ICICI Bank':    { Q4FY26:22979, Q3FY26:21227, Q4FY25:21192 },
+    'Axis Bank':     { Q4FY26:14457, Q3FY26:14287, Q4FY25:13811 },
+    'Union Bank':    { Q4FY26:9406,  Q3FY26:9332,  Q4FY25:9514  },
+    'Indian Bank':   { Q4FY26:7110,  Q3FY26:6617,  Q4FY25:6389  },
+    'IndusInd Bank': { Q4FY26:4371,  Q3FY26:4399,  Q4FY25:5285  },
+    'YES Bank':      { Q4FY26:2638,  Q3FY26:2466,  Q4FY25:2277  },
+    'RBL Bank':      { Q4FY26:1671,  Q3FY26:1657,  Q4FY25:1563  },
+    'CUB':           { Q4FY26:786,   Q3FY26:752,   Q4FY25:600   },
+    'TMB':           { Q4FY26:704,   Q3FY26:646,   Q4FY25:568   },
+    'Karnataka Bank':{ Q4FY26:843,   Q3FY26:792,   Q4FY25:781   },
+    'SIB':           { Q4FY26:915,   Q3FY26:881,   Q4FY25:868   },
+  },
+  'NIM': {
+    'HDFC Bank':     { Q4FY26:3.38, Q3FY26:3.35, Q4FY25:3.63 },
+    'ICICI Bank':    { Q4FY26:4.32, Q3FY26:4.30, Q4FY25:4.44 },
+    'Axis Bank':     { Q4FY26:3.62, Q3FY26:3.99, Q4FY25:3.97 },
+    'Union Bank':    { Q4FY26:2.64, Q3FY26:2.76, Q4FY25:2.97 },
+    'Indian Bank':   { Q4FY26:3.37, Q3FY26:3.40, Q4FY25:3.34 },
+    'IndusInd Bank': { Q4FY26:3.39, Q3FY26:3.58, Q4FY25:4.29 },
+    'YES Bank':      { Q4FY26:2.70, Q3FY26:2.60, Q4FY25:2.50 },
+    'RBL Bank':      { Q4FY26:4.41, Q3FY26:4.63, Q4FY25:4.89 },
+    'CUB':           { Q4FY26:3.90, Q3FY26:3.89, Q4FY25:3.60 },
+    'TMB':           { Q4FY26:4.18, Q3FY26:3.91, Q4FY25:3.91 },
+    'Karnataka Bank':{ Q4FY26:3.07, Q3FY26:2.92, Q4FY25:2.98 },
+    'SIB':           { Q4FY26:2.95, Q3FY26:2.86, Q4FY25:3.21 },
+  },
+  'Other Income': {
+    'HDFC Bank':     { Q4FY26:13200, Q3FY26:12100, Q4FY25:12030 },
+    'ICICI Bank':    { Q4FY26:7309,  Q3FY26:7350,  Q4FY25:7021  },
+    'Axis Bank':     { Q4FY26:6023,  Q3FY26:6500,  Q4FY25:6780  },
+    'Union Bank':    { Q4FY26:4500,  Q3FY26:4200,  Q4FY25:4200  },
+    'Indian Bank':   { Q4FY26:2120,  Q3FY26:1960,  Q4FY25:1980  },
+    'IndusInd Bank': { Q4FY26:1714,  Q3FY26:1820,  Q4FY25:2086  },
+    'YES Bank':      { Q4FY26:1215,  Q3FY26:1155,  Q4FY25:1058  },
+    'RBL Bank':      { Q4FY26:1069,  Q3FY26:1050,  Q4FY25:999   },
+    'CUB':           { Q4FY26:290,   Q3FY26:261,   Q4FY25:251   },
+    'TMB':           { Q4FY26:242,   Q3FY26:196,   Q4FY25:184   },
+    'Karnataka Bank':{ Q4FY26:399,   Q3FY26:302,   Q4FY25:428   },
+    'SIB':           { Q4FY26:406,   Q3FY26:485,   Q4FY25:440   },
+  },
+  'Provisions': {
+    'HDFC Bank':     { Q4FY26:2609,  Q3FY26:3195,  Q4FY25:3193  },
+    'ICICI Bank':    { Q4FY26:96,    Q3FY26:2556,  Q4FY25:891   },
+    'Axis Bank':     { Q4FY26:3522,  Q3FY26:2213,  Q4FY25:1359  },
+    'Union Bank':    { Q4FY26:2640,  Q3FY26:1925,  Q4FY25:2715  },
+    'Indian Bank':   { Q4FY26:308,   Q3FY26:857,   Q4FY25:1062  },
+    'IndusInd Bank': { Q4FY26:1482,  Q3FY26:1743,  Q4FY25:1196  },
+    'YES Bank':      { Q4FY26:341,   Q3FY26:22,    Q4FY25:318   },
+    'RBL Bank':      { Q4FY26:678,   Q3FY26:746,   Q4FY25:1359  },
+    'CUB':           { Q4FY26:120,   Q3FY26:96,    Q4FY25:88    },
+    'TMB':           { Q4FY26:149,   Q3FY26:1,     Q4FY25:110   },
+    'Karnataka Bank':{ Q4FY26:90,    Q3FY26:95,    Q4FY25:31    },
+    'SIB':           { Q4FY26:34,    Q3FY26:80,    Q4FY25:224   },
+  },
+  'Net Profit (PAT)': {
+    'HDFC Bank':     { Q4FY26:19221, Q3FY26:18654, Q4FY25:17616 },
+    'ICICI Bank':    { Q4FY26:13702, Q3FY26:11318, Q4FY25:12630 },
+    'Axis Bank':     { Q4FY26:7071,  Q3FY26:6490,  Q4FY25:7117  },
+    'Union Bank':    { Q4FY26:5316,  Q3FY26:5017,  Q4FY25:4985  },
+    'Indian Bank':   { Q4FY26:3103,  Q3FY26:3061,  Q4FY25:2956  },
+    'IndusInd Bank': { Q4FY26:594,   Q3FY26:1401,  Q4FY25:2349  },
+    'YES Bank':      { Q4FY26:1068,  Q3FY26:952,   Q4FY25:738   },
+    'RBL Bank':      { Q4FY26:230,   Q3FY26:214,   Q4FY25:69    },
+    'CUB':           { Q4FY26:360,   Q3FY26:332,   Q4FY25:288   },
+    'TMB':           { Q4FY26:374,   Q3FY26:342,   Q4FY25:292   },
+    'Karnataka Bank':{ Q4FY26:408,   Q3FY26:291,   Q4FY25:252   },
+    'SIB':           { Q4FY26:408,   Q3FY26:374,   Q4FY25:342   },
+  },
+  'CASA': {
+    'HDFC Bank':     { Q4FY26:34.20, Q3FY26:33.70, Q4FY25:35.00 },
+    'ICICI Bank':    { Q4FY26:38.60, Q3FY26:39.00, Q4FY25:38.40 },
+    'Axis Bank':     { Q4FY26:40.00, Q3FY26:38.70, Q4FY25:41.00 },
+    'Union Bank':    { Q4FY26:35.20, Q3FY26:34.10, Q4FY25:33.50 },
+    'Indian Bank':   { Q4FY26:38.00, Q3FY26:39.08, Q4FY25:37.50 },
+    'IndusInd Bank': { Q4FY26:31.24, Q3FY26:33.42, Q4FY25:37.56 },
+    'YES Bank':      { Q4FY26:35.10, Q3FY26:33.70, Q4FY25:34.30 },
+    'RBL Bank':      { Q4FY26:33.60, Q3FY26:30.90, Q4FY25:31.20 },
+    'CUB':           { Q4FY26:28.50, Q3FY26:27.00, Q4FY25:28.00 },
+    'TMB':           { Q4FY26:28.10, Q3FY26:27.30, Q4FY25:27.00 },
+    'Karnataka Bank':{ Q4FY26:33.61, Q3FY26:31.53, Q4FY25:31.75 },
+    'SIB':           { Q4FY26:32.12, Q3FY26:31.84, Q4FY25:31.37 },
+  },
+  'GNPA': {
+    'HDFC Bank':     { Q4FY26:1.15, Q3FY26:1.24, Q4FY25:1.33 },
+    'ICICI Bank':    { Q4FY26:1.40, Q3FY26:1.53, Q4FY25:1.67 },
+    'Axis Bank':     { Q4FY26:1.23, Q3FY26:1.40, Q4FY25:1.28 },
+    'Union Bank':    { Q4FY26:2.82, Q3FY26:3.06, Q4FY25:3.60 },
+    'Indian Bank':   { Q4FY26:1.98, Q3FY26:2.23, Q4FY25:3.26 },
+    'IndusInd Bank': { Q4FY26:3.43, Q3FY26:2.25, Q4FY25:1.92 },
+    'YES Bank':      { Q4FY26:1.30, Q3FY26:1.60, Q4FY25:1.60 },
+    'RBL Bank':      { Q4FY26:1.45, Q3FY26:1.88, Q4FY25:2.60 },
+    'CUB':           { Q4FY26:1.91, Q3FY26:2.17, Q4FY25:3.09 },
+    'TMB':           { Q4FY26:0.73, Q3FY26:0.91, Q4FY25:1.25 },
+    'Karnataka Bank':{ Q4FY26:2.78, Q3FY26:3.32, Q4FY25:3.08 },
+    'SIB':           { Q4FY26:1.43, Q3FY26:2.67, Q4FY25:3.20 },
+  },
+  'NNPA': {
+    'HDFC Bank':     { Q4FY26:0.38, Q3FY26:0.42, Q4FY25:0.45 },
+    'ICICI Bank':    { Q4FY26:0.33, Q3FY26:0.37, Q4FY25:0.39 },
+    'Axis Bank':     { Q4FY26:0.37, Q3FY26:0.42, Q4FY25:0.33 },
+    'Union Bank':    { Q4FY26:0.48, Q3FY26:0.51, Q4FY25:0.63 },
+    'Indian Bank':   { Q4FY26:0.16, Q3FY26:0.15, Q4FY25:0.21 },
+    'IndusInd Bank': { Q4FY26:1.00, Q3FY26:0.60, Q4FY25:0.57 },
+    'YES Bank':      { Q4FY26:0.20, Q3FY26:0.30, Q4FY25:0.30 },
+    'RBL Bank':      { Q4FY26:0.39, Q3FY26:0.55, Q4FY25:0.29 },
+    'CUB':           { Q4FY26:0.68, Q3FY26:0.78, Q4FY25:1.25 },
+    'TMB':           { Q4FY26:0.18, Q3FY26:0.20, Q4FY25:0.36 },
+    'Karnataka Bank':{ Q4FY26:0.98, Q3FY26:1.31, Q4FY25:1.31 },
+    'SIB':           { Q4FY26:0.29, Q3FY26:0.45, Q4FY25:0.92 },
+  },
+  'PCR': {
+    'HDFC Bank':     { Q4FY26:75.00, Q3FY26:74.20, Q4FY25:74.00 },
+    'ICICI Bank':    { Q4FY26:75.80, Q3FY26:78.50, Q4FY25:76.20 },
+    'Axis Bank':     { Q4FY26:70.00, Q3FY26:71.00, Q4FY25:70.00 },
+    'Union Bank':    { Q4FY26:95.00, Q3FY26:94.50, Q4FY25:93.20 },
+    'Indian Bank':   { Q4FY26:98.30, Q3FY26:98.28, Q4FY25:98.09 },
+    'IndusInd Bank': { Q4FY26:71.45, Q3FY26:68.00, Q4FY25:70.00 },
+    'YES Bank':      { Q4FY26:84.00, Q3FY26:83.30, Q4FY25:79.70 },
+    'RBL Bank':      { Q4FY26:73.60, Q3FY26:71.00, Q4FY25:89.00 },
+    'CUB':           { Q4FY26:85.00, Q3FY26:83.00, Q4FY25:77.00 },
+    'TMB':           { Q4FY26:96.14, Q3FY26:94.32, Q4FY25:89.00 },
+    'Karnataka Bank':{ Q4FY26:83.54, Q3FY26:80.90, Q4FY25:81.42 },
+    'SIB':           { Q4FY26:94.10, Q3FY26:91.57, Q4FY25:85.03 },
+  },
+  'CTI': {
+    'HDFC Bank':     { Q4FY26:39.90, Q3FY26:40.90, Q4FY25:40.20 },
+    'ICICI Bank':    { Q4FY26:39.80, Q3FY26:40.40, Q4FY25:38.60 },
+    'Axis Bank':     { Q4FY26:51.10, Q3FY26:52.00, Q4FY25:52.00 },
+    'Union Bank':    { Q4FY26:52.00, Q3FY26:51.00, Q4FY25:53.00 },
+    'Indian Bank':   { Q4FY26:46.90, Q3FY26:46.90, Q4FY25:49.00 },
+    'IndusInd Bank': { Q4FY26:62.30, Q3FY26:57.00, Q4FY25:45.00 },
+    'YES Bank':      { Q4FY26:69.50, Q3FY26:71.00, Q4FY25:73.10 },
+    'RBL Bank':      { Q4FY26:65.10, Q3FY26:66.30, Q4FY25:71.00 },
+    'CUB':           { Q4FY26:46.10, Q3FY26:49.40, Q4FY25:50.00 },
+    'TMB':           { Q4FY26:44.80, Q3FY26:44.40, Q4FY25:57.40 },
+    'Karnataka Bank':{ Q4FY26:50.47, Q3FY26:58.72, Q4FY25:68.98 },
+    'SIB':           { Q4FY26:57.50, Q3FY26:57.20, Q4FY25:59.50 },
+  },
+  'CRAR': {
+    'HDFC Bank':     { Q4FY26:19.71, Q3FY26:19.50, Q4FY25:19.60 },
+    'ICICI Bank':    { Q4FY26:17.18, Q3FY26:17.34, Q4FY25:16.55 },
+    'Axis Bank':     { Q4FY26:16.42, Q3FY26:16.54, Q4FY25:17.07 },
+    'Union Bank':    { Q4FY26:18.10, Q3FY26:17.80, Q4FY25:16.97 },
+    'Indian Bank':   { Q4FY26:17.10, Q3FY26:16.58, Q4FY25:15.97 },
+    'IndusInd Bank': { Q4FY26:17.48, Q3FY26:16.88, Q4FY25:18.24 },
+    'YES Bank':      { Q4FY26:18.50, Q3FY26:18.30, Q4FY25:18.50 },
+    'RBL Bank':      { Q4FY26:14.25, Q3FY26:14.94, Q4FY25:16.00 },
+    'CUB':           { Q4FY26:21.92, Q3FY26:20.13, Q4FY25:19.50 },
+    'TMB':           { Q4FY26:33.73, Q3FY26:30.08, Q4FY25:32.71 },
+    'Karnataka Bank':{ Q4FY26:20.07, Q3FY26:19.94, Q4FY25:19.85 },
+    'SIB':           { Q4FY26:19.66, Q3FY26:17.84, Q4FY25:19.31 },
+  },
+  'CET 1': {
+    'HDFC Bank':     { Q4FY26:17.30, Q3FY26:17.00, Q4FY25:17.20 },
+    'ICICI Bank':    { Q4FY26:16.35, Q3FY26:16.46, Q4FY25:15.94 },
+    'Axis Bank':     { Q4FY26:14.38, Q3FY26:14.56, Q4FY25:14.67 },
+    'Union Bank':    { Q4FY26:15.69, Q3FY26:15.20, Q4FY25:14.98 },
+    'Indian Bank':   { Q4FY26:14.10, Q3FY26:14.54, Q4FY25:13.38 },
+    'IndusInd Bank': { Q4FY26:15.20, Q3FY26:14.78, Q4FY25:16.46 },
+    'YES Bank':      { Q4FY26:14.60, Q3FY26:14.30, Q4FY25:13.50 },
+    'RBL Bank':      { Q4FY26:12.77, Q3FY26:13.45, Q4FY25:14.00 },
+    'CUB':           { Q4FY26:20.82, Q3FY26:19.03, Q4FY25:18.20 },
+    'TMB':           { Q4FY26:32.27, Q3FY26:29.12, Q4FY25:31.52 },
+    'Karnataka Bank':{ Q4FY26:18.70, Q3FY26:18.40, Q4FY25:18.40 },
+    'SIB':           { Q4FY26:16.88, Q3FY26:16.40, Q4FY25:16.30 },
+  },
+  'ROE': {
+    'HDFC Bank':     { Q4FY26:14.10, Q3FY26:13.90, Q4FY25:13.80 },
+    'ICICI Bank':    { Q4FY26:17.20, Q3FY26:16.20, Q4FY25:18.00 },
+    'Axis Bank':     { Q4FY26:13.50, Q3FY26:12.80, Q4FY25:17.11 },
+    'Union Bank':    { Q4FY26:15.86, Q3FY26:15.50, Q4FY25:17.50 },
+    'Indian Bank':   { Q4FY26:18.54, Q3FY26:19.66, Q4FY25:17.30 },
+    'IndusInd Bank': { Q4FY26:3.78,  Q3FY26:9.20,  Q4FY25:16.40 },
+    'YES Bank':      { Q4FY26:8.20,  Q3FY26:7.70,  Q4FY25:5.20  },
+    'RBL Bank':      { Q4FY26:4.20,  Q3FY26:4.10,  Q4FY25:1.30  },
+    'CUB':           { Q4FY26:13.35, Q3FY26:12.17, Q4FY25:12.64 },
+    'TMB':           { Q4FY26:15.50, Q3FY26:14.50, Q4FY25:13.60 },
+    'Karnataka Bank':{ Q4FY26:12.69, Q3FY26:9.06,  Q4FY25:8.56  },
+    'SIB':           { Q4FY26:12.62, Q3FY26:11.20, Q4FY25:11.50 },
+  },
+  'ROA': {
+    'HDFC Bank':     { Q4FY26:1.96, Q3FY26:1.92, Q4FY25:1.91 },
+    'ICICI Bank':    { Q4FY26:2.28, Q3FY26:2.10, Q4FY25:2.40 },
+    'Axis Bank':     { Q4FY26:1.50, Q3FY26:1.45, Q4FY25:1.88 },
+    'Union Bank':    { Q4FY26:1.25, Q3FY26:1.20, Q4FY25:1.15 },
+    'Indian Bank':   { Q4FY26:1.20, Q3FY26:1.30, Q4FY25:1.15 },
+    'IndusInd Bank': { Q4FY26:0.40, Q3FY26:0.85, Q4FY25:1.65 },
+    'YES Bank':      { Q4FY26:1.00, Q3FY26:0.90, Q4FY25:0.60 },
+    'RBL Bank':      { Q4FY26:0.43, Q3FY26:0.40, Q4FY25:0.13 },
+    'CUB':           { Q4FY26:1.56, Q3FY26:1.53, Q4FY25:1.57 },
+    'TMB':           { Q4FY26:2.05, Q3FY26:1.97, Q4FY25:1.81 },
+    'Karnataka Bank':{ Q4FY26:1.27, Q3FY26:0.92, Q4FY25:0.81 },
+    'SIB':           { Q4FY26:1.17, Q3FY26:1.09, Q4FY25:1.12 },
+  },
+  'Yield on Adv': {
+    'HDFC Bank':     { Q4FY26:8.75, Q3FY26:8.90, Q4FY25:9.20 },
+    'ICICI Bank':    { Q4FY26:9.50, Q3FY26:9.60, Q4FY25:9.86 },
+    'Axis Bank':     { Q4FY26:9.50, Q3FY26:9.80, Q4FY25:9.90 },
+    'Union Bank':    { Q4FY26:8.20, Q3FY26:8.40, Q4FY25:8.70 },
+    'Indian Bank':   { Q4FY26:8.31, Q3FY26:8.31, Q4FY25:8.54 },
+    'IndusInd Bank': { Q4FY26:8.53, Q3FY26:9.30, Q4FY25:9.84 },
+    'YES Bank':      { Q4FY26:9.60, Q3FY26:9.50, Q4FY25:9.50 },
+    'RBL Bank':      { Q4FY26:11.00,Q3FY26:11.50,Q4FY25:12.00 },
+    'CUB':           { Q4FY26:9.07, Q3FY26:9.73, Q4FY25:9.79 },
+    'TMB':           { Q4FY26:12.00,Q3FY26:11.80,Q4FY25:12.20 },
+    'Karnataka Bank':{ Q4FY26:8.78, Q3FY26:8.71, Q4FY25:9.43  },
+    'SIB':           { Q4FY26:9.80, Q3FY26:9.75, Q4FY25:10.10 },
+  },
+  'Cost of Deposits': {
+    'HDFC Bank':     { Q4FY26:4.90, Q3FY26:5.05, Q4FY25:4.90 },
+    'ICICI Bank':    { Q4FY26:4.43, Q3FY26:4.55, Q4FY25:4.85 },
+    'Axis Bank':     { Q4FY26:4.85, Q3FY26:4.86, Q4FY25:5.29 },
+    'Union Bank':    { Q4FY26:4.80, Q3FY26:5.00, Q4FY25:5.30 },
+    'Indian Bank':   { Q4FY26:5.02, Q3FY26:5.02, Q4FY25:5.12 },
+    'IndusInd Bank': { Q4FY26:6.07, Q3FY26:6.50, Q4FY25:6.80 },
+    'YES Bank':      { Q4FY26:5.30, Q3FY26:5.60, Q4FY25:5.60 },
+    'RBL Bank':      { Q4FY26:6.80, Q3FY26:7.00, Q4FY25:7.30 },
+    'CUB':           { Q4FY26:5.46, Q3FY26:5.57, Q4FY25:6.02 },
+    'TMB':           { Q4FY26:5.30, Q3FY26:5.60, Q4FY25:5.70 },
+    'Karnataka Bank':{ Q4FY26:5.37, Q3FY26:5.43, Q4FY25:5.79 },
+    'SIB':           { Q4FY26:5.65, Q3FY26:5.80, Q4FY25:6.10 },
+  },
+  'LCR': {
+    'HDFC Bank':     { Q4FY26:1.14, Q3FY26:1.16, Q4FY25:1.20 },
+    'ICICI Bank':    { Q4FY26:1.26, Q3FY26:1.25, Q4FY25:1.26 },
+    'Axis Bank':     { Q4FY26:1.17, Q3FY26:1.18, Q4FY25:1.18 },
+    'Union Bank':    { Q4FY26:1.20, Q3FY26:1.18, Q4FY25:1.15 },
+    'Indian Bank':   { Q4FY26:1.20, Q3FY26:1.18, Q4FY25:1.16 },
+    'IndusInd Bank': { Q4FY26:1.18, Q3FY26:1.20, Q4FY25:1.15 },
+    'YES Bank':      { Q4FY26:1.19, Q3FY26:1.18, Q4FY25:1.20 },
+    'RBL Bank':      { Q4FY26:1.30, Q3FY26:1.25, Q4FY25:1.30 },
+    'CUB':           { Q4FY26:1.30, Q3FY26:1.28, Q4FY25:1.25 },
+    'TMB':           { Q4FY26:1.25, Q3FY26:1.22, Q4FY25:1.20 },
+    'Karnataka Bank':{ Q4FY26:1.65, Q3FY26:1.87, Q4FY25:1.63 },
+    'SIB':           { Q4FY26:1.55, Q3FY26:1.50, Q4FY25:1.45 },
+  },
+  'BVPS': {
+    'HDFC Bank':     { Q4FY26:733,   Q3FY26:718,   Q4FY25:695   },
+    'ICICI Bank':    { Q4FY26:470,   Q3FY26:452,   Q4FY25:427   },
+    'Axis Bank':     { Q4FY26:647,   Q3FY26:625,   Q4FY25:577   },
+    'Union Bank':    { Q4FY26:145,   Q3FY26:141,   Q4FY25:131   },
+    'Indian Bank':   { Q4FY26:275,   Q3FY26:258,   Q4FY25:232   },
+    'IndusInd Bank': { Q4FY26:479,   Q3FY26:475,   Q4FY25:531   },
+    'YES Bank':      { Q4FY26:21.50, Q3FY26:21.00, Q4FY25:19.80 },
+    'RBL Bank':      { Q4FY26:215,   Q3FY26:212,   Q4FY25:203   },
+    'CUB':           { Q4FY26:145,   Q3FY26:137,   Q4FY25:122   },
+    'TMB':           { Q4FY26:638,   Q3FY26:621,   Q4FY25:569   },
+    'Karnataka Bank':{ Q4FY26:350,   Q3FY26:341,   Q4FY25:320   },
+    'SIB':           { Q4FY26:42,    Q3FY26:40,    Q4FY25:37    },
+  },
+  'Market Price': {
+    'HDFC Bank':     { Q4FY26:830,   Q3FY26:760,   Q4FY25:1740  },
+    'ICICI Bank':    { Q4FY26:1347,  Q3FY26:1200,  Q4FY25:1390  },
+    'Axis Bank':     { Q4FY26:1370,  Q3FY26:1130,  Q4FY25:1100  },
+    'Union Bank':    { Q4FY26:180,   Q3FY26:215,   Q4FY25:135   },
+    'Indian Bank':   { Q4FY26:835,   Q3FY26:530,   Q4FY25:547   },
+    'IndusInd Bank': { Q4FY26:848,   Q3FY26:1000,  Q4FY25:1560  },
+    'YES Bank':      { Q4FY26:20.50, Q3FY26:18.50, Q4FY25:19.40 },
+    'RBL Bank':      { Q4FY26:322,   Q3FY26:255,   Q4FY25:220   },
+    'CUB':           { Q4FY26:281,   Q3FY26:283,   Q4FY25:171   },
+    'TMB':           { Q4FY26:684,   Q3FY26:612,   Q4FY25:430   },
+    'Karnataka Bank':{ Q4FY26:223,   Q3FY26:192,   Q4FY25:199   },
+    'SIB':           { Q4FY26:42.50, Q3FY26:38.50, Q4FY25:29.50 },
+  },
+  'P/BV': {
+    'HDFC Bank':     { Q4FY26:1.13, Q3FY26:1.06, Q4FY25:2.50 },
+    'ICICI Bank':    { Q4FY26:2.87, Q3FY26:2.65, Q4FY25:3.26 },
+    'Axis Bank':     { Q4FY26:2.12, Q3FY26:1.81, Q4FY25:1.91 },
+    'Union Bank':    { Q4FY26:1.24, Q3FY26:1.52, Q4FY25:1.03 },
+    'Indian Bank':   { Q4FY26:3.04, Q3FY26:2.05, Q4FY25:2.36 },
+    'IndusInd Bank': { Q4FY26:1.77, Q3FY26:2.10, Q4FY25:2.94 },
+    'YES Bank':      { Q4FY26:0.95, Q3FY26:0.88, Q4FY25:0.98 },
+    'RBL Bank':      { Q4FY26:1.50, Q3FY26:1.20, Q4FY25:1.08 },
+    'CUB':           { Q4FY26:1.94, Q3FY26:2.07, Q4FY25:1.40 },
+    'TMB':           { Q4FY26:1.07, Q3FY26:0.99, Q4FY25:0.76 },
+    'Karnataka Bank':{ Q4FY26:0.64, Q3FY26:0.56, Q4FY25:0.62 },
+    'SIB':           { Q4FY26:1.01, Q3FY26:0.96, Q4FY25:0.80 },
+  },
+};
+
+const DEPOSIT_ORDER = ['HDFC Bank','ICICI Bank','Axis Bank','Union Bank','SIB','Karnataka Bank','Indian Bank','IndusInd Bank','YES Bank','RBL Bank','CUB','TMB'];
+
+const BANK_USP = [
+  {
+    bank: 'HDFC Bank', type: 'private', color: '#2979FF',
+    moat: 'Distribution Scale + Low-Cost CASA Franchise',
+    text: 'India\'s largest private bank by assets. Unmatched liability franchise with 9,000+ branches. Low credit cost cycle historically, best-in-class risk management. Net Profit leader at ₹19,221 Cr in Q4 FY26. Strong cross-sell through insurance & wealth arms.',
+    pills: ['Retail Dominance', 'CASA Moat', 'Risk Mgmt', 'Wealth Cross-sell']
+  },
+  {
+    bank: 'ICICI Bank', type: 'private', color: '#22C55E',
+    moat: 'Digital-First Retail + Diversified Ecosystem',
+    text: 'Fastest ROA recovery story post-2019 transformation. iMobile Pay leads digital banking with 50M+ users. Strong wholesale-to-retail pivot. Best RoA at 2.28% among large peers. Near-zero provisions in Q4 FY26 (₹96 Cr) signals pristine book.',
+    pills: ['Digital Ecosystem', 'High ROA', 'Low Provisions', 'iMobile Scale']
+  },
+  {
+    bank: 'Axis Bank', type: 'private', color: '#FF6A00',
+    moat: 'Corporate + Retail Balance + CASA Growth Engine',
+    text: 'Post-Citi acquisition, Axis commands a premium credit card portfolio and affluent banking segment. Strong Burgundy Private wealth platform. GNPA improved sharply to 1.23%. Credit-Deposit ratio at 92.32% signals aggressive deployment.',
+    pills: ['Credit Cards', 'Burgundy Private', 'Citi Synergies', 'CD Ratio']
+  },
+  {
+    bank: 'Union Bank', type: 'psu', color: '#A371F7',
+    moat: 'PSU Scale + Post-Amalgamation Efficiency Gains',
+    text: 'One of India\'s largest PSU banks post-Andhra/Corporation Bank merger. PCR at 95% is among the highest—a buffer against future NPA risk. GNPA improving trajectory from 3.60% (Q4FY25) to 2.82% (Q4FY26). Deposits > ₹13 lakh Cr.',
+    pills: ['High PCR', 'NPA Recovery', 'PSU Backing', 'Merger Synergies']
+  },
+  {
+    bank: 'Indian Bank', type: 'psu', color: '#E11D48',
+    moat: 'South India Anchor + Ultra-Low NNPA + ROE Leader',
+    text: 'Post-Allahabad Bank merger, Indian Bank has the cleanest book among PSU peers — NNPA at just 0.16%. ROE of 18.54% is the highest in this pack. Chennai-headquartered, with deep penetration in TN/AP agriculture and MSME. P/BV of 3.04x reflects premium valuation.',
+    pills: ['Cleanest PSU Book', 'ROE Leader', 'TN/AP Anchor', 'NNPA 0.16%']
+  },
+  {
+    bank: 'IndusInd Bank', type: 'private', color: '#F0A500',
+    moat: 'Vehicle Finance + Microfinance — Now Under Stress',
+    text: 'Historically built on CV/vehicle loans and microfinance. Currently undergoing leadership transition with CEO change and accounting restatements. PAT collapsed from ₹2,349 Cr (Q4FY25) to ₹594 Cr (Q4FY26). GNPA rose to 3.43%. Potential re-rating play if resolution completes.',
+    pills: ['CV Finance', 'MFI Exposure', 'Turnaround Watch', 'Restatement Risk']
+  },
+  {
+    bank: 'YES Bank', type: 'private', color: '#58A6FF',
+    moat: 'Post-Restructuring Recovery + Rising NII',
+    text: 'Rescued by SBI-led consortium in 2020. Steadily rebuilding: NII up 16% YoY, GNPA down to 1.30%, PAT ₹1,068 Cr—a multi-year high. CASA improving to 35%. But P/BV < 1x and negative CET-1 overhang remain concerns. Long recovery runway ahead.',
+    pills: ['Turnaround Story', 'NPA Declining', 'SBI Backing', 'NII Recovery']
+  },
+  {
+    bank: 'RBL Bank', type: 'private', color: '#56D364',
+    moat: 'Credit Cards + Microfinance — High-Yield, High-Risk Mix',
+    text: 'Niche player with high NIMs (4.41%) driven by credit cards and MFI. PAT recovering from near-zero (FY23 crisis) to ₹230 Cr. CTI at 65% signals cost inefficiency. GNPA improved to 1.45% from 2.60%. Valuations cheap but execution quality still being established.',
+    pills: ['Credit Cards', 'High NIM', 'MFI Book', 'Turnaround Watch']
+  },
+  {
+    bank: 'CUB', type: 'private', color: '#FFB74D',
+    moat: 'Chettiar Community Network + Conservative Lending',
+    text: 'City Union Bank — 120-year old Kumbakonam-rooted bank with near-zero political risk. GNPA at 1.91%, PCR 85%, CRAR 21.92% — a capital fortress. NIM of 3.90% reflects disciplined trade & MSME lending. Consistently profitable with zero major controversies.',
+    pills: ['Community Bank', 'Ultra-Stable', 'Trade Finance', 'High CRAR']
+  },
+  {
+    bank: 'TMB', type: 'private', color: '#FF7B72',
+    moat: 'Gold Loans + Highest NIM + Capital Surplus',
+    text: 'Tamilnad Mercantile Bank — highest NIM at 4.18% in this peer set. GNPA at just 0.73% — best asset quality here. CRAR of 33.73% is extraordinary — 14% above minimum. ROA at 2.05% is also best-in-class. Gold loan-heavy retail focus in TN/AP MSME corridor.',
+    pills: ['Best GNPA 0.73%', 'Highest NIM 4.18%', 'Gold Loans', 'CRAR 33.73%']
+  },
+  {
+    bank: 'Karnataka Bank', type: 'private', color: '#7C3AED',
+    moat: 'Karnataka SME Anchor + Centenary Transformation',
+    text: '102-year-old Mangaluru bank undergoing a structural overhaul. PAT ₹408 Cr — record quarter. GNPA down to 2.78%, NNPA < 1%. NIM recovering to 3.07%. New management (ex-SBI DNA) driving technology, retail lending and MSME pivots. LCR at 165% signals excess liquidity buffer.',
+    pills: ['Centenary Bank', 'Transformation Phase', 'MSME/Agri Focus', 'High LCR']
+  },
+  {
+    bank: 'SIB', type: 'private', color: '#0D9488',
+    moat: 'Kerala NRI Franchise + Gold Loans + Asset Turnaround',
+    text: 'South Indian Bank — record FY26 profit ₹1,455 Cr. GNPA plunged from 3.20% to 1.43% in a single year — the sharpest NPA turnaround in this pack. Gold loan book grew 46% YoY. Strong NRI deposit base from Kerala diaspora. PCR at 94% and CRAR 19.66% indicate solid provisioning.',
+    pills: ['NRI Deposits', 'Gold Loans 46% Growth', 'GNPA Turnaround', 'PCR 94%']
+  },
+];
+
+function renderUSP() {
+  const grid = document.getElementById('uspGrid');
+  grid.innerHTML = BANK_USP.map(b => `
+    <div class="usp-card">
+      <div class="usp-card-accent" style="background:${b.color};"></div>
+      <div style="padding-left:8px;">
+        <span class="usp-bank-name" style="color:${b.color};">${b.bank}</span>
+        <span class="usp-tag ${b.type}">${b.type === 'psu' ? 'PSU' : 'Private'}</span>
+      </div>
+      <div class="usp-moat">⚡ ${b.moat}</div>
+      <div class="usp-text">${b.text}</div>
+      <div class="usp-pill-row">${b.pills.map(p => `<span class="usp-pill">${p}</span>`).join('')}</div>
+    </div>
+  `).join('');
+}
+
+
+// ── SUGGEST CHIPS ──
+const SUGGEST_CHIPS = {
+  en: ['What is NIM and why does it matter?','Which bank has the best asset quality?','Why is IndusInd Bank in trouble?','What does CRAR tell an investor?','Compare ROA of all banks','What is CASA ratio?','Which bank has lowest GNPA?','Why is P/BV important for banks?','What is credit cost?','Which bank looks best for investment?'],
+  ta: ['NIM என்றால் என்ன?','எந்த வங்கி சிறந்த சொத்து தரம் கொண்டது?','IndusInd Bank ஏன் சிக்கலில் உள்ளது?','CRAR என்ன சொல்கிறது?','அனைத்து வங்கிகளின் ROA ஒப்பீடு','CASA ratio என்றால் என்ன?','மிகக் குறைந்த GNPA எந்த வங்கி?','P/BV ஏன் முக்கியம்?','Credit cost என்றால் என்ன?','முதலீட்டுக்கு எந்த வங்கி?']
+};
+
+// ── USER Q&A KNOWLEDGE BASE ──
+const USER_QA_KB = [
+  { keywords:['nim','net interest margin','interest margin'],
+    en:{title:'Net Interest Margin (NIM)',body:`<p><strong>NIM = (Interest Income − Interest Expense) / Average Earning Assets.</strong> It measures how profitably a bank deploys its funds. Higher NIM = more earned per rupee lent vs paid to depositors.</p><p>Q4 FY26 in this dashboard: <strong>RBL Bank 4.41%</strong> (credit cards), <strong>ICICI 4.32%</strong>, <strong>TMB 4.18%</strong> (gold loans). Lower end: <strong>SIB 2.95%</strong>, <strong>Union Bank 2.64%</strong>. PSU banks have lower NIMs — they lend at finer rates to government projects. NIM compression across FY26 reflects RBI rate cuts and falling lending yields.</p>`},
+    ta:{title:'நிகர வட்டி வரம்பு (NIM)',body:`<p><strong>NIM = (வட்டி வருமானம் − வட்டி செலவு) / சராசரி வருமான சொத்துகள்.</strong> அதிக NIM = வங்கி திறமையாக நிதி deploy செய்கிறது.</p><p>Q4 FY26: <strong>RBL 4.41%</strong>, <strong>ICICI 4.32%</strong>, <strong>TMB 4.18%</strong>. குறைவு: <strong>SIB 2.95%</strong>, <strong>Union Bank 2.64%</strong>. RBI rate cuts காரணமாக FY26-ல் NIM சுருக்கம் தொடர்கிறது.</p>`}
+  },
+  { keywords:['gnpa','nnpa','npa','non performing','bad loan','asset quality','best asset'],
+    en:{title:'Asset Quality — GNPA & NNPA',body:`<p>GNPA% = all bad loans / gross advances. NNPA% = after deducting provisions. Q4 FY26 rankings: <strong>Best GNPA: TMB 0.73%</strong>. <strong>Best NNPA: Indian Bank 0.16%</strong> (PCR 98.3%). <strong>Worst GNPA: IndusInd 3.43%</strong> — rising from 1.92% in Q4FY25. <strong>Biggest improvement: SIB</strong> — GNPA fell from 3.20% → 1.43% in one year. Rule: below 2% = healthy; 2–4% = watch; above 4% = stress.</p>`},
+    ta:{title:'சொத்து தரம் — GNPA & NNPA',body:`<p>Q4 FY26: <strong>சிறந்த GNPA: TMB 0.73%</strong>. <strong>சிறந்த NNPA: Indian Bank 0.16%</strong>. <strong>மோசமான: IndusInd 3.43%</strong>. <strong>மிகப்பெரிய முன்னேற்றம்: SIB</strong> — 3.20% → 1.43%. விதி: 2% கீழ் = ஆரோக்கியம்; 2–4% = கவனி; 4%+ = stress.</p>`}
+  },
+  { keywords:['indusind','induslnd','indus ind','why indusind','indusind trouble'],
+    en:{title:'IndusInd Bank — What Went Wrong?',body:`<p>PAT collapsed from <strong>₹2,349 Cr (Q4FY25) → ₹594 Cr (Q4FY26) — a 75% decline</strong>. Three converging problems: (1) <strong>Microfinance (MFI) portfolio stress</strong> — rural over-leveraging post-COVID; (2) <strong>Derivatives accounting restatement</strong> — hidden forex derivatives losses surfaced; (3) <strong>CEO transition</strong> — leadership uncertainty. GNPA jumped 1.92% → 3.43% in 5 quarters. P/BV 1.77x at ROE 3.78% looks expensive. Core franchise (vehicle loans, corporate) remains intact — watch new management.</p>`},
+    ta:{title:'IndusInd Bank — என்ன நடந்தது?',body:`<p>PAT <strong>₹2,349 Cr → ₹594 Cr — 75% சரிவு</strong>. மூன்று பிரச்சனைகள்: (1) <strong>MFI portfolio stress</strong>; (2) <strong>Derivatives accounting restatement</strong> — hidden losses; (3) <strong>CEO மாற்றம்</strong>. GNPA 1.92% → 3.43%. P/BV 1.77x + ROE 3.78% — விலை அதிகம். Vehicle loans franchise intact — new management கவனிக்கவும்.</p>`}
+  },
+  { keywords:['crar','capital adequacy','tier 1','cet1','capital ratio','capital'],
+    en:{title:'CRAR — Capital Adequacy Ratio',body:`<p><strong>CRAR = Capital (Tier 1 + Tier 2) / Risk-Weighted Assets.</strong> RBI minimum: 11.5%. Higher CRAR = more losses absorbable before insolvency.</p><p>Q4 FY26: <strong>TMB 33.73%</strong> — 3x minimum, a fortress. <strong>CUB 21.92%</strong>, <strong>HDFC 19.71%</strong>. <strong>Lowest: RBL 14.25%</strong> — only 2.75% buffer above minimum. Very high CRAR (TMB) can signal under-deployment and suppressed ROE. Ideal range for growth-oriented private bank: 16–20%.</p>`},
+    ta:{title:'CRAR — மூலதன போதுமான விகிதம்',body:`<p><strong>CRAR = மூலதனம் / Risk-Weighted Assets.</strong> RBI minimum 11.5%.</p><p>Q4 FY26: <strong>TMB 33.73%</strong> — minimum-ஐ 3 மடங்கு. <strong>RBL 14.25%</strong> — minimum-ஐ 2.75% மட்டும் மிஞ்சி. Growth bank-க்கு சிறந்த range: 16–20%.</p>`}
+  },
+  { keywords:['roa','return on assets','return on asset'],
+    en:{title:'Return on Assets (ROA)',body:`<p>ROA = Net Profit / Average Total Assets. RBI considers 1%+ healthy. Q4 FY26: <strong>ICICI 2.28%</strong>, <strong>TMB 2.05%</strong>, <strong>HDFC 1.96%</strong>, Axis 1.50%, CUB 1.56%, Karnataka Bank 1.27%, SIB 1.17%, Indian Bank 1.20%, Union Bank 1.25%. Underperformers: <strong>IndusInd 0.40%</strong>, <strong>RBL 0.43%</strong>. ROA is leverage-independent — the cleanest measure of operational efficiency.</p>`},
+    ta:{title:'சொத்துகளின் மீதான வருமானம் (ROA)',body:`<p>ROA = நிகர லாபம் / சராசரி சொத்துகள். RBI 1%+ ஆரோக்கியம். Q4 FY26: <strong>ICICI 2.28%</strong>, <strong>TMB 2.05%</strong>, <strong>HDFC 1.96%</strong>. Underperformers: <strong>IndusInd 0.40%</strong>, <strong>RBL 0.43%</strong>.</p>`}
+  },
+  { keywords:['casa','current account','savings account','casa ratio','low cost deposit'],
+    en:{title:'CASA Ratio — Low-Cost Deposit Franchise',body:`<p><strong>CASA = (Current + Savings deposits) / Total Deposits.</strong> Current accounts = 0% interest; savings = ~3–4%. High CASA → lower funding cost → wider NIM.</p><p>Q4 FY26 leaders: <strong>Axis 40.00%</strong>, <strong>ICICI 38.60%</strong>, <strong>Indian Bank 38.00%</strong>. Laggards: <strong>TMB 28.10%</strong>, <strong>CUB 28.50%</strong>. <strong>Karnataka Bank improved to 33.61%</strong> (+186 bps YoY) — a positive transformation signal. CASA is a structural moat built over years — the single biggest differentiator between top-tier and second-tier banks.</p>`},
+    ta:{title:'CASA Ratio — குறைந்த செலவு வைப்பு franchise',body:`<p>CASA அதிகம் = குறைந்த funding cost = அகலமான NIM. Q4 FY26: <strong>Axis 40%</strong>, <strong>ICICI 38.6%</strong>, <strong>Indian Bank 38%</strong>. <strong>Karnataka Bank 33.61%</strong> — 186 bps YoY முன்னேற்றம். TMB/CUB ~28% — குறைவு ஆனால் high-yield lending-ல் compensate.</p>`}
+  },
+  { keywords:['pcr','provision coverage','provision coverage ratio'],
+    en:{title:'Provision Coverage Ratio (PCR)',body:`<p><strong>PCR = Cumulative Provisions / Gross NPAs.</strong> High PCR = bank has already absorbed NPA pain; future earnings protected. Q4 FY26: <strong>Indian Bank 98.30%</strong> (best), <strong>TMB 96.14%</strong>, <strong>Union Bank 95.00%</strong>, <strong>SIB 94.10%</strong>. Lowest: <strong>IndusInd 71.45%</strong>, <strong>RBL 73.60%</strong> — meaningful uncovered risk remains. High PCR + falling GNPA = silent earnings tailwind.</p>`},
+    ta:{title:'Provision Coverage Ratio (PCR)',body:`<p>PCR அதிகம் = வலி ஏற்கனவே absorbed. Q4 FY26: <strong>Indian Bank 98.30%</strong>, <strong>TMB 96.14%</strong>, <strong>SIB 94.10%</strong>. குறைவு: <strong>IndusInd 71.45%</strong>, <strong>RBL 73.60%</strong> — uncovered risk இன்னும் உள்ளது.</p>`}
+  },
+  { keywords:['pbv','p/bv','price to book','book value','price book'],
+    en:{title:'Price-to-Book Value (P/BV)',body:`<p><strong>P/BV = Market Price / Book Value Per Share.</strong> Below 1x = market fears hidden losses. Always read with ROE — high P/BV only justified by high ROE.</p><p>Q4 FY26: <strong>Indian Bank 3.04x</strong> (ROE 18.54%), <strong>ICICI 2.87x</strong>, <strong>Axis 2.12x</strong>. Below book: <strong>Karnataka Bank 0.64x</strong>, <strong>YES Bank 0.95x</strong>, <strong>SIB 1.01x</strong> — value plays if fundamentals hold. <strong>IndusInd 1.77x at ROE 3.78%</strong> — expensive given collapsed returns.</p>`},
+    ta:{title:'Price-to-Book Value (P/BV)',body:`<p>1x கீழ் = மறைந்த நஷ்ட கவலை. எப்போதும் ROE-உடன் சேர்த்துப் படிக்கவும். Q4 FY26: <strong>Indian Bank 3.04x</strong>, <strong>ICICI 2.87x</strong>. Book கீழ்: <strong>Karnataka Bank 0.64x</strong>, <strong>YES Bank 0.95x</strong>. <strong>IndusInd 1.77x + ROE 3.78%</strong> — விலை அதிகம்.</p>`}
+  },
+  { keywords:['credit cost','cost of credit','provisioning cost'],
+    en:{title:'Credit Cost — The Hidden P&L Driver',body:`<p><strong>Credit Cost = Net NPA Provisions / Average Advances.</strong> Transitioning from high to low credit cost is the most powerful PAT lever — no revenue growth needed.</p><p>Q4 FY26: <strong>SIB ~0.03%</strong> (near zero — enables record PAT), <strong>Indian Bank ~0.10%</strong>. IndusInd's credit cost spiked as MFI slippages hit. When credit cost normalises (like Indian Bank post-2022), even flat NII delivers strong profit growth.</p>`},
+    ta:{title:'Credit Cost — மறைந்த P&L இயக்கி',body:`<p>Credit Cost high → low transition = மிகவும் சக்திவாய்ந்த PAT lever. Q4 FY26: <strong>SIB ~0.03%</strong> (record PAT காரணம் இதுவே), <strong>Indian Bank ~0.10%</strong>. IndusInd spike — MFI slippages. Credit cost normalisation = flat NII-யிலும் வலுவான PAT வளர்ச்சி.</p>`}
+  },
+  { keywords:['best bank','invest','which bank','top bank','recommend','investment','buy','good bank'],
+    en:{title:'Which Bank Looks Best? (Data View — Not Advice)',body:`<p>Based purely on Q4 FY26 data — not investment advice. <strong>Quality + Consistency:</strong> ICICI (ROA 2.28%, GNPA 1.40%), Indian Bank (ROE 18.54%, NNPA 0.16%). <strong>Turnaround / Value:</strong> SIB (GNPA 1.43%, P/BV 1.01x), Karnataka Bank (P/BV 0.64x, record PAT). <strong>Stability:</strong> TMB (GNPA 0.73%, CRAR 33.73%, ROA 2.05%). <strong>High Risk / Avoid:</strong> IndusInd (PAT -75% YoY, GNPA rising). The "best" bank depends on your risk appetite, investment horizon, and portfolio purpose.</p>`},
+    ta:{title:'எந்த வங்கி சிறந்தது? (Data பார்வை — Advice அல்ல)',body:`<p><strong>தரம்:</strong> ICICI (ROA 2.28%), Indian Bank (ROE 18.54%). <strong>Turnaround:</strong> SIB (P/BV 1.01x), Karnataka Bank (P/BV 0.64x). <strong>நிலைத்தன்மை:</strong> TMB (GNPA 0.73%). <strong>Avoid:</strong> IndusInd (PAT -75%). "சிறந்த" வங்கி உங்கள் risk appetite-ஐ பொறுத்தது.</p>`}
+  },
+  { keywords:['roe','return on equity','return equity'],
+    en:{title:'Return on Equity (ROE)',body:`<p>ROE = Net Profit / Average Shareholders Equity. Sustained 15%+ = excellent. Q4 FY26: <strong>Indian Bank 18.54%</strong>, <strong>ICICI 17.20%</strong>, <strong>Union Bank 15.86%</strong>, <strong>TMB 15.50%</strong>. Below cost of equity (~14%): <strong>IndusInd 3.78%</strong>, <strong>RBL 4.20%</strong>, <strong>YES Bank 8.20%</strong>. <strong>Karnataka Bank improved 8.56% → 12.69%</strong> — meaningful turnaround signal. Banks below cost of equity are destroying value.</p>`},
+    ta:{title:'Return on Equity (ROE)',body:`<p>15%+ சிறந்தது. Q4 FY26: <strong>Indian Bank 18.54%</strong>, <strong>ICICI 17.20%</strong>, <strong>TMB 15.50%</strong>. Cost of equity (~14%) கீழ்: <strong>IndusInd 3.78%</strong>, <strong>RBL 4.20%</strong>. <strong>Karnataka Bank 8.56% → 12.69%</strong> — turnaround signal.</p>`}
+  },
+  { keywords:['hdfc','hdfc bank'],
+    en:{title:'HDFC Bank — Q4 FY26',body:`<p>PAT <strong>₹19,221 Cr</strong> (+9% YoY), NII ₹33,081 Cr, <strong>NIM 3.38%</strong> (compressed from 3.63% YoY), GNPA 1.15%, CD Ratio 95.32% (historically high). ROA 1.96%, ROE 14.10%, CRAR 19.71%, P/BV 1.13x. Market concerns: NIM compression and elevated CD ratio — not asset quality. Franchise strength: India's best distribution network.</p>`},
+    ta:{title:'HDFC Bank — Q4 FY26',body:`<p>PAT <strong>₹19,221 Cr</strong>, NIM 3.38% (3.63% இலிருந்து சுருக்கம்), GNPA 1.15%, CD Ratio 95.32%. P/BV 1.13x. கவலை: NIM compression + high CD ratio. Franchise: India-ன் சிறந்த distribution network.</p>`}
+  },
+  { keywords:['indian bank','indianbank'],
+    en:{title:'Indian Bank — Q4 FY26',body:`<p>PAT <strong>₹3,103 Cr</strong>, ROE <strong>18.54%</strong> (highest here), NNPA <strong>0.16%</strong> (best book quality), PCR 98.30%. NIM 3.37%, CRAR 17.10%, P/BV 3.04x. Chennai-based, strong TN/AP agriculture & MSME. Post-Allahabad Bank merger: balance sheet thoroughly cleaned. The only PSU trading at meaningful book premium — justified by NNPA + ROE combination.</p>`},
+    ta:{title:'Indian Bank — Q4 FY26',body:`<p>PAT <strong>₹3,103 Cr</strong>, ROE <strong>18.54%</strong> (இங்கு அதிகம்), NNPA <strong>0.16%</strong>, PCR 98.30%, P/BV 3.04x. Chennai தலைமையகம், TN/AP வலிமை. PSU premium valuation நியாயமானது.</p>`}
+  },
+  { keywords:['karnataka bank','ktkbank','ktk'],
+    en:{title:'Karnataka Bank — Q4 FY26',body:`<p>102-year-old Mangaluru bank in transformation. PAT <strong>₹408 Cr</strong> (record, +62% YoY). NIM 3.07% (recovering from 2.72%), GNPA 2.78% (↓ from 3.08%), NNPA 0.98% (below 1% for first time). CTI improved dramatically: 68.98% → 50.47% — biggest efficiency gain in this pack. LCR 165%, CRAR 20.07%, CASA 33.61%. <strong>P/BV 0.64x</strong> — deeply below book, potential value if turnaround sustains.</p>`},
+    ta:{title:'Karnataka Bank — Q4 FY26',body:`<p>PAT <strong>₹408 Cr</strong> (record, +62% YoY). NIM 3.07%, GNPA 2.78%, NNPA 0.98% (முதல்முறை 1% கீழ்). CTI 68.98% → 50.47% — மிகப்பெரிய efficiency gain. <strong>P/BV 0.64x</strong> — book-க்கு கீழ், turnaround தொடர்ந்தால் value.</p>`}
+  },
+  { keywords:['sib','south indian bank','southbank'],
+    en:{title:'South Indian Bank (SIB) — Q4 FY26',body:`<p>PAT <strong>₹408 Cr</strong> (record, +19% YoY), NII ₹915 Cr (record), NIM 2.95%. GNPA <strong>3.20% → 1.43%</strong> — sharpest NPA improvement in this pack. PCR 94.10%, NNPA 0.29%. Gold loans +46% YoY. CRAR 19.66%, P/BV 1.01x. MD term ends September 2026 — CEO succession is the key near-term risk. FY27 growth guidance: 15–16%.</p>`},
+    ta:{title:'South Indian Bank (SIB) — Q4 FY26',body:`<p>PAT <strong>₹408 Cr</strong> (record), GNPA <strong>3.20% → 1.43%</strong> — இந்த pack-ல் மிகப்பெரிய NPA turnaround. தங்கக் கடன்கள் 46% YoY. P/BV 1.01x. MD September 2026 — CEO succession risk.</p>`}
+  },
+  { keywords:['tmb','tamilnad','tamilnad mercantile'],
+    en:{title:'TMB — Q4 FY26',body:`<p>PAT <strong>₹374 Cr</strong> (+28% YoY), NIM <strong>4.18%</strong> (2nd highest), GNPA <strong>0.73%</strong> (best here), ROA <strong>2.05%</strong> (best here), CRAR 33.73%. Gold loan-heavy TN/AP focus. P/BV 1.07x — undervalued for the quality. No promoter, clean governance. Consistent dividend. Risk: geography concentration, gold price sensitivity.</p>`},
+    ta:{title:'TMB — Q4 FY26',body:`<p>PAT <strong>₹374 Cr</strong>, NIM <strong>4.18%</strong>, GNPA <strong>0.73%</strong> (இங்கு சிறந்தது), ROA <strong>2.05%</strong>, CRAR 33.73%. P/BV 1.07x — quality-க்கு undervalued. Clean governance. Risk: gold price sensitivity.</p>`}
+  },
+  { keywords:['deposit','deposit growth','cd ratio','credit deposit'],
+    en:{title:'Deposits & Credit-Deposit Ratio',body:`<p>CD Ratio = Advances / Deposits. RBI comfort: 75–85%. <strong>HDFC 95.32%</strong> — running hot; aggressive loans outpacing deposits. <strong>Union Bank 73.80%</strong> — conservative PSU. Largest deposit base: HDFC ₹31.05 lakh Cr, ICICI ₹17.95 lakh Cr. <strong>SIB deposit growth 15% YoY</strong>, Karnataka Bank 3.79% YoY. PSU banks have structural advantage in deposit mobilisation via government accounts and rural reach.</p>`},
+    ta:{title:'வைப்புகள் & Credit-Deposit Ratio',body:`<p>CD Ratio = Advances / Deposits. RBI range: 75–85%. <strong>HDFC 95.32%</strong> — hot. <strong>Union Bank 73.80%</strong> — conservative. <strong>SIB deposit growth 15% YoY</strong>, Karnataka Bank 3.79%. PSU banks-க்கு அரசு கணக்குகள் மூலம் structural deposit advantage.</p>`}
+  }
+];
+
+// ── CURATED DEEP-DIVE Q&A ──
+const QA_DATA = [
+  {
+    category: { en: 'Valuation Fundamentals', ta: 'மதிப்பீட்டு அடிப்படைகள்' },
+    questions: [
+      {
+        q: { en: 'Why is Price-to-Book Value (P/BV) the most relevant valuation metric for banks, unlike P/E for manufacturing companies?', ta: 'வங்கிகளுக்கு P/BV ஏன் P/E ஐ விட முக்கியமான மதிப்பீட்டு அளவுகோலாகும்?' },
+        a: { en: `<p>Banks are fundamentally <strong>balance-sheet businesses</strong> — their core asset is money itself. A manufacturing company's value lies in factories and brands, which may not appear accurately on a balance sheet. But a bank's assets (loans, bonds) and liabilities (deposits) are directly financial, making book value a realistic proxy for intrinsic worth.</p><p>A P/BV below 1x means the market values the bank at less than its net worth — signalling hidden NPAs or capital erosion risk. In this dashboard: <strong>Karnataka Bank at 0.64x</strong> and <strong>YES Bank at 0.95x</strong> trade below book, while <strong>Indian Bank at 3.04x</strong> and <strong>ICICI at 2.87x</strong> command a premium for high ROE and clean books. P/E, by contrast, can be inflated by provisioning choices, treasury gains, or deferred tax — none of which affect P/BV.</p>`, ta: `<p>வங்கிகள் அடிப்படையில் <strong>இருப்புநிலை வணிகங்கள்</strong> — Book Value உண்மையான மதிப்பின் நேரடி அளவுகோல். P/BV 1x கீழ் = மறைந்த NPA கவலை அல்லது மூலதன அரிப்பு அபாயம்.</p><p>இந்த dashboard-ல்: <strong>Karnataka Bank 0.64x</strong>, <strong>YES Bank 0.95x</strong> — Book கீழ். <strong>Indian Bank 3.04x</strong>, <strong>ICICI 2.87x</strong> — premium valuation. P/E provision choices, treasury gains-ஆல் distort ஆகலாம் — P/BV ஆகாது.</p>` }
+      },
+      {
+        q: { en: 'For the same P/BV, why does ROE matter? How should you read P/BV alongside ROE when comparing these 12 banks?', ta: 'ஒரே P/BV இருந்தாலும் ROE ஏன் முக்கியம்? P/BV மற்றும் ROE ஐ எப்படி சேர்த்துப் படிக்க வேண்டும்?' },
+        a: { en: `<p>P/BV is meaningless without ROE context. The Gordon Growth formula: <strong>P/BV = (ROE − g) / (CoE − g)</strong>. A bank with high ROE deserves a high P/BV — it compounds book value faster.</p><p>In this dashboard: <strong>Indian Bank ROE 18.54% at P/BV 3.04x</strong> — defensible. <strong>TMB ROE 15.5% at P/BV 1.07x</strong> — arguably undervalued. <strong>IndusInd ROE 3.78% at P/BV 1.77x</strong> — dangerously expensive. <strong>SIB P/BV 1.01x at recovering ROE</strong> — potential re-rating if turnaround sustains. Always cross-check: high P/BV with low ROE is a value trap.</p>`, ta: `<p>P/BV-க்கு ROE சூழல் இல்லாமல் அர்த்தமில்லை. Gordon Growth: <strong>P/BV = (ROE − g) / (CoE − g)</strong>.</p><p><strong>Indian Bank ROE 18.54% + P/BV 3.04x</strong> — நியாயமானது. <strong>IndusInd ROE 3.78% + P/BV 1.77x</strong> — value trap. <strong>SIB P/BV 1.01x</strong> + recovering ROE — turnaround re-rating சாத்தியம்.</p>` }
+      }
+    ]
+  },
+  {
+    category: { en: 'Balance Sheet vs P&L Analysis', ta: 'இருப்புநிலை vs லாப-நஷ்டக் கணக்கு' },
+    questions: [
+      {
+        q: { en: 'Why is the balance sheet a more reliable lens than the P&L for banks — and how can a bank report strong profits while its balance sheet deteriorates?', ta: 'வங்கிக்கு P&L-ஐ விட Balance Sheet ஏன் நம்பகமான கண்ணோட்டம்? வலுவான லாபம் அறிவித்தாலும் Balance Sheet எப்படி மோசமாகலாம்?' },
+        a: { en: `<p>In a bank, P&L is <strong>heavily influenced by management discretion</strong> — provisioning policy, NPA recognition timing, and deferred tax adjustments can shift reported profits without reflecting reality. A bank can report high PAT by simply under-provisioning for bad loans.</p><p>The balance sheet reveals the truth: <strong>GNPA%, NNPA%, PCR, CRAR, and CD ratio</strong> are the real health indicators. IndusInd Bank is the live example in this pack — PAT appeared healthy at ₹2,349 Cr (Q4FY25) while GNPA was quietly rising and derivatives losses were accumulating. Compare: Indian Bank's steady earnings are backed by NNPA 0.16% and PCR 98.3% — the provisioning work was done years earlier.</p>`, ta: `<p>P&L <strong>நிர்வாக விருப்பத்தால் பாதிக்கப்படுகிறது</strong> — under-provisioning மூலம் PAT உயர்த்தலாம்.</p><p>Balance Sheet மறைக்காத உண்மை: <strong>GNPA%, PCR, CRAR</strong>. IndusInd — PAT ₹2,349 Cr "healthy"-ஆக தெரிந்தாலும் GNPA quietly உயர்ந்தது. Indian Bank — NNPA 0.16%, PCR 98.3% — clean balance sheet = steady earnings.</p>` }
+      },
+      {
+        q: { en: 'PCR at Indian Bank is 98.3% and TMB is 96.1% — what does this actually protect future earnings from, and why is it a moat?', ta: 'Indian Bank PCR 98.3%, TMB 96.1% — இது எதிர்கால வருவாயை எதிலிருந்து பாதுகாக்கிறது? ஏன் இது ஒரு moat?' },
+        a: { en: `<p><strong>PCR = Cumulative Provisions / Gross NPAs.</strong> At 98.3%, Indian Bank has set aside ₹98.30 for every ₹100 of bad loans — only ₹1.70 remains uncovered. This means: (1) future NPA surprises have minimal P&L impact, (2) when NPAs resolve (recovery, ARC sale, upgrade), provisions reverse as income — a silent <strong>earnings tailwind</strong>.</p><p>Compare with <strong>IndusInd at 71.45%</strong> — ₹28.55 of every ₹100 bad loan is uncovered. Any fresh slippage hits P&L hard. This asymmetry is why Indian Bank has delivered consistent PAT growth even as NII was flat. High PCR is not just safety — it is a future profit reservoir.</p>`, ta: `<p>PCR 98.3% = ₹100 கெட்ட கடனுக்கு ₹98.30 ஒதுக்கப்பட்டது. NPA resolve ஆகும்போது provisions income ஆகும் — <strong>மறைமுக வருவாய் ஊக்கம்</strong>.</p><p><strong>IndusInd 71.45%</strong> — ₹28.55 uncovered. Fresh slippage direct P&L hit. Indian Bank flat NII-யிலும் consistent PAT — high PCR ஒரு future profit reservoir.</p>` }
+      }
+    ]
+  },
+  {
+    category: { en: 'NIM, Spreads & Operating Leverage', ta: 'வட்டி வரம்பு & செயல்பாட்டு leverage' },
+    questions: [
+      {
+        q: { en: 'TMB (4.18% NIM) and ICICI (4.32%) sit at the top — yet ICICI is 50x larger. Why can large banks not replicate small-bank margins?', ta: 'TMB NIM 4.18%, ICICI 4.32% — ICICI 50 மடங்கு பெரியது. பெரிய வங்கிகளால் சிறிய வங்கிகளின் NIM-ஐ ஏன் நகல் எடுக்க முடியாது?' },
+        a: { en: `<p>High NIMs come from <strong>high-yield lending</strong> (gold loans, credit cards, microfinance) or <strong>low-cost liabilities</strong> (high CASA). TMB's 4.18% reflects its gold loan-heavy book — rates of 10–14% with minimal credit appraisal cost. Large banks cannot concentrate here: the addressable market is too small relative to their balance sheet size.</p><p>ICICI's 4.32% at its scale is exceptional — its post-2018 pivot to retail (credit cards, personal loans) explains it. <strong>HDFC at 3.38%</strong> has compressed because scale forces exposure to lower-yield corporate/mortgage segments. <strong>Union Bank at 2.64%</strong> — PSU lending to government projects at thin spreads. In this dashboard, <strong>RBL Bank leads at 4.41%</strong> via credit cards — but this comes with the highest credit cost risk.</p>`, ta: `<p>TMB 4.18% NIM = gold loan-heavy book (10–14% rates). பெரிய வங்கிகளால் இதை நகல் எடுக்க முடியாது — addressable market மிகவும் சிறியது.</p><p>ICICI 4.32% — retail pivot (credit cards) காரணம். <strong>HDFC 3.38%</strong> — corporate/mortgage scale compression. <strong>Union Bank 2.64%</strong> — government lending thin spreads. <strong>RBL 4.41%</strong> highest — credit cards, but highest credit cost risk.</p>` }
+      },
+      {
+        q: { en: 'Karnataka Bank\'s Cost-to-Income ratio fell from 68.98% to 50.47% in one year. How does CTI improvement translate to ROE expansion without any revenue growth?', ta: 'Karnataka Bank CTI 68.98% → 50.47% ஒரே வருடத்தில். Revenue வளர்ச்சி இல்லாமல் CTI முன்னேற்றம் எப்படி ROE expansion-ஆக மாறுகிறது?' },
+        a: { en: `<p><strong>CTI = Operating Expenses / Net Revenue (NII + Other Income).</strong> A drop from 68.98% to 50.47% means Karnataka Bank now retains ₹49.53 per ₹100 earned instead of ₹31.02 — that extra ₹18.51 flows straight to operating profit.</p><p>The math: if NII stays flat at ₹843 Cr but CTI drops 18 points, operating profit grows ~59% automatically. This is pure operating leverage — no credit risk taken, no new customers needed. For ROE: higher operating profit → higher PAT → higher return on the same equity base. <strong>Karnataka Bank ROE jumped from 8.56% to 12.69%</strong> in one year largely on this CTI improvement. Sustained CTI below 50% is the marker that separates tier-1 private banks (HDFC 39.9%, ICICI 39.8%) from the rest.</p>`, ta: `<p>CTI 68.98% → 50.47% = ₹100 சம்பாதிக்க இப்போது ₹50.47 மட்டும் செலவு. மீதமுள்ள ₹49.53 operating profit-ஆக மாறுகிறது.</p><p>NII flat ஆக இருந்தாலும் CTI 18 points குறைந்தால் operating profit ~59% auto-growth. <strong>Karnataka Bank ROE 8.56% → 12.69%</strong> — இந்த CTI improvement தான் முக்கிய காரணம். 50% கீழ் CTI = tier-1 marker (HDFC 39.9%, ICICI 39.8%).</p>` }
+      }
+    ]
+  },
+  {
+    category: { en: 'Asset Quality & Risk Reading', ta: 'சொத்து தரம் & ஆபத்து வாசிப்பு' },
+    questions: [
+      {
+        q: { en: 'SIB\'s GNPA fell from 3.20% to 1.43% in a year. How much of this is genuine recovery vs technical write-offs — and what are the risks ahead?', ta: 'SIB GNPA 3.20% → 1.43% ஒரே வருடத்தில். இதில் எவ்வளவு உண்மையான மீட்சி vs technical write-off? முன்னிருக்கும் risks என்ன?' },
+        a: { en: `<p>SIB's improvement is real but needs unpacking. There are three ways to reduce GNPA: (1) actual recoveries, (2) <strong>technical write-offs</strong> (removed from GNPA but loan still exists), (3) restructuring upgrades. SIB's FY26 investor presentation discloses a <strong>₹1,163 Cr technical write-off</strong> — excluding this, gross advances growth would have been 15.8% not 14.5%.</p><p>However, the genuine indicators are equally strong: PCR rose to 94.10%, slippage ratio is near-nil (0.03%), and SIB's new loan book (post Oct-2020) is 96% A+ rated. Key risks ahead: gold price correction (45.62% gold loan growth creates concentration), NRI remittance slowdown from West Asia (MD explicitly flagged), and CEO succession (term ends September 2026).</p>`, ta: `<p>SIB-ன் முன்னேற்றம் உண்மையானது ஆனால் விளக்கம் தேவை. FY26-ல் <strong>₹1,163 Cr technical write-off</strong> — இதை நீக்கினால் loan growth 15.8%. ஆனால் genuine indicators: PCR 94.10%, slippage 0.03%, new book 96% A+ rated.</p><p>முன்னிருக்கும் risks: gold price correction (45.62% gold loan concentration), West Asia NRI remittance slowdown, CEO succession September 2026.</p>` }
+      },
+      {
+        q: { en: 'HDFC Bank\'s CD ratio is at a historic high of 95.32%. What does this signal about liquidity, NIM trajectory, and deposit strategy?', ta: 'HDFC Bank CD ratio வரலாற்றுத் திட்டம் 95.32%. இது liquidity, NIM மற்றும் deposit strategy-யில் என்ன சொல்கிறது?' },
+        a: { en: `<p>A CD ratio of 95.32% means HDFC is deploying ₹95.32 in loans for every ₹100 raised as deposits — historically it was below 85%. This signals: (1) <strong>loan growth is running ahead of deposit mobilisation</strong>; (2) limited buffer for sudden large deposit outflows; (3) HDFC must keep raising deposit rates to attract funds, compressing NIM from the liability side.</p><p>Evidence: HDFC's NIM has already compressed from 3.63% (Q4FY25) to 3.38% (Q4FY26) — a 25 bps squeeze in one year. This is why HDFC has been running aggressive deposit campaigns. The CD ratio risk is not solvency — HDFC's CRAR at 19.71% is robust — but it caps NIM recovery potential and makes the bank vulnerable to deposit competition from PSUs and small finance banks offering higher rates.</p>`, ta: `<p>CD ratio 95.32% = ₹100 வைப்பிற்கு ₹95.32 கடன் — வரலாற்றில் 85% கீழ் இருந்தது. Signals: (1) loan growth வைப்பை விட வேகமாக; (2) deposit outflow buffer குறைவு; (3) NIM compression.</p><p>HDFC NIM 3.63% → 3.38% — ஒரே வருடத்தில் 25 bps சுருக்கம். Risk: solvency அல்ல (CRAR 19.71% robust) — ஆனால் NIM recovery cap ஆகுமா என்பது கேள்வி.</p>` }
+      }
+    ]
+  },
+  {
+    category: { en: 'Capital, Strategy & Long-Term Investing', ta: 'மூலதனம், மூலோபாயம் & நீண்ட கால முதலீடு' },
+    questions: [
+      {
+        q: { en: 'TMB\'s CRAR is 33.73% — nearly 3x the regulatory minimum. Is this a sign of financial strength, or is excess capital destroying shareholder value?', ta: 'TMB CRAR 33.73% — minimum-ஐ 3 மடங்கு. இது நிதி வலிமையின் அறிகுறியா அல்லது shareholder value-ஐ அழிக்கிறதா?' },
+        a: { en: `<p>This is one of banking's great tensions. Excess capital suppresses ROE — the denominator (equity) is bloated relative to earnings. TMB's ROE of 15.5% is healthy, but with optimal capital deployment it could theoretically reach 18–20%+. Shareholders are implicitly leaving returns on the table.</p><p>However, for a 100-year-old institution with no promoter and no government backstop, <strong>excess capital IS the moat</strong>. It enables: (1) growing the loan book rapidly without rights issues, (2) absorbing a bad cycle without dilution, (3) credibility with depositors. TMB and CUB have survived multiple recessions precisely because of this conservatism. The investor question: are you buying TMB for near-term ROE optimisation, or as a generational wealth compounder with embedded safety? The answer determines whether 33.73% CRAR is a feature or a bug.</p>`, ta: `<p>Excess capital = bloated equity denominator = suppressed ROE. TMB ROE 15.5% healthy ஆனால் optimal deployment-ல் 18–20%+ சாத்தியம்.</p><p>ஆனால் 100 வருட institution-க்கு promoter இல்லாமல், <strong>excess capital தான் moat</strong>: rights issue இல்லாமல் growth, bad cycle survival, depositor credibility. TMB/CUB multiple recessions survived — இதனாலேயே. கேள்வி: near-term ROE-க்கு வாங்குகிறீர்களா அல்லது generational compounder-க்கா?</p>` }
+      },
+      {
+        q: { en: 'IndusInd Bank\'s PAT fell 75% YoY. What does this teach investors who rely only on quarterly profit numbers without reading the balance sheet?', ta: 'IndusInd PAT 75% YoY சரிந்தது. Balance Sheet பார்க்காமல் quarterly profit மட்டும் நம்புவது என்ன பாடம் கற்பிக்கிறது?' },
+        a: { en: `<p>IndusInd is the most instructive cautionary tale in this pack. For several quarters PAT looked healthy (₹2,349 Cr Q4FY25) while <strong>balance sheet warnings were clear</strong>: GNPA steadily rising from 1.92% → 3.43%, microfinance portfolio under stress, and derivatives book accounting irregularities being quietly restated.</p><p>The lessons: (1) <strong>Cross-check PAT with PCR trend</strong> — if PAT is stable but PCR isn't rising, provisioning is inadequate; (2) <strong>GNPA direction matters more than level</strong> — rising GNPA during "good" quarters is a red flag; (3) <strong>High NIM in MFI-heavy banks carries hidden credit cost</strong> — the spread looks attractive until slippages hit; (4) Governance disclosures — derivatives restatements are invisible in P&L but visible in balance sheet notes. The data to catch all of this was in the quarterly investor presentations used to build this dashboard.</p>`, ta: `<p>IndusInd மிக முக்கியமான எச்சரிக்கை கதை. PAT ₹2,349 Cr "healthy"-ஆக தெரிந்தாலும்: GNPA 1.92% → 3.43% quietly உயர்வு, MFI stress, derivatives restatement.</p><p>பாடங்கள்: (1) <strong>PAT + PCR trend cross-check</strong>; (2) <strong>GNPA direction முக்கியம்</strong> — "good" quarters-லும் rising = red flag; (3) <strong>MFI high NIM = hidden credit cost</strong>; (4) Derivatives restatement P&L-ல் தெரியாது, balance sheet notes-ல் தெரியும். இந்த dashboard-ல் உள்ள quarterly presentation data இதையெல்லாம் catch செய்திருக்கும்.</p>` }
+      }
+    ]
+  }
+];
+
+
+// ═══ CHART ENGINE ═══
+let sortedMode = false;
+let chart = null;
+
+function getFilteredBanks() {
+  var f = document.getElementById('bankFilter').value;
+  if (f === 'private') return DEPOSIT_ORDER.filter(function(b){ return BANKS[b].type === 'private'; });
+  if (f === 'psu')     return DEPOSIT_ORDER.filter(function(b){ return BANKS[b].type === 'psu'; });
+  if (f === 'top5')    return DEPOSIT_ORDER.slice(0, 5);
+  if (f === 'ib')      return ['Indian Bank'];
+  if (f === 'south')   return ['Karnataka Bank','SIB','TMB','CUB'];
+  return DEPOSIT_ORDER.slice();
+}
+
+function getQtr() { return document.getElementById('quarterSelect').value; }
+
+function getVal(metric, bank, qtr) {
+  var d = DATA[metric][bank];
+  return d ? (d[qtr] !== undefined ? d[qtr] : 0) : 0;
+}
+
+function fmt(v, metric) {
+  var unit = METRICS[metric].unit;
+  if (unit === '₹ Cr') return '₹' + Math.round(v).toLocaleString('en-IN') + ' Cr';
+  if (unit === '%')    return v.toFixed(2) + '%';
+  if (unit === 'x')    return v.toFixed(2) + 'x';
+  if (unit === '₹')    return '₹' + v.toLocaleString('en-IN');
+  return v;
+}
+
+function fmtShort(v, metric) { return fmt(v, metric); }
+
+function updateChart() {
+  var metric  = document.getElementById('metricSelect').value;
+  var qtrSel  = getQtr();
+  var banks   = getFilteredBanks();
+  var mInfo   = METRICS[metric];
+  var isComp  = qtrSel === 'compare';
+
+  document.getElementById('deltaPanel').style.display = isComp ? '' : 'none';
+  document.getElementById('tableQtrLabel').textContent = isComp ? 'Showing: All 3 Quarters' : 'Showing: ' + qtrSel;
+
+  var datasets, labels;
+
+  if (isComp) {
+    var pairs = banks.map(function(b){ return { bank:b, val:getVal(metric,b,'Q4FY26') }; });
+    if (sortedMode) pairs.sort(function(a,b){ return mInfo.lowerBetter ? a.val-b.val : b.val-a.val; });
+    labels = pairs.map(function(p){ return p.bank; });
+    datasets = [
+      { label:'Q4 FY26', data:pairs.map(function(p){ return getVal(metric,p.bank,'Q4FY26'); }), backgroundColor:'#2979FFCC', borderColor:'#2979FF', borderWidth:2, borderRadius:4 },
+      { label:'Q3 FY26', data:pairs.map(function(p){ return getVal(metric,p.bank,'Q3FY26'); }), backgroundColor:'#22C55ECC', borderColor:'#22C55E', borderWidth:2, borderRadius:4 },
+      { label:'Q4 FY25', data:pairs.map(function(p){ return getVal(metric,p.bank,'Q4FY25'); }), backgroundColor:'#FF6A00CC', borderColor:'#FF6A00', borderWidth:2, borderRadius:4 }
+    ];
+    buildDeltaPanel(metric, pairs, mInfo);
+  } else {
+    var pairs2 = banks.map(function(b){ return { bank:b, val:getVal(metric,b,qtrSel) }; });
+    if (sortedMode) pairs2.sort(function(a,b){ return mInfo.lowerBetter ? a.val-b.val : b.val-a.val; });
+    labels = pairs2.map(function(p){ return p.bank; });
+    var vals = pairs2.map(function(p){ return p.val; });
+    var bestVal  = mInfo.lowerBetter ? Math.min.apply(null,vals) : Math.max.apply(null,vals);
+    var worstVal = mInfo.lowerBetter ? Math.max.apply(null,vals) : Math.min.apply(null,vals);
+    var colors = pairs2.map(function(p){
+      if (p.val === bestVal)  return '#22C55E';
+      if (p.val === worstVal) return '#F85149';
+      return BANKS[p.bank].color;
+    });
+    datasets = [{ label:metric, data:vals, backgroundColor:colors.map(function(c){ return c+'CC'; }), borderColor:colors, borderWidth:2, borderRadius:6, borderSkipped:false }];
+    updateStats(metric, pairs2, mInfo, qtrSel);
+  }
+
+  document.getElementById('chartTitle').textContent = metric;
+  document.getElementById('unitTag').textContent = mInfo.unit;
+  document.getElementById('chartMeta').textContent = (isComp ? '3 Qtrs Compared' : qtrSel) + ' · ' + banks.length + ' Bank' + (banks.length>1?'s':'');
+
+  if (chart) chart.destroy();
+  var canvas = document.getElementById('barChart');
+  var minW = isComp ? banks.length * 80 * 3 : banks.length * 90;
+  canvas.width  = Math.max(1000, minW);
+  canvas.height = 430;
+  var ctx = canvas.getContext('2d');
+
+  chart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels:labels, datasets:datasets },
+    options: {
+      responsive:false, maintainAspectRatio:false,
+      plugins: {
+        legend: { display:isComp, position:'top', labels:{ font:{family:'DM Sans',size:11}, padding:16, color:'#1A2744' } },
+        tooltip: { backgroundColor:'#FFFFFF', borderColor:'#D0D9E8', borderWidth:1, titleColor:'#1A2744', bodyColor:'#5A6A8A', padding:12,
+          callbacks:{ label:function(ctx){ return ' '+fmt(ctx.raw,metric); } } }
+      },
+      scales: {
+        x:{ grid:{color:'#E2E8F4'}, ticks:{color:'#5A6A8A', font:{family:'DM Sans',size:10}, maxRotation:30} },
+        y:{ grid:{color:'#E2E8F4'}, ticks:{color:'#5A6A8A', font:{family:'DM Mono',size:10}, callback:function(v){ return fmt(v,metric); }} }
+      },
+      layout:{ padding:{top:46,right:20,left:10,bottom:10} }
+    },
+    plugins:[{
+      id:'topLabels',
+      afterDatasetsDraw:function(chartInst){
+        var ctx2 = chartInst.ctx;
+        var dsIdx = 0;
+        var dataset = chartInst.data.datasets[dsIdx];
+        var meta = chartInst.getDatasetMeta(dsIdx);
+        meta.data.forEach(function(bar,i){
+          var v = dataset.data[i];
+          if (v === undefined || v === null) return;
+          var label2 = fmt(v,metric);
+          ctx2.save();
+          ctx2.fillStyle = '#1A2744';
+          ctx2.font = '600 10px DM Mono, monospace';
+          ctx2.textAlign = 'center';
+          ctx2.fillText(label2, bar.x, bar.y-6);
+          ctx2.restore();
+        });
+      }
+    }]
+  });
+
+  if (!isComp) {
+    var pairs3 = banks.map(function(b){ return { bank:b, val:getVal(metric,b,qtrSel) }; });
+    updateStats(metric, pairs3, mInfo, qtrSel);
+  } else {
+    document.getElementById('statsRow').innerHTML = '';
+  }
+  buildTable(banks, metric);
+}
+
+function buildDeltaPanel(metric, pairs, mInfo) {
+  document.getElementById('deltaTitle').textContent = metric + ' — Quarter Comparison';
+  var grid = document.getElementById('deltaGrid');
+  grid.innerHTML = pairs.map(function(p){
+    var q4 = getVal(metric,p.bank,'Q4FY26'), q3 = getVal(metric,p.bank,'Q3FY26'), q4py = getVal(metric,p.bank,'Q4FY25');
+    var yoy = q4py ? ((q4-q4py)/q4py*100) : 0;
+    var qoq = q3 ? ((q4-q3)/q3*100) : 0;
+    var yoyGood = mInfo.lowerBetter ? yoy<0 : yoy>0;
+    var qoqGood = mInfo.lowerBetter ? qoq<0 : qoq>0;
+    return '<div class="delta-card"><div class="delta-bank">'+p.bank+'</div><div class="delta-vals">Q4FY26: '+fmt(q4,metric)+'</div><div class="delta-vals">Q3FY26: '+fmt(q3,metric)+' | Q4FY25: '+fmt(q4py,metric)+'</div><div class="delta-pct">YoY: <span class="'+(yoyGood?'delta-pos':'delta-neg')+'">'+(yoy>=0?'+':'')+yoy.toFixed(1)+'%</span> &nbsp;|&nbsp; QoQ: <span class="'+(qoqGood?'delta-pos':'delta-neg')+'">'+(qoq>=0?'+':'')+qoq.toFixed(1)+'%</span></div></div>';
+  }).join('');
+}
+
+function updateStats(metric, pairs, mInfo, qtr) {
+  var best  = mInfo.lowerBetter ? pairs.reduce(function(a,b){return a.val<b.val?a:b;}) : pairs.reduce(function(a,b){return a.val>b.val?a:b;});
+  var worst = mInfo.lowerBetter ? pairs.reduce(function(a,b){return a.val>b.val?a:b;}) : pairs.reduce(function(a,b){return a.val<b.val?a:b;});
+  var avg   = pairs.reduce(function(s,p){return s+p.val;},0)/pairs.length;
+  var ib = pairs.filter(function(p){return p.bank==='Indian Bank';})[0];
+  var ibRank = ib ? pairs.slice().sort(function(a,b){return mInfo.lowerBetter?a.val-b.val:b.val-a.val;}).indexOf(ib)+1 : null;
+  document.getElementById('statsRow').innerHTML =
+    '<div class="stat-card best"><div class="stat-label">🏆 Best</div><div class="stat-value">'+fmt(best.val,metric)+'</div><div class="stat-bank">'+best.bank+'</div></div>'+
+    '<div class="stat-card worst"><div class="stat-label">⚠ Weakest</div><div class="stat-value">'+fmt(worst.val,metric)+'</div><div class="stat-bank">'+worst.bank+'</div></div>'+
+    '<div class="stat-card"><div class="stat-label">∑ Average</div><div class="stat-value">'+fmt(avg,metric)+'</div><div class="stat-bank">All '+pairs.length+' Banks · '+qtr+'</div></div>'+
+    (ib?'<div class="stat-card" style="border-left:3px solid #E11D48;"><div class="stat-label">🏦 Indian Bank</div><div class="stat-value">'+fmt(ib.val,metric)+'</div><div class="stat-bank">Rank #'+ibRank+' of '+pairs.length+'</div></div>':'');
+}
+
+function buildTable(banks, activeMetric) {
+  var qtrSel = getQtr();
+  var allMetrics = Object.keys(METRICS);
+  var table = document.getElementById('fullTable');
+  var isComp = qtrSel === 'compare';
+  var html = '<thead><tr><th>Metric</th>';
+  if (isComp) {
+    banks.forEach(function(b){ var isIB=b==='Indian Bank'; html+='<th colspan="3"'+(isIB?' style="background:#fffbeb;"':'')+'>'+b+'</th>'; });
+    html += '</tr><tr><th></th>';
+    banks.forEach(function(b){ var isIB=b==='Indian Bank'; html+='<th class="'+(isIB?'ib-col':'')+'">Q4 FY26</th><th class="'+(isIB?'ib-col':'')+'">Q3 FY26</th><th class="'+(isIB?'ib-col':'')+'">Q4 FY25</th>'; });
+  } else {
+    banks.forEach(function(b){ var isIB=b==='Indian Bank'; html+='<th class="'+(isIB?'ib-col':'')+'">'+b+'</th>'; });
+  }
+  html += '</tr></thead><tbody>';
+  allMetrics.forEach(function(metric){
+    var mInfo = METRICS[metric];
+    var isActive = metric === activeMetric;
+    if (isComp) {
+      html += '<tr class="'+(isActive?'active-row':'')+'"><td>'+metric+' <span style="color:#5A6A8A;font-size:10px;">'+mInfo.unit+'</span></td>';
+      banks.forEach(function(b){
+        var isIB=b==='Indian Bank';
+        html+='<td class="'+(isIB?'ib-col':'')+'">'+fmtShort(getVal(metric,b,'Q4FY26'),metric)+'</td>';
+        html+='<td class="'+(isIB?'ib-col':'')+'" style="color:#5A6A8A;">'+fmtShort(getVal(metric,b,'Q3FY26'),metric)+'</td>';
+        html+='<td class="'+(isIB?'ib-col':'')+'" style="color:#5A6A8A;">'+fmtShort(getVal(metric,b,'Q4FY25'),metric)+'</td>';
+      });
+    } else {
+      var vals = banks.map(function(b){return getVal(metric,b,qtrSel);});
+      var bestV  = mInfo.lowerBetter ? Math.min.apply(null,vals) : Math.max.apply(null,vals);
+      var worstV = mInfo.lowerBetter ? Math.max.apply(null,vals) : Math.min.apply(null,vals);
+      html += '<tr class="'+(isActive?'active-row':'')+'"><td>'+metric+' <span style="color:#5A6A8A;font-size:10px;">'+mInfo.unit+'</span></td>';
+      banks.forEach(function(b,i){
+        var v=vals[i]; var isIB=b==='Indian Bank';
+        var cls = isIB?'ib-col':'';
+        if(v===bestV) cls+=' best-cell'; else if(v===worstV) cls+=' worst-cell';
+        html+='<td class="'+cls+'">'+fmtShort(v,metric)+'</td>';
+      });
+    }
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+function toggleSort() {
+  sortedMode = !sortedMode;
+  var btn = document.getElementById('sortBtn');
+  btn.classList.toggle('active', sortedMode);
+  btn.textContent = sortedMode ? '⇅ Deposit Order' : '⇅ Sort by Value';
+  updateChart();
+}
+
+// ═══ HAMBURGER PANELS ═══
+function togglePanel(id) {
+  var body = document.getElementById(id);
+  var btn  = document.getElementById('btn-'+id);
+  var isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  btn.textContent = isOpen ? '☰' : '✕';
+}
+
+// ═══ BANK MOATS ═══
+function renderUSP() {
+  var grid = document.getElementById('uspGrid');
+  if (!grid) return;
+  grid.innerHTML = BANK_USP.map(function(b){
+    return '<div class="usp-card">'+
+      '<div class="usp-card-accent" style="background:'+b.color+';"></div>'+
+      '<div style="padding-left:8px;">'+
+        '<span class="usp-bank-name" style="color:'+b.color+';">'+b.bank+'</span>'+
+        '<span class="usp-tag '+b.type+'">'+(b.type==='psu'?'PSU':'Private')+'</span>'+
+      '</div>'+
+      '<div class="usp-moat">⚡ '+b.moat+'</div>'+
+      '<div class="usp-text">'+b.text+'</div>'+
+      '<div class="usp-pill-row">'+b.pills.map(function(p){ return '<span class="usp-pill">'+p+'</span>'; }).join('')+'</div>'+
+    '</div>';
+  }).join('');
+}
+
+// ═══ CB ASSIST ═══
+var currentLang = 'en';
+
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+  document.getElementById('btnTa').classList.toggle('active', lang === 'ta');
+  var el;
+  el = document.getElementById('askLabel');
+  if (el) el.textContent = lang === 'en' ? 'Ask your question about banking or this data' : 'வங்கி பற்றிய உங்கள் கேள்வியை கேளுங்கள்';
+  el = document.getElementById('userQuestion');
+  if (el) el.placeholder = lang === 'en' ? 'e.g. What is NIM? Which bank has best ROA? Why is IndusInd in trouble?' : 'எ.கா. NIM என்றால் என்ன? IndusInd ஏன் சிக்கலில்?';
+  el = document.getElementById('askBtn');
+  if (el) el.textContent = lang === 'en' ? 'Ask' : 'கேளுங்கள்';
+  el = document.getElementById('userResponseArea');
+  if (el) el.classList.remove('visible');
+  renderSuggestChips();
+  renderQA();
+}
+
+function renderSuggestChips() {
+  var chips = document.getElementById('suggestChips');
+  if (!chips) return;
+  var arr = SUGGEST_CHIPS[currentLang].slice(0, 6);
+  chips.innerHTML = arr.map(function(s){
+    return '<span class="suggest-chip" onclick="chipAsk(this)">'+s+'</span>';
+  }).join('');
+}
+
+function chipAsk(el) {
+  document.getElementById('userQuestion').value = el.textContent;
+  handleUserQuestion();
+}
+
+function handleUserQuestion() {
+  var input = document.getElementById('userQuestion');
+  var q = input ? input.value.trim() : '';
+  if (!q) return;
+  var area = document.getElementById('userResponseArea');
+  var btn  = document.getElementById('askBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '...'; }
+  var lq = q.toLowerCase();
+  var found = null;
+  for (var i = 0; i < USER_QA_KB.length; i++) {
+    var item = USER_QA_KB[i];
+    for (var j = 0; j < item.keywords.length; j++) {
+      if (lq.indexOf(item.keywords[j]) !== -1) { found = item; break; }
+    }
+    if (found) break;
+  }
+  setTimeout(function() {
+    if (found) {
+      var r = found[currentLang];
+      area.innerHTML = '<p style="font-weight:700;color:var(--accent);font-size:13px;margin-bottom:10px;">📌 '+r.title+'</p>'+r.body;
+    } else {
+      var noMatch = currentLang === 'en'
+        ? '<p>No specific answer found for <strong>"'+q+'"</strong>.</p><p>Try: NIM, GNPA, NNPA, PCR, CRAR, ROA, ROE, CASA, P/BV, Credit Cost, or a bank name (HDFC, ICICI, TMB, SIB, Karnataka Bank, Indian Bank, IndusInd...)</p>'
+        : '<p><strong>"'+q+'"</strong>-க்கான பதில் கிடைக்கவில்லை.</p><p>முயற்சிக்கவும்: NIM, GNPA, PCR, CRAR, ROA, ROE, CASA, P/BV அல்லது வங்கி பெயர் (TMB, SIB, Karnataka Bank...)</p>';
+      area.innerHTML = noMatch;
+    }
+    area.classList.add('visible');
+    if (btn) { btn.disabled = false; btn.textContent = currentLang === 'en' ? 'Ask' : 'கேளுங்கள்'; }
+    area.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }, 380);
+}
+
+function renderQA() {
+  var list = document.getElementById('qaList');
+  if (!list) return;
+  var html = '', qNum = 0;
+  for (var c = 0; c < QA_DATA.length; c++) {
+    var cat = QA_DATA[c];
+    html += '<div class="qa-category">'+cat.category[currentLang]+'</div>';
+    for (var q2 = 0; q2 < cat.questions.length; q2++) {
+      var qa = cat.questions[q2];
+      qNum++;
+      html += '<div class="qa-item">'+
+        '<div class="qa-question" onclick="toggleQA(this)">'+
+          '<span class="qa-num">Q'+qNum+'</span>'+
+          '<span style="flex:1;">'+qa.q[currentLang]+'</span>'+
+          '<span class="qa-chevron">▼</span>'+
+        '</div>'+
+        '<div class="qa-answer">'+qa.a[currentLang]+'</div>'+
+      '</div>';
+    }
+  }
+  list.innerHTML = html;
+}
+
+function toggleQA(el) {
+  var answer = el.nextElementSibling;
+  var isOpen = answer.classList.contains('open');
+  var allAns = document.querySelectorAll('.qa-answer.open');
+  var allQ   = document.querySelectorAll('.qa-question.open');
+  for (var i=0;i<allAns.length;i++) allAns[i].classList.remove('open');
+  for (var i=0;i<allQ.length;i++)   allQ[i].classList.remove('open');
+  if (!isOpen) { answer.classList.add('open'); el.classList.add('open'); }
+}
+
+// ═══ INIT ═══
+function init() {
+  var sel = document.getElementById('metricSelect');
+  Object.keys(METRICS).forEach(function(m){
+    var opt = document.createElement('option');
+    opt.value = m; opt.textContent = m;
+    if (m === 'Net Profit (PAT)') opt.selected = true;
+    sel.appendChild(opt);
+  });
+  updateChart();
+  renderUSP();
+  setLang('en');
+}
+
+init();
+
+</script>
+</body>
+</html>
