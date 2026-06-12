@@ -1,5 +1,267 @@
 [
-  { "file": "india-pharma-dashboard-8626.html", "sectors": ["Pharma"] },
-  { "file": "Defence_Sector_Intelligence_Dashboard_Q4FY26.html", "sectors": ["Defence"] },
-  { "file": "Power_CapGoods_Water_Q4FY26.html", "sectors": ["Power (Gencos/Transmission)", "Capital Goods"] }
+  {
+    "file": "india-pharma-dashboard-8626.html",
+    "sectors": [
+      "Pharma"
+    ]
+  },
+  {
+    "file": "Defence_Sector_Intelligence_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Defence"
+    ]
+  },
+  {
+    "file": "Power_CapGoods_Water_Q4FY26.html",
+    "sectors": [
+      "Capital Goods"
+    ]
+  },
+  {
+    "file": "PFC_REC_IREDA_Q4FY26_Dashboard.html",
+    "sectors": [
+      "Power Financiers (PFC/REC/IREDA)"
+    ]
+  },
+  {
+    "file": "Railway_Sector_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Railways"
+    ]
+  },
+  {
+    "file": "Textile_Companies_Intelligence_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Textiles"
+    ]
+  },
+  {
+    "file": "Tyre_Sector_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Tyres"
+    ]
+  },
+  {
+    "file": "OilGas_OMC_Q4FY26.html",
+    "sectors": [
+      "Oil & Gas"
+    ]
+  },
+  {
+    "file": "IT_Services_Sector_Intelligence_Dashboard_Q4FY26.html",
+    "sectors": [
+      "IT Services"
+    ]
+  },
+  {
+    "file": "Aluminium_Dashboard_NALCO_Hindalco_Q4FY26_v4.html",
+    "sectors": [
+      "Metals"
+    ]
+  },
+  {
+    "file": "Banking_PSU_Q4FY26.html",
+    "sectors": [
+      "Banking"
+    ]
+  },
+  {
+    "file": "Mixed_Banking_Pvt_others_Q4FY26.html",
+    "sectors": [
+      "Banking"
+    ]
+  },
+  {
+    "file": "Cables_Wires_Dashboard_Q4FY26_9626.html",
+    "sectors": [
+      "Cables & Wires"
+    ]
+  },
+  {
+    "file": "Sugar_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Sugar / Ethanol"
+    ]
+  },
+  {
+    "file": "Cross_Sector_IEX_IndiGo_Fractal_Airtel_Q4FY26.html",
+    "tokens": {
+      "iex": "IEX",
+      "ind": "IndiGo",
+      "frc": "Fractal",
+      "air": "Airtel"
+    },
+    "split": {
+      "IEX": "Exchanges / Depositories",
+      "IndiGo": "Aviation",
+      "Fractal": "IT Services"
+    }
+  },
+  {
+    "file": "Shaily_ShaktiPumps_Q4FY26.html",
+    "split": {
+      "Shakti Pumps": "Solar / Renewables",
+      "Shaily": "Capital Goods"
+    }
+  },
+  {
+    "file": "Cement_Companies_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Cement"
+    ]
+  },
+  {
+    "file": "gold_analysis_all_companies.html",
+    "sectors": [
+      "Gold & Jewellery"
+    ]
+  },
+  {
+    "file": "Hospital_Sector_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Hospitals"
+    ]
+  },
+  {
+    "file": "PaintSector_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Paints"
+    ]
+  },
+  {
+    "file": "Power_Sector_Dashboard_Q4FY26_Corrected.html",
+    "sectors": [
+      "Power (Gencos/Transmission)"
+    ]
+  },
+  {
+    "file": "Recycling_Sector_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Recycling"
+    ]
+  },
+  {
+    "file": "MultiSector_Dashboard_Q4FY26.html",
+    "split": {
+      "Tata Communications": "Telecom",
+      "Netweb": "EMS",
+      "Azad": "Defence",
+      "Varun": "FMCG"
+    }
+  },
+  {
+    "file": "PowerProxy_Dashboard_Q4FY26.html",
+    "split": {
+      "Hitachi Energy": "Capital Goods",
+      "ABB": "Capital Goods",
+      "Siemens": "Capital Goods",
+      "Voltamp": "Capital Goods",
+      "Bosch": "Auto Ancillaries"
+    }
+  },
+  {
+    "file": "2W_Companies_Intelligence_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Auto 2W"
+    ],
+    "exclude": [
+      "Eicher (RE)"
+    ]
+  },
+  {
+    "file": "auto_spares_q4fy26_dashboard.html",
+    "sectors": [
+      "Auto Ancillaries"
+    ]
+  },
+  {
+    "file": "BankChart_Q4FY26_20May.html",
+    "sectors": [
+      "Banking"
+    ]
+  },
+  {
+    "file": "BSE_MCX_CDSL_NSDL_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Exchanges / Depositories"
+    ],
+    "companies": [
+      "Bombay Stock Exchange",
+      "Multi Commodity Exchange",
+      "CDSL",
+      "NSDL"
+    ]
+  },
+  {
+    "file": "EMS_Sector_Analysis_FY26_4companies_final.html",
+    "sectors": [
+      "EMS"
+    ]
+  },
+  {
+    "file": "india_alcobev_fy26_dashboard.html",
+    "sectors": [
+      "Alcobev"
+    ]
+  },
+  {
+    "file": "india_pv_sector_q4fy26_analysis_ai.html",
+    "sectors": [
+      "Auto 4W"
+    ],
+    "exclude": [
+      "TMPV",
+      "JLR",
+      "Maruti (SA)",
+      "Hyundai Consol"
+    ]
+  },
+  {
+    "file": "india_steel_fy26_dashboard_ai.html",
+    "sectors": [
+      "Metals"
+    ]
+  },
+  {
+    "file": "sfb-investment-dashboard.html",
+    "sectors": [
+      "Banking"
+    ]
+  },
+  {
+    "file": "Solar_Companies_Dashboard_Q4FY26_21May26.html",
+    "sectors": [
+      "Solar / Renewables"
+    ]
+  },
+  {
+    "file": "Telecom_Q4FY26_Dashboard_Bilingual.html",
+    "sectors": [
+      "Telecom"
+    ]
+  },
+  {
+    "file": "Top_nbfc_q4fy26_dashboard.html",
+    "sectors": [
+      "NBFC (Lending)"
+    ],
+    "tokens": {
+      "c1": "Bajaj Finance",
+      "c2": "Shriram Finance",
+      "c3": "Cholamandalam",
+      "c4": "Muthoot Finance"
+    },
+    "companies": [
+      "Bajaj Finance",
+      "Shriram Finance",
+      "Cholamandalam",
+      "Muthoot Finance"
+    ]
+  },
+  {
+    "file": "india-fmcg-analysis.html",
+    "sectors": [
+      "FMCG"
+    ]
+  }
 ]
