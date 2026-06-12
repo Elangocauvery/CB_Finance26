@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Small Finance Banks — Investment Analysis Dashboard Q4 FY26</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#f0f4f8;--card:#ffffff;--card2:#f8fafc;--border:#e2e8f0;
+  --accent:#0369a1;--green:#16a34a;--amber:#d97706;--red:#dc2626;--purple:#7c3aed;
+  --teal:#0891b2;--text:#0f172a;--muted:#64748b;--light:#e0f2fe;
+  --au:#185FA5;--eq:#1D9E75;--uj:#BA7517;--su:#D85A30;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px}
+.header{background:linear-gradient(135deg,#0c4a6e 0%,#0369a1 60%,#0891b2 100%);color:#fff;padding:28px 32px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.18)}
+.header h1{font-size:1.7rem;font-weight:700;letter-spacing:-.3px}
+.header p{opacity:.85;margin-top:4px;font-size:.88rem}
+.badge-row{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.badge{padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600}
+.b-q4{background:rgba(22,163,74,.3);color:#bbf7d0}
+.b-ann{background:rgba(99,102,241,.3);color:#c7d2fe}
+.b-val{background:rgba(217,119,6,.3);color:#fde68a}
+.b-date{background:rgba(255,255,255,.15);color:#e0f2fe}
+nav{background:#fff;border-bottom:2px solid var(--border);display:flex;gap:0;overflow-x:auto;position:sticky;top:88px;z-index:90;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+nav button{padding:13px 20px;border:none;background:none;cursor:pointer;font-size:.85rem;font-weight:600;color:var(--muted);white-space:nowrap;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
+nav button.active{color:var(--accent);border-bottom-color:var(--accent);background:#f0f9ff}
+nav button:hover:not(.active){color:var(--text);background:var(--bg)}
+.tab{display:none;padding:24px 28px;max-width:1400px;margin:0 auto}
+.tab.active{display:block}
+.section-title{font-size:1.15rem;font-weight:700;color:var(--text);margin-bottom:16px;padding-bottom:8px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:8px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-bottom:28px}
+.kpi-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;text-align:center;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.kpi-val{font-size:1.55rem;font-weight:900}
+.kpi-lbl{font-size:.78rem;color:var(--muted);margin-top:4px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06);transition:box-shadow .2s,transform .15s}
+.card:hover{box-shadow:0 4px 16px rgba(0,0,0,.12);transform:translateY(-2px)}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.card-name{font-size:1.05rem;font-weight:700}
+.card-sub{font-size:.78rem;color:var(--muted);margin-top:2px}
+.tag{padding:2px 8px;border-radius:12px;font-size:.7rem;font-weight:700}
+.tag-q4{background:#dcfce7;color:#166534}
+.tag-hold{background:#fef9c3;color:#854d0e}
+.tag-buy{background:#dcfce7;color:#166534}
+.tag-caution{background:#fee2e2;color:#991b1b}
+.metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0}
+.metrics4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin:10px 0}
+.metric{background:var(--card2);border-radius:8px;padding:8px 10px;text-align:center}
+.metric-val{font-size:.98rem;font-weight:700;color:var(--accent)}
+.metric-lbl{font-size:.67rem;color:var(--muted);margin-top:2px}
+.metric-green .metric-val{color:var(--green)}
+.metric-amber .metric-val{color:var(--amber)}
+.metric-red .metric-val{color:var(--red)}
+.metric-purple .metric-val{color:var(--purple)}
+.metric-teal .metric-val{color:var(--teal)}
+.chart-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:22px;margin-bottom:28px}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.chart-title{font-size:.9rem;font-weight:700;margin-bottom:4px;color:var(--text)}
+.chart-sub{font-size:.74rem;color:var(--muted);margin-bottom:12px}
+.chart-wrap{position:relative;height:270px}
+.chart-wrap-sm{position:relative;height:210px}
+.chart-wrap-lg{position:relative;height:340px}
+.tbl-wrap{overflow-x:auto;margin-bottom:28px}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+thead tr{background:linear-gradient(135deg,#0c4a6e,#0369a1);color:#fff}
+th{padding:11px 12px;text-align:left;font-size:.78rem;font-weight:700;white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{background:rgba(255,255,255,.15)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:.82rem;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:#f8fafc}
+tr:hover td{background:#f0f9ff}
+.sort-icon{opacity:.6;font-size:.7rem;margin-left:4px}
+.td-green{color:var(--green);font-weight:700}
+.td-red{color:var(--red);font-weight:700}
+.td-amber{color:var(--amber);font-weight:700}
+.td-blue{color:var(--accent);font-weight:700}
+.td-purple{color:var(--purple);font-weight:700}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.filter-bar button{padding:6px 14px;border-radius:20px;border:1.5px solid var(--border);background:#fff;cursor:pointer;font-size:.8rem;font-weight:600;color:var(--muted);transition:all .15s}
+.filter-bar button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.bank-panel{display:none}.bank-panel.active{display:block}
+.info-box{background:var(--light);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:18px;font-size:.83rem;line-height:1.6}
+.warn-box{background:#fffbeb;border-left:4px solid var(--amber);border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:18px;font-size:.83rem;line-height:1.6}
+.good-box{background:#f0fdf4;border-left:4px solid var(--green);border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:18px;font-size:.83rem;line-height:1.6}
+.usp-row{font-size:.78rem;color:var(--muted);margin-top:8px;line-height:1.5}
+.usp-row strong{color:var(--text)}
+.debt-bar-wrap{margin-top:8px}
+.debt-label{display:flex;justify-content:space-between;font-size:.75rem;margin-bottom:3px}
+.debt-bar{height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden}
+.debt-fill{height:100%;border-radius:3px}
+.fill-green{background:var(--green)}
+.fill-amber{background:var(--amber)}
+.fill-red{background:var(--red)}
+.fill-blue{background:var(--accent)}
+.fill-purple{background:var(--purple)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:18px;margin-bottom:28px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-bottom:20px}
+.analyst-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:28px}
+.analyst-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.analyst-name{font-weight:700;font-size:.92rem;margin-bottom:6px}
+.rec-buy{background:#dcfce7;color:#166534;padding:3px 10px;border-radius:12px;font-size:.72rem;font-weight:700;display:inline-block;margin-bottom:6px}
+.rec-hold{background:#fef9c3;color:#854d0e;padding:3px 10px;border-radius:12px;font-size:.72rem;font-weight:700;display:inline-block;margin-bottom:6px}
+.rec-sell{background:#fee2e2;color:#991b1b;padding:3px 10px;border-radius:12px;font-size:.72rem;font-weight:700;display:inline-block;margin-bottom:6px}
+.analyst-tp{font-size:.8rem;color:var(--muted)}
+.analyst-note{font-size:.76rem;color:var(--muted);margin-top:5px;line-height:1.5}
+.score-wrap{margin:8px 0}
+.score-row{display:grid;grid-template-columns:110px 1fr 44px;gap:6px;align-items:center;margin-bottom:5px}
+.score-lbl{font-size:.73rem;color:var(--muted);text-align:right}
+.score-bg{background:#e2e8f0;border-radius:4px;height:8px;overflow:hidden}
+.score-bar{height:100%;border-radius:4px}
+.score-val{font-size:.73rem;font-weight:700;color:var(--text)}
+.rank-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px}
+.rank-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;gap:14px;align-items:flex-start;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.rank-num{font-size:1.6rem;font-weight:900;min-width:42px;text-align:center;line-height:1}
+.rank-1 .rank-num{color:#f59e0b}.rank-2 .rank-num{color:#94a3b8}.rank-3 .rank-num{color:#b45309}.rank-4 .rank-num{color:var(--accent)}
+.rank-info h3{font-size:.95rem;font-weight:700;margin-bottom:4px}
+.rank-info p{font-size:.78rem;color:var(--muted);line-height:1.5}
+.period-bar{display:flex;gap:0;border:1.5px solid var(--border);border-radius:8px;overflow:hidden;width:fit-content;margin-bottom:16px}
+.period-bar button{padding:6px 18px;border:none;background:#fff;cursor:pointer;font-size:.8rem;font-weight:600;color:var(--muted);border-right:1px solid var(--border);transition:all .15s}
+.period-bar button:last-child{border-right:none}
+.period-bar button.active{background:var(--accent);color:#fff}
+.bank-sel-panel{display:none}.bank-sel-panel.active{display:block}
+@media(max-width:700px){
+  .header h1{font-size:1.2rem}
+  .chart-grid{grid-template-columns:1fr}
+  .grid2{grid-template-columns:1fr}
+  .rank-grid{grid-template-columns:1fr}
+  .tab{padding:16px 14px}
+  nav button{padding:10px 13px;font-size:.78rem}
+  .metrics4{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏦 Small Finance Banks — Investment Dashboard Q4 FY26</h1>
+  <p>AU SFB · Equitas SFB · Ujjivan SFB · Suryoday SFB &nbsp;|&nbsp; Quarterly · Annual · Valuation (BV &amp; P/B) · Bank-wise · Rankings</p>
+  <div class="badge-row">
+    <span class="badge b-q4">✓ All 4 Banks — Q4 FY26 Actuals</span>
+    <span class="badge b-ann">📅 FY24 · FY25 · FY26 Annual</span>
+    <span class="badge b-val">📐 BV &amp; P/B Valuation</span>
+    <span class="badge b-date">Data: May 14, 2026 · IST</span>
+  </div>
+</div>
+
+<nav id="nav">
+  <button class="active" onclick="switchTab('overview',this)">📊 Overview</button>
+  <button onclick="switchTab('bankwise',this)">🏦 Bank-wise</button>
+  <button onclick="switchTab('quarterly',this)">📅 Quarterly</button>
+  <button onclick="switchTab('annual',this)">📆 Annual</button>
+  <button onclick="switchTab('valuation',this)">📐 BV &amp; Valuation</button>
+  <button onclick="switchTab('charts',this)">📈 Charts</button>
+  <button onclick="switchTab('table',this)">📋 Data Table</button>
+  <button onclick="switchTab('rankings',this)">🏆 Rankings</button>
+</nav>
+
+<!-- ═══════════════ OVERVIEW ═══════════════ -->
+<div id="tab-overview" class="tab active">
+  <div class="info-box">
+    <strong>Q4 FY26 Sector Verdict:</strong> All four small finance banks reported Q4 FY26 actuals — a decisive sector turnaround from the MFI stress of FY25. Equitas posted highest-ever PAT (+406% YoY, ₹213 Cr), AU SFB delivered highest-ever quarterly PAT (₹832 Cr, +65%), Ujjivan hit record-low NNPA (0.43%), and Suryoday reversed prior-year losses with ₹50 Cr PAT. <strong>AU SFB</strong> has filed for a Universal Bank licence (Mar 2026). Valuation divergence is stark — AU at 3.9x P/B vs Suryoday near book value (0.9x). Credit cost normalisation in FY27 is the key sector risk to watch.
+  </div>
+
+  <div class="section-title">📌 Sector KPIs at a Glance — Q4 FY26</div>
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--accent)">4</div><div class="kpi-lbl">Banks · Q4 FY26 Actuals</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--green)">₹1,378 Cr</div><div class="kpi-lbl">Aggregate Q4 PAT</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--green)">+183%</div><div class="kpi-lbl">Avg PAT Growth YoY</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--teal)">7.29%</div><div class="kpi-lbl">Best NIM · Equitas</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--green)">0.43%</div><div class="kpi-lbl">Best NNPA · Ujjivan</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--purple)">3.9x</div><div class="kpi-lbl">Highest P/B · AU SFB</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--amber)">0.9x</div><div class="kpi-lbl">Cheapest P/B · Suryoday</div></div>
+    <div class="kpi-card"><div class="kpi-val" style="color:var(--accent)">1</div><div class="kpi-lbl">Universal Bank Lic.<br>Pending (AU SFB)</div></div>
+  </div>
+
+  <div class="section-title">⚖️ Q4 FY26 — Full Metrics Snapshot</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th onclick="sortT('overviewBody',0)">Bank <span class="sort-icon">⇅</span></th>
+        <th onclick="sortT('overviewBody',1)">PAT ₹Cr <span class="sort-icon">⇅</span></th>
+        <th onclick="sortT('overviewBody',2)">PAT YoY</th>
+        <th onclick="sortT('overviewBody',3)">NII ₹Cr</th>
+        <th onclick="sortT('overviewBody',4)">NIM %</th>
+        <th onclick="sortT('overviewBody',5)">GNPA %</th>
+        <th onclick="sortT('overviewBody',6)">NNPA %</th>
+        <th onclick="sortT('overviewBody',7)">RoA %</th>
+        <th onclick="sortT('overviewBody',8)">RoE %</th>
+        <th onclick="sortT('overviewBody',9)">CRAR %</th>
+        <th onclick="sortT('overviewBody',10)">BVPS ₹</th>
+        <th onclick="sortT('overviewBody',11)">CMP ₹</th>
+        <th onclick="sortT('overviewBody',12)">P/B</th>
+        <th onclick="sortT('overviewBody',13)">Mkt Cap ₹Cr</th>
+      </tr></thead>
+      <tbody id="overviewBody">
+        <tr><td><strong style="color:var(--au)">AU SFB</strong></td><td class="td-green">832</td><td class="td-green">+65%</td><td class="td-green">2,582</td><td>6.00%</td><td class="td-green">2.03%</td><td>0.74%</td><td class="td-green">1.80%</td><td class="td-green">17.0%</td><td>18.68%</td><td class="td-blue">~265</td><td>~1,000</td><td class="td-purple">~3.9x</td><td class="td-green">75,000</td></tr>
+        <tr><td><strong style="color:var(--eq)">Equitas SFB</strong></td><td class="td-green">213</td><td class="td-green">+406%</td><td>981</td><td class="td-green">7.29%</td><td>2.49%</td><td class="td-green">0.68%</td><td>1.46%</td><td>14.10%</td><td class="td-green">20.31%</td><td class="td-blue">~57</td><td>~72</td><td class="td-amber">~1.3x</td><td>8,256</td></tr>
+        <tr><td><strong style="color:var(--uj)">Ujjivan SFB</strong></td><td class="td-green">282</td><td class="td-green">+238%</td><td>1,093</td><td>8.50%</td><td>2.26%</td><td class="td-green">0.43%</td><td class="td-green">2.10%</td><td class="td-green">17.2%</td><td class="td-green">21.14%</td><td class="td-blue">~33</td><td>~63</td><td class="td-amber">~1.9x</td><td>12,232</td></tr>
+        <tr><td><strong style="color:var(--su)">Suryoday SFB</strong></td><td class="td-amber">50</td><td class="td-green">+247%</td><td>317</td><td>8.87%</td><td class="td-red">6.55%</td><td class="td-red">4.21%</td><td>0.27%</td><td class="td-red">3.44%</td><td>20.45%</td><td class="td-blue">~200</td><td>~180</td><td class="td-green">~0.9x</td><td>1,837</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-title">⚠️ Key Themes &amp; Risks</div>
+  <div class="grid3">
+    <div class="card"><div style="font-weight:700;color:var(--green);margin-bottom:6px">✅ Tailwinds</div><div style="font-size:.82rem;line-height:1.7;color:var(--muted)">• MFI stress cycle decisively over — GNPA falling<br>• Secured portfolio mix rising (Ujjivan 49.4%)<br>• AU universal bank licence re-rating potential<br>• RBI rate cuts reducing sector cost of funds<br>• Equitas NIM expansion to 7.29% — 8-quarter high<br>• Record disbursements: Equitas ₹7,347 Cr (+72% YoY)<br>• Suryoday Vikas Loan disbursements +98% YoY</div></div>
+    <div class="card"><div style="font-weight:700;color:var(--red);margin-bottom:6px">⚠️ Headwinds</div><div style="font-size:.82rem;line-height:1.7;color:var(--muted)">• Suryoday GNPA 6.55% — worst in peer group<br>• Equitas credit cost to normalise ~1.5% in FY27<br>• AU CD ratio 90.5% — aggressive lending<br>• Suryoday pledged promoter shares 22.35%<br>• CRAR declining at AU (18.68%) &amp; Suryoday (20.45%)<br>• Ujjivan no promoter holding — governance risk<br>• AU premium valuation 3.9x P/B limits upside</div></div>
+    <div class="card"><div style="font-weight:700;color:var(--accent);margin-bottom:6px">🔭 FY27 Guidance</div><div style="font-size:.82rem;line-height:1.7;color:var(--muted)">• AU: RoA 1.6% FY26, targets higher in FY27<br>• Equitas: 20%+ advance growth, exit RoA 1.5% Q4 FY27<br>• Ujjivan: 25% advance growth, NIM 8.5%, RoA 1.6%<br>• Suryoday: Advance growth 29%+, diversification<br>• All: Credit cost normalisation from Q1 FY27<br>• AU: Universal bank licence decision awaited<br>• Ujjivan: QIP up to ₹2,000 Cr approved</div></div>
+  </div>
+</div>
+
+<!-- ═══════════════ BANK-WISE ═══════════════ -->
+<div id="tab-bankwise" class="tab">
+  <div class="filter-bar">
+    <button class="active" onclick="showBank('au',this)">🔵 AU Small Finance Bank</button>
+    <button onclick="showBank('eq',this)">🟢 Equitas SFB</button>
+    <button onclick="showBank('uj',this)">🟡 Ujjivan SFB</button>
+    <button onclick="showBank('su',this)">🟠 Suryoday SFB</button>
+  </div>
+
+  <!-- AU BANK -->
+  <div id="bank-au" class="bank-panel active">
+    <div style="background:linear-gradient(135deg,#0c4a6e,var(--au));color:#fff;padding:16px 20px;border-radius:12px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+        <div><div style="font-size:1.2rem;font-weight:700">AU Small Finance Bank</div><div style="opacity:.85;font-size:.83rem;margin-top:4px">Jaipur, Rajasthan · NSE: AUBANK · BSE: 540611 · SFB licence: 2017 · Founded: 1996</div></div>
+        <div style="text-align:right"><span class="tag tag-q4">✓ Q4 FY26</span><br><span style="font-size:.78rem;opacity:.9">Universal Bank Licence Filed</span></div>
+      </div>
+    </div>
+    <div class="info-box"><strong>Business:</strong> India's largest SFB by market cap (₹75,000 Cr+). Started as AU Financiers (vehicle finance NBFC), converted to SFB in 2017, merged with Fincare SFB in 2024. Full-service bank with ~2,790 touchpoints across 21 states. Loan book: Vehicle/Wheels, Micro Business Loans, Mortgages, Gold, Credit Cards, MFI (~5%). Filed for universal bank licence March 2026 — biggest re-rating catalyst in sector history for an SFB. Q4 FY26 delivered highest-ever quarterly PAT of ₹832 Cr.</div>
+    <div class="section-title" style="font-size:1rem">Q4 FY26 Key Metrics</div>
+    <div class="metrics4">
+      <div class="metric metric-green"><div class="metric-val">₹832 Cr</div><div class="metric-lbl">PAT (+65% YoY)</div></div>
+      <div class="metric"><div class="metric-val">₹2,582 Cr</div><div class="metric-lbl">NII (+23% YoY)</div></div>
+      <div class="metric"><div class="metric-val">6.00%</div><div class="metric-lbl">NIM (+3bps QoQ)</div></div>
+      <div class="metric metric-green"><div class="metric-val">₹1,352 Cr</div><div class="metric-lbl">PPOP (+11% QoQ)</div></div>
+      <div class="metric metric-green"><div class="metric-val">2.03%</div><div class="metric-lbl">GNPA (↓ from 2.30%)</div></div>
+      <div class="metric metric-green"><div class="metric-val">0.74%</div><div class="metric-lbl">NNPA</div></div>
+      <div class="metric metric-green"><div class="metric-val">1.80%</div><div class="metric-lbl">RoA (Q4 annualised)</div></div>
+      <div class="metric metric-green"><div class="metric-val">17.0%</div><div class="metric-lbl">RoE (Q4 annualised)</div></div>
+      <div class="metric"><div class="metric-val">18.68%</div><div class="metric-lbl">CRAR</div></div>
+      <div class="metric"><div class="metric-val">28%</div><div class="metric-lbl">CASA Ratio</div></div>
+      <div class="metric metric-purple"><div class="metric-val">~₹265</div><div class="metric-lbl">Book Value/Share</div></div>
+      <div class="metric metric-amber"><div class="metric-val">~3.9x</div><div class="metric-lbl">Price / Book</div></div>
+    </div>
+    <div class="section-title" style="font-size:1rem">Balance Sheet Scale</div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>Gross Loan Portfolio (GLP)</span><span style="font-weight:700;color:var(--au)">₹1,40,330 Cr (+21% YoY)</span></div><div class="debt-bar"><div class="debt-fill fill-blue" style="width:100%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>Deposits</span><span style="font-weight:700;color:var(--green)">₹1,52,661 Cr (+23% YoY)</span></div><div class="debt-bar"><div class="debt-fill fill-green" style="width:100%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>CRAR vs Regulatory Min (15%)</span><span style="font-weight:700;color:var(--amber)">18.68%</span></div><div class="debt-bar"><div class="debt-fill fill-amber" style="width:74%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>Provision Coverage</span><span style="font-weight:700;color:var(--green)">85%</span></div><div class="debt-bar"><div class="debt-fill fill-green" style="width:85%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>GNPA (lower better)</span><span style="font-weight:700;color:var(--green)">2.03%</span></div><div class="debt-bar"><div class="debt-fill fill-amber" style="width:20.3%"></div></div></div>
+    <div class="usp-row"><strong>FY27 Guidance:</strong> Management targeting advance growth above sector avg; RoA to maintain above 1.6%. Universal bank licence: if approved, unlocks full banking capabilities, retail deposits at lower cost, and significant valuation re-rating. Dividend ₹1/share declared for FY26.</div>
+    <div class="usp-row" style="margin-top:8px"><strong>Valuation Note:</strong> At 3.9x P/B, AU is the most expensive SFB — justified by scale, universal bank optionality, and 26% NII CAGR over 5 years. However, downside risk if licence is denied or delayed beyond FY27.</div>
+  </div>
+
+  <!-- EQUITAS -->
+  <div id="bank-eq" class="bank-panel">
+    <div style="background:linear-gradient(135deg,#064e3b,var(--eq));color:#fff;padding:16px 20px;border-radius:12px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+        <div><div style="font-size:1.2rem;font-weight:700">Equitas Small Finance Bank</div><div style="opacity:.85;font-size:.83rem;margin-top:4px">Chennai, Tamil Nadu · NSE: EQUITASBNK · BSE: 543243 · SFB licence: 2016</div></div>
+        <div style="text-align:right"><span class="tag tag-q4">✓ Q4 FY26</span><br><span style="font-size:.78rem;opacity:.9">Highest-ever quarterly PAT</span></div>
+      </div>
+    </div>
+    <div class="info-box"><strong>Business:</strong> India's one of largest SFBs by loan book (₹46,183 Cr). Originated from Equitas Holdings' microfinance background, now diversified into Small Business Loans (SBL), Used Commercial Vehicles, Used Cars, Micro Mortgages, Gold Loans, and minimal MFI (~10%). Chennai HQ with pan-India presence across 964 banking outlets in 18 states. After a rough FY25 with MFI provisioning, Q4 FY26 marks a decisive turnaround: record PAT, record NII, record disbursements (₹7,347 Cr, +72% YoY). Tagline: "Beyond Banking."</div>
+    <div class="section-title" style="font-size:1rem">Q4 FY26 Key Metrics</div>
+    <div class="metrics4">
+      <div class="metric metric-green"><div class="metric-val">₹213 Cr</div><div class="metric-lbl">PAT (+406% YoY) ★</div></div>
+      <div class="metric"><div class="metric-val">₹981 Cr</div><div class="metric-lbl">NII (+18% YoY) ★</div></div>
+      <div class="metric metric-green"><div class="metric-val">7.29%</div><div class="metric-lbl">NIM (+57bps QoQ) ★</div></div>
+      <div class="metric metric-green"><div class="metric-val">₹402 Cr</div><div class="metric-lbl">PPOP (+29% YoY)</div></div>
+      <div class="metric"><div class="metric-val">2.49%</div><div class="metric-lbl">GNPA (↓ 40bps YoY)</div></div>
+      <div class="metric metric-green"><div class="metric-val">0.68%</div><div class="metric-lbl">NNPA (↓ from 0.92%)</div></div>
+      <div class="metric metric-green"><div class="metric-val">1.46%</div><div class="metric-lbl">RoA (↑ from 0.32%)</div></div>
+      <div class="metric metric-green"><div class="metric-val">14.10%</div><div class="metric-lbl">RoE (↑ from 2.79%)</div></div>
+      <div class="metric"><div class="metric-val">20.31%</div><div class="metric-lbl">CRAR</div></div>
+      <div class="metric"><div class="metric-val">1.11%</div><div class="metric-lbl">Credit Cost (↓ from 1.88%)</div></div>
+      <div class="metric metric-purple"><div class="metric-val">~₹57</div><div class="metric-lbl">Book Value/Share</div></div>
+      <div class="metric metric-amber"><div class="metric-val">~1.3x</div><div class="metric-lbl">Price / Book</div></div>
+    </div>
+    <div class="section-title" style="font-size:1rem">Balance Sheet Scale</div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>Advances</span><span style="font-weight:700;color:var(--eq)">₹46,183 Cr (+21.6% YoY)</span></div><div class="debt-bar"><div class="debt-fill fill-green" style="width:34%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>Deposits</span><span style="font-weight:700;color:var(--green)">₹46,533 Cr (+8% YoY)</span></div><div class="debt-bar"><div class="debt-fill fill-green" style="width:30%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>CRAR vs Min (15%)</span><span style="font-weight:700;color:var(--green)">20.31%</span></div><div class="debt-bar"><div class="debt-fill fill-green" style="width:81%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>Provision Coverage</span><span style="font-weight:700;color:var(--amber)">73%</span></div><div class="debt-bar"><div class="debt-fill fill-amber" style="width:73%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>NIM — 7.29% (highest in peer group)</span><span style="font-weight:700;color:var(--green)">Best-in-class</span></div><div class="debt-bar"><div class="debt-fill fill-green" style="width:73%"></div></div></div>
+    <div class="usp-row"><strong>FY27 Guidance:</strong> 20%+ advance growth; exit RoA 1.5% by Q4 FY27 (full year ~1.2%). Credit cost to normalise to ~1.5% from 1.11% in Q4. Cost-to-income to improve in H2 FY27 via operating leverage. MFI book to stay ~10% of advances.</div>
+    <div class="usp-row" style="margin-top:8px"><strong>Valuation Note:</strong> At 1.3x P/B, Equitas trades at a significant discount to AU SFB despite comparable RoE (14.1%). FY26 annual PAT was ₹103 Cr (depressed by H1 provisioning). Q4 annualised PAT would be ~₹850 Cr — the real run-rate. Axis Direct TP: ₹85. Elara Capital TP: ₹83. Cheap relative to turnaround story.</div>
+  </div>
+
+  <!-- UJJIVAN -->
+  <div id="bank-uj" class="bank-panel">
+    <div style="background:linear-gradient(135deg,#7c2d12,var(--uj));color:#fff;padding:16px 20px;border-radius:12px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+        <div><div style="font-size:1.2rem;font-weight:700">Ujjivan Small Finance Bank</div><div style="opacity:.85;font-size:.83rem;margin-top:4px">Bengaluru, Karnataka · NSE: UJJIVANSFB · BSE: 542904 · SFB licence: 2017</div></div>
+        <div style="text-align:right"><span class="tag tag-q4">✓ Q4 FY26</span><br><span style="font-size:.78rem;opacity:.9">Record NNPA 0.43%</span></div>
+      </div>
+    </div>
+    <div class="info-box"><strong>Business:</strong> Mass-market focused SFB born from Ujjivan Financial Services (NBFC-MFI, 2005). Serves ~97 lakh customers across 754 branches in 326 districts. Loan book rapidly diversifying: secured share now 49.4% (up from ~27% in 2023). Products: Group Loans, Individual Business Loans, Home Loans, Vehicle Loans, Gold Loans, MSE Loans. No promoter holding — entirely institutional + retail. Board approved QIP of up to ₹2,000 Cr (May 2026). Targets loan book ₹1 lakh Cr by FY30.</div>
+    <div class="section-title" style="font-size:1rem">Q4 FY26 Key Metrics</div>
+    <div class="metrics4">
+      <div class="metric metric-green"><div class="metric-val">₹282 Cr</div><div class="metric-lbl">PAT (+238% YoY)</div></div>
+      <div class="metric"><div class="metric-val">₹1,093 Cr</div><div class="metric-lbl">NII (+26% YoY)</div></div>
+      <div class="metric"><div class="metric-val">8.50%</div><div class="metric-lbl">NIM (guided FY27)</div></div>
+      <div class="metric metric-green"><div class="metric-val">₹515 Cr</div><div class="metric-lbl">PPOP (+43% YoY)</div></div>
+      <div class="metric"><div class="metric-val">2.26%</div><div class="metric-lbl">GNPA (↓ from 2.38%)</div></div>
+      <div class="metric metric-green"><div class="metric-val">0.43% ★</div><div class="metric-lbl">NNPA — Record Low</div></div>
+      <div class="metric metric-green"><div class="metric-val">2.10%</div><div class="metric-lbl">RoA Q4 ann. (FY: 1.4%)</div></div>
+      <div class="metric metric-green"><div class="metric-val">17.2%</div><div class="metric-lbl">RoE Q4 ann. (FY: 10.9%)</div></div>
+      <div class="metric metric-green"><div class="metric-val">21.14%</div><div class="metric-lbl">CRAR (Highest)</div></div>
+      <div class="metric"><div class="metric-val">49.4%</div><div class="metric-lbl">Secured Book Share</div></div>
+      <div class="metric metric-purple"><div class="metric-val">~₹33</div><div class="metric-lbl">Book Value/Share</div></div>
+      <div class="metric metric-amber"><div class="metric-val">~1.9x</div><div class="metric-lbl">Price / Book</div></div>
+    </div>
+    <div class="section-title" style="font-size:1rem">Balance Sheet Scale</div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>Gross Loan Book</span><span style="font-weight:700;color:var(--uj)">₹40,655 Cr (+27% YoY)</span></div><div class="debt-bar"><div class="debt-fill fill-amber" style="width:30%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>Deposits</span><span style="font-weight:700;color:var(--green)">₹45,668 Cr</span></div><div class="debt-bar"><div class="debt-fill fill-green" style="width:30%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>CRAR (highest in peer group)</span><span style="font-weight:700;color:var(--green)">21.14%</span></div><div class="debt-bar"><div class="debt-fill fill-green" style="width:84.5%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>Secured Book — 49.4% (rising to 50%+)</span><span style="font-weight:700;color:var(--green)">49.4%</span></div><div class="debt-bar"><div class="debt-fill fill-green" style="width:49.4%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>MF Holdings (surged from 4.7% → 26.4%)</span><span style="font-weight:700;color:var(--amber)">26.4%</span></div><div class="debt-bar"><div class="debt-fill fill-amber" style="width:26.4%"></div></div></div>
+    <div class="usp-row"><strong>FY27 Guidance:</strong> 25% advance growth, NIM 8.5%, RoA 1.6%. OpEx ratio expected 20–30 bps higher in FY27 due to branch expansion investments, then declining. QIP ₹2,000 Cr will fund balance sheet growth. Universal bank re-application likely.</div>
+    <div class="usp-row" style="margin-top:8px"><strong>Valuation Note:</strong> At 1.9x P/B, reasonably priced for a bank with record-clean asset quality and strong institutional backing. Emkay Global TP: ₹80. 16 analyst consensus TP: ~₹70 average. Stock up 50%+ in a year. No promoter holding remains the key governance risk.</div>
+  </div>
+
+  <!-- SURYODAY -->
+  <div id="bank-su" class="bank-panel">
+    <div style="background:linear-gradient(135deg,#7c1d12,var(--su));color:#fff;padding:16px 20px;border-radius:12px;margin-bottom:20px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+        <div><div style="font-size:1.2rem;font-weight:700">Suryoday Small Finance Bank</div><div style="opacity:.85;font-size:.83rem;margin-top:4px">Navi Mumbai, Maharashtra · NSE: SURYODAY · BSE: 543279 · SFB licence: 2017</div></div>
+        <div style="text-align:right"><span class="tag tag-q4">✓ Q4 FY26</span><br><span style="font-size:.78rem;opacity:.9">Turnaround in progress</span></div>
+      </div>
+    </div>
+    <div class="warn-box"><strong>Business:</strong> Smallest of the four by AUM (₹13,261 Cr). Serves unbanked/underbanked segments across 16 states with ~3.8 million customers, 712 banking outlets. Flagship product: "Vikas Loan" (individually underwritten micro-enterprise) — now 70% of IF book with disbursements up 98% YoY. Non-IF (secured: mortgages, wheels) is now 55% of advances. Heavy MFI stress in FY25–H1 FY26 drove GNPA to peak 8.46% (Jun 2025); now recovering to 6.55% with CGFMU govt credit guarantee covering ₹508 Cr of risk. Promoter holds 22.4% but 22.35% is pledged — monitor carefully.</div>
+    <div class="section-title" style="font-size:1rem">Q4 FY26 Key Metrics</div>
+    <div class="metrics4">
+      <div class="metric metric-green"><div class="metric-val">₹50 Cr</div><div class="metric-lbl">PAT (+247% YoY)</div></div>
+      <div class="metric"><div class="metric-val">₹317 Cr</div><div class="metric-lbl">NII (+29% YoY)</div></div>
+      <div class="metric"><div class="metric-val">~8.87%</div><div class="metric-lbl">NIM (avg, high)</div></div>
+      <div class="metric metric-green"><div class="metric-val">₹107 Cr</div><div class="metric-lbl">PPOP (+129% YoY)</div></div>
+      <div class="metric metric-red"><div class="metric-val">6.55%</div><div class="metric-lbl">GNPA (↓ from 7.16%)</div></div>
+      <div class="metric metric-red"><div class="metric-val">4.21%</div><div class="metric-lbl">NNPA (↓ from 4.58%)</div></div>
+      <div class="metric"><div class="metric-val">0.27%</div><div class="metric-lbl">RoA (↑ from −0.23%)</div></div>
+      <div class="metric metric-amber"><div class="metric-val">3.44%</div><div class="metric-lbl">RoE (improving)</div></div>
+      <div class="metric"><div class="metric-val">20.45%</div><div class="metric-lbl">CRAR (↓ from 25.83%)</div></div>
+      <div class="metric"><div class="metric-val">22.6%</div><div class="metric-lbl">CASA Ratio</div></div>
+      <div class="metric metric-purple"><div class="metric-val">~₹200</div><div class="metric-lbl">Book Value/Share</div></div>
+      <div class="metric metric-green"><div class="metric-val">~0.9x</div><div class="metric-lbl">Price / Book ← Cheap</div></div>
+    </div>
+    <div class="section-title" style="font-size:1rem">Balance Sheet &amp; Risk Bars</div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>Advances</span><span style="font-weight:700;color:var(--su)">₹13,261 Cr (+29% YoY)</span></div><div class="debt-bar"><div class="debt-fill fill-amber" style="width:10%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>GNPA — 6.55% (⚠ Elevated, but CGFMU covers ₹508 Cr)</span><span style="font-weight:700;color:var(--red)">High Risk</span></div><div class="debt-bar"><div class="debt-fill fill-red" style="width:65.5%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>CRAR (fast declining from 25.83%)</span><span style="font-weight:700;color:var(--amber)">20.45%</span></div><div class="debt-bar"><div class="debt-fill fill-amber" style="width:55%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>Promoter pledging (22.35% of 22.40% held)</span><span style="font-weight:700;color:var(--red)">⚠ High</span></div><div class="debt-bar"><div class="debt-fill fill-red" style="width:99%"></div></div></div>
+    <div class="debt-bar-wrap"><div class="debt-label"><span>Cost-to-Income (improving from 84.7%)</span><span style="font-weight:700;color:var(--amber)">73.7%</span></div><div class="debt-bar"><div class="debt-fill fill-amber" style="width:73.7%"></div></div></div>
+    <div class="usp-row"><strong>CGFMU Protection:</strong> Against NNPA of ₹542 Cr, the bank has ₹508 Cr receivable under the government's Credit Guarantee Fund for Micro Units. This de-risks the headline NPA substantially — effective net risk is only ~₹34 Cr uncovered.</div>
+    <div class="usp-row" style="margin-top:8px"><strong>Valuation Note:</strong> At 0.9x P/B, Suryoday trades near book value — potentially a deep value play if GNPA normalises. FY26 PAT ₹152 Cr (+32% YoY). High-risk, high-reward: if MFI recovery continues, FY27 PAT could double. Dividend ₹1.50/share declared for FY26. PEG ratio 0.4x — inexpensive on growth-adjusted basis.</div>
+  </div>
+</div>
+
+<!-- ═══════════════ QUARTERLY ═══════════════ -->
+<div id="tab-quarterly" class="tab">
+  <div class="info-box">Quarterly data: Q1 FY26 = Apr–Jun 2025, Q2 = Jul–Sep 2025, Q3 = Oct–Dec 2025, Q4 = Jan–Mar 2026. All four banks report Q4 FY26 actuals. Quarterly NIM for Suryoday is approximate from disclosed data. AU Q4 RoA/RoE are annualised quarterly figures.</div>
+
+  <div class="section-title">📅 Quarterly PAT (₹ Crore) — FY26 All Banks</div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">PAT trend — AU SFB (FY26 quarters)</div>
+      <div class="chart-sub">Q4 FY26 = Highest-ever quarterly PAT of ₹832 Cr</div>
+      <div class="chart-wrap-sm"><canvas id="auPATQ" role="img" aria-label="AU SFB quarterly PAT: Q1 581, Q2 571, Q3 668, Q4 832 crore">Q1:581, Q2:571, Q3:668, Q4:832 Cr</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">PAT trend — Equitas SFB (FY26 quarters)</div>
+      <div class="chart-sub">Dramatic U-turn: Q1 loss → Q4 record PAT ₹213 Cr</div>
+      <div class="chart-wrap-sm"><canvas id="eqPATQ" role="img" aria-label="Equitas SFB quarterly PAT: Q1 loss -224, Q2 24, Q3 90, Q4 213 crore">Q1:-224, Q2:24, Q3:90, Q4:213 Cr</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">PAT trend — Ujjivan SFB (FY26 quarters)</div>
+      <div class="chart-sub">Consistent recovery from Q1 trough through Q4</div>
+      <div class="chart-wrap-sm"><canvas id="ujPATQ" role="img" aria-label="Ujjivan SFB quarterly PAT: Q1 103, Q2 122, Q3 186, Q4 282 crore">Q1:103, Q2:122, Q3:186, Q4:282 Cr</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">PAT trend — Suryoday SFB (FY26 quarters)</div>
+      <div class="chart-sub">Loss reversed: Q4 FY25 loss → ₹50 Cr PAT in Q4 FY26</div>
+      <div class="chart-wrap-sm"><canvas id="suPATQ" role="img" aria-label="Suryoday SFB quarterly PAT: Q1 35, Q2 30, Q3 37, Q4 50 crore">Q1:35, Q2:30, Q3:37, Q4:50 Cr</canvas></div>
+    </div>
+  </div>
+
+  <div class="section-title">📅 Quarterly NIM % — FY26 All Banks</div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">NIM quarterly trend — AU SFB</div>
+      <div class="chart-sub">Compressed in H1, recovered strongly to 6.0% in Q4</div>
+      <div class="chart-wrap-sm"><canvas id="auNIMQ" role="img" aria-label="AU SFB quarterly NIM: Q1 5.4, Q2 5.5, Q3 5.7, Q4 6.0 percent">Q1:5.4%, Q2:5.5%, Q3:5.7%, Q4:6.0%</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">NIM quarterly trend — Equitas SFB</div>
+      <div class="chart-sub">Expanded 57bps in Q4 to reach 7.29% — 8-quarter high</div>
+      <div class="chart-wrap-sm"><canvas id="eqNIMQ" role="img" aria-label="Equitas SFB quarterly NIM: Q1 7.1, Q2 6.9, Q3 6.7, Q4 7.29 percent">Q1:7.1%, Q2:6.9%, Q3:6.7%, Q4:7.29%</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">GNPA trend — All Banks (Q1–Q4 FY26)</div>
+      <div class="chart-sub">AU and Equitas converging near 2%; Suryoday still elevated</div>
+      <div class="chart-wrap-sm"><canvas id="gnpaQ" role="img" aria-label="GNPA quarterly trend for four banks">Grouped GNPA trend Q1-Q4 FY26</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Credit cost % — Equitas SFB (FY26 quarters)</div>
+      <div class="chart-sub">Peak Q1 (6.48%) → dramatic fall to 1.11% in Q4</div>
+      <div class="chart-wrap-sm"><canvas id="eqCCQ" role="img" aria-label="Equitas credit cost: Q1 6.48, Q2 2.16, Q3 1.88, Q4 1.11 percent">Q1:6.48%, Q2:2.16%, Q3:1.88%, Q4:1.11%</canvas></div>
+    </div>
+  </div>
+
+  <div class="section-title">📅 Quarterly NII (₹ Cr) — All Banks Combined</div>
+  <div class="chart-card" style="margin-bottom:28px">
+    <div class="chart-title">Quarterly NII comparison — All 4 Banks (FY26)</div>
+    <div class="chart-sub">AU dominates by scale; Equitas and Ujjivan converging; Suryoday smallest</div>
+    <div class="chart-wrap"><canvas id="niiQAll" role="img" aria-label="Quarterly NII grouped bar chart for all four banks across FY26 quarters">Quarterly NII comparison</canvas></div>
+  </div>
+
+  <div class="section-title">📅 Quarterly Data Table — FY26</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th>Bank</th><th>Quarter</th><th>PAT ₹Cr</th><th>NII ₹Cr</th><th>NIM %</th><th>GNPA %</th><th>NNPA %</th><th>RoA %</th><th>CRAR %</th><th>Advances ₹Cr</th><th>Deposits ₹Cr</th>
+      </tr></thead>
+      <tbody id="qtrBody">
+        <tr><td style="color:var(--au);font-weight:700">AU SFB</td><td>Q1 FY26</td><td>581</td><td>2,045</td><td>5.40%</td><td>2.47%</td><td>0.88%</td><td>1.50%</td><td>—</td><td>~1,09,000</td><td>~1,17,000</td></tr>
+        <tr><td style="color:var(--au);font-weight:700">AU SFB</td><td>Q2 FY26</td><td>571</td><td>2,186</td><td>5.50%</td><td>2.40%</td><td>0.90%</td><td>~1.4%</td><td>19.01%</td><td>~1,17,000</td><td>~1,26,000</td></tr>
+        <tr><td style="color:var(--au);font-weight:700">AU SFB</td><td>Q3 FY26</td><td>668</td><td>2,341</td><td>5.70%</td><td>2.30%</td><td>0.88%</td><td>~1.5%</td><td>19.01%</td><td>~1,25,000</td><td>~1,38,000</td></tr>
+        <tr style="background:#f0f9ff"><td style="color:var(--au);font-weight:700">AU SFB</td><td><strong>Q4 FY26 ✓</strong></td><td class="td-green">832</td><td class="td-green">2,582</td><td class="td-green">6.00%</td><td class="td-green">2.03%</td><td>0.74%</td><td class="td-green">1.80%</td><td>18.68%</td><td class="td-green">1,36,040</td><td class="td-green">1,52,661</td></tr>
+        <tr><td style="color:var(--eq);font-weight:700">Equitas</td><td>Q1 FY26</td><td class="td-red">−224</td><td>~830</td><td>7.10%</td><td>2.73%</td><td>~0.95%</td><td class="td-red">−1.5%</td><td>—</td><td>~38,000</td><td>~43,000</td></tr>
+        <tr><td style="color:var(--eq);font-weight:700">Equitas</td><td>Q2 FY26</td><td>24</td><td>774</td><td>6.90%</td><td>2.82%</td><td>0.95%</td><td>~0.2%</td><td>—</td><td>~39,000</td><td>~43,500</td></tr>
+        <tr><td style="color:var(--eq);font-weight:700">Equitas</td><td>Q3 FY26</td><td>90</td><td>854</td><td>6.72%</td><td>2.68%</td><td>0.92%</td><td>~0.7%</td><td>20.11%</td><td>~43,270</td><td>~45,000</td></tr>
+        <tr style="background:#f0fdf4"><td style="color:var(--eq);font-weight:700">Equitas</td><td><strong>Q4 FY26 ✓</strong></td><td class="td-green">213</td><td class="td-green">981</td><td class="td-green">7.29%</td><td>2.49%</td><td class="td-green">0.68%</td><td class="td-green">1.46%</td><td class="td-green">20.31%</td><td>46,183</td><td>46,533</td></tr>
+        <tr><td style="color:var(--uj);font-weight:700">Ujjivan</td><td>Q1 FY26</td><td>103</td><td>~866</td><td>~9.0%</td><td>2.52%</td><td>0.70%</td><td>~0.2%</td><td>22.80%</td><td>~33,000</td><td>~38,000</td></tr>
+        <tr><td style="color:var(--uj);font-weight:700">Ujjivan</td><td>Q2 FY26</td><td>122</td><td>~880</td><td>~8.8%</td><td>2.46%</td><td>0.57%</td><td>~0.3%</td><td>—</td><td>~35,000</td><td>~40,000</td></tr>
+        <tr><td style="color:var(--uj);font-weight:700">Ujjivan</td><td>Q3 FY26</td><td>186</td><td>~964</td><td>~8.5%</td><td>2.38%</td><td>0.57%</td><td>0.37%</td><td>21.62%</td><td>~37,000</td><td>~43,000</td></tr>
+        <tr style="background:#fffbeb"><td style="color:var(--uj);font-weight:700">Ujjivan</td><td><strong>Q4 FY26 ✓</strong></td><td class="td-green">282</td><td class="td-green">1,093</td><td>8.50%</td><td>2.26%</td><td class="td-green">0.43%</td><td class="td-green">2.1% ann.</td><td class="td-green">21.14%</td><td>40,655</td><td>45,668</td></tr>
+        <tr><td style="color:var(--su);font-weight:700">Suryoday</td><td>Q1 FY26</td><td>35</td><td>247</td><td>~8.5%</td><td class="td-red">8.46%</td><td class="td-red">5.64%</td><td>0.90%</td><td>24.61%</td><td>10,846</td><td>11,312</td></tr>
+        <tr><td style="color:var(--su);font-weight:700">Suryoday</td><td>Q2 FY26</td><td>30</td><td>258</td><td>~8.6%</td><td class="td-red">5.90%</td><td class="td-red">3.80%</td><td>0.22%</td><td>23.40%</td><td>11,124</td><td>11,991</td></tr>
+        <tr><td style="color:var(--su);font-weight:700">Suryoday</td><td>Q3 FY26</td><td>37</td><td>~245</td><td>~8.7%</td><td class="td-red">6.69%</td><td class="td-red">4.35%</td><td>0.22%</td><td>21.94%</td><td>~12,200</td><td>~13,000</td></tr>
+        <tr style="background:#fff7ed"><td style="color:var(--su);font-weight:700">Suryoday</td><td><strong>Q4 FY26 ✓</strong></td><td class="td-green">50</td><td>317</td><td>~8.9%</td><td class="td-amber">6.55%</td><td class="td-red">4.21%</td><td>0.27%</td><td>20.45%</td><td>13,261</td><td>13,994</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════ ANNUAL ═══════════════ -->
+<div id="tab-annual" class="tab">
+  <div class="info-box">Annual data covers FY24, FY25, and FY26 (ended March 31). FY26 figures are full-year audited. P/B is based on current market price relative to end-of-year book value. RoA and RoE are full-year annualised.</div>
+
+  <div class="section-title">📆 Annual PAT — All Banks (FY24–FY26)</div>
+  <div class="chart-card" style="margin-bottom:28px">
+    <div class="chart-title">Annual PAT comparison (₹ Crore) — FY24 · FY25 · FY26</div>
+    <div class="chart-sub">AU SFB leads by scale; Equitas FY26 annual PAT depressed by H1 provisioning — Q4 run-rate is ~₹850 Cr annualised</div>
+    <div class="chart-wrap-lg"><canvas id="annPAT" role="img" aria-label="Annual PAT for 4 banks across FY24, FY25, FY26">Annual PAT comparison</canvas></div>
+  </div>
+
+  <div class="section-title">📆 Annual NIM % — All Banks (FY24–FY26)</div>
+  <div class="chart-card" style="margin-bottom:28px">
+    <div class="chart-title">Annual NIM trend (%) — FY24 · FY25 · FY26</div>
+    <div class="chart-sub">Ujjivan had highest NIM historically; AU expanded from 5.45% to ~5.96%; Equitas volatile due to MFI mix shift</div>
+    <div class="chart-wrap"><canvas id="annNIM" role="img" aria-label="Annual NIM trend for 4 banks">Annual NIM</canvas></div>
+  </div>
+
+  <div class="section-title">📆 Annual Data Table — FY24 · FY25 · FY26</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th onclick="sortT('annBody',0)">Bank</th>
+        <th onclick="sortT('annBody',1)">FY</th>
+        <th onclick="sortT('annBody',2)">PAT ₹Cr</th>
+        <th onclick="sortT('annBody',3)">PAT YoY</th>
+        <th onclick="sortT('annBody',4)">NII ₹Cr</th>
+        <th onclick="sortT('annBody',5)">NIM %</th>
+        <th onclick="sortT('annBody',6)">GNPA %</th>
+        <th onclick="sortT('annBody',7)">NNPA %</th>
+        <th onclick="sortT('annBody',8)">RoA %</th>
+        <th onclick="sortT('annBody',9)">RoE %</th>
+        <th onclick="sortT('annBody',10)">CRAR %</th>
+        <th onclick="sortT('annBody',11)">Advances ₹Cr</th>
+        <th onclick="sortT('annBody',12)">Deposits ₹Cr</th>
+        <th onclick="sortT('annBody',13)">BVPS ₹</th>
+      </tr></thead>
+      <tbody id="annBody">
+        <tr><td style="color:var(--au);font-weight:700">AU SFB</td><td>FY24</td><td>1,592</td><td>—</td><td>5,157</td><td>5.45%</td><td>1.85%</td><td>0.56%</td><td>1.60%</td><td>13.50%</td><td>20.06%</td><td>73,999</td><td>87,182</td><td class="td-blue">~188</td></tr>
+        <tr><td style="color:var(--au);font-weight:700">AU SFB</td><td>FY25</td><td>2,106</td><td class="td-green">+32%</td><td>8,012</td><td>5.94%</td><td>2.28%</td><td>0.74%</td><td>1.50%</td><td>13.10%</td><td>20.06%</td><td>~1,08,778</td><td>~1,24,000</td><td class="td-blue">~231</td></tr>
+        <tr style="background:#f0f9ff"><td style="color:var(--au);font-weight:700">AU SFB</td><td><strong>FY26</strong></td><td class="td-green">2,641</td><td class="td-green">+25%</td><td class="td-green">~10,500</td><td class="td-green">5.96%</td><td class="td-green">2.03%</td><td class="td-green">0.74%</td><td class="td-green">1.60%</td><td class="td-green">14.20%</td><td>18.68%</td><td class="td-green">1,36,040</td><td class="td-green">1,52,661</td><td class="td-blue">~265</td></tr>
+        <tr><td style="color:var(--eq);font-weight:700">Equitas</td><td>FY24</td><td>574</td><td>—</td><td>3,101</td><td>~8.5%</td><td>2.60%</td><td>0.70%</td><td>1.76%</td><td>13.50%</td><td>21.50%</td><td>~30,900</td><td>~36,130</td><td class="td-blue">~54</td></tr>
+        <tr><td style="color:var(--eq);font-weight:700">Equitas</td><td>FY25</td><td>147</td><td class="td-red">−74%</td><td>3,260</td><td>~7.8%</td><td>2.89%</td><td>0.92%</td><td>0.28%</td><td>2.40%</td><td>20.56%</td><td>37,900</td><td>43,110</td><td class="td-blue">~55</td></tr>
+        <tr style="background:#f0fdf4"><td style="color:var(--eq);font-weight:700">Equitas</td><td><strong>FY26</strong></td><td class="td-amber">103</td><td class="td-red">−30%</td><td>3,391</td><td class="td-green">7.29%</td><td class="td-green">2.49%</td><td class="td-green">0.68%</td><td>0.27%</td><td>4.00%</td><td class="td-green">20.31%</td><td>46,183</td><td>46,533</td><td class="td-blue">~57</td></tr>
+        <tr><td style="color:var(--uj);font-weight:700">Ujjivan</td><td>FY24</td><td>1,282</td><td>—</td><td>3,400</td><td>9.20%</td><td>2.10%</td><td>0.30%</td><td>3.30%</td><td>25.00%</td><td>25.00%</td><td>~27,000</td><td>~30,000</td><td class="td-blue">~27</td></tr>
+        <tr><td style="color:var(--uj);font-weight:700">Ujjivan</td><td>FY25</td><td>726</td><td class="td-red">−43%</td><td>3,500</td><td>~8.8%</td><td>2.18%</td><td>0.49%</td><td>1.60%</td><td>12.00%</td><td>23.10%</td><td>~31,390</td><td>~37,630</td><td class="td-blue">~29</td></tr>
+        <tr style="background:#fffbeb"><td style="color:var(--uj);font-weight:700">Ujjivan</td><td><strong>FY26</strong></td><td class="td-green">693</td><td class="td-amber">−4%</td><td>~3,930</td><td>~8.5%</td><td class="td-green">2.26%</td><td class="td-green">0.43%</td><td class="td-green">1.40%</td><td class="td-green">10.9%</td><td class="td-green">21.14%</td><td>40,655</td><td>45,668</td><td class="td-blue">~33</td></tr>
+        <tr><td style="color:var(--su);font-weight:700">Suryoday</td><td>FY24</td><td>216</td><td>—</td><td>~1,100</td><td>9.00%</td><td>2.90%</td><td>0.58%</td><td>1.74%</td><td>12.00%</td><td>28.40%</td><td>~8,047</td><td>~7,480</td><td class="td-blue">~185</td></tr>
+        <tr><td style="color:var(--su);font-weight:700">Suryoday</td><td>FY25</td><td>115</td><td class="td-red">−47%</td><td>~1,050</td><td>~8.8%</td><td>7.16%</td><td>4.58%</td><td>0.84%</td><td>7.30%</td><td>25.83%</td><td>10,251</td><td>10,580</td><td class="td-blue">~193</td></tr>
+        <tr style="background:#fff7ed"><td style="color:var(--su);font-weight:700">Suryoday</td><td><strong>FY26</strong></td><td class="td-green">152</td><td class="td-green">+32%</td><td>~1,100</td><td>~8.9%</td><td class="td-amber">6.55%</td><td class="td-red">4.21%</td><td>0.27%</td><td>3.44%</td><td>20.45%</td><td>13,261</td><td>13,994</td><td class="td-blue">~200</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════ VALUATION ═══════════════ -->
+<div id="tab-valuation" class="tab">
+  <div class="info-box"><strong>Book Value &amp; P/B Analysis:</strong> For banks, Price-to-Book (P/B) is the primary valuation metric. A bank trading above 1x P/B implies the market expects returns above cost of equity. Premium P/B (like AU at 3.9x) reflects quality, scale, and growth optionality. Discount to P/B (Suryoday at ~0.9x) reflects asset quality stress and RoE below cost of equity. Book Value Per Share (BVPS) = Shareholders' Equity ÷ Shares Outstanding. EPS and BVPS are from latest available audited results.</div>
+
+  <div class="section-title">📐 Valuation Dashboard — All 4 Banks</div>
+  <div class="grid">
+    <!-- AU -->
+    <div class="card">
+      <div class="card-head"><div><div class="card-name" style="color:var(--au)">AU Small Finance Bank</div><div class="card-sub">NSE: AUBANK · CMP ~₹1,000</div></div><span class="tag tag-buy">PREMIUM</span></div>
+      <div class="metrics4">
+        <div class="metric metric-purple"><div class="metric-val">~₹265</div><div class="metric-lbl">BVPS FY26</div></div>
+        <div class="metric metric-amber"><div class="metric-val">~3.9x</div><div class="metric-lbl">P/B (Current)</div></div>
+        <div class="metric"><div class="metric-val">~₹231</div><div class="metric-lbl">BVPS FY25</div></div>
+        <div class="metric"><div class="metric-val">~₹188</div><div class="metric-lbl">BVPS FY24</div></div>
+      </div>
+      <div class="metrics">
+        <div class="metric metric-green"><div class="metric-val">~₹34.5</div><div class="metric-lbl">EPS FY26</div></div>
+        <div class="metric"><div class="metric-val">~29x</div><div class="metric-lbl">P/E (TTM)</div></div>
+        <div class="metric metric-green"><div class="metric-val">14.2%</div><div class="metric-lbl">RoE FY26</div></div>
+      </div>
+      <div class="score-wrap">
+        <div class="score-row"><span class="score-lbl">P/B (3.9x)</span><div class="score-bg"><div class="score-bar" style="width:78%;background:var(--purple)"></div></div><span class="score-val" style="color:var(--purple)">3.9x</span></div>
+        <div class="score-row"><span class="score-lbl">BVPS Growth</span><div class="score-bg"><div class="score-bar" style="width:85%;background:var(--green)"></div></div><span class="score-val" style="color:var(--green)">+41% 2yr</span></div>
+        <div class="score-row"><span class="score-lbl">RoE</span><div class="score-bg"><div class="score-bar" style="width:71%;background:var(--accent)"></div></div><span class="score-val" style="color:var(--accent)">14.2%</span></div>
+      </div>
+      <div class="usp-row" style="margin-top:8px"><strong>Verdict:</strong> Expensive but justified — Universal bank licence optionality, 5-yr NII CAGR 26%, highest institutional trust. Emkay: Reduce (TP ₹950); Systematix: Hold (TP ₹1,020). Staggered entry on dips suggested.</div>
+    </div>
+    <!-- Equitas -->
+    <div class="card">
+      <div class="card-head"><div><div class="card-name" style="color:var(--eq)">Equitas SFB</div><div class="card-sub">NSE: EQUITASBNK · CMP ~₹72</div></div><span class="tag tag-buy">VALUE BUY</span></div>
+      <div class="metrics4">
+        <div class="metric metric-purple"><div class="metric-val">~₹57</div><div class="metric-lbl">BVPS FY26</div></div>
+        <div class="metric metric-green"><div class="metric-val">~1.3x</div><div class="metric-lbl">P/B (Current)</div></div>
+        <div class="metric"><div class="metric-val">~₹55</div><div class="metric-lbl">BVPS FY25</div></div>
+        <div class="metric"><div class="metric-val">~₹54</div><div class="metric-lbl">BVPS FY24</div></div>
+      </div>
+      <div class="metrics">
+        <div class="metric metric-amber"><div class="metric-val">~₹0.90</div><div class="metric-lbl">EPS FY26 (depressed)</div></div>
+        <div class="metric metric-amber"><div class="metric-val">~80x</div><div class="metric-lbl">P/E TTM (optical)</div></div>
+        <div class="metric metric-green"><div class="metric-val">~14.1%</div><div class="metric-lbl">RoE Q4 ann.</div></div>
+      </div>
+      <div class="score-wrap">
+        <div class="score-row"><span class="score-lbl">P/B (1.3x)</span><div class="score-bg"><div class="score-bar" style="width:26%;background:var(--green)"></div></div><span class="score-val" style="color:var(--green)">1.3x</span></div>
+        <div class="score-row"><span class="score-lbl">BVPS Growth</span><div class="score-bg"><div class="score-bar" style="width:30%;background:var(--amber)"></div></div><span class="score-val" style="color:var(--amber)">+6% 2yr</span></div>
+        <div class="score-row"><span class="score-lbl">Q4 RoE</span><div class="score-bg"><div class="score-bar" style="width:71%;background:var(--green)"></div></div><span class="score-val" style="color:var(--green)">14.1%</span></div>
+      </div>
+      <div class="usp-row" style="margin-top:8px"><strong>Verdict:</strong> Most attractive P/B in the group given Q4 turnaround. FY26 annual PAT is artificially depressed by H1 losses. Q4 annualised run-rate ~₹850 Cr implies forward P/E ~10x. Axis Direct TP ₹85 (+18%). Strong Buy for 12–18m horizon.</div>
+    </div>
+    <!-- Ujjivan -->
+    <div class="card">
+      <div class="card-head"><div><div class="card-name" style="color:var(--uj)">Ujjivan SFB</div><div class="card-sub">NSE: UJJIVANSFB · CMP ~₹63</div></div><span class="tag tag-hold">FAIR VALUE</span></div>
+      <div class="metrics4">
+        <div class="metric metric-purple"><div class="metric-val">~₹33</div><div class="metric-lbl">BVPS FY26</div></div>
+        <div class="metric metric-amber"><div class="metric-val">~1.9x</div><div class="metric-lbl">P/B (Current)</div></div>
+        <div class="metric"><div class="metric-val">~₹29</div><div class="metric-lbl">BVPS FY25</div></div>
+        <div class="metric"><div class="metric-val">~₹27</div><div class="metric-lbl">BVPS FY24</div></div>
+      </div>
+      <div class="metrics">
+        <div class="metric metric-green"><div class="metric-val">~₹3.55</div><div class="metric-lbl">EPS FY26</div></div>
+        <div class="metric"><div class="metric-val">~17.7x</div><div class="metric-lbl">P/E (TTM)</div></div>
+        <div class="metric"><div class="metric-val">10.9%</div><div class="metric-lbl">RoE FY26</div></div>
+      </div>
+      <div class="score-wrap">
+        <div class="score-row"><span class="score-lbl">P/B (1.9x)</span><div class="score-bg"><div class="score-bar" style="width:38%;background:var(--amber)"></div></div><span class="score-val" style="color:var(--amber)">1.9x</span></div>
+        <div class="score-row"><span class="score-lbl">BVPS Growth</span><div class="score-bg"><div class="score-bar" style="width:55%;background:var(--green)"></div></div><span class="score-val" style="color:var(--green)">+22% 2yr</span></div>
+        <div class="score-row"><span class="score-lbl">RoE</span><div class="score-bg"><div class="score-bar" style="width:55%;background:var(--amber)"></div></div><span class="score-val" style="color:var(--amber)">10.9%</span></div>
+      </div>
+      <div class="usp-row" style="margin-top:8px"><strong>Verdict:</strong> Fairly valued at 1.9x. BVPS has grown +22% over 2 years. FY26 full-year RoE 10.9% approaching cost of equity (~12%). Q4 annualised RoE 17.2% shows strong exit momentum. Emkay TP ₹80; stock at ₹63. QIP ₹2,000 Cr will dilute BVPS slightly. Hold existing; accumulate below ₹58.</div>
+    </div>
+    <!-- Suryoday -->
+    <div class="card">
+      <div class="card-head"><div><div class="card-name" style="color:var(--su)">Suryoday SFB</div><div class="card-sub">NSE: SURYODAY · CMP ~₹180</div></div><span class="tag tag-caution">DEEP VALUE / RISKY</span></div>
+      <div class="metrics4">
+        <div class="metric metric-purple"><div class="metric-val">~₹200</div><div class="metric-lbl">BVPS FY26</div></div>
+        <div class="metric metric-green"><div class="metric-val">~0.9x</div><div class="metric-lbl">P/B (Current)</div></div>
+        <div class="metric"><div class="metric-val">~₹193</div><div class="metric-lbl">BVPS FY25</div></div>
+        <div class="metric"><div class="metric-val">~₹185</div><div class="metric-lbl">BVPS FY24</div></div>
+      </div>
+      <div class="metrics">
+        <div class="metric metric-amber"><div class="metric-val">~₹14.30</div><div class="metric-lbl">EPS FY26</div></div>
+        <div class="metric"><div class="metric-val">~12.6x</div><div class="metric-lbl">P/E (TTM)</div></div>
+        <div class="metric metric-red"><div class="metric-val">3.44%</div><div class="metric-lbl">RoE FY26</div></div>
+      </div>
+      <div class="score-wrap">
+        <div class="score-row"><span class="score-lbl">P/B (0.9x)</span><div class="score-bg"><div class="score-bar" style="width:18%;background:var(--green)"></div></div><span class="score-val" style="color:var(--green)">0.9x</span></div>
+        <div class="score-row"><span class="score-lbl">BVPS Growth</span><div class="score-bg"><div class="score-bar" style="width:20%;background:var(--amber)"></div></div><span class="score-val" style="color:var(--amber)">+8% 2yr</span></div>
+        <div class="score-row"><span class="score-lbl">RoE</span><div class="score-bg"><div class="score-bar" style="width:17%;background:var(--red)"></div></div><span class="score-val" style="color:var(--red)">3.44%</span></div>
+      </div>
+      <div class="usp-row" style="margin-top:8px"><strong>Verdict:</strong> Only SFB trading below book — deep value if GNPA normalises. PEG ratio 0.4x is attractive. CGFMU guarantee covers ₹508 Cr of the ₹542 Cr NNPA — real credit risk is minimal. BUT: pledged promoter shares (22.35%) and declining CRAR are genuine risks. High-risk, high-reward speculative position; not for conservative investors.</div>
+    </div>
+  </div>
+
+  <div class="section-title">📐 P/B Ratio Comparison — FY24 · FY25 · FY26</div>
+  <div class="chart-card" style="margin-bottom:28px">
+    <div class="chart-title">Price-to-Book ratio across years (approximate, based on year-end price and BV)</div>
+    <div class="chart-sub">AU SFB consistently commands a premium; Suryoday dipped to below book during MFI stress</div>
+    <div class="chart-wrap"><canvas id="pbChart" role="img" aria-label="Price to book ratio trend for 4 banks across FY24 FY25 FY26">P/B ratio comparison</canvas></div>
+  </div>
+
+  <div class="section-title">📐 BVPS Growth — FY24 → FY26</div>
+  <div class="chart-card" style="margin-bottom:28px">
+    <div class="chart-title">Book Value Per Share (₹) — FY24, FY25, FY26</div>
+    <div class="chart-sub">AU SFB has compounded BVPS 41% over 2 years; Equitas almost flat due to provisioning; Suryoday steady growth</div>
+    <div class="chart-wrap"><canvas id="bvpsChart" role="img" aria-label="BVPS trend for four banks across three fiscal years">BVPS comparison</canvas></div>
+  </div>
+</div>
+
+<!-- ═══════════════ CHARTS ═══════════════ -->
+<div id="tab-charts" class="tab">
+  <div class="section-title">📈 Comparative Charts — All 4 Banks</div>
+  <div class="chart-grid">
+    <div class="chart-card">
+      <div class="chart-title">Q4 FY26 — Net Profit (₹ Cr)</div>
+      <div class="chart-sub">AU dominates; Equitas and Ujjivan broadly similar; Suryoday rebuilding</div>
+      <div class="chart-wrap-sm"><canvas id="c_pat" role="img" aria-label="Q4 FY26 PAT: AU 832, Equitas 213, Ujjivan 282, Suryoday 50">Q4 PAT comparison</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Q4 FY26 — YoY PAT Growth %</div>
+      <div class="chart-sub">Equitas leads on growth %; all turnaround stories this quarter</div>
+      <div class="chart-wrap-sm"><canvas id="c_patg" role="img" aria-label="PAT growth: AU 65, Equitas 406, Ujjivan 238, Suryoday 247 percent">PAT growth comparison</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Q4 FY26 — NIM % comparison</div>
+      <div class="chart-sub">Higher NIM = better spread on loans. Equitas 7.29% leads; AU compressed at 6%</div>
+      <div class="chart-wrap-sm"><canvas id="c_nim" role="img" aria-label="NIM comparison across four banks">NIM comparison</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Q4 FY26 — GNPA vs NNPA %</div>
+      <div class="chart-sub">Suryoday's GNPA is 3x peers but CGFMU covers bulk of risk</div>
+      <div class="chart-wrap-sm"><canvas id="c_npa" role="img" aria-label="GNPA and NNPA comparison for four banks">NPA comparison</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Q4 FY26 — RoA vs RoE %</div>
+      <div class="chart-sub">AU and Equitas lead on returns; Ujjivan and Suryoday still recovering</div>
+      <div class="chart-wrap-sm"><canvas id="c_roa" role="img" aria-label="RoA and RoE comparison">RoA vs RoE</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Q4 FY26 — CRAR % (min 15%)</div>
+      <div class="chart-sub">All well above regulatory minimum; Ujjivan highest at 21.14%</div>
+      <div class="chart-wrap-sm"><canvas id="c_car" role="img" aria-label="CRAR comparison for four banks">CRAR comparison</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Q4 FY26 — Gross Advances (₹ Cr)</div>
+      <div class="chart-sub">Scale gap: AU (1.36L Cr) vs others (13K–46K Cr)</div>
+      <div class="chart-wrap-sm"><canvas id="c_adv" role="img" aria-label="Gross advances comparison for four banks">Advances comparison</canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Radar — Overall Scorecard</div>
+      <div class="chart-sub">Six dimensions: Profitability · Margins · Asset Quality · Capital · Growth · Scale</div>
+      <div class="chart-wrap-sm"><canvas id="c_radar" role="img" aria-label="Radar chart comparing all four banks">Radar scorecard</canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DATA TABLE ═══════════════ -->
+<div id="tab-table" class="tab">
+  <div class="section-title">📋 Complete Data Table — Q4 FY26 (Sortable)</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr>
+        <th onclick="sortT('mainBody',0)">Bank <span class="sort-icon">⇅</span></th>
+        <th onclick="sortT('mainBody',1)">PAT ₹Cr <span class="sort-icon">⇅</span></th>
+        <th onclick="sortT('mainBody',2)">PAT YoY <span class="sort-icon">⇅</span></th>
+        <th onclick="sortT('mainBody',3)">NII ₹Cr</th>
+        <th onclick="sortT('mainBody',4)">PPOP ₹Cr</th>
+        <th onclick="sortT('mainBody',5)">NIM %</th>
+        <th onclick="sortT('mainBody',6)">Credit Cost %</th>
+        <th onclick="sortT('mainBody',7)">GNPA %</th>
+        <th onclick="sortT('mainBody',8)">NNPA %</th>
+        <th onclick="sortT('mainBody',9)">PCR %</th>
+        <th onclick="sortT('mainBody',10)">RoA %</th>
+        <th onclick="sortT('mainBody',11)">RoE %</th>
+        <th onclick="sortT('mainBody',12)">CRAR %</th>
+        <th onclick="sortT('mainBody',13)">CASA %</th>
+        <th onclick="sortT('mainBody',14)">Advances ₹Cr</th>
+        <th onclick="sortT('mainBody',15)">Deposits ₹Cr</th>
+        <th onclick="sortT('mainBody',16)">BVPS ₹</th>
+        <th onclick="sortT('mainBody',17)">CMP ₹</th>
+        <th onclick="sortT('mainBody',18)">P/B</th>
+        <th onclick="sortT('mainBody',19)">Mkt Cap ₹Cr</th>
+        <th>C/I %</th>
+      </tr></thead>
+      <tbody id="mainBody">
+        <tr>
+          <td><strong style="color:var(--au)">AU SFB</strong></td>
+          <td class="td-green">832</td><td class="td-green">+65%</td>
+          <td class="td-green">2,582</td><td>1,352</td>
+          <td>6.00%</td><td class="td-green">0.60%</td>
+          <td class="td-green">2.03%</td><td>0.74%</td><td class="td-green">85%</td>
+          <td class="td-green">1.80%</td><td class="td-green">17.0%</td>
+          <td>18.68%</td><td>28%</td>
+          <td class="td-green">1,36,040</td><td class="td-green">1,52,661</td>
+          <td class="td-blue">~265</td><td>~1,000</td><td class="td-purple">~3.9x</td>
+          <td class="td-green">75,000</td><td>~55%</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--eq)">Equitas SFB</strong></td>
+          <td class="td-green">213</td><td class="td-green">+406%</td>
+          <td>981</td><td>402</td>
+          <td class="td-green">7.29%</td><td>1.11%</td>
+          <td>2.49%</td><td class="td-green">0.68%</td><td>73%</td>
+          <td>1.46%</td><td>14.10%</td>
+          <td class="td-green">20.31%</td><td>26%</td>
+          <td>46,183</td><td>46,533</td>
+          <td class="td-blue">~57</td><td>~72</td><td class="td-green">~1.3x</td>
+          <td>8,256</td><td>67.5%</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--uj)">Ujjivan SFB</strong></td>
+          <td class="td-green">282</td><td class="td-green">+238%</td>
+          <td>1,093</td><td>515</td>
+          <td>8.50%</td><td>~0.90%</td>
+          <td>2.26%</td><td class="td-green">0.43%</td><td>76%</td>
+          <td class="td-green">2.10%</td><td class="td-green">17.2%</td>
+          <td class="td-green">21.14%</td><td>30%</td>
+          <td>40,655</td><td>45,668</td>
+          <td class="td-blue">~33</td><td>~63</td><td class="td-amber">~1.9x</td>
+          <td>12,232</td><td>~62%</td>
+        </tr>
+        <tr>
+          <td><strong style="color:var(--su)">Suryoday SFB</strong></td>
+          <td class="td-amber">50</td><td class="td-green">+247%</td>
+          <td>317</td><td>107</td>
+          <td class="td-green">8.87%</td><td class="td-amber">~2.2%</td>
+          <td class="td-red">6.55%</td><td class="td-red">4.21%</td><td class="td-red">50%</td>
+          <td>0.27%</td><td class="td-red">3.44%</td>
+          <td>20.45%</td><td class="td-red">22.6%</td>
+          <td class="td-red">13,261</td><td class="td-red">13,994</td>
+          <td class="td-blue">~200</td><td>~180</td><td class="td-green">~0.9x</td>
+          <td class="td-red">1,837</td><td>73.7%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════ RANKINGS ═══════════════ -->
+<div id="tab-rankings" class="tab">
+  <div class="section-title">🏆 Rankings — Q4 FY26</div>
+
+  <div class="section-title" style="font-size:1rem;margin-top:10px">💰 Profitability</div>
+  <div class="rank-grid">
+    <div class="rank-card rank-1"><div class="rank-num">1</div><div class="rank-info"><h3 style="color:var(--au)">AU Small Finance Bank</h3><p>PAT ₹832 Cr · RoA 1.80% · RoE 17.0% · Highest-ever quarterly PAT. NIM 6.0% expanding. FY26 full-year PAT ₹2,641 Cr (+25%).</p></div></div>
+    <div class="rank-card rank-2"><div class="rank-num">2</div><div class="rank-info"><h3 style="color:var(--eq)">Equitas SFB</h3><p>PAT ₹213 Cr · RoA 1.46% · RoE 14.10% · Highest-ever quarterly PAT. Best PAT growth rate (+406%). NIM 7.29%.</p></div></div>
+    <div class="rank-card rank-3"><div class="rank-num">3</div><div class="rank-info"><h3 style="color:var(--uj)">Ujjivan SFB</h3><p>PAT ₹282 Cr · RoA 2.1% (Q4 ann.) · FY RoA 1.4% · RoE 17.2% (Q4 ann.) · FY RoE 10.9% · PAT +238% YoY. FY27 RoA guidance 1.6%.</p></div></div>
+    <div class="rank-card rank-4"><div class="rank-num">4</div><div class="rank-info"><h3 style="color:var(--su)">Suryoday SFB</h3><p>PAT ₹50 Cr · RoA 0.27% · RoE 3.44% · Smallest PAT but strong recovery. FY26 full-year PAT +32% YoY.</p></div></div>
+  </div>
+
+  <div class="section-title" style="font-size:1rem">🛡️ Asset Quality</div>
+  <div class="rank-grid">
+    <div class="rank-card rank-1"><div class="rank-num">1</div><div class="rank-info"><h3 style="color:var(--uj)">Ujjivan SFB</h3><p>NNPA 0.43% — Record low in bank's history. GNPA 2.26%. PCR 76%. Net slippages at multi-year low.</p></div></div>
+    <div class="rank-card rank-2"><div class="rank-num">2</div><div class="rank-info"><h3 style="color:var(--au)">AU Small Finance Bank</h3><p>GNPA 2.03% — Best GNPA in peer group. NNPA 0.74%. PCR 85% — Strongest coverage. Slippages ↓17% QoQ.</p></div></div>
+    <div class="rank-card rank-3"><div class="rank-num">3</div><div class="rank-info"><h3 style="color:var(--eq)">Equitas SFB</h3><p>GNPA 2.49%, NNPA 0.68%. Credit cost 1.11% (↓ from 1.88% in Q3). Net slippages at 10-quarter low.</p></div></div>
+    <div class="rank-card rank-4"><div class="rank-num">4</div><div class="rank-info"><h3 style="color:var(--su)">Suryoday SFB</h3><p>GNPA 6.55%, NNPA 4.21% — Highest in group. BUT: ₹508 Cr CGFMU coverage offsets ₹542 Cr NNPA risk.</p></div></div>
+  </div>
+
+  <div class="section-title" style="font-size:1rem">📐 Valuation (P/B)</div>
+  <div class="rank-grid">
+    <div class="rank-card rank-1"><div class="rank-num">🏷</div><div class="rank-info"><h3 style="color:var(--su)">Suryoday SFB — Cheapest</h3><p>P/B ~0.9x · Trading near book value · EPS ₹14.30 · PEG 0.4x · High-risk deep value play</p></div></div>
+    <div class="rank-card rank-2"><div class="rank-num">🏷</div><div class="rank-info"><h3 style="color:var(--eq)">Equitas SFB — Best Value</h3><p>P/B ~1.3x · Turnaround story at discount · Q4 run-rate annualised implies forward P/E ~10x · Axis TP ₹85</p></div></div>
+    <div class="rank-card rank-3"><div class="rank-num">🏷</div><div class="rank-info"><h3 style="color:var(--uj)">Ujjivan SFB — Fair</h3><p>P/B ~1.9x · Reasonably priced · BVPS growing · QIP dilution risk · Emkay TP ₹80</p></div></div>
+    <div class="rank-card rank-4"><div class="rank-num">🏷</div><div class="rank-info"><h3 style="color:var(--au)">AU SFB — Expensive</h3><p>P/B ~3.9x · Premium justified by quality + universal bank optionality · Risk of de-rating if licence denied</p></div></div>
+  </div>
+
+  <div class="section-title">📊 Overall Investment Scorecard</div>
+  <div class="analyst-grid">
+    <div class="analyst-card">
+      <div class="analyst-name" style="color:var(--au)">AU Small Finance Bank</div>
+      <span class="rec-hold">Hold / Accumulate on Dips</span>
+      <div class="analyst-tp">CMP ~₹1,000 · BVPS ~₹265 · P/B 3.9x · RoA 1.8%</div>
+      <div class="score-wrap" style="margin-top:10px">
+        <div class="score-row"><span class="score-lbl">Profitability</span><div class="score-bg"><div class="score-bar" style="width:90%;background:var(--green)"></div></div><span class="score-val">9/10</span></div>
+        <div class="score-row"><span class="score-lbl">Asset Quality</span><div class="score-bg"><div class="score-bar" style="width:88%;background:var(--green)"></div></div><span class="score-val">8.8</span></div>
+        <div class="score-row"><span class="score-lbl">Capital</span><div class="score-bg"><div class="score-bar" style="width:70%;background:var(--amber)"></div></div><span class="score-val">7.0</span></div>
+        <div class="score-row"><span class="score-lbl">Valuation</span><div class="score-bg"><div class="score-bar" style="width:35%;background:var(--red)"></div></div><span class="score-val">3.5</span></div>
+        <div class="score-row"><span class="score-lbl">Growth</span><div class="score-bg"><div class="score-bar" style="width:85%;background:var(--green)"></div></div><span class="score-val">8.5</span></div>
+      </div>
+      <div class="analyst-note">Brokerages: Emkay Reduce (TP ₹950), Systematix Hold (TP ₹1,020). Universal bank licence = joker card. Premium valuation limits short-term upside.</div>
+    </div>
+    <div class="analyst-card">
+      <div class="analyst-name" style="color:var(--eq)">Equitas Small Finance Bank</div>
+      <span class="rec-buy">Strong Buy</span>
+      <div class="analyst-tp">CMP ~₹72 · BVPS ~₹57 · P/B 1.3x · RoE 14.1% (Q4)</div>
+      <div class="score-wrap" style="margin-top:10px">
+        <div class="score-row"><span class="score-lbl">Profitability</span><div class="score-bg"><div class="score-bar" style="width:78%;background:var(--green)"></div></div><span class="score-val">7.8</span></div>
+        <div class="score-row"><span class="score-lbl">Asset Quality</span><div class="score-bg"><div class="score-bar" style="width:80%;background:var(--green)"></div></div><span class="score-val">8.0</span></div>
+        <div class="score-row"><span class="score-lbl">Capital</span><div class="score-bg"><div class="score-bar" style="width:80%;background:var(--green)"></div></div><span class="score-val">8.0</span></div>
+        <div class="score-row"><span class="score-lbl">Valuation</span><div class="score-bg"><div class="score-bar" style="width:85%;background:var(--green)"></div></div><span class="score-val">8.5</span></div>
+        <div class="score-row"><span class="score-lbl">Growth</span><div class="score-bg"><div class="score-bar" style="width:82%;background:var(--green)"></div></div><span class="score-val">8.2</span></div>
+      </div>
+      <div class="analyst-note">Axis Direct TP ₹85 (+18%). Elara TP ₹83. Best turnaround story with cheapest P/B among recovering peers. Q4 run-rate implies ~10x forward P/E. Chennai-based — strong local franchise. FY27 RoA target 1.5%.</div>
+    </div>
+    <div class="analyst-card">
+      <div class="analyst-name" style="color:var(--uj)">Ujjivan SFB</div>
+      <span class="rec-hold">Hold / Selective Buy Below ₹58</span>
+      <div class="analyst-tp">CMP ~₹63 · BVPS ~₹33 · P/B 1.9x · RoA 2.1% Q4 ann. (FY: 1.4%) · RoE 17.2% Q4 ann. (FY: 10.9%)</div>
+      <div class="score-wrap" style="margin-top:10px">
+        <div class="score-row"><span class="score-lbl">Profitability</span><div class="score-bg"><div class="score-bar" style="width:75%;background:var(--green)"></div></div><span class="score-val">7.5</span></div>
+        <div class="score-row"><span class="score-lbl">Asset Quality</span><div class="score-bg"><div class="score-bar" style="width:92%;background:var(--green)"></div></div><span class="score-val">9.2</span></div>
+        <div class="score-row"><span class="score-lbl">Capital</span><div class="score-bg"><div class="score-bar" style="width:85%;background:var(--green)"></div></div><span class="score-val">8.5</span></div>
+        <div class="score-row"><span class="score-lbl">Valuation</span><div class="score-bg"><div class="score-bar" style="width:60%;background:var(--amber)"></div></div><span class="score-val">6.0</span></div>
+        <div class="score-row"><span class="score-lbl">Growth</span><div class="score-bg"><div class="score-bar" style="width:75%;background:var(--green)"></div></div><span class="score-val">7.5</span></div>
+      </div>
+      <div class="analyst-note">Emkay TP ₹80; 16-analyst consensus ~₹70. Best asset quality in class. QIP dilution risk. No promoter is governance overhang. RoA target 1.6% for FY27 — if achieved, stock re-rates. Stock up 50%+ already in 1 year.</div>
+    </div>
+    <div class="analyst-card">
+      <div class="analyst-name" style="color:var(--su)">Suryoday SFB</div>
+      <span class="rec-sell">Speculative Buy — High Risk</span>
+      <div class="analyst-tp">CMP ~₹180 · BVPS ~₹200 · P/B 0.9x · PAT ₹50 Cr</div>
+      <div class="score-wrap" style="margin-top:10px">
+        <div class="score-row"><span class="score-lbl">Profitability</span><div class="score-bg"><div class="score-bar" style="width:35%;background:var(--red)"></div></div><span class="score-val">3.5</span></div>
+        <div class="score-row"><span class="score-lbl">Asset Quality</span><div class="score-bg"><div class="score-bar" style="width:30%;background:var(--red)"></div></div><span class="score-val">3.0</span></div>
+        <div class="score-row"><span class="score-lbl">Capital</span><div class="score-bg"><div class="score-bar" style="width:65%;background:var(--amber)"></div></div><span class="score-val">6.5</span></div>
+        <div class="score-row"><span class="score-lbl">Valuation</span><div class="score-bg"><div class="score-bar" style="width:90%;background:var(--green)"></div></div><span class="score-val">9.0</span></div>
+        <div class="score-row"><span class="score-lbl">Growth</span><div class="score-bg"><div class="score-bar" style="width:70%;background:var(--amber)"></div></div><span class="score-val">7.0</span></div>
+      </div>
+      <div class="analyst-note">Trading below book (0.9x) is rare for a bank with positive PAT and CGFMU protection. High-reward if GNPA normalises to 3% by FY28. Risks: pledged promoter shares, declining CRAR, concentrated geographic exposure. Not for risk-averse investors. Dividend ₹1.50/share declared.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const AU='#185FA5',EQ='#1D9E75',UJ='#BA7517',SU='#D85A30';
+const BANKS=['AU SFB','Equitas SFB','Ujjivan SFB','Suryoday SFB'];
+const COLS=[AU,EQ,UJ,SU];
+const QTR=['Q1 FY26','Q2 FY26','Q3 FY26','Q4 FY26'];
+
+function switchTab(name,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='charts')setTimeout(initCharts,80);
+  if(name==='quarterly')setTimeout(initQtrCharts,80);
+  if(name==='annual')setTimeout(initAnnCharts,80);
+  if(name==='valuation')setTimeout(initValCharts,80);
+}
+
+function showBank(id,btn){
+  document.querySelectorAll('.bank-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.filter-bar button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('bank-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+let sortDir={};
+function sortT(tbodyId,col){
+  const tbody=document.getElementById(tbodyId);
+  if(!tbody)return;
+  const rows=Array.from(tbody.querySelectorAll('tr'));
+  const dir=(sortDir[tbodyId+'_'+col]=!(sortDir[tbodyId+'_'+col]));
+  rows.sort((a,b)=>{
+    const av=a.cells[col]?a.cells[col].innerText.replace(/[₹,+★†✓~%x]/g,'').trim():'';
+    const bv=b.cells[col]?b.cells[col].innerText.replace(/[₹,+★†✓~%x]/g,'').trim():'';
+    const an=parseFloat(av),bn=parseFloat(bv);
+    if(!isNaN(an)&&!isNaN(bn))return dir?an-bn:bn-an;
+    return dir?av.localeCompare(bv):bv.localeCompare(av);
+  });
+  rows.forEach(r=>tbody.appendChild(r));
+}
+
+const opts=(ylabel,fmt)=>({
+  responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>fmt?fmt(ctx.parsed.y):ctx.parsed.y}}},
+  scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:10},callback:ylabel||(v=>v)}}}
+});
+
+const barD=(vals,colors)=>({labels:BANKS,datasets:[{data:vals,backgroundColor:colors||COLS,borderRadius:5}]});
+
+let chartsInit=false;
+function initCharts(){
+  if(chartsInit)return; chartsInit=true;
+  new Chart(document.getElementById('c_pat'),{type:'bar',data:barD([832,213,282,50]),options:{...opts(v=>'₹'+v,ctx=>'₹'+ctx.parsed.y+' Cr'),plugins:{legend:{display:false},datalabels:{display:false},tooltip:{callbacks:{label:ctx=>'₹'+ctx.parsed.y+' Cr'}}}}});
+  new Chart(document.getElementById('c_patg'),{type:'bar',data:barD([65,406,238,247]),options:{...opts(v=>v+'%',ctx=>'+'+ctx.parsed.y+'%')}});
+  new Chart(document.getElementById('c_nim'),{type:'bar',data:{labels:BANKS,datasets:[{data:[6.0,7.29,8.5,8.87],backgroundColor:COLS,borderRadius:5}]},options:{...opts(v=>v+'%',ctx=>ctx.parsed.y+'%')}});
+  new Chart(document.getElementById('c_npa'),{type:'bar',data:{labels:BANKS,datasets:[{label:'GNPA %',data:[2.03,2.49,2.26,6.55],backgroundColor:['#ef4444','#ef4444','#ef4444','#ef4444'],borderRadius:5},{label:'NNPA %',data:[0.74,0.68,0.43,4.21],backgroundColor:['#93c5fd','#93c5fd','#93c5fd','#93c5fd'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{font:{size:10}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.parsed.y+'%'}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:10},callback:v=>v+'%'}}}}});
+  new Chart(document.getElementById('c_roa'),{type:'bar',data:{labels:BANKS,datasets:[{label:'RoA %',data:[1.80,1.46,2.10,0.27],backgroundColor:COLS,borderRadius:5},{label:'RoE %',data:[17.0,14.10,17.2,3.44],backgroundColor:['rgba(24,95,165,.35)','rgba(29,158,117,.35)','rgba(186,117,23,.35)','rgba(216,90,48,.35)'],borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{font:{size:10}}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.parsed.y+'%'}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:10},callback:v=>v+'%'}}}}});
+  new Chart(document.getElementById('c_car'),{type:'bar',data:barD([18.68,20.31,21.14,20.45]),options:{...opts(v=>v+'%',ctx=>ctx.parsed.y+'%')}});
+  new Chart(document.getElementById('c_adv'),{type:'bar',data:barD([136040,46183,40655,13261]),options:{...opts(v=>'₹'+Math.round(v/1000)+'K',ctx=>'₹'+ctx.parsed.y.toLocaleString('en-IN')+' Cr')}});
+  new Chart(document.getElementById('c_radar'),{type:'radar',data:{labels:['Profitability','Margins','Asset Quality','Capital','Growth','Scale'],datasets:[{label:'AU',data:[90,62,88,65,80,100],borderColor:AU,backgroundColor:'rgba(24,95,165,.08)',pointBackgroundColor:AU,borderWidth:2,pointRadius:3},{label:'Equitas',data:[78,78,82,75,82,30],borderColor:EQ,backgroundColor:'rgba(29,158,117,.08)',pointBackgroundColor:EQ,borderWidth:2,pointRadius:3,borderDash:[4,2]},{label:'Ujjivan',data:[55,85,92,84,72,28],borderColor:UJ,backgroundColor:'rgba(186,117,23,.08)',pointBackgroundColor:UJ,borderWidth:2,pointRadius:3,borderDash:[2,2]},{label:'Suryoday',data:[30,88,30,72,85,9],borderColor:SU,backgroundColor:'rgba(216,90,48,.05)',pointBackgroundColor:SU,borderWidth:2,pointRadius:3,borderDash:[6,2]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{font:{size:10},padding:8}}},scales:{r:{min:0,max:100,ticks:{display:false},grid:{color:'rgba(0,0,0,.1)'},pointLabels:{font:{size:10}}}}}});
+}
+
+let qtrInit=false;
+function initQtrCharts(){
+  if(qtrInit)return; qtrInit=true;
+  const qopts=(lbl)=>({responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>lbl+(ctx.parsed.y)}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:10}}}}});
+  const lineD=(vals,col,lbl)=>({labels:QTR,datasets:[{label:lbl,data:vals,borderColor:col,backgroundColor:col+'22',pointBackgroundColor:col,fill:true,tension:.3,pointRadius:4,borderWidth:2.5}]});
+  new Chart(document.getElementById('auPATQ'),{type:'line',data:lineD([581,571,668,832],AU,'AU PAT'),options:qopts('₹')});
+  new Chart(document.getElementById('eqPATQ'),{type:'line',data:lineD([-224,24,90,213],EQ,'Equitas PAT'),options:qopts('₹')});
+  new Chart(document.getElementById('ujPATQ'),{type:'line',data:lineD([103,122,186,282],UJ,'Ujjivan PAT'),options:qopts('₹')});
+  new Chart(document.getElementById('suPATQ'),{type:'line',data:lineD([35,30,37,50],SU,'Suryoday PAT'),options:qopts('₹')});
+  new Chart(document.getElementById('auNIMQ'),{type:'line',data:lineD([5.4,5.5,5.7,6.0],AU,'AU NIM'),options:qopts('%')});
+  new Chart(document.getElementById('eqNIMQ'),{type:'line',data:lineD([7.1,6.9,6.72,7.29],EQ,'Equitas NIM'),options:qopts('%')});
+  new Chart(document.getElementById('gnpaQ'),{type:'line',data:{labels:QTR,datasets:[{label:'AU',data:[2.47,2.40,2.30,2.03],borderColor:AU,pointBackgroundColor:AU,fill:false,tension:.3,pointRadius:3,borderWidth:2},{label:'Equitas',data:[2.73,2.82,2.68,2.49],borderColor:EQ,pointBackgroundColor:EQ,fill:false,tension:.3,pointRadius:3,borderWidth:2,borderDash:[4,2]},{label:'Ujjivan',data:[2.52,2.46,2.38,2.26],borderColor:UJ,pointBackgroundColor:UJ,fill:false,tension:.3,pointRadius:3,borderWidth:2,borderDash:[2,2]},{label:'Suryoday',data:[8.46,5.90,6.69,6.55],borderColor:SU,pointBackgroundColor:SU,fill:false,tension:.3,pointRadius:3,borderWidth:2,borderDash:[6,2]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{font:{size:10},padding:6}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:10},callback:v=>v+'%'}}}}});
+  new Chart(document.getElementById('eqCCQ'),{type:'bar',data:{labels:QTR,datasets:[{data:[6.48,2.16,1.88,1.11],backgroundColor:[SU,UJ,UJ,EQ],borderRadius:5}]},options:qopts('%')});
+  new Chart(document.getElementById('niiQAll'),{type:'bar',data:{labels:QTR,datasets:[{label:'AU',data:[2045,2186,2341,2582],backgroundColor:AU,borderRadius:3},{label:'Equitas',data:[830,774,854,981],backgroundColor:EQ,borderRadius:3},{label:'Ujjivan',data:[866,880,964,1093],backgroundColor:UJ,borderRadius:3},{label:'Suryoday',data:[247,258,245,317],backgroundColor:SU,borderRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{font:{size:10},padding:8}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:10},callback:v=>'₹'+v}}}}});
+}
+
+let annInit=false;
+function initAnnCharts(){
+  if(annInit)return; annInit=true;
+  new Chart(document.getElementById('annPAT'),{type:'bar',data:{labels:BANKS,datasets:[{label:'FY24',data:[1592,750,1282,216],backgroundColor:COLS.map(c=>c+'66'),borderRadius:4},{label:'FY25',data:[2106,147,726,115],backgroundColor:COLS.map(c=>c+'99'),borderRadius:4},{label:'FY26',data:[2641,103,693,152],backgroundColor:COLS,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{font:{size:11},padding:10}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:10},callback:v=>'₹'+v}}}}});
+  new Chart(document.getElementById('annNIM'),{type:'line',data:{labels:['FY24','FY25','FY26'],datasets:[{label:'AU SFB',data:[5.45,5.94,5.96],borderColor:AU,pointBackgroundColor:AU,fill:false,tension:.3,pointRadius:5,borderWidth:2.5},{label:'Equitas',data:[8.5,7.8,7.3],borderColor:EQ,pointBackgroundColor:EQ,fill:false,tension:.3,pointRadius:5,borderWidth:2.5,borderDash:[5,3]},{label:'Ujjivan',data:[9.2,8.8,8.5],borderColor:UJ,pointBackgroundColor:UJ,fill:false,tension:.3,pointRadius:5,borderWidth:2.5,borderDash:[2,2]},{label:'Suryoday',data:[9.5,9.0,8.9],borderColor:SU,pointBackgroundColor:SU,fill:false,tension:.3,pointRadius:5,borderWidth:2.5,borderDash:[6,3]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{font:{size:11},padding:10}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{min:4,ticks:{font:{size:10},callback:v=>v+'%'}}}}});
+}
+
+let valInit=false;
+function initValCharts(){
+  if(valInit)return; valInit=true;
+  new Chart(document.getElementById('pbChart'),{type:'bar',data:{labels:BANKS,datasets:[{label:'FY24',data:[3.2,1.4,2.2,0.7],backgroundColor:COLS.map(c=>c+'66'),borderRadius:4},{label:'FY25',data:[3.5,1.3,1.8,0.6],backgroundColor:COLS.map(c=>c+'99'),borderRadius:4},{label:'FY26',data:[3.9,1.3,1.9,0.9],backgroundColor:COLS,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{font:{size:11},padding:10}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+ctx.parsed.y+'x'}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:10},callback:v=>v+'x'}}}}});
+  new Chart(document.getElementById('bvpsChart'),{type:'bar',data:{labels:BANKS,datasets:[{label:'BVPS FY24',data:[188,54,27,185],backgroundColor:COLS.map(c=>c+'66'),borderRadius:4},{label:'BVPS FY25',data:[231,55,29,193],backgroundColor:COLS.map(c=>c+'99'),borderRadius:4},{label:'BVPS FY26',data:[265,57,33,200],backgroundColor:COLS,borderRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'top',labels:{font:{size:11},padding:10}},tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': ₹'+ctx.parsed.y}}},scales:{x:{grid:{display:false},ticks:{font:{size:10}}},y:{grid:{color:'rgba(0,0,0,.06)'},ticks:{font:{size:10},callback:v=>'₹'+v}}}}});
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  const activeTab=document.querySelector('.tab.active');
+  if(activeTab&&activeTab.id==='tab-charts')initCharts();
+});
+</script>
+</body>
+</html>
