@@ -697,6 +697,10 @@ tr:last-child td{border-bottom:none;}
 <!-- WATERMARK -->
 <div id="wm"><div>CB FINANCE26™ · CONFIDENTIAL</div></div>
 
+<!-- Owner-only admin unlock trigger. Deliberately tiny/low-contrast so members
+     won't notice it — just click it (no keyboard shortcut needed). -->
+<div onclick="adminToggle()" title="" style="position:fixed;bottom:6px;right:6px;width:10px;height:10px;border-radius:50%;background:rgba(0,0,0,0.06);cursor:default;z-index:99998;"></div>
+
 <!-- NAV -->
 <nav class="nav">
   <div class="nav-inner">
@@ -2999,6 +3003,7 @@ async function tryAdminUnlock(){
   }
 }
 function adminLock(){ sessionStorage.removeItem('cbf26_admin'); location.reload(); }
+function adminToggle(){ if(isAdminMode()){ adminLock(); } else { tryAdminUnlock(); } }
 function showAdminBadge(){
   const crB=document.getElementById('cr-admin-banner'); if(crB) crB.style.display=isAdminMode()?'block':'none';
   const srB=document.getElementById('sr-admin-banner'); if(srB) srB.style.display=isAdminMode()?'block':'none';
@@ -3009,8 +3014,9 @@ function showAdminBadge(){
   if(document.getElementById('cbf26-admin-badge'))return;
   const b=document.createElement('div');
   b.id='cbf26-admin-badge';
-  b.textContent='🔓 Admin view — live factors visible (Ctrl+Alt+Shift+X to exit)';
-  b.style.cssText='position:fixed;bottom:10px;left:10px;background:#1a1e2e;color:#ffc107;font-size:10px;font-weight:700;padding:5px 10px;border-radius:14px;z-index:99999;opacity:0.88;font-family:"Segoe UI",system-ui,sans-serif;pointer-events:none;';
+  b.textContent='🔓 Admin view — click to exit';
+  b.onclick=adminLock;
+  b.style.cssText='position:fixed;bottom:10px;left:10px;background:#1a1e2e;color:#ffc107;font-size:10px;font-weight:700;padding:5px 10px;border-radius:14px;z-index:99999;opacity:0.88;font-family:"Segoe UI",system-ui,sans-serif;cursor:pointer;';
   document.body.appendChild(b);
 }
 document.addEventListener('keydown', e=>{
@@ -4788,12 +4794,48 @@ function medalEl(r,cb){
 // RENDER CARD
 // ══════════════════════════════════════════════════════════
 function buildCard(d, rank){
-  const model = modelFor2(d.sector);
-  const params = getParamsForSector(d.sector);
   const cb = d.cb;
   const liveSig = d.liveSig || {adj:0,parts:[]};
   const cbLive = (d.cbLive!==undefined) ? d.cbLive : cb;
   const cbCls = cbColorCls(cbLive);
+  const sym = MI_NAME_TO_SYMBOL[d.name] || '';
+
+  // ── MEMBER VIEW ──────────────────────────────────────────────────────────
+  // Only objective, reported figures + the resulting rank/score. None of the
+  // 9-parameter classification rubric (labels, 1-5 ratings, weights, season
+  // tagging, sector model) is shown — that stays admin-only below.
+  if(!isAdminMode()){
+    return `<div class="card" id="card-${d.id}">
+      <div class="card-head">
+        <div class="card-rank">
+          ${medalEl(rank,cbLive)}
+          <span class="mcap-badge" title="NSE Mkt Cap Rank #${d.mcap_rank||'—'}">
+            ${fmtMcap(d.mcap)} &nbsp;MC:${d.mcap_rank||'—'}
+          </span>
+        </div>
+        <div class="card-info">
+          <div class="card-name">${d.name}${sym?` <span style="font-size:10.5px;color:#6b7498;font-weight:600;">(${sym})</span>`:''}</div>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:5px;font-size:10.5px;color:#3a3f5c;">
+            <span>Revenue (Qtr): <strong>${d.revQtr||'—'}</strong></span>
+            <span>EBITDA (Qtr): <strong>${d.ebitdaQtr||'—'}</strong></span>
+            <span>Net Profit (Qtr): <strong>${d.patQtr||'—'}</strong></span>
+          </div>
+        </div>
+        <div class="card-score">
+          <div>
+            <div class="${cbCls}" id="cbwrap-${d.id}">
+              <div class="cb-num" id="cbnum-${d.id}">${cbLive}</div>
+              <div class="cb-bar-wrap"><div class="cb-bar" id="cbbar-${d.id}" style="width:${cbLive}%;background:${cbBarCol(cbLive)};"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // ── ADMIN VIEW (owner only) — full classification breakdown, unchanged ──
+  const model = modelFor2(d.sector);
+  const params = getParamsForSector(d.sector);
   const sv = d.scores[d.scores.length-1]; // season always last
   const aff = getSeasonAffinity(sv);
   const isQtrMatch = qtrFilter!=='all' && aff.qtr===qtrFilter;
@@ -5747,20 +5789,21 @@ function renderCard(s){
   ].filter(Boolean).join(' ');
   const patClass=s.pat.includes('↑↑')?'pos':s.pat.includes('↓')?'neg':'';
   const revClass=s.revN>=15?'pos':s.revN>=8?'warn-c':'neg';
+  const admin=isAdminMode();
   return`
-<div class="${cls}" id="card-${s.rank}" onclick="toggleDetail(${s.rank})">
+<div class="${cls}" id="card-${s.rank}" ${admin?`onclick="toggleDetail(${s.rank})"`:''}>
   <div class="rank-badge ${rc}">${s.rank}</div>
   <div class="sec-name">
     <span class="sec-title">${s.name}</span>
-    <span class="sec-grp">${groupEmoji(s.group)} ${s.group}</span>
+    ${admin?`<span class="sec-grp">${groupEmoji(s.group)} ${s.group}</span>`:''}
   </div>
-  <div class="met"><span class="val ${revClass}">${s.rev}</span><span class="tag">Rev YoY</span></div>
-  <div class="met"><span class="val">${s.ebitda}</span><span class="tag">EBITDA%</span></div>
-  <div class="met"><span class="val ${patClass}">${s.pat}</span><span class="tag">PAT</span></div>
-  <div class="met"><span class="val">${'★'.repeat(s.detail.stars)}${'☆'.repeat(5-s.detail.stars)}</span><span class="tag">Outlook</span></div>
+  <div class="met">${admin?`<span class="val ${revClass}">${s.rev}</span><span class="tag">Rev YoY</span>`:''}</div>
+  <div class="met">${admin?`<span class="val">${s.ebitda}</span><span class="tag">EBITDA%</span>`:''}</div>
+  <div class="met">${admin?`<span class="val ${patClass}">${s.pat}</span><span class="tag">PAT</span>`:''}</div>
+  <div class="met">${admin?`<span class="val">${'★'.repeat(s.detail.stars)}${'☆'.repeat(5-s.detail.stars)}</span><span class="tag">Outlook</span>`:''}</div>
   <div class="heat-wrap">
     <div class="heat-bar"><div class="heat-fill" style="width:${cbLive}%;background:${heatColor(cbLive)};"></div></div>
-    <div class="heat-lbl">${cbLive}/100${(isAdminMode()&&s.liveAdj)?` <small style="color:${s.liveAdj>0?'#059669':'#e11d48'};">(Fund. ${s.cb} ${s.liveAdj>0?'+':''}${s.liveAdj})</small>`:''}</div>
+    <div class="heat-lbl">${cbLive}/100${(admin&&s.liveAdj)?` <small style="color:${s.liveAdj>0?'#059669':'#e11d48'};">(Fund. ${s.cb} ${s.liveAdj>0?'+':''}${s.liveAdj})</small>`:''}</div>
   </div>
   <div class="cb-score ${cbLive>=75?'s-hi':cbLive>=60?'s-mid':'s-lo'}">
     <span class="sc">${cbLive}</span>
@@ -5769,6 +5812,7 @@ function renderCard(s){
   ${miSectorLiveBadge(s)}
 </div>
 <div class="detail-panel" id="dp-${s.rank}">
+${admin?`
   <div class="dp-grid">
     <div class="dp-block">
       <div class="dp-block-title">📊 Q4 FY26 Numbers</div>
@@ -5790,10 +5834,11 @@ function renderCard(s){
       <div style="font-size:11px;color:var(--red);margin-top:8px;"><strong>Risk:</strong> ${s.detail.risk}</div>
     </div>
     <div class="dp-block">
-      <div class="dp-block-title">🏢 Key Companies ${isAdminMode()?`<span style="font-size:9px;color:#0277bd;font-weight:400;">📡 = live NSE data today</span>`:''}</div>
+      <div class="dp-block-title">🏢 Key Companies ${admin?`<span style="font-size:9px;color:#0277bd;font-weight:400;">📡 = live NSE data today</span>`:''}</div>
       <div class="dp-co-list">${s.companies.map(c=>miCompanyChipHtml(c)).join('')}</div>
     </div>
   </div>
+`:''}
 </div>`;
 }
 
@@ -5856,6 +5901,7 @@ function srFilterGrp(g,btn){
   renderAll();
 }
 function toggleDetail(rank){
+  if(!isAdminMode())return; // panel content is admin-only; nothing to expand for members
   const dp=document.getElementById('dp-'+rank);
   if(!dp)return;
   const wasOpen=dp.classList.contains('open');
