@@ -2631,7 +2631,10 @@ async function grFetchAll(){
   const lines=out.files.map(f=>f.agg
     ?'✅ '+f.file+' — '+f.agg.n+' companies parsed ('+(f.agg.period||'period n/a')+') → '+f.sectors.join(', ')
     :'❌ '+f.file+' — '+f.err+(String(f.err).includes('404')?' (file not found at this address — check exact spelling/case in repo vs index)':String(f.err).includes('parseable')?' (file is reachable but its tables have no data attributes — send this file to Claude to adapt the parser)':''));
-  log('Loaded '+out.files.filter(f=>f.agg).length+' of '+entries.length+' files · '+new Date(out.ts).toLocaleString()+'<br>'+lines.join('<br>'));
+  const failedCount=out.files.filter(f=>f.err).length;
+  const okEntries=entries.length-failedCount;
+  const totalRecords=out.files.filter(f=>f.agg).length;
+  log(okEntries+' of '+entries.length+' files loaded ('+totalRecords+' sector records after multi-company splits) · '+new Date(out.ts).toLocaleString()+'<br>'+lines.join('<br>'));
   renderSectorImpact();
 }
 // ── LOCAL FILE PICKER (works without hosting) ──
