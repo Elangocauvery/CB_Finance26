@@ -269,5 +269,128 @@
     "sectors": [
       "Hotels"
     ]
+  },
+  {
+    "file": "Broking_Sector_Q4FY26.html",
+    "sectors": [
+      "Brokers / Wealth"
+    ]
+  },
+  {
+    "file": "HFC_Sector_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Housing Finance"
+    ]
+  },
+  {
+    "file": "NewAge_Sector_Dashboard_Q4FY26.html",
+    "sectors": [
+      "New Age / Platforms"
+    ],
+    "companies": [
+      "Zomato",
+      "Swiggy",
+      "Meesho",
+      "Nykaa",
+      "Urban Company",
+      "Trent"
+    ]
+  },
+  {
+    "file": "Realestate_Q4fy26_dashboard.html",
+    "sectors": [
+      "Real Estate"
+    ],
+    "companies": [
+      "Brigade Enterprises",
+      "Oberoi Realty",
+      "DLF",
+      "Ganesh Housing",
+      "Anant Raj",
+      "Prestige Estates"
+    ]
+  },
+  {
+    "file": "MTAR_Technologies_Q4FY26_Analysis.html",
+    "sectors": [
+      "Defence"
+    ]
+  },
+  {
+    "file": "Dairy_Sector_Q4FY26.html",
+    "sectors": [
+      "Dairy"
+    ]
+  },
+  {
+    "file": "Indian_Fertilizer_Sector_Q4FY26_Dashboard.html",
+    "sectors": [
+      "Fertilizers"
+    ]
+  },
+  {
+    "file": "CB Research - SFB Sector Q4 FY26.html",
+    "sectors": [
+      "Banking"
+    ]
+  },
+  {
+    "file": "Dual_Dashboard_MTAR_INOX_Q4FY26.html",
+    "split": {
+      "MTAR": "Defence",
+      "INOX": "Capital Goods"
+    }
+  },
+  {
+    "file": "CB_MultiCo_Dashboard_Q4FY26.html",
+    "split": {
+      "GE Vernova": "Capital Goods",
+      "LG Electronics": "Consumer Durables",
+      "Cera": "Building Materials",
+      "PG Electroplast": "EMS",
+      "Blue Jet": "Pharma"
+    }
+  },
+  {
+    "file": "BSE_MCX_CDSL_NSDL_CAMS_KFintech_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Exchanges / Depositories"
+    ],
+    "companies": [
+      "Bombay Stock Exchange",
+      "Multi Commodity Exchange",
+      "CDSL",
+      "NSDL",
+      "CAMS",
+      "KFintech"
+    ]
+  },
+  {
+    "file": "india_4steel_Companies_Q4fy26_dashboard.html",
+    "sectors": [
+      "Metals"
+    ],
+    "companies": [
+      "Tata Steel",
+      "JSW Steel",
+      "Shyam Metalics",
+      "SAIL"
+    ]
+  },
+  {
+    "file": "india_Full_alcobev_fy26_dashboard.html",
+    "sectors": [
+      "Alcobev"
+    ],
+    "companies": [
+      "United Spirits",
+      "Radico Khaitan",
+      "United Breweries",
+      "Allied Blenders",
+      "Tilaknagar Inds.",
+      "Globus Spirits",
+      "Sula Vineyards",
+      "GM Breweries"
+    ]
   }
 ]
