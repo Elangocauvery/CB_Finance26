@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MTAR Technologies — Business &amp; Investment Analysis | Q4 FY26</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f6f2;--surface:#fff;--surface2:#f2f0eb;--border:#e2ddd5;
+  --text:#181511;--muted:#6e6860;
+  --mtr:#1a5276;--mtr-s:#eaf0f6;
+  --ce:#2d8b3e;--ce-s:#e8f5ec;
+  --ad:#c8202a;--ad-s:#fdeaea;
+  --nu:#7b3fa0;--nu-s:#f3ebfa;
+  --pos:#166534;--neg:#dc2626;--warn:#ea580c;
+  --gold:#b8911e;--gold-s:#fdf5e0;
+  --sh:0 1px 8px rgba(24,21,17,.07);--sh2:0 4px 20px rgba(24,21,17,.10);
+  --r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:13.5px;line-height:1.55;}
+.hdr{background:#0d1c2e;padding:0 32px;display:flex;align-items:stretch;justify-content:space-between;min-height:68px;flex-wrap:wrap;}
+.hdr h1{font-family:'Playfair Display',serif;font-size:1.5rem;color:#fff;line-height:1.15;padding:16px 0 4px;}
+.hdr .sub{font-size:10px;font-weight:500;color:rgba(255,255,255,.4);letter-spacing:.1em;text-transform:uppercase;padding-bottom:16px;}
+.hdr-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:12px 0;}
+.chip{padding:3px 9px;border-radius:20px;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#fff;}
+.chip-mtr{background:var(--mtr);}.chip-ce{background:var(--ce);}.chip-ad{background:var(--ad);}.chip-nu{background:var(--nu);}
+.chip-date{background:rgba(255,255,255,.1);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.12);}
+.tab-nav{background:var(--surface);border-bottom:2px solid var(--border);display:flex;padding:0 32px;overflow-x:auto;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(24,21,17,.06);}
+.tab-nav::-webkit-scrollbar{height:0;}
+.tab-btn{padding:13px 13px 11px;font-size:11.5px;font-weight:600;color:var(--muted);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;margin-bottom:-2px;transition:color .15s,border-color .15s;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--text);border-bottom-color:var(--mtr);font-weight:700;}
+.main{padding:22px 32px 48px;max-width:1480px;margin:0 auto;}
+.panel{display:none;animation:fi .18s ease;}
+.panel.active{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+.sec-hdr{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:var(--text);margin-bottom:16px;padding-bottom:9px;border-bottom:2px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.sec-note{font-size:10.5px;color:var(--muted);font-weight:400;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:var(--sh);}
+.card-lbl{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px;}
+.seg-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh2);position:relative;overflow:hidden;}
+.seg-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;}
+.seg-card.ce::before{background:var(--ce);}.seg-card.ad::before{background:var(--ad);}.seg-card.nu::before{background:var(--nu);}.seg-card.po::before{background:var(--gold);}
+.seg-name{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;margin-bottom:2px;}
+.seg-tag{font-size:9.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600;margin-bottom:9px;}
+.m-row{display:flex;justify-content:space-between;margin-bottom:5px;align-items:center;}
+.m-lbl{font-size:11px;color:var(--muted);}
+.m-val{font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:var(--text);}
+.badge-row{margin-top:10px;display:flex;gap:4px;flex-wrap:wrap;}
+.badge{font-size:10px;padding:2px 7px;border-radius:4px;font-weight:700;font-family:'IBM Plex Mono',monospace;}
+.b-pos{background:#dcfce7;color:#15803d;}.b-neg{background:#fee2e2;color:#b91c1c;}.b-warn{background:#fff7ed;color:#c2410c;}.b-neu{background:#f3f4f6;color:#4b5563;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:20px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;box-shadow:var(--sh);}
+.kpi.mtr-a{border-left:4px solid var(--mtr);}.kpi.ce-a{border-left:4px solid var(--ce);}
+.kpi.ad-a{border-left:4px solid var(--ad);}.kpi.gold-a{border-left:4px solid var(--gold);}
+.kpi .kl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px;}
+.kpi .kv{font-size:1rem;font-weight:800;color:var(--text);font-family:'IBM Plex Mono',monospace;}
+.kpi .kc{font-size:9.5px;font-weight:700;margin-top:2px;}
+.pos{color:var(--pos);}.neg{color:var(--neg);}.warn{color:var(--warn);}
+table{width:100%;border-collapse:collapse;background:var(--surface);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);}
+th{background:#0d1c2e;color:#fff;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;padding:10px 12px;text-align:left;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;}
+td{padding:9px 12px;border-bottom:1px solid var(--border);font-size:12px;white-space:nowrap;vertical-align:middle;color:var(--text);}
+tr:last-child td{border-bottom:none;}
+tr:nth-child(even) td{background:#fafaf8;}
+td.num{font-family:'IBM Plex Mono',monospace;text-align:right;color:var(--text);}
+td.tpos{color:var(--pos);font-weight:700;font-family:'IBM Plex Mono',monospace;text-align:right;}
+td.tneg{color:var(--neg);font-weight:700;font-family:'IBM Plex Mono',monospace;text-align:right;}
+td.tb{font-weight:700;color:var(--text);}
+td.src{font-size:10px;color:var(--muted);white-space:normal;}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:6px;vertical-align:middle;}
+.val-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh);}
+.val-co{font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-family:'IBM Plex Mono',monospace;}
+.note-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;font-size:11.5px;color:var(--muted);margin-top:14px;}
+.swot-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px;}
+.swot{border-radius:var(--r);padding:14px 16px;border:1.5px solid var(--border);}
+.swot h4{font-family:'Playfair Display',serif;font-size:.95rem;margin-bottom:8px;}
+.swot ul{padding-left:18px;font-size:11.5px;}
+.swot ul li{margin-bottom:5px;}
+.s-strength{background:#f0fdf4;border-color:#bbf7d0;}
+.s-weak{background:#fef2f2;border-color:#fecaca;}
+.s-opp{background:#eff6ff;border-color:#bfdbfe;}
+.s-threat{background:#fff7ed;border-color:#fed7aa;}
+.risk-row{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:11px 14px;border:1px solid var(--border);border-radius:8px;margin-bottom:8px;background:var(--surface);}
+.risk-tag{font-size:9.5px;font-weight:800;padding:3px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
+.rt-h{background:#fee2e2;color:#b91c1c;}.rt-m{background:#fff7ed;color:#c2410c;}.rt-l{background:#f3f4f6;color:#4b5563;}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh);}
+.mgmt-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);}
+.mgmt-name{font-weight:700;font-size:12.5px;}
+.mgmt-role{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;}
+.an-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);margin-bottom:10px;}
+.rate-pill{font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em;}
+.rp-buy{background:#dcfce7;color:#15803d;}.rp-hold{background:#fff7ed;color:#c2410c;}.rp-sell{background:#fee2e2;color:#b91c1c;}.rp-neu{background:#f3f4f6;color:#4b5563;}
+/* CB Assist chat */
+.cb-wrap{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.cb-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh2);overflow:hidden;display:flex;flex-direction:column;height:480px;}
+.cb-hdr{background:#0d1c2e;color:#fff;padding:11px 16px;font-family:'Playfair Display',serif;font-weight:700;font-size:.95rem;}
+.cb-msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
+.chat-msg{max-width:88%;padding:9px 12px;border-radius:10px;font-size:12px;line-height:1.5;}
+.chat-msg.user{align-self:flex-end;background:var(--mtr);color:#fff;border-bottom-right-radius:3px;}
+.chat-msg.bot{align-self:flex-start;background:var(--surface2);color:var(--text);border-bottom-left-radius:3px;}
+.typing-ind{display:none;align-self:flex-start;padding:9px 12px;color:var(--muted);font-size:11px;}
+.cb-in-row{display:flex;border-top:1px solid var(--border);}
+.cb-in-row input{flex:1;border:none;padding:11px 14px;font-size:12px;font-family:'Inter',sans-serif;outline:none;}
+.cb-in-row button{background:var(--mtr);color:#fff;border:none;padding:0 18px;font-weight:700;cursor:pointer;font-size:11px;text-transform:uppercase;letter-spacing:.05em;}
+.cb-sugg{padding:8px 14px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px;}
+.sugg-chip{font-size:10px;background:var(--surface2);border:1px solid var(--border);border-radius:14px;padding:4px 9px;cursor:pointer;color:var(--muted);}
+.sugg-chip:hover{color:var(--text);border-color:var(--mtr);}
+.watermark{text-align:center;font-size:10px;color:var(--muted);padding:20px 0 4px;letter-spacing:.06em;text-transform:uppercase;}
+@media(max-width:1100px){.g2,.g3,.g4,.swot-grid,.cb-wrap{grid-template-columns:1fr;}.kpi-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <h1>MTAR Technologies — Business &amp; Investment Analysis</h1>
+    <div class="sub">Precision Engineering · Clean Energy · Aerospace &amp; Defence · Civil Nuclear · CB Research</div>
+  </div>
+  <div class="hdr-right">
+    <span class="chip chip-mtr">NSE: MTARTECH</span>
+    <span class="chip chip-ce">BSE: 543270</span>
+    <span class="chip chip-ad">Q4 FY26</span>
+    <span class="chip chip-date">Results: 12-May-2026</span>
+    <span class="chip chip-date">Market Data: 19-Jun-2026</span>
+  </div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('overview',this)">Overview</button>
+  <button class="tab-btn" onclick="showTab('profile',this)">Company Profile</button>
+  <button class="tab-btn" onclick="showTab('financials',this)">Financials</button>
+  <button class="tab-btn" onclick="showTab('orderbook',this)" style="color:#2d8b3e;font-weight:800;">Segments &amp; Order Book</button>
+  <button class="tab-btn" onclick="showTab('charts',this)">Charts</button>
+  <button class="tab-btn" onclick="showTab('valuation',this)">Valuation</button>
+  <button class="tab-btn" onclick="showTab('swot',this)">SWOT &amp; Moat</button>
+  <button class="tab-btn" onclick="showTab('risks',this)" style="color:#c8202a;font-weight:800;">Risks</button>
+  <button class="tab-btn" onclick="showTab('management',this)">Management &amp; Board</button>
+  <button class="tab-btn" onclick="showTab('analyst',this)">Analysts' Ratings</button>
+  <button class="tab-btn" onclick="showTab('outlook',this)" style="color:#c2410c;font-weight:800;">FY27 Outlook</button>
+  <button class="tab-btn" onclick="showTab('cb',this)" style="color:var(--mtr);font-weight:800;">CB Assist</button>
+</div>
+
+<div class="main">
+
+<!-- ═══════════════ OVERVIEW ═══════════════ -->
+<div class="panel active" id="tab-overview">
+  <div class="sec-hdr">Overview <span class="sec-note">· Q4 FY26 Actuals (Quarter ended 31-Mar-2026) · Consolidated · CB Research</span></div>
+
+  <div class="kpi-grid">
+    <div class="kpi mtr-a"><div class="kl">Q4 FY26 Revenue</div><div class="kv">₹306.1 Cr</div><div class="kc pos">▲ 67.2% YoY · ▲ 10.1% QoQ</div></div>
+    <div class="kpi ce-a"><div class="kl">Q4 FY26 EBITDA</div><div class="kv">₹61.8 Cr</div><div class="kc pos">▲ 80.9% YoY · Margin 20.2%</div></div>
+    <div class="kpi ad-a"><div class="kl">Q4 FY26 PAT</div><div class="kv">₹44.3 Cr</div><div class="kc pos">▲ 222.3% YoY · ▲ 27.7% QoQ</div></div>
+    <div class="kpi gold-a"><div class="kl">Order Book (31-Mar-26)</div><div class="kv">₹2,581.9 Cr</div><div class="kc pos">2.9x FY26 Revenue</div></div>
+  </div>
+
+  <div class="g3">
+    <div class="card">
+      <div class="card-lbl">FY26 Full Year Snapshot</div>
+      <div class="m-row"><span class="m-lbl">Revenue from Operations</span><span class="m-val">₹876.2 Cr (+29.6% YoY)</span></div>
+      <div class="m-row"><span class="m-lbl">EBITDA</span><span class="m-val">₹171.2 Cr (+41.7% YoY)</span></div>
+      <div class="m-row"><span class="m-lbl">EBITDA Margin</span><span class="m-val">19.5% (vs 17.9% FY25)</span></div>
+      <div class="m-row"><span class="m-lbl">Profit Before Tax</span><span class="m-val">₹126.1 Cr (+75.1% YoY)</span></div>
+      <div class="m-row"><span class="m-lbl">Profit After Tax</span><span class="m-val">₹94.0 Cr (+76.2% YoY)</span></div>
+      <div class="m-row"><span class="m-lbl">PAT Margin</span><span class="m-val">10.7% (vs 7.9% FY25)</span></div>
+      <div class="m-row"><span class="m-lbl">Gross Margin (FY26)</span><span class="m-val">47.7%</span></div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Order Book &amp; Inflow</div>
+      <div class="m-row"><span class="m-lbl">FY26 Order Inflow (Record)</span><span class="m-val">₹2,453.3 Cr</span></div>
+      <div class="m-row"><span class="m-lbl">Q4 FY26 Order Inflow</span><span class="m-val">₹481.6 Cr</span></div>
+      <div class="m-row"><span class="m-lbl">Order Book (31-Mar-26)</span><span class="m-val">₹2,581.9 Cr</span></div>
+      <div class="m-row"><span class="m-lbl">Clean Energy (Fuel Cell/Hydel/Others)</span><span class="m-val">51.2%</span></div>
+      <div class="m-row"><span class="m-lbl">Civil Nuclear Power</span><span class="m-val">26.3%</span></div>
+      <div class="m-row"><span class="m-lbl">Aerospace &amp; Defence</span><span class="m-val">14.0%</span></div>
+      <div class="m-row"><span class="m-lbl">Products &amp; Others</span><span class="m-val">8.5%</span></div>
+      <div class="m-row"><span class="m-lbl">FY27 Order Book Target (Mgmt)</span><span class="m-val">~₹5,000 Cr</span></div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Market Snapshot (19-Jun-2026)</div>
+      <div class="m-row"><span class="m-lbl">CMP</span><span class="m-val">₹8,434</span></div>
+      <div class="m-row"><span class="m-lbl">Market Cap</span><span class="m-val">~₹26,800 Cr</span></div>
+      <div class="m-row"><span class="m-lbl">52-Week Range</span><span class="m-val">₹1,390.50 – ₹8,449.50</span></div>
+      <div class="m-row"><span class="m-lbl">Trailing P/E</span><span class="m-val">~285x</span></div>
+      <div class="m-row"><span class="m-lbl">Price/Book</span><span class="m-val">~32.4x</span></div>
+      <div class="m-row"><span class="m-lbl">Promoter Holding</span><span class="m-val">30.4%</span></div>
+      <div class="m-row"><span class="m-lbl">Dividend</span><span class="m-val">Nil (profits reinvested)</span></div>
+    </div>
+  </div>
+
+  <div class="note-box">
+    <strong>Quarter in one line:</strong> MTAR Technologies closed FY26 with its strongest-ever quarter — revenue up 67% YoY and PAT nearly tripling, driven by operating leverage in the Clean Energy (fuel cells/hydel) segment and a record order book of ₹2,581.9 Cr that now stands at roughly 2.9x FY26 revenue. Management has raised FY27 revenue growth guidance to 80%+ and targets EBITDA margins stabilising near 24%, anchored by the Bloom Energy fuel-cell relationship and a ramp in Aerospace &amp; Defence (AMCA, LCA Tejas Mk1A) and a new Civil Nuclear/Oil &amp; Gas push. The stock has re-rated sharply (52-week range ₹1,390 → ₹8,449), and now trades at a valuation that prices in near-flawless execution of this growth path.
+  </div>
+</div>
+
+<!-- ═══════════════ COMPANY PROFILE ═══════════════ -->
+<div class="panel" id="tab-profile">
+  <div class="sec-hdr">Company Profile <span class="sec-note">· History · Business Model · Facilities · Customers</span></div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-lbl">Corporate Snapshot</div>
+      <div class="m-row"><span class="m-lbl">Founded</span><span class="m-val">1969–70, Hyderabad</span></div>
+      <div class="m-row"><span class="m-lbl">Listed</span><span class="m-val">NSE &amp; BSE, 15-Mar-2021</span></div>
+      <div class="m-row"><span class="m-lbl">Headquarters</span><span class="m-val">Balanagar, Hyderabad, Telangana</span></div>
+      <div class="m-row"><span class="m-lbl">Business</span><span class="m-val">Precision-engineered systems &amp; assemblies</span></div>
+      <div class="m-row"><span class="m-lbl">FY26 Exports Share</span><span class="m-val">82% of revenue</span></div>
+      <div class="m-row"><span class="m-lbl">Greenfield Facility (New)</span><span class="m-val">Oil &amp; Gas, Adibatla SEZ — commissioning ~Jun–Sep 2026</span></div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Marquee Customers</div>
+      <div class="m-row"><span class="m-lbl">Clean Energy</span><span class="m-val">Bloom Energy (US)</span></div>
+      <div class="m-row"><span class="m-lbl">Civil Nuclear</span><span class="m-val">NPCIL</span></div>
+      <div class="m-row"><span class="m-lbl">Space</span><span class="m-val">ISRO</span></div>
+      <div class="m-row"><span class="m-lbl">Defence</span><span class="m-val">DRDO, HAL</span></div>
+      <div class="m-row"><span class="m-lbl">Global Aerospace</span><span class="m-val">Thales Alenia Space, IAI, GKN Aerospace, Collins Aerospace</span></div>
+      <div class="m-row"><span class="m-lbl">Oil &amp; Gas (New)</span><span class="m-val">Weatherford Products GmbH (10-yr contract)</span></div>
+    </div>
+  </div>
+
+  <div class="sec-hdr" style="margin-top:22px;font-size:1.05rem;">What MTAR Actually Makes</div>
+  <div class="g3">
+    <div class="seg-card ce">
+      <div class="seg-name">Clean Energy — Fuel Cells, Hydel &amp; Others</div>
+      <div class="seg-tag">~70% of FY26 Revenue</div>
+      <div class="m-row"><span class="m-lbl">Products</span><span class="m-val">SOFC hot-box assemblies, electrolysers</span></div>
+      <div class="m-row"><span class="m-lbl">Anchor Customer</span><span class="m-val">Bloom Energy (sole supplier, ~60–70% wallet share)</span></div>
+      <div class="m-row"><span class="m-lbl">Demand Driver</span><span class="m-val">AI data-centre power, on-site fuel cells</span></div>
+    </div>
+    <div class="seg-card ad">
+      <div class="seg-name">Aerospace &amp; Defence</div>
+      <div class="seg-tag">~12% of FY26 Revenue</div>
+      <div class="m-row"><span class="m-lbl">Products</span><span class="m-val">Magnesium gearboxes (HAL), LCA Tejas actuators, missile canisters, structural assemblies</span></div>
+      <div class="m-row"><span class="m-lbl">New Wins</span><span class="m-val">AMCA landing-gear test box; Scramjet combustor dev.</span></div>
+      <div class="m-row"><span class="m-lbl">Nature</span><span class="m-val">Orders-led, execution can be lumpy</span></div>
+    </div>
+    <div class="seg-card nu">
+      <div class="seg-name">Civil Nuclear &amp; Space</div>
+      <div class="seg-tag">26.3% of Order Book</div>
+      <div class="m-row"><span class="m-lbl">Products</span><span class="m-val">Fuelling machine heads, grid plates, FMBC assemblies for PHWRs; cryogenic/liquid propulsion parts for ISRO</span></div>
+      <div class="m-row"><span class="m-lbl">Structural Moat</span><span class="m-val">35+ years with NPCIL; India targeting 8 GW → 100 GW nuclear by 2047</span></div>
+    </div>
+  </div>
+
+  <div class="note-box">
+    MTAR is best understood as four businesses bolted together under one precision-machining roof: a high-growth, high-concentration <strong>Clean Energy</strong> export business (Bloom Energy); a slow-but-sticky <strong>Civil Nuclear</strong> annuity business (NPCIL); a lumpy, tender-driven <strong>Aerospace &amp; Defence</strong> business (HAL, DRDO, ISRO, global primes); and an emerging <strong>Oil &amp; Gas</strong> vertical (Weatherford) being built out from FY27. The common thread is tight-tolerance precision machining and assembly — not any single end-market — which is both the diversification argument and the reason segment economics differ so widely.
+  </div>
+</div>
+
+<!-- ═══════════════ FINANCIALS ═══════════════ -->
+<div class="panel" id="tab-financials">
+  <div class="sec-hdr">Financials <span class="sec-note">· Quarterly Trend · Annual P&amp;L · Balance Sheet Snapshot · Consolidated, ₹ Crore</span></div>
+
+  <table style="margin-bottom:20px;">
+    <thead><tr><th>Metric</th><th style="text-align:right;">Q4 FY25</th><th style="text-align:right;">Q3 FY26</th><th style="text-align:right;">Q4 FY26</th><th style="text-align:right;">YoY</th><th style="text-align:right;">QoQ</th></tr></thead>
+    <tbody>
+      <tr><td class="tb">Revenue from Operations</td><td class="num">183.1</td><td class="num">278.0</td><td class="num">306.1</td><td class="tpos">+67.2%</td><td class="tpos">+10.1%</td></tr>
+      <tr><td class="tb">EBITDA</td><td class="num">34.2</td><td class="num">—</td><td class="num">61.8</td><td class="tpos">+80.9%</td><td class="num">—</td></tr>
+      <tr><td>EBITDA Margin</td><td class="num">18.7%</td><td class="num">—</td><td class="num">20.2%</td><td class="tpos">+150 bps</td><td class="num">—</td></tr>
+      <tr><td>Gross Margin</td><td class="num">52.3%</td><td class="num">—</td><td class="num">44.2%</td><td class="tneg">-810 bps</td><td class="num">—</td></tr>
+      <tr><td class="tb">Profit After Tax</td><td class="num">13.7</td><td class="num">34.7</td><td class="num">44.3</td><td class="tpos">+222.3%</td><td class="tpos">+27.7%</td></tr>
+      <tr><td>PAT Margin</td><td class="num">7.5%</td><td class="num">~12.5%</td><td class="num">14.5%</td><td class="tpos">+700 bps</td><td class="tpos">+200 bps</td></tr>
+    </tbody>
+  </table>
+
+  <table style="margin-bottom:20px;">
+    <thead><tr><th>Annual P&amp;L</th><th style="text-align:right;">FY25</th><th style="text-align:right;">FY26</th><th style="text-align:right;">YoY Growth</th></tr></thead>
+    <tbody>
+      <tr><td class="tb">Revenue from Operations</td><td class="num">676.0</td><td class="num">876.2</td><td class="tpos">+29.6%</td></tr>
+      <tr><td>Total Income (incl. Other Income)</td><td class="num">—</td><td class="num">899.3</td><td class="num">—</td></tr>
+      <tr><td>Gross Profit</td><td class="num">—</td><td class="num">417.8</td><td class="num">—</td></tr>
+      <tr><td>Gross Margin</td><td class="num">—</td><td class="num">47.7%</td><td class="num">—</td></tr>
+      <tr><td class="tb">EBITDA</td><td class="num">120.9</td><td class="num">171.2</td><td class="tpos">+41.7%</td></tr>
+      <tr><td>EBITDA Margin</td><td class="num">17.9%</td><td class="num">19.5%</td><td class="tpos">+160 bps</td></tr>
+      <tr><td class="tb">Profit Before Tax</td><td class="num">72.1</td><td class="num">126.1</td><td class="tpos">+75.1%</td></tr>
+      <tr><td class="tb">Profit After Tax</td><td class="num">53.4</td><td class="num">94.0</td><td class="tpos">+76.2%</td></tr>
+      <tr><td>PAT Margin</td><td class="num">7.9%</td><td class="num">10.7%</td><td class="tpos">+280 bps</td></tr>
+    </tbody>
+  </table>
+
+  <table>
+    <thead><tr><th>Balance Sheet (Consolidated)</th><th style="text-align:right;">31-Mar-2025</th><th style="text-align:right;">31-Mar-2026</th><th>Sources</th></tr></thead>
+    <tbody>
+      <tr><td class="tb">Total Assets</td><td class="num">1,130.3</td><td class="num">1,743.4</td><td class="src" rowspan="6">HDFC Sky / Business Standard / Marketsmojo, based on company investor presentation &amp; exchange filings, May–Jun 2026</td></tr>
+      <tr><td>Trade Receivables</td><td class="num">—</td><td class="num">336.8</td></tr>
+      <tr><td>Inventories</td><td class="num">—</td><td class="num">500.5</td></tr>
+      <tr><td class="tb">Total Equity</td><td class="num">728.9</td><td class="num">822.6</td></tr>
+      <tr><td>Net Working Capital Days</td><td class="num">—</td><td class="num">172 (improved)</td></tr>
+      <tr><td>Debt/Equity</td><td class="num">—</td><td class="num">~0.17</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note-box">
+    Note: Q3 FY26 EBITDA and standalone-quarter gross-margin figures were not separately disclosed in the sources reviewed and are shown as "—". Q3 FY26 PAT margin is an approximate derived figure. Full quarterly EBITDA/PAT bridge across all of FY26 is available in MTAR's investor presentation on the BSE/NSE filings page and is not reproduced here in full to respect source copyright.
+  </div>
+</div>
+
+<!-- ═══════════════ SEGMENTS & ORDER BOOK ═══════════════ -->
+<div class="panel" id="tab-orderbook">
+  <div class="sec-hdr">Segments &amp; Order Book <span class="sec-note">· FY26 Revenue Mix · Order Book Composition · Customer Concentration</span></div>
+
+  <div class="g2" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-lbl">FY26 Revenue Mix by Segment</div>
+      <div class="m-row"><span class="m-lbl">Clean Energy — Fuel Cells, Hydel &amp; Others</span><span class="m-val">₹615.4 Cr (~70%)</span></div>
+      <div class="m-row"><span class="m-lbl">Aerospace &amp; Defence</span><span class="m-val">₹103.8 Cr (~12%)</span></div>
+      <div class="m-row"><span class="m-lbl">Products &amp; Others</span><span class="m-val">~15%</span></div>
+      <div class="m-row"><span class="m-lbl">Exports (of total FY26 revenue)</span><span class="m-val">82%</span></div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Order Book Composition (31-Mar-2026)</div>
+      <div class="m-row"><span class="m-lbl">Clean Energy — Fuel Cell, Hydel &amp; Others</span><span class="m-val">51.2%</span></div>
+      <div class="m-row"><span class="m-lbl">Clean Energy — Civil Nuclear Power</span><span class="m-val">26.3%</span></div>
+      <div class="m-row"><span class="m-lbl">Aerospace &amp; Defence</span><span class="m-val">14.0%</span></div>
+      <div class="m-row"><span class="m-lbl">Products &amp; Others</span><span class="m-val">8.5%</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-lbl">Bloom Energy — The Single Most Important Relationship</div>
+    <div class="m-row"><span class="m-lbl">Estimated share of consolidated revenue</span><span class="m-val">~55–65%</span></div>
+    <div class="m-row"><span class="m-lbl">Role</span><span class="m-val">Sole/primary supplier of SOFC hot-box assemblies</span></div>
+    <div class="m-row"><span class="m-lbl">Wallet share within Bloom's component supply chain</span><span class="m-val">~60–70%</span></div>
+    <div class="m-row"><span class="m-lbl">Recent trigger orders</span><span class="m-val">₹386 Cr order (Sep-2025); Oracle–Bloom expanded partnership (~₹1,400–1,700 Cr potential, Apr-2026)</span></div>
+    <div class="m-row"><span class="m-lbl">Demonstrated downside risk</span><span class="m-val">Stock fell ~8% on 11-Jun-2026 after Crusoe paused a Bloom-linked data-centre project (Project Jade, Cheyenne)</span></div>
+    <div class="note-box" style="margin-top:10px;">
+      The Bloom Energy relationship is simultaneously MTAR's biggest growth lever and its single largest investment risk. Every order, pause, or customer announcement at Bloom or its AI-data-centre customers (Oracle, Crusoe, etc.) now transmits almost directly into MTAR's share price — as seen on 11-Jun-2026. This is a textbook customer-concentration setup: the upside is real and large, but it is not diversified.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-lbl">New Growth Vectors (Beyond Core Three Segments)</div>
+    <div class="m-row"><span class="m-lbl">Oil &amp; Gas (Weatherford)</span><span class="m-val">10-yr contract; ₹10 Cr FY26 → ~₹90 Cr/yr from FY27 via new Adibatla facility</span></div>
+    <div class="m-row"><span class="m-lbl">AI Data-Centre Infrastructure</span><span class="m-val">Initial ₹35 Cr order; potential ₹400–500 Cr over coming years</span></div>
+    <div class="m-row"><span class="m-lbl">AMCA Fighter Jet Programme</span><span class="m-val">Main landing-gear support structure test-box order received</span></div>
+    <div class="m-row"><span class="m-lbl">LCA Tejas Mk1A</span><span class="m-val">Significant actuator-assembly orders expected (₹62,000 Cr govt programme for 97 jets)</span></div>
+  </div>
+</div>
+
+<!-- ═══════════════ CHARTS ═══════════════ -->
+<div class="panel" id="tab-charts">
+  <div class="sec-hdr">Charts <span class="sec-note">· Revenue, EBITDA &amp; PAT Trend · FY25–FY26 · ₹ Crore (Full Real Figures)</span></div>
+  <div class="g2">
+    <div class="chart-box"><canvas id="chRev" height="260"></canvas></div>
+    <div class="chart-box"><canvas id="chMargin" height="260"></canvas></div>
+  </div>
+  <div class="chart-box" style="margin-top:16px;">
+    <canvas id="chOrder" height="220"></canvas>
+  </div>
+</div>
+
+<!-- ═══════════════ VALUATION ═══════════════ -->
+<div class="panel" id="tab-valuation">
+  <div class="sec-hdr">Valuation <span class="sec-note">· CMP · Market Cap · P/E · P/B · Peer Comparison · As of 19-Jun-2026</span></div>
+
+  <div class="g3" style="margin-bottom:20px;">
+    <div class="val-card"><div class="val-co">CMP / 52-Wk Range</div>
+      <div class="m-row"><span class="m-lbl">CMP</span><span class="m-val">₹8,434</span></div>
+      <div class="m-row"><span class="m-lbl">52-Wk High</span><span class="m-val">₹8,449.50</span></div>
+      <div class="m-row"><span class="m-lbl">52-Wk Low</span><span class="m-val">₹1,390.50</span></div>
+      <div class="m-row"><span class="m-lbl">1-Yr Return</span><span class="m-val pos">~+245%</span></div>
+    </div>
+    <div class="val-card"><div class="val-co">Valuation Multiples</div>
+      <div class="m-row"><span class="m-lbl">Market Cap</span><span class="m-val">~₹26,800 Cr</span></div>
+      <div class="m-row"><span class="m-lbl">Trailing P/E</span><span class="m-val">~285x</span></div>
+      <div class="m-row"><span class="m-lbl">Industry P/E (avg.)</span><span class="m-val">~35x</span></div>
+      <div class="m-row"><span class="m-lbl">Price/Book</span><span class="m-val">~32.4x</span></div>
+    </div>
+    <div class="val-card"><div class="val-co">Ownership &amp; Returns</div>
+      <div class="m-row"><span class="m-lbl">Promoter Holding</span><span class="m-val">30.4%</span></div>
+      <div class="m-row"><span class="m-lbl">Return on Equity</span><span class="m-val">~11.8%</span></div>
+      <div class="m-row"><span class="m-lbl">Dividend Yield</span><span class="m-val">0.00%</span></div>
+      <div class="m-row"><span class="m-lbl">Debt/Equity</span><span class="m-val">~0.17</span></div>
+    </div>
+  </div>
+
+  <table style="margin-bottom:16px;">
+    <thead><tr><th>Company</th><th style="text-align:right;">CMP (₹)</th><th style="text-align:right;">Mkt Cap (₹ Cr)</th><th style="text-align:right;">P/E (x)</th><th>Sources</th></tr></thead>
+    <tbody>
+      <tr><td class="tb">MTAR Technologies</td><td class="num">8,434</td><td class="num">~26,800</td><td class="num">~285</td><td class="src" rowspan="4">Tipranks / Screener.in peer-comparison snapshots, approximate &amp; date-stamped — figures move quickly given high volatility in this peer set; treat as illustrative, not live quotes</td></tr>
+      <tr><td>Apollo Micro Systems</td><td class="num">337.50</td><td class="num">~11,449</td><td class="num">~158</td></tr>
+      <tr><td>Avalon Technologies</td><td class="num">1,131.40</td><td class="num">~7,039</td><td class="num">~87</td></tr>
+      <tr><td>AXISCADES Technologies</td><td class="num">1,684.40</td><td class="num">~7,253</td><td class="num">~92</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note-box">
+    MTAR trades at a steep premium even relative to an already richly-valued precision engineering/defence peer set — roughly 8x the broader industry average P/E. The market is effectively pricing in management's 80%+ FY27 revenue growth guidance and 24% EBITDA margin target playing out with limited slippage. Any miss on Bloom Energy order timing, AMCA/Tejas execution, or margin delivery carries asymmetric downside risk at this multiple. This is not a recommendation to buy, hold, or sell — it is a description of what the current price already assumes.
+  </div>
+</div>
+
+<!-- ═══════════════ SWOT & MOAT ═══════════════ -->
+<div class="panel" id="tab-swot">
+  <div class="sec-hdr">SWOT &amp; Moat <span class="sec-note">· Strengths · Weaknesses · Opportunities · Threats</span></div>
+  <div class="swot-grid">
+    <div class="swot s-strength"><h4>Strengths</h4><ul>
+      <li>Sole/primary supplier status with Bloom Energy on critical hot-box assemblies — high switching cost</li>
+      <li>35+ year relationship with NPCIL on civil nuclear PHWR components — regulatory/qualification moat</li>
+      <li>Highest-ever order book (₹2,581.9 Cr) provides ~2.9x FY26 revenue visibility</li>
+      <li>Diversified across Clean Energy, Nuclear, Aerospace &amp; Defence, and now Oil &amp; Gas</li>
+      <li>Low leverage (D/E ~0.17) leaves room to fund capacity expansion</li>
+    </ul></div>
+    <div class="swot s-weak"><h4>Weaknesses</h4><ul>
+      <li>Bloom Energy concentration (~55–65% of revenue) — single point of failure</li>
+      <li>Gross margin compressed 810 bps YoY in Q4 FY26 (52.3% → 44.2%) even as EBITDA margin improved — cost-mix/pricing pressure to monitor</li>
+      <li>Working capital intensive business — inventories ₹500.5 Cr, receivables ₹336.8 Cr against ₹876 Cr revenue</li>
+      <li>No dividend despite consistent profitability — all cash reinvested</li>
+      <li>Aerospace &amp; Defence orders are lumpy and dependent on government approval timelines</li>
+    </ul></div>
+    <div class="swot s-opp"><h4>Opportunities</h4><ul>
+      <li>AI data-centre power build-out (100 GW global capacity 2026–2030) driving Bloom Energy fuel-cell demand</li>
+      <li>India's nuclear capacity expansion plan (8 GW → 100 GW by 2047)</li>
+      <li>LCA Tejas Mk1A (₹62,000 Cr govt programme) and AMCA fighter jet ramp-up</li>
+      <li>New Oil &amp; Gas vertical (Weatherford) — 10-year annuity-style contract</li>
+      <li>Entry into AI data-centre infrastructure components directly (~₹400–500 Cr potential)</li>
+    </ul></div>
+    <div class="swot s-threat"><h4>Threats</h4><ul>
+      <li>Any pause/cancellation in Bloom Energy's downstream AI data-centre projects (demonstrated 11-Jun-2026 with Crusoe's Project Jade pause)</li>
+      <li>Valuation risk — P/E of ~285x assumes flawless execution; any guidance miss could trigger sharp de-rating</li>
+      <li>US tariff/trade-policy shifts affecting export economics (82% of FY26 revenue is exports)</li>
+      <li>Execution risk in scaling new Oil &amp; Gas and structural-assembly capabilities for the first time</li>
+      <li>Competitive intensity rising from peers (Apollo Micro, Avalon, Azad Engineering, Data Patterns, Paras Defence) also chasing the same defence/clean-energy capex cycle</li>
+    </ul></div>
+  </div>
+</div>
+
+<!-- ═══════════════ RISKS ═══════════════ -->
+<div class="panel" id="tab-risks">
+  <div class="sec-hdr">Risks <span class="sec-note">· Probability · Severity · Company-Specific</span></div>
+
+  <div class="risk-row"><div><strong>Bloom Energy customer concentration</strong><br><span style="font-size:11px;color:var(--muted);">~55–65% of revenue tied to one customer's capex cycle and its own end-customers (Oracle, Crusoe, other AI data-centre developers)</span></div><span class="risk-tag rt-h">High Probability</span><span class="risk-tag rt-h">High Severity</span></div>
+
+  <div class="risk-row"><div><strong>Valuation / multiple compression risk</strong><br><span style="font-size:11px;color:var(--muted);">Trailing P/E ~285x vs industry ~35x; any growth or margin disappointment could trigger a sharp re-rating down</span></div><span class="risk-tag rt-h">High Probability</span><span class="risk-tag rt-h">High Severity</span></div>
+
+  <div class="risk-row"><div><strong>Gross margin compression</strong><br><span style="font-size:11px;color:var(--muted);">Q4 FY26 gross margin fell 810 bps YoY (52.3% → 44.2%) on cost-mix and project execution profile</span></div><span class="risk-tag rt-m">Medium Probability</span><span class="risk-tag rt-m">Medium Severity</span></div>
+
+  <div class="risk-row"><div><strong>Working capital strain</strong><br><span style="font-size:11px;color:var(--muted);">Inventories + receivables of ₹837 Cr against ₹876 Cr revenue; execution ramp could pressure cash conversion further</span></div><span class="risk-tag rt-m">Medium Probability</span><span class="risk-tag rt-m">Medium Severity</span></div>
+
+  <div class="risk-row"><div><strong>Defence order timing/lumpiness</strong><br><span style="font-size:11px;color:var(--muted);">AMCA/Tejas Mk1A orders depend on government approval cycles and platform status, not purely commercial timelines</span></div><span class="risk-tag rt-m">Medium Probability</span><span class="risk-tag rt-m">Low-Medium Severity</span></div>
+
+  <div class="risk-row"><div><strong>New-vertical execution risk (Oil &amp; Gas, AI infra)</strong><br><span style="font-size:11px;color:var(--muted);">Greenfield Adibatla facility and Weatherford ramp are unproven at scale; commissioning timeline (Jun–Sep 2026) is a near-term watch item</span></div><span class="risk-tag rt-l">Lower Probability</span><span class="risk-tag rt-m">Medium Severity</span></div>
+
+  <div class="risk-row"><div><strong>FX / export policy risk</strong><br><span style="font-size:11px;color:var(--muted);">82% of FY26 revenue is exports — US tariff or trade-policy shifts directly affect realisation and Bloom Energy's own cost competitiveness</span></div><span class="risk-tag rt-l">Lower Probability</span><span class="risk-tag rt-m">Medium Severity</span></div>
+</div>
+
+<!-- ═══════════════ MANAGEMENT & BOARD ═══════════════ -->
+<div class="panel" id="tab-management">
+  <div class="sec-hdr">Management &amp; Board <span class="sec-note">· Leadership · Governance · Ownership</span></div>
+
+  <div class="g3" style="margin-bottom:16px;">
+    <div class="mgmt-card"><div class="mgmt-name">P. Srinivas Reddy</div><div class="mgmt-role">Managing Director &amp; Promoter</div>30+ years with the company; CEO since 2020. Direct ownership ~0.8% of equity.</div>
+    <div class="mgmt-card"><div class="mgmt-name">M. Anushman Reddy</div><div class="mgmt-role">Executive Director</div>Part of the founding/promoter family leadership team.</div>
+    <div class="mgmt-card"><div class="mgmt-name">A. Praveen Kumar Reddy</div><div class="mgmt-role">Executive Director</div>Part of the founding/promoter family leadership team.</div>
+    <div class="mgmt-card"><div class="mgmt-name">Gunneswara Rao Pusarla</div><div class="mgmt-role">Chief Financial Officer</div>Oversees finance, capital allocation and investor relations.</div>
+    <div class="mgmt-card"><div class="mgmt-name">B.V.R. Subbu</div><div class="mgmt-role">Chairman &amp; Independent Director</div>Leads the board's independent oversight function.</div>
+    <div class="mgmt-card"><div class="mgmt-name">Independent Directors</div><div class="mgmt-role">Board Composition</div>Dr. V.G. Sekaran, U.C. Muktibodh, A. Krishna Kumar, Ameeta Chatterjee, plus Rohith Loka Reddy (Non-Executive)</div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-lbl">Governance Snapshot</div>
+      <div class="m-row"><span class="m-lbl">Board Average Tenure</span><span class="m-val">~4.8 years</span></div>
+      <div class="m-row"><span class="m-lbl">Management Average Tenure</span><span class="m-val">~3.2 years</span></div>
+      <div class="m-row"><span class="m-lbl">CEO Tenure (current role)</span><span class="m-val">~5–6 years</span></div>
+      <div class="m-row"><span class="m-lbl">CEO Total Compensation (FY25)</span><span class="m-val">~₹4.0 Cr</span></div>
+      <div class="m-row"><span class="m-lbl">Promoter Holding</span><span class="m-val">30.4%</span></div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Notes for Investors</div>
+      <div style="font-size:11.5px;color:var(--muted);">Leadership is founder-led and promoter-family dominated across the three executive director roles, with an independent chairman providing board-level oversight. CEO direct ownership is modest in percentage terms but meaningful in absolute value given the stock's re-rating. No dividend has been paid to date despite sustained profitability — capital is being retained for capacity expansion (Oil &amp; Gas facility, Clean Energy capacity additions).</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ ANALYSTS' RATINGS ═══════════════ -->
+<div class="panel" id="tab-analyst">
+  <div class="sec-hdr">Analysts' Ratings <span class="sec-note">· Consensus Coverage · Target Prices · Rationale · As of Jun 2026</span></div>
+
+  <div class="an-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <strong>Motilal Oswal Financial Services</strong>
+      <span class="rate-pill rp-buy">Buy</span>
+    </div>
+    <div class="m-row"><span class="m-lbl">Target Price (post Q4 FY26, 14-May-2026)</span><span class="m-val">₹8,000</span></div>
+    <div class="m-row"><span class="m-lbl">Basis</span><span class="m-val">60x FY28E EPS (~0.6x PEG on FY26–28E EPS CAGR)</span></div>
+    <div class="m-row"><span class="m-lbl">FY25–28E CAGR Estimate</span><span class="m-val">Revenue 49% / EBITDA 65% / PAT 90%</span></div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px;">Rationale: Oracle–Bloom Energy partnership expansion, strong order book (~₹2,600 Cr), working-capital improvement, and operating-leverage-led margin expansion. Target progressively raised through the year (₹4,810 → ₹6,000 → ₹8,000) as the rally and order momentum continued.</div>
+  </div>
+
+  <div class="an-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <strong>Broker Consensus (4 analysts, aggregated)</strong>
+      <span class="rate-pill rp-hold">Hold-Leaning</span>
+    </div>
+    <div class="m-row"><span class="m-lbl">Average 1-Yr Target</span><span class="m-val">~₹7,358</span></div>
+    <div class="m-row"><span class="m-lbl">Implied vs CMP (₹8,434)</span><span class="m-val neg">~-13% (downside)</span></div>
+    <div style="font-size:11px;color:var(--muted);margin-top:6px;">Rationale: Even bullish brokerages flag that the stock's ~285x trailing P/E already discounts a large part of the FY27 growth story; consensus average target sitting below CMP signals the market price has run ahead of blended analyst fair value.</div>
+  </div>
+
+  <div class="note-box">
+    Two genuinely different signals sit side by side here: a high-conviction structural Buy from MTAR's most bullish covering broker (Motilal Oswal, ₹8,000 target, citing the AI/Bloom Energy growth runway) versus a broader consensus average target that is now below the current market price, reflecting valuation caution after the ~245% one-year rally. CB Research does not issue its own buy/sell/hold recommendation — this section summarises third-party analyst views as published, for the investor's own evaluation. Not investment advice; please consult a SEBI-registered advisor.
+  </div>
+
+  <table style="margin-top:16px;">
+    <thead><tr><th>Source / Note</th><th>Detail</th><th>Sources</th></tr></thead>
+    <tbody>
+      <tr><td>MOSL target evolution</td><td>₹4,810 (27-Feb-26) → ₹6,000 (16-Apr-26) → ₹8,000 (14-May-26)</td><td class="src">Business Standard, Feb/Apr/May 2026</td></tr>
+      <tr><td>Consensus average target</td><td>₹7,358 (4 analysts, mid-Jun-2026)</td><td class="src">Trendlyne, Jun 2026</td></tr>
+      <tr><td>Valuation scrutiny flag</td><td>P/E ~276–285x described as pricing in "near-perfect execution"</td><td class="src">Whalesbook, Apr–May 2026</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════ FY27 OUTLOOK ═══════════════ -->
+<div class="panel" id="tab-outlook">
+  <div class="sec-hdr">FY27 Outlook <span class="sec-note">· Management Guidance · CB Research Data View (No Recommendations)</span></div>
+
+  <div class="g3" style="margin-bottom:18px;">
+    <div class="card">
+      <div class="card-lbl">Management Guidance (FY27)</div>
+      <div class="m-row"><span class="m-lbl">Revenue Growth Guidance</span><span class="m-val">80%+ (±5%)</span></div>
+      <div class="m-row"><span class="m-lbl">EBITDA Margin Target</span><span class="m-val">~24%</span></div>
+      <div class="m-row"><span class="m-lbl">Targeted Margin Improvement</span><span class="m-val">200–300 bps via integrated-systems shift</span></div>
+      <div class="m-row"><span class="m-lbl">Order Book Target (FY27-end)</span><span class="m-val">~₹5,000 Cr</span></div>
+      <div class="m-row"><span class="m-lbl">Clean Energy Order Inflow Target</span><span class="m-val">~₹4,000 Cr (₹40 billion)</span></div>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Bull Case Drivers</div>
+      <ul style="font-size:11.5px;padding-left:18px;">
+        <li>Oracle–Bloom Energy partnership scales to full ₹1,400–1,700 Cr order potential</li>
+        <li>LCA Tejas Mk1A and AMCA orders convert on schedule</li>
+        <li>Oil &amp; Gas facility commissions on time, Weatherford ramps to ₹90 Cr+/yr</li>
+        <li>EBITDA margin reaches or exceeds 24% guidance</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-lbl">Bear Case Drivers</div>
+      <ul style="font-size:11.5px;padding-left:18px;">
+        <li>AI data-centre capex pause spreads beyond Crusoe's Project Jade, hitting Bloom Energy orders</li>
+        <li>Gross margin compression (seen in Q4 FY26) persists, capping EBITDA delivery below 24%</li>
+        <li>Defence order approvals slip past FY27 on government timelines</li>
+        <li>Valuation multiple compresses toward industry average (~35x) even if earnings grow, capping/negative share returns</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note-box">
+    <strong>CB Research Visibility Read (no recommendation):</strong> Earnings visibility for FY27 is genuinely high — the ₹2,581.9 Cr order book, record FY26 inflows, and management's explicit 80%+ revenue and 24% margin guidance give a real anchor. The open question is not "will MTAR grow" but "how much of that growth is already in the price." At ~285x trailing earnings against a guided EBITDA-margin and revenue path, the stock requires FY27 execution to land at or above the top end of guidance simply to hold today's multiple — let alone re-rate further.
+  </div>
+</div>
+
+<!-- ═══════════════ CB ASSIST ═══════════════ -->
+<div class="panel" id="tab-cb">
+  <div class="sec-hdr">CB Assist <span class="sec-note">· Cauvery Business Research · Bilingual English / Tamil · Offline Keyword Engine</span></div>
+  <div class="cb-wrap">
+    <div class="cb-panel">
+      <div class="cb-hdr">CB Assist — English</div>
+      <div class="cb-msgs" id="chatMsgs">
+        <div class="chat-msg bot">Ask me about MTAR's Q4 FY26 results, Bloom Energy exposure, valuation, order book, or FY27 outlook.</div>
+      </div>
+      <div class="typing-ind" id="typingInd">CB Assist is typing…</div>
+      <div class="cb-sugg">
+        <span class="sugg-chip" onclick="cbA('bloom energy concentration','en')">Bloom Energy risk?</span>
+        <span class="sugg-chip" onclick="cbA('valuation pe','en')">Is the valuation justified?</span>
+        <span class="sugg-chip" onclick="cbA('order book','en')">Order book strength?</span>
+        <span class="sugg-chip" onclick="cbA('fy27 outlook','en')">FY27 outlook?</span>
+      </div>
+      <div class="cb-in-row">
+        <input id="chatIn" type="text" placeholder="Ask about MTAR Technologies..." onkeydown="if(event.key==='Enter')cbA(this.value,'en')">
+        <button onclick="cbA(document.getElementById('chatIn').value,'en')">Ask</button>
+      </div>
+    </div>
+    <div class="cb-panel">
+      <div class="cb-hdr">CB Assist — தமிழ்</div>
+      <div class="cb-msgs" id="chatMsgsTa">
+        <div class="chat-msg bot">MTAR Q4 FY26 results, Bloom Energy exposure, valuation, order book, FY27 outlook பத்தி கேளுங்க.</div>
+      </div>
+      <div class="typing-ind" id="typingIndTa">CB Assist டைப் பண்றது…</div>
+      <div class="cb-sugg">
+        <span class="sugg-chip" onclick="cbATa('bloom energy risk')">Bloom Energy risk?</span>
+        <span class="sugg-chip" onclick="cbATa('valuation')">Valuation justify ஆகுமா?</span>
+        <span class="sugg-chip" onclick="cbATa('order book')">Order book எப்படி?</span>
+        <span class="sugg-chip" onclick="cbATa('outlook')">FY27 outlook?</span>
+      </div>
+      <div class="cb-in-row">
+        <input id="chatInTa" type="text" placeholder="MTAR பத்தி கேளுங்க..." onkeydown="if(event.key==='Enter')cbATa(this.value)">
+        <button onclick="cbATa(document.getElementById('chatInTa').value)">கேள்</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="watermark">CB Research · Cauvery Business · MTAR Technologies Q4 FY26 Intelligence · Audited BSE/NSE Data Only · No Buy/Sell/Hold Recommendation by CB Research</div>
+
+</div>
+
+<script>
+function showTab(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(id==='charts'){setTimeout(initCharts,50);}
+}
+
+let chartsInit=false;
+function initCharts(){
+  if(chartsInit)return;
+  chartsInit=true;
+  new Chart(document.getElementById('chRev'),{
+    type:'bar',
+    data:{labels:['Q4 FY25','Q3 FY26','Q4 FY26'],
+      datasets:[
+        {label:'Revenue (₹ Cr)',data:[183.1,278.0,306.1],backgroundColor:'#1a5276'},
+        {label:'PAT (₹ Cr)',data:[13.7,34.7,44.3],backgroundColor:'#c8202a'}
+      ]},
+    options:{responsive:true,plugins:{title:{display:true,text:'Quarterly Revenue vs PAT (₹ Crore)'},legend:{position:'bottom'},
+      tooltip:{callbacks:{label:c=>c.dataset.label+': ₹'+c.parsed.y.toLocaleString('en-IN')+' Cr'}},
+      datalabels:{}},
+      scales:{y:{ticks:{callback:v=>'₹'+v.toLocaleString('en-IN')}}}}
+  });
+  new Chart(document.getElementById('chMargin'),{
+    type:'line',
+    data:{labels:['Q4 FY25','Q4 FY26'],
+      datasets:[
+        {label:'EBITDA Margin %',data:[18.7,20.2],borderColor:'#2d8b3e',backgroundColor:'#2d8b3e',tension:.3},
+        {label:'PAT Margin %',data:[7.5,14.5],borderColor:'#7b3fa0',backgroundColor:'#7b3fa0',tension:.3},
+        {label:'Gross Margin %',data:[52.3,44.2],borderColor:'#b8911e',backgroundColor:'#b8911e',tension:.3}
+      ]},
+    options:{responsive:true,plugins:{title:{display:true,text:'Margin Trend: Q4 FY25 vs Q4 FY26'},legend:{position:'bottom'}}}
+  });
+  new Chart(document.getElementById('chOrder'),{
+    type:'bar',
+    data:{labels:['Clean Energy (Fuel Cell/Hydel/Other)','Civil Nuclear Power','Aerospace & Defence','Products & Others'],
+      datasets:[{label:'Order Book Share %',data:[51.2,26.3,14.0,8.5],backgroundColor:['#2d8b3e','#7b3fa0','#c8202a','#b8911e']}]},
+    options:{indexAxis:'y',responsive:true,plugins:{title:{display:true,text:'Order Book Composition (₹2,581.9 Cr as of 31-Mar-2026)'},legend:{display:false}},
+      scales:{x:{ticks:{callback:v=>v+'%'}}}}
+  });
+}
+
+/* ─── CB ASSIST KNOWLEDGE BASE ─── */
+const KB={
+  bloom:{
+    en:`<strong>Bloom Energy Concentration — Why It Matters</strong><br><br>Bloom Energy is estimated to be ~55–65% of MTAR's consolidated revenue. MTAR is the sole/primary supplier of solid-oxide fuel-cell hot-box assemblies, commanding ~60–70% wallet share within Bloom's component supply chain.<br><br><strong>Upside:</strong> Oracle's expanded partnership with Bloom could bring ₹1,400–1,700 Cr of incremental orders to MTAR — about 1.8x FY26 revenue.<br><br><strong>Downside, demonstrated:</strong> On 11-Jun-2026, MTAR fell ~8% after Crusoe paused its Cheyenne data-centre project where Bloom was the fuel-cell supplier — a direct transmission of Bloom-side risk into MTAR's price.<br><br>This single relationship is both the core investment thesis and the core risk.`,
+    ta:`<strong>Bloom Energy Concentration (Tamil)</strong><br><br>MTAR revenue-ல் ~55–65% Bloom Energy-ஓட இருந்து வருது. SOFC hot-box assembly-க்கு sole supplier — Bloom-ஓட supply chain-ல் ~60–70% wallet share.<br><br>Upside: Oracle-Bloom partnership-ல் இருந்து ₹1,400–1,700 கோடி incremental orders வரலாம்.<br><br>Downside (நடந்தது): 11-Jun-2026 அன்று Crusoe-ஓட Cheyenne data-centre project pause பண்ணதால MTAR stock 8% குறைஞ்சது.<br><br>இந்த ஒரு relationship-தான் MTAR-ஓட investment thesis-உம், risk-உம்.`
+  },
+  valuation:{
+    en:`<strong>Is MTAR's Valuation Justified?</strong><br><br>MTAR trades at ~285x trailing P/E versus an industry average of ~35x — roughly 8x the peer average. Even bullish broker Motilal Oswal's ₹8,000 target (60x FY28E EPS) is barely above the current CMP of ₹8,434, while the 4-analyst consensus average target of ₹7,358 sits ~13% BELOW the current price.<br><br>This means the stock's current price already assumes management's 80%+ FY27 revenue growth and 24% EBITDA margin guidance plays out with minimal slippage. There is little room for execution disappointment without a sharp de-rating.<br><br>CB Research does not make buy/sell/hold calls — this is a description of what the price implies, not a recommendation.`,
+    ta:`<strong>MTAR Valuation Justify ஆகுதா? (Tamil)</strong><br><br>MTAR ~285x trailing P/E-ல் trade ஆகுது, industry average ~35x. Motilal Oswal-ஓட bullish target ₹8,000-கூட CMP ₹8,434-ஐ விட கொஞ்சம்தான் கீழ. 4-analyst consensus average target ₹7,358 — CMP-ஐ விட ~13% குறைவு.<br><br>அதாவது current price-ல FY27 80%+ growth guidance perfectly நடக்கணும்னு assume பண்ணிருக்காங்க. execution slip ஆனா sharp de-rating வரலாம்.`
+  },
+  orderbook:{
+    en:`<strong>Order Book Strength</strong><br><br>Order book stood at ₹2,581.9 Cr as of 31-Mar-2026 — about 2.9x FY26 revenue, and the highest in company history. FY26 order inflow of ₹2,453.3 Cr was also a record, including ₹481.6 Cr in Q4 FY26 alone.<br><br>Composition: Clean Energy (Fuel Cell/Hydel/Others) 51.2%, Civil Nuclear 26.3%, Aerospace & Defence 14.0%, Products & Others 8.5%.<br><br>Management targets growing this to ~₹5,000 Cr by FY27-end, with ~₹4,000 Cr of fresh Clean Energy inflows expected alone.`,
+    ta:`<strong>Order Book Strength (Tamil)</strong><br><br>31-Mar-2026 நிலவரப்படி order book ₹2,581.9 கோடி — FY26 revenue-ஓட ~2.9x, company history-ல் highest. FY26 order inflow ₹2,453.3 கோடி (record), அதுல Q4-ல மட்டும் ₹481.6 கோடி.<br><br>Mix: Clean Energy 51.2%, Civil Nuclear 26.3%, A&D 14.0%, Products 8.5%.<br><br>FY27-end-க்கு ₹5,000 கோடி order book target பண்றாங்க.`
+  },
+  outlook:{
+    en:`<strong>FY27 Outlook — Management Guidance</strong><br><br>Revenue growth guidance: 80%+ (±5%)<br>EBITDA margin target: ~24%<br>Targeted margin improvement: 200–300 bps via shift to integrated systems<br>Order book target: ~₹5,000 Cr by FY27-end<br>Clean Energy order inflow target: ~₹4,000 Cr<br><br>Bull case: Oracle-Bloom scale-up, Tejas Mk1A/AMCA orders convert, Oil & Gas ramps on time.<br>Bear case: AI data-centre capex pause spreads, gross margin stays compressed, defence orders slip, valuation multiple compresses.<br><br>This is management's stated guidance, not a CB Research forecast or recommendation.`,
+    ta:`<strong>FY27 Outlook (Tamil)</strong><br><br>Revenue growth guidance: 80%+ <br>EBITDA margin target: ~24%<br>Order book target: ~₹5,000 கோடி FY27-end-க்கு<br><br>Bull case: Oracle-Bloom scale-up, Tejas Mk1A/AMCA orders, Oil & Gas on time.<br>Bear case: AI data-centre capex pause, margin compression தொடரும், defence orders delay, valuation multiple compress ஆகலாம்.<br><br>இது management guidance — CB Research recommendation இல்லை.`
+  },
+  segments:{
+    en:`<strong>What MTAR Makes — Segment Breakdown</strong><br><br>Clean Energy (Fuel Cells, Hydel & Others): ~70% of FY26 revenue (₹615.4 Cr), anchored by Bloom Energy.<br>Aerospace & Defence: ~12% of FY26 revenue (₹103.8 Cr) — HAL gearboxes, Tejas actuators, AMCA structural parts.<br>Civil Nuclear: 26.3% of order book — NPCIL fuelling machine heads, grid plates, 35+ year relationship.<br>New: Oil & Gas (Weatherford, 10-yr contract) and AI data-centre infrastructure components.<br><br>Exports were 82% of FY26 revenue.`,
+    ta:`<strong>MTAR Segments (Tamil)</strong><br><br>Clean Energy: ~70% FY26 revenue (₹615.4 கோடி), Bloom Energy anchor.<br>Aerospace & Defence: ~12% (₹103.8 கோடி).<br>Civil Nuclear: order book-ல் 26.3%, NPCIL உடன் 35+ வருட relationship.<br>புதிது: Oil & Gas (Weatherford), AI data-centre infra.<br><br>Exports FY26 revenue-ல் 82%.`
+  },
+  risks:{
+    en:`<strong>Key Risks</strong><br><br>1. Bloom Energy concentration (High/High)<br>2. Valuation/multiple compression (High/High)<br>3. Gross margin compression (Medium/Medium) — fell 810 bps YoY in Q4 FY26<br>4. Working capital strain — inventories + receivables of ₹837 Cr vs ₹876 Cr FY26 revenue<br>5. Defence order timing/lumpiness (Medium/Low-Medium)<br>6. New-vertical execution risk — Oil & Gas, AI infra (Lower/Medium)<br>7. FX/export policy risk — 82% of revenue is exports (Lower/Medium)`,
+    ta:`<strong>Key Risks (Tamil)</strong><br><br>1. Bloom Energy concentration (High/High)<br>2. Valuation compression risk (High/High)<br>3. Gross margin compression — Q4 FY26-ல் 810 bps குறைஞ்சது<br>4. Working capital strain<br>5. Defence order timing lumpy<br>6. New vertical execution risk (Oil & Gas, AI infra)<br>7. FX/export policy risk — 82% revenue exports`
+  }
+};
+
+function findA(q,l){
+  const G=k=>KB[k]?.[l]||KB[k]?.en||'';
+  if(/bloom|concentration|customer risk/.test(q))return G('bloom');
+  if(/valuation|pe|p\/e|expensive|justif/.test(q))return G('valuation');
+  if(/order book|orderbook|order inflow/.test(q))return G('orderbook');
+  if(/fy27|outlook|guidance|bull|bear/.test(q))return G('outlook');
+  if(/segment|clean energy|aerospace|nuclear|what.*make/.test(q))return G('segments');
+  if(/risk/.test(q))return G('risks');
+  if(l==='ta')return `<strong>CB Assist</strong> — இதை try பண்ணுங்க:<br><br>• Bloom Energy concentration risk?<br>• Valuation justify ஆகுமா?<br>• Order book strength எப்படி?<br>• FY27 outlook என்ன?<br>• MTAR segments என்ன?<br>• Key risks என்ன?`;
+  return `<strong>CB Assist</strong> — Smart questions to explore:<br><br>• <em>How concentrated is MTAR's Bloom Energy exposure?</em><br>• <em>Is the current ~285x P/E justified?</em><br>• <em>How strong is the ₹2,581.9 Cr order book?</em><br>• <em>What is management's FY27 guidance?</em><br>• <em>What does MTAR actually manufacture?</em><br>• <em>What are the key risks to the investment case?</em>`;
+}
+
+function cbA(q,lang){
+  if(!q||!q.trim())return;
+  const msgs=document.getElementById('chatMsgs');
+  const inp=document.getElementById('chatIn');
+  const typ=document.getElementById('typingInd');
+  const uEl=document.createElement('div');
+  uEl.className='chat-msg user';uEl.textContent=q.trim();
+  msgs.appendChild(uEl);inp.value='';msgs.scrollTop=msgs.scrollHeight;
+  const isTa=/[\u0B80-\u0BFF]/.test(q)||/tamil/i.test(q);
+  const l=(lang==='ta'||isTa)?'ta':'en';
+  typ.style.display='flex';msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    typ.style.display='none';
+    const a=findA(q.toLowerCase(),l);
+    const bEl=document.createElement('div');
+    bEl.className='chat-msg bot';bEl.innerHTML=a;
+    msgs.appendChild(bEl);msgs.scrollTop=msgs.scrollHeight;
+  },500);
+}
+
+function cbATa(q){
+  if(!q||!q.trim())return;
+  const msgs=document.getElementById('chatMsgsTa');
+  const inp=document.getElementById('chatInTa');
+  const typ=document.getElementById('typingIndTa');
+  const uEl=document.createElement('div');
+  uEl.className='chat-msg user';uEl.textContent=q.trim();
+  msgs.appendChild(uEl);inp.value='';msgs.scrollTop=msgs.scrollHeight;
+  typ.style.display='flex';msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    typ.style.display='none';
+    const a=findA(q.toLowerCase(),'ta');
+    const bEl=document.createElement('div');
+    bEl.className='chat-msg bot';bEl.innerHTML=a;
+    msgs.appendChild(bEl);msgs.scrollTop=msgs.scrollHeight;
+  },500);
+}
+</script>
+</body>
+</html>
