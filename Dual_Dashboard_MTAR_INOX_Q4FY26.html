@@ -244,6 +244,7 @@ var CO={
   <button class="tab-btn" onclick="showTab('mtr','analyst',this)">Analysts' Ratings</button>
   <button class="tab-btn" onclick="showTab('mtr','outlook',this)" style="color:#c2410c;font-weight:800;">FY27 Outlook</button>
   <button class="tab-btn" onclick="showTab('mtr','cb',this)" style="color:var(--mtr);font-weight:800;">CB Assist</button>
+  <button class="tab-btn" onclick="showTab('mtr','socrates',this)" style="color:#b8911e;font-weight:800;">🦉 Cauvery Socrates</button>
 </div>
 
 <div class="main">
@@ -410,6 +411,20 @@ var CO={
 
   <div class="note-box">
     Note: Quarterly EBITDA for Q1–Q3 FY26 was not separately broken out in the sources reviewed; PAT for those quarters is approximate based on the annual sum of ₹94 Cr minus Q4's ₹44.3 Cr = ₹49.7 Cr split across Q1–Q3. FY24 PAT is an approximate sourced figure; precise figure per audited annual report. Full quarterly data is available in MTAR's investor presentation on BSE.
+  </div>
+
+  <!-- CB Rating — Financials -->
+  <div class="sec-hdr" style="margin-top:28px;font-size:1.05rem;">CB Rating — Financials <span class="sec-note">· CBF26 Framework · g / m / d / v / t / r Factors · No Buy/Sell/Hold</span></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;">
+    <div class="kpi ce-a"><div class="kl">g — Growth</div><div class="kv" style="color:#15803d;">★★★★☆</div><div class="kc pos">Revenue +29.6% · PAT +76.2% FY26. Q4 PAT tripled YoY. FY27 guidance 80%+.</div></div>
+    <div class="kpi ad-a"><div class="kl">m — Margins</div><div class="kv" style="color:#c2410c;">★★★☆☆</div><div class="kc warn">EBITDA 19.5% FY26 (↑ from 17.9%). Gross margin -810 bps Q4. Target 24% EBITDA FY27 — not yet achieved.</div></div>
+    <div class="kpi mtr-a"><div class="kl">d — Debt / Balance Sheet</div><div class="kv" style="color:#15803d;">★★★★☆</div><div class="kc pos">D/E ~0.17 (low). NWC Days 172 (high but structural). Total equity ₹822.6 Cr.</div></div>
+    <div class="kpi gold-a"><div class="kl">v — Valuation</div><div class="kv" style="color:#b91c1c;">★☆☆☆☆</div><div class="kc neg">~285x trailing P/E · ~8x sector avg · P/B 32.4x. Price-to-growth very stretched.</div></div>
+    <div class="kpi ce-a"><div class="kl">t — Track Record</div><div class="kv" style="color:#15803d;">★★★★☆</div><div class="kc pos">FY24→FY25→FY26 revenue: ₹714→₹676→₹876 Cr. PAT: ₹40→₹53→₹94 Cr. 35+ yr customer relationships.</div></div>
+    <div class="kpi ad-a"><div class="kl">r — Risk</div><div class="kv" style="color:#c2410c;">★★☆☆☆</div><div class="kc warn">Bloom ~60% revenue concentration. 82% exports. AI data-centre capex lumpy. High valuation leaves no margin for error.</div></div>
+  </div>
+  <div class="note-box" style="border-left:4px solid #1a5276;">
+    <strong>CBF26 Financial Summary — MTAR Technologies:</strong> MTAR is a high-growth, low-leverage precision engineering company with a genuine qualification moat. The financial profile is compelling on growth (g★★★★) and track record (t★★★★) but strained on valuation (v★) and risk (r★★). The gross margin compression in Q4 FY26 (-810 bps) despite volume growth is a watchpoint. Until EBITDA reaches the guided 24%+ and margin recovery is confirmed, the financials-vs-price gap remains wide. <em>CB Research does not issue buy/sell/hold recommendations.</em>
   </div>
 </div>
 
@@ -871,9 +886,133 @@ var CO={
   </div>
 </div>
 
+
+<!-- ═══════════════ MTAR CAUVERY SOCRATES ═══════════════ -->
+<div class="panel" id="mtr-tab-socrates">
+  <div class="sec-hdr">🦉 Cauvery Socrates — MTAR Technologies <span class="sec-note">· Socratic Learning · English &amp; Tamil · Think Before You Invest</span></div>
+  <div style="background:linear-gradient(135deg,#eaf0f6 0%,#f7f6f2 100%);border:2px solid var(--mtr);border-radius:var(--r);padding:16px 20px;margin-bottom:22px;">
+    <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--mtr);margin-bottom:6px;">🦉 Cauvery Socrates — What is this?</div>
+    <div style="font-size:12px;color:var(--muted);">Cauvery Socrates doesn't give you answers — it asks you the right questions. Pick a question below (English or Tamil) to start your own thinking process. The goal is deep understanding, not shortcuts. CB Research's Socratic learning engine for investors.</div>
+  </div>
+
+  <!-- ENGLISH QUESTIONS -->
+  <div class="sec-hdr" style="font-size:1rem;margin-bottom:14px;">English — Socratic Questions on MTAR Technologies</div>
+  <div id="mtrSocEnPanel" style="display:block;">
+    <div style="display:grid;gap:10px;margin-bottom:22px;">
+
+      <!-- Q1 -->
+      <div class="card" style="border-left:4px solid var(--mtr);cursor:pointer;" onclick="mtrSocToggle('en1')">
+        <div style="font-weight:700;font-size:12.5px;color:var(--mtr);">Q1 · Business Model &amp; Moat</div>
+        <div style="font-size:12px;margin:6px 0;">Why is MTAR described as having a "qualification moat" rather than just a "technology moat"? What is the practical difference for an investor?</div>
+        <div id="mtrSocEn1" style="display:none;margin-top:10px;padding:12px;background:var(--mtr-s);border-radius:8px;font-size:12px;color:var(--text);">
+          <strong>Think about this:</strong><br>A technology moat means a company has superior tech — but a competitor can research and replicate it, sometimes in 2–3 years. A qualification moat is different: it means the customer has formally approved <em>this specific factory, this specific process, this specific person's work</em> for a safety-critical or mission-critical application. For NPCIL (nuclear), every welding procedure and heat-treatment cycle is independently approved by AERB. Replacing MTAR would mean re-running those approvals from scratch — a 3–5 year, multi-crore process the customer has every incentive to avoid.<br><br>
+          <strong>The investor implication:</strong> Qualification moats can't be bought or copied quickly. They create switching costs so high that the rational customer keeps using the same supplier even if a cheaper competitor exists. This is fundamentally more durable than a patent or a trade secret — because the moat lives in the customer's own approval system, not just in MTAR's factory.<br><br>
+          <strong>Follow-up question to yourself:</strong> Does this moat apply equally to all four of MTAR's segments? Hint: compare nuclear/aerospace (deep qualification) vs. oil &amp; gas (new, unproven).
+        </div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="card" style="border-left:4px solid var(--ce);cursor:pointer;" onclick="mtrSocToggle('en2')">
+        <div style="font-weight:700;font-size:12.5px;color:var(--ce);">Q2 · Concentration Risk</div>
+        <div style="font-size:12px;margin:6px 0;">Bloom Energy is ~60% of MTAR's revenue. When you look at the stock's 8% single-day drop on 11-Jun-2026, what does that tell you about how the market is pricing this company?</div>
+        <div id="mtrSocEn2" style="display:none;margin-top:10px;padding:12px;background:#e8f5ec;border-radius:8px;font-size:12px;color:var(--text);">
+          <strong>Think about this:</strong><br>The stock dropped ~8% because Crusoe (an AI data-centre company) paused Project Jade — a project where Bloom Energy was the fuel-cell supplier. Notice: no MTAR order was cancelled. No customer contacted MTAR. A third-party company's capex decision caused an 8% move in MTAR's market cap (roughly ₹2,100 Cr destroyed in one day).<br><br>
+          <strong>What this reveals:</strong> The market isn't just pricing MTAR's order book — it's pricing the <em>narrative pipeline</em> several links up the chain: AI capex → Bloom Energy orders → MTAR orders. Any weakness in that narrative chain hits the stock even before it hits the financials. At a ~285x P/E, you are not buying earnings — you are buying a narrative. Narrative assets are inherently more volatile.<br><br>
+          <strong>Follow-up question to yourself:</strong> If you owned MTAR and the stock dropped 8% on news that didn't affect the order book, would you add more, hold, or sell? What would change your decision?
+        </div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="card" style="border-left:4px solid var(--nu);cursor:pointer;" onclick="mtrSocToggle('en3')">
+        <div style="font-weight:700;font-size:12.5px;color:var(--nu);">Q3 · Valuation</div>
+        <div style="font-size:12px;margin:6px 0;">MTAR trades at ~285x trailing P/E. Motilal Oswal's target price of ₹8,000 is built on 60x FY28E EPS. Walk through what "60x FY28E" actually means and what you are assuming when you own the stock today at ₹8,434.</div>
+        <div id="mtrSocEn3" style="display:none;margin-top:10px;padding:12px;background:#f3ebfa;border-radius:8px;font-size:12px;color:var(--text);">
+          <strong>Think about this:</strong><br>If MOSL values MTAR at 60x FY28E EPS and that gives a target of ₹8,000, then FY28E EPS = ₹8,000 ÷ 60 = ~₹133/share. MTAR's FY26 EPS was ~₹29.5 (PAT ₹94 Cr / 3.18 Cr shares). To reach ₹133 EPS by FY28, PAT must grow from ₹94 Cr → ~₹423 Cr in just 2 years — a 4.5x jump. That requires FY27 revenue to hit ~₹1,600 Cr (80% growth) AND margins to expand AND earnings to follow.<br><br>
+          <strong>The compounding problem:</strong> Even at that ₹8,000 target, the stock's current price of ₹8,434 is already above it — meaning at today's price, a perfect execution of all management guidance still gives you ~5% downside to the analyst's best case.<br><br>
+          <strong>Follow-up question to yourself:</strong> What is the appropriate P/E multiple for a company that is growing at 80% but whose single largest customer (60% revenue) has lumpily-growing capex dependent on AI data-centre decisions? Compare to 35x (sector average) and think about why MTAR deserves more — and how much more.
+        </div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="card" style="border-left:4px solid var(--ad);cursor:pointer;" onclick="mtrSocToggle('en4')">
+        <div style="font-weight:700;font-size:12.5px;color:var(--ad);">Q4 · Working Capital</div>
+        <div style="font-size:12px;margin:6px 0;">MTAR has ₹500.5 Cr of inventory and ₹336.8 Cr of receivables against ₹876 Cr of revenue. NWC days are 172. Is this a sign of financial mismanagement or a structural feature of the business? How would you decide?</div>
+        <div id="mtrSocEn4" style="display:none;margin-top:10px;padding:12px;background:#fdeaea;border-radius:8px;font-size:12px;color:var(--text);">
+          <strong>Think about this:</strong><br>High NWC is usually a red flag — it means cash is stuck in the business and not generating returns. But in MTAR's case, you need to ask: <em>why</em> is inventory high? Because precision engineering for nuclear and aerospace requires long lead-time raw materials (12–18 months), multi-month machining cycles, and qualification-lot buffers you can't rush. You cannot ask NPCIL to "just wait" while you order the Inconel. The inventory exists because of the moat, not despite it.<br><br>
+          <strong>The receivables side:</strong> Government-linked customers (NPCIL, HAL) and large-programme customers (Bloom Energy) all have defined payment terms that are contractually set — MTAR cannot unilaterally demand faster payment without risking the relationship. So high receivables are also structural.<br><br>
+          <strong>The test:</strong> Is NWC <em>improving or deteriorating</em> as revenue grows? FY26 NWC days improved to 172 vs prior periods. If NWC days keep rising faster than revenue, that would be a problem. The current trajectory is acceptable — but it demands ongoing scrutiny.
+        </div>
+      </div>
+
+      <!-- Q5 -->
+      <div class="card" style="border-left:4px solid var(--gold);cursor:pointer;" onclick="mtrSocToggle('en5')">
+        <div style="font-weight:700;font-size:12.5px;color:var(--gold);">Q5 · FY27 Guidance Check</div>
+        <div style="font-size:12px;margin:6px 0;">Management has guided for 80%+ revenue growth in FY27 and ₹5,000 Cr order book. What are the 3 most critical things that must go right for this guidance to be achieved?</div>
+        <div id="mtrSocEn5" style="display:none;margin-top:10px;padding:12px;background:var(--gold-s);border-radius:8px;font-size:12px;color:var(--text);">
+          <strong>Think through each pillar:</strong><br>
+          <strong>1. Bloom Energy order execution:</strong> 80% growth means ~₹1,580 Cr revenue in FY27. Bloom must provide orders at the pace and volume management expects. The Oracle–Bloom 2.8 GW partnership and the residual of the Sep-2025 ₹386 Cr order are key sources. If Bloom's AI data-centre customers (Oracle, others) slow their capex, order inflow to MTAR slows — even if cancellations don't happen.<br><br>
+          <strong>2. Adibatla Oil &amp; Gas facility commissioning on schedule:</strong> ₹90 Cr/year from Weatherford starts only once Adibatla is operational. Delays push revenue to FY28.<br><br>
+          <strong>3. Gross margin recovery to 47%+:</strong> Q4 FY26 showed gross margin compress to 44.2% (from 52.3% a year ago). EBITDA of 24% is achievable only if gross margins recover AND fixed cost absorption improves on higher volumes. If product mix stays unfavourable (more Bloom hot-boxes at lower margin), EBITDA may stay at 20–21% even on higher revenue.<br><br>
+          <strong>Follow-up:</strong> Of these three, which is most outside MTAR's control? That's your primary risk to monitor in Q1 FY27 results.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TAMIL QUESTIONS -->
+  <div class="sec-hdr" style="font-size:1rem;margin-bottom:14px;margin-top:10px;">தமிழ் — MTAR பத்தி Cauvery Socrates கேள்விகள்</div>
+  <div style="display:grid;gap:10px;margin-bottom:20px;">
+
+    <div class="card" style="border-left:4px solid var(--mtr);cursor:pointer;" onclick="mtrSocToggle('ta1')">
+      <div style="font-weight:700;font-size:12.5px;color:var(--mtr);">கே.1 · தொழில் மாதிரி</div>
+      <div style="font-size:12px;margin:6px 0;">MTAR-ஐ "Qualification Moat" உள்ள company என்று ஏன் சொல்கிறார்கள்? இது சாதாரண technology moat-ஐ விட எப்படி வித்தியாசமாக இருக்கு?</div>
+      <div id="mtrSocTa1" style="display:none;margin-top:10px;padding:12px;background:var(--mtr-s);border-radius:8px;font-size:12px;color:var(--text);">
+        <strong>யோசியுங்க:</strong><br>Technology moat என்பது — ஒரு company-க்கு superior technology இருக்கு. ஆனால் competitor 2–3 வருஷத்தில் copy பண்ணிடலாம். ஆனால் Qualification moat வேற மாதிரி — customer தனது safety-critical application-க்காக இந்த specific factory, இந்த specific process-ஐ formally approve பண்ணிருக்கார். NPCIL (nuclear)-க்கு MTAR-ஓட ஒவ்வொரு welding procedure-ம் AERB approve பண்ணியிருக்கு. MTAR-ஐ மாத்தணும்னா, அந்த approvals எல்லாத்தையும் மீண்டும் 3–5 வருஷம் எடுத்து பண்ணணும். Customer அதை avoid பண்ண விரும்புவார்.<br><br>
+        <strong>Investor-க்கு என்ன அர்த்தம்:</strong> Qualification moat-ஐ எந்த competitor-உம் quickly replicate பண்ண முடியாது — ஏன்னா அந்த moat customer-ஓட own approval system-ல இருக்கு, MTAR-ஓட factory-ல மட்டும் இல்ல.<br><br>
+        <strong>உங்களுக்கு ஒரு கேள்வி:</strong> MTAR-ஓட நான்கு segments-ல எல்லாவற்றுக்கும் இந்த moat equal-ஆ apply ஆகுதா? Nuclear vs Oil &amp; Gas (புது vertical) compare பண்ணுங்க.
+      </div>
+    </div>
+
+    <div class="card" style="border-left:4px solid var(--ce);cursor:pointer;" onclick="mtrSocToggle('ta2')">
+      <div style="font-weight:700;font-size:12.5px;color:var(--ce);">கே.2 · Concentration Risk</div>
+      <div style="font-size:12px;margin:6px 0;">Bloom Energy MTAR-ஓட ~60% revenue. 11-Jun-2026 அன்று stock 8% drop ஆனது ஏன்? இது investor-க்கு என்ன lesson சொல்றது?</div>
+      <div id="mtrSocTa2" style="display:none;margin-top:10px;padding:12px;background:#e8f5ec;border-radius:8px;font-size:12px;color:var(--text);">
+        <strong>யோசியுங்க:</strong><br>Crusoe (ஒரு AI data-centre company) Project Jade-ஐ pause பண்ணுச்சு. அவங்க Bloom Energy-ஓட fuel cell customer. MTAR-க்கு எந்த order-உம் cancel ஆகல. ஆனால் MTAR stock 8% drop — market cap ₹2,100 Cr ஒரே நாளில் போச்சு.<br><br>
+        <strong>Lesson:</strong> ~285x P/E-ல நீங்க வாங்கறது MTAR-ஓட current earnings-ஐ இல்ல — AI capex → Bloom orders → MTAR orders என்ற narrative chain-ஐ வாங்கறீங்க. Narrative asset-கள் volatile — ஒரு link பாதிக்கப்பட்டாலும் stock ஆடும்.<br><br>
+        <strong>உங்களுக்கு ஒரு கேள்வி:</strong> இந்த 8% drop-ல நீங்க என்ன பண்ணியிருப்பீங்க — மேலும் வாங்குவீங்களா, hold பண்ணுவீங்களா, sell பண்ணுவீங்களா? எது உங்க decision-ஐ மாத்தும்?
+      </div>
+    </div>
+
+    <div class="card" style="border-left:4px solid var(--nu);cursor:pointer;" onclick="mtrSocToggle('ta3')">
+      <div style="font-weight:700;font-size:12.5px;color:var(--nu);">கே.3 · Valuation யோசிக்கணும்</div>
+      <div style="font-size:12px;margin:6px 0;">MTAR ~285x trailing P/E. Motilal Oswal ₹8,000 target பண்ணியிருக்காங்க 60x FY28E EPS-ல. Current price ₹8,434 — analyst target-ஐ விட above. இது என்ன சொல்றது?</div>
+      <div id="mtrSocTa3" style="display:none;margin-top:10px;padding:12px;background:#f3ebfa;border-radius:8px;font-size:12px;color:var(--text);">
+        <strong>Calculate பண்ணுங்க:</strong><br>60x FY28E EPS = ₹8,000 target → FY28E EPS = ~₹133. FY26 EPS = ~₹29.5 (₹94 Cr PAT ÷ 3.18 Cr shares). ₹29.5 → ₹133 ஆக வேணும் — 2 வருஷத்தில் 4.5x jump. இதற்கு FY27-ல revenue ~₹1,600 Cr (+80%) AND margin expansion தேவை.<br><br>
+        <strong>கஷ்டமான விஷயம்:</strong> ₹8,000 analyst target = current price ₹8,434-ஐ விட below. அதாவது perfect execution ஆனாலும் ~5% downside. Flawless execution + best case scenario = still lose money at today's price.<br><br>
+        <strong>உங்களுக்கு ஒரு கேள்வி:</strong> 80% growth company-க்கு 35x P/E (sector average) போதுமா? அல்லது more deserve பண்றதா? எத்தனை x justify ஆகும்?
+      </div>
+    </div>
+
+    <div class="card" style="border-left:4px solid var(--gold);cursor:pointer;" onclick="mtrSocToggle('ta4')">
+      <div style="font-weight:700;font-size:12.5px;color:var(--gold);">கே.4 · FY27 Guidance Reality Check</div>
+      <div style="font-size:12px;margin:6px 0;">Management 80%+ revenue growth guide பண்ணியிருக்காங்க FY27-க்கு. இது achieve ஆக என்ன 3 முக்கியமான விஷயங்கள் நடக்கணும்?</div>
+      <div id="mtrSocTa4" style="display:none;margin-top:10px;padding:12px;background:var(--gold-s);border-radius:8px;font-size:12px;color:var(--text);">
+        <strong>மூன்று pillars:</strong><br>
+        <strong>1. Bloom Energy orders on track:</strong> 80% growth = ~₹1,580 Cr FY27 revenue. Bloom-இன் AI data-centre customers (Oracle) capex slow ஆனா, MTAR-க்கு order inflow slow ஆகும்.<br><br>
+        <strong>2. Adibatla facility commission on time:</strong> Weatherford-க்கு ₹90 Cr/yr Oil &amp; Gas revenue, Adibatla factory ready ஆனா மட்டும் start ஆகும். Delay = FY28-க்கு push.<br><br>
+        <strong>3. Gross margin recovery:</strong> Q4 FY26-ல gross margin 44.2% — previously 52.3% இருந்தது. 24% EBITDA guidance achieve ஆக margins மேலே போகணும். Mixed product revenue இருந்தா margin recover ஆகாது.<br><br>
+        <strong>உங்களுக்கு ஒரு கேள்வி:</strong> இந்த மூன்றில் எது MTAR-ஓட control-க்கு வெளியே? அதுதான் Q1 FY27 results-ல நீங்க watch பண்ண வேண்டிய key number.
+      </div>
+    </div>
+
+  </div>
+  <div class="watermark" style="padding-top:4px;">🦉 Cauvery Socrates · CB Research · Think Before You Invest · Click any question to reveal the thinking framework</div>
+</div>
+
 <div class="watermark">CB Research · Cauvery Business · MTAR Technologies Q4 FY26 Intelligence Dashboard v2 · Audited BSE/NSE Data Only · No Buy/Sell/Hold Recommendation by CB Research · 20-Jun-2026</div>
 
-</div><!-- /main -->
+</div><!-- /mtr-main -->
 </div><!-- /sec-MTAR -->
 
 <!-- ═══════════════════════ INOX INDIA SECTION ═══════════════════════ -->
@@ -906,6 +1045,7 @@ var CO={
   <button class="tab-btn" onclick="showTab('inox','analyst',this)">Analysts' Ratings</button>
   <button class="tab-btn" onclick="showTab('inox','outlook',this)" style="color:#c2410c;font-weight:800;">FY27 Outlook</button>
   <button class="tab-btn" onclick="showTab('inox','cb',this)" style="color:var(--inx);font-weight:800;">CB Assist</button>
+  <button class="tab-btn" onclick="showTab('inox','socrates',this)" style="color:#b8911e;font-weight:800;">🦉 Cauvery Socrates</button>
 </div>
 
 <div class="main">
@@ -1063,6 +1203,20 @@ var CO={
   </table>
   <div class="note-box inx-nb">
     EBITDA margins dipped slightly from FY25's ~24% to FY26's 23.8% primarily due to ramp-up costs at the new Savli facility (staff hired ahead of full productivity) and a higher mix of project-based LNG revenues (large terminals carry lower margins than standard equipment). The company's clean balance sheet — zero net debt, ₹257 Cr free cash, 37% ROCE — is its most important structural differentiator versus many capital-intensive manufacturing peers.
+  </div>
+
+  <!-- CB Rating — Financials -->
+  <div class="sec-hdr" style="margin-top:28px;font-size:1.05rem;">CB Rating — Financials <span class="sec-note">· CBF26 Framework · g / m / d / v / t / r Factors · No Buy/Sell/Hold</span></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px;">
+    <div class="kpi inx-a"><div class="kl">g — Growth</div><div class="kv" style="color:#15803d;">★★★★☆</div><div class="kc pos">Revenue +21.2% · PAT +19.3% FY26. Highest-ever revenue. Export revenue +37.7% YoY.</div></div>
+    <div class="kpi lg-a"><div class="kl">m — Margins</div><div class="kv" style="color:#15803d;">★★★★☆</div><div class="kc pos">EBITDA ~23.8% FY26. PAT margin ~16%. Strong vs industry. Savli ramp-up created transient dip.</div></div>
+    <div class="kpi inx-a"><div class="kl">d — Debt / Balance Sheet</div><div class="kv" style="color:#15803d;">★★★★★</div><div class="kc pos">Zero net debt. ₹257 Cr free cash. 37% ROCE. Promoter 75%. Best-in-class balance sheet.</div></div>
+    <div class="kpi ig-a"><div class="kl">v — Valuation</div><div class="kv" style="color:#c2410c;">★★☆☆☆</div><div class="kc warn">~60x trailing P/E · P/B 15.6x. Q4 PAT growth only 9% vs 60x P/E. Consensus target implies ~28% downside.</div></div>
+    <div class="kpi cs-a"><div class="kl">t — Track Record</div><div class="kv" style="color:#15803d;">★★★★☆</div><div class="kc pos">FY24→FY25→FY26 revenue: ₹1,117→₹1,347→₹1,632 Cr. PAT: ₹186→₹219→₹261 Cr. Consistent compounder.</div></div>
+    <div class="kpi lg-a"><div class="kl">r — Risk</div><div class="kv" style="color:#c2410c;">★★★☆☆</div><div class="kc warn">SpaceX narrative vs fundamentals gap. US tariff on cylinders. Savli ramp-up costs. LNG project lumpiness.</div></div>
+  </div>
+  <div class="note-box" style="border-left:4px solid #1e6b4f;">
+    <strong>CBF26 Financial Summary — INOX India:</strong> INOX India is a high-quality, consistent compounder with a standout balance sheet (d★★★★★). The growth trajectory is steady rather than explosive — a 20%+ compounder, not an 80%+ growth story. Margins are healthy and structurally defensible. The only meaningful financial concern is that the current valuation (~60x P/E) embeds far more than 20% growth, implying significant execution on new adjacencies (aerospace, marine LNG, LAES) must materialise to sustain the multiple. <em>CB Research does not issue buy/sell/hold recommendations.</em>
   </div>
 </div>
 
@@ -1434,6 +1588,134 @@ var CO={
   </div>
 </div>
 
+<!-- ═══ INOX CAUVERY SOCRATES ═══ -->
+<div class="panel" id="inox-tab-socrates">
+  <div class="sec-hdr">🦉 Cauvery Socrates — INOX India <span class="sec-note">· Socratic Learning · English &amp; Tamil · Think Before You Invest</span></div>
+  <div style="background:linear-gradient(135deg,#e6f5ef 0%,#f7f6f2 100%);border:2px solid var(--inx);border-radius:var(--r);padding:16px 20px;margin-bottom:22px;">
+    <div style="font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;color:var(--inx);margin-bottom:6px;">🦉 Cauvery Socrates — What is this?</div>
+    <div style="font-size:12px;color:var(--muted);">Cauvery Socrates doesn't give you answers — it asks you the right questions. Click any question to unlock the thinking framework. Build your conviction the right way — from first principles, not tips.</div>
+  </div>
+
+  <!-- ENGLISH QUESTIONS -->
+  <div class="sec-hdr" style="font-size:1rem;margin-bottom:14px;">English — Socratic Questions on INOX India</div>
+  <div style="display:grid;gap:10px;margin-bottom:22px;">
+
+    <div class="card" style="border-left:4px solid var(--inx);cursor:pointer;" onclick="inxSocToggle('en1')">
+      <div style="font-weight:700;font-size:12.5px;color:var(--inx);">Q1 · Business Model</div>
+      <div style="font-size:12px;margin:6px 0;">INOX India sells cryogenic equipment — tanks, containers, semi-trailers. Why is this a better business than it sounds, and what makes it difficult to replicate?</div>
+      <div id="inxSocEn1" style="display:none;margin-top:10px;padding:12px;background:#e6f5ef;border-radius:8px;font-size:12px;color:var(--text);">
+        <strong>Think about this:</strong><br>On the surface, cryogenic tanks sound like a commodity business — metal tanks that store cold gas. But the reality is that cryogenic engineering operates at the extremes: liquid nitrogen (-196°C), liquid oxygen (-183°C), LNG (-162°C), liquid helium (-269°C). At these temperatures, most metals become brittle, welds crack, and conventional seals fail. The engineering required to build a tank that safely contains 1,500 m3 of liquid oxygen for a rocket launch site involves materials science, vacuum insulation, and precision welding that took INOX 50+ years to master.<br><br>
+        <strong>The moat:</strong> International customers (ITER, Highview, US space company) have approved INOX's designs, processes, and quality systems. Getting a new supplier approved for a fusion energy project or a space-launch facility takes years. 5,000 customers across 100 countries also means INOX has accumulated a knowledge base of requirements that no new entrant can replicate quickly.<br><br>
+        <strong>Follow-up:</strong> Compare INOX's Industrial Gas tanks (repeat, high volume) vs Cryo-Scientific (low volume, ultra-high complexity). Which segment has a deeper moat? Which drives more predictable earnings?
+      </div>
+    </div>
+
+    <div class="card" style="border-left:4px solid var(--inx-lg);cursor:pointer;" onclick="inxSocToggle('en2')">
+      <div style="font-weight:700;font-size:12.5px;color:var(--inx-lg);">Q2 · The SpaceX Question</div>
+      <div style="font-size:12px;margin:6px 0;">INOX India's stock rose ~25% in one month partly due to SpaceX IPO excitement. INOX has not confirmed SpaceX as the customer. How should an investor think about this kind of narrative-driven rally?</div>
+      <div id="inxSocEn2" style="display:none;margin-top:10px;padding:12px;background:#eff6ff;border-radius:8px;font-size:12px;color:var(--text);">
+        <strong>Think about this:</strong><br>There is a real order: ~₹200 Cr from "a leading US-based private space company" — confirmed by management. The order exists. What is <em>not</em> confirmed is that the customer is SpaceX. The ~25% rally was driven partly by investors assuming SpaceX and pricing in the entire SpaceX opportunity (future repeat orders, narrative premium for "being in SpaceX's supply chain").<br><br>
+        <strong>The risk:</strong> If the customer is not SpaceX — say it's Rocket Lab or Blue Origin — the order is still real, but the narrative value collapse would be sharp. The order value doesn't change, but the "story" attached to it does, and at 60x P/E, you are partly paying for story.<br><br>
+        <strong>A useful mental model:</strong> Separate the known facts (₹200 Cr order, real, confirmed) from the extrapolations (SpaceX, multi-billion repeat pipeline, Starship propellant tank opportunity). Value the facts conservatively; assign probability weights to the extrapolations. Don't pay full price for unconfirmed narratives.<br><br>
+        <strong>Follow-up:</strong> If INOX eventually confirms the customer is not SpaceX, what would be a fair P/E for the stock? Would you change your estimate?
+      </div>
+    </div>
+
+    <div class="card" style="border-left:4px solid var(--inx-ig);cursor:pointer;" onclick="inxSocToggle('en3')">
+      <div style="font-weight:700;font-size:12.5px;color:var(--inx-ig);">Q3 · Margins &amp; Profitability</div>
+      <div style="font-size:12px;margin:6px 0;">INOX India's EBITDA margin dipped from 24.9% to 22.7% in Q4 FY26. Management explains this as Savli ramp-up costs. How do you evaluate whether a margin dip is temporary or structural?</div>
+      <div id="inxSocEn3" style="display:none;margin-top:10px;padding:12px;background:#fff7ed;border-radius:8px;font-size:12px;color:var(--text);">
+        <strong>Think through these questions:</strong><br>
+        <strong>1. Is the cause known and bounded?</strong> Savli ramp-up costs are visible — staff hired ahead of productivity, fixed costs absorbed before revenue. This is a time-bounded event, unlike a structural competitive pricing pressure. That's a good sign.<br><br>
+        <strong>2. Is it happening across all segments or just one?</strong> The EBITDA margin dip is partly from project-led LNG orders (Bahamas terminal, marine) — large projects inherently carry lower margins than repeat-order standard tanks. As the product mix normalises, margins may recover without any management action.<br><br>
+        <strong>3. What does the forward-looking guidance say?</strong> Management is guiding 24%+ EBITDA margins in FY27. If Savli reaches capacity and LNG mix normalises, this is achievable. But if the Savli ramp takes longer than guided OR if LNG project revenue grows faster than industrial gas margins, 24% EBITDA stays elusive.<br><br>
+        <strong>The test to watch:</strong> Q1 FY27 and Q2 FY27 EBITDA margin. If it recovers above 23.5%, the thesis is intact. If it stays below 22%, the margin story needs re-examination.
+      </div>
+    </div>
+
+    <div class="card" style="border-left:4px solid var(--inx-cs);cursor:pointer;" onclick="inxSocToggle('en4')">
+      <div style="font-weight:700;font-size:12.5px;color:var(--inx-cs);">Q4 · Balance Sheet as Competitive Advantage</div>
+      <div style="font-size:12px;margin:6px 0;">INOX India has zero net debt, ₹257 Cr free cash, and 37% ROCE. How does a strong balance sheet actually give a manufacturing company a competitive advantage?</div>
+      <div id="inxSocEn4" style="display:none;margin-top:10px;padding:12px;background:#f3ebfa;border-radius:8px;font-size:12px;color:var(--text);">
+        <strong>Think about this:</strong><br>A company with zero debt and ₹257 Cr cash can:<br>
+        1. <strong>Bid aggressively on large orders</strong> — a Bahamas terminal or a marine LNG shipset requires upfront working capital (buy materials, deploy team, build over 12 months, get paid at delivery). A leveraged competitor can't commit to 3 projects simultaneously; INOX can.<br><br>
+        2. <strong>Invest in capabilities without asking shareholders for equity</strong> — the 5th Kandla facility can be funded internally. A competitor with debt on its books needs to either raise equity (diluting shareholders) or raise more debt (raising interest costs).<br><br>
+        3. <strong>Survive downturns</strong> — if LNG capex globally slowdowns for 2 years, INOX can absorb the revenue dip. A leveraged competitor may not survive.<br><br>
+        <strong>The ROCE angle:</strong> 37% ROCE means for every ₹100 of capital employed, INOX earns ₹37 of operating profit. Most manufacturing companies in India manage 12–18%. This means INOX's capital is being deployed into genuinely high-return activities — a sign of moat, pricing power, or both.<br><br>
+        <strong>Follow-up:</strong> Compare INOX's 37% ROCE to MTAR's ROE of ~11.8%. What explains the difference? Think about NWC days and asset intensity.
+      </div>
+    </div>
+
+    <div class="card" style="border-left:4px solid var(--gold);cursor:pointer;" onclick="inxSocToggle('en5')">
+      <div style="font-weight:700;font-size:12.5px;color:var(--gold);">Q5 · Valuation at ₹1,830 (20-Jun-2026)</div>
+      <div style="font-size:12px;margin:6px 0;">Analyst consensus target is ~₹1,320 (28% below CMP). MNCL Group's BUY target is ₹1,656 (still 9% below CMP). The company has delivered 19%+ PAT growth. Is 60x P/E justified?</div>
+      <div id="inxSocEn5" style="display:none;margin-top:10px;padding:12px;background:var(--gold-s);border-radius:8px;font-size:12px;color:var(--text);">
+        <strong>The maths:</strong><br>FY26 PAT = ₹261 Cr. At ₹1,830 CMP, market cap = ₹17,407 Cr. P/E = 17,407 ÷ 261 = ~66x (close to stated ~60x). Growth rate = 19.3% YoY PAT. PEG ratio = 66 ÷ 19.3 = ~3.4x. A PEG above 2 is typically considered expensive for a steady-growth company.<br><br>
+        <strong>What justifies a premium?</strong> Zero net debt, 37% ROCE, 75% promoter holding, genuine new adjacencies (space, marine LNG, LAES), first-mover advantage in Indian cryogenic engineering. These are genuine premium factors.<br><br>
+        <strong>What does NOT justify the premium?</strong> A 25% one-month rally driven by an unconfirmed SpaceX narrative. That's sentiment, not fundamentals.<br><br>
+        <strong>A fair value framework:</strong> If you assume FY27 PAT growth of 20% (guided), FY27E PAT = ~₹313 Cr. At 40x forward P/E (a premium to sector, reflecting quality), fair value = ~₹1,300–1,400/share. At 50x forward, fair value = ~₹1,640/share. The current price at ₹1,830 implies you are paying 58–59x forward earnings — pricing in near-perfection.<br><br>
+        <strong>Final question:</strong> At what price would you be comfortable owning INOX India for a 3-year holding period? Build that number from fundamentals, not from the stock chart.
+      </div>
+    </div>
+
+  </div>
+
+  <!-- TAMIL QUESTIONS -->
+  <div class="sec-hdr" style="font-size:1rem;margin-bottom:14px;">தமிழ் — INOX India பத்தி Cauvery Socrates கேள்விகள்</div>
+  <div style="display:grid;gap:10px;margin-bottom:20px;">
+
+    <div class="card" style="border-left:4px solid var(--inx);cursor:pointer;" onclick="inxSocToggle('ta1')">
+      <div style="font-weight:700;font-size:12.5px;color:var(--inx);">கே.1 · தொழில் மாதிரி</div>
+      <div style="font-size:12px;margin:6px 0;">INOX India cryogenic tanks விற்கிறது. இது ஒரு சாதாரண metal tank company-ஆ? அல்லது இதன் பின்னால் ஒரு deep moat இருக்கா?</div>
+      <div id="inxSocTa1" style="display:none;margin-top:10px;padding:12px;background:#e6f5ef;border-radius:8px;font-size:12px;color:var(--text);">
+        <strong>யோசியுங்க:</strong><br>Cryogenic tanks -196°C முதல் -269°C வரை உள்ள temperatures-ல வேலை பண்ணும். இந்த temperatures-ல ordinary metals brittle ஆகும், welds crack ஆகும். 1,500 m3 liquid oxygen safely store பண்ண rocket launch site-க்கு — இதற்கு 50+ வருட experience-ல வந்த materials science, vacuum insulation, precision welding தேவை.<br><br>
+        <strong>Moat:</strong> ITER (fusion energy), Highview (energy storage), US space company — இவங்கள் எல்லாரும் INOX-ஓட quality systems-ஐ formally approve பண்ணியிருக்காங்க. New supplier-ஐ approve பண்ண years ஆகும். 5,000 customers × 100+ countries = replicate பண்ண முடியாத knowledge base.<br><br>
+        <strong>உங்களுக்கு கேள்வி:</strong> Industrial Gas tanks (repeat, high volume) vs Cryo-Scientific (ultra-complex, low volume) — எதுல deeper moat? எதுல predictable earnings?
+      </div>
+    </div>
+
+    <div class="card" style="border-left:4px solid var(--inx-lg);cursor:pointer;" onclick="inxSocToggle('ta2')">
+      <div style="font-weight:700;font-size:12.5px;color:var(--inx-lg);">கே.2 · SpaceX கேள்வி</div>
+      <div style="font-size:12px;margin:6px 0;">INOX India stock June 2026-ல ~25% jump ஆனது SpaceX IPO excitement-ல. ஆனால் INOX "leading US private space company" மட்டும் confirm பண்ணியிருக்காங்க, SpaceX-ஐ இல்ல. நீங்க investor-ஆ இதை எப்படி evaluate பண்ணுவீங்க?</div>
+      <div id="inxSocTa2" style="display:none;margin-top:10px;padding:12px;background:#eff6ff;border-radius:8px;font-size:12px;color:var(--text);">
+        <strong>Facts vs Extrapolations:</strong><br>
+        <strong>Confirmed facts:</strong> ~₹200 Cr order, real, NSE filed, for US private space company. இது real.<br>
+        <strong>Unconfirmed extrapolations:</strong> Customer = SpaceX; Starship propellant tank opportunity; multi-billion pipeline. இவை narrative — confirmed இல்ல.<br><br>
+        <strong>Risk:</strong> Customer Rocket Lab அல்லது Blue Origin ஆ இருந்தா, order real-ஆ இருக்கும், ஆனால் narrative value crash ஆகும். 60x P/E-ல நீங்க partly story-க்கு pay பண்றீங்க.<br><br>
+        <strong>Mental model:</strong> Known facts-ஐ conservative-ஆ value பண்ணுங்க. Unconfirmed narratives-க்கு probability weight போடுங்க. Story-க்கு full price கொடுக்காதீங்க.<br><br>
+        <strong>உங்களுக்கு கேள்வி:</strong> SpaceX confirm ஆகல என்று INOX சொன்னா, fair P/E என்னவாக இருக்கும்?
+      </div>
+    </div>
+
+    <div class="card" style="border-left:4px solid var(--inx-ig);cursor:pointer;" onclick="inxSocToggle('ta3')">
+      <div style="font-weight:700;font-size:12.5px;color:var(--inx-ig);">கே.3 · Balance Sheet Advantage</div>
+      <div style="font-size:12px;margin:6px 0;">INOX India zero net debt, ₹257 Cr free cash, 37% ROCE. ஒரு manufacturing company-க்கு இந்த balance sheet strength practical-ஆ என்ன advantage தருது?</div>
+      <div id="inxSocTa3" style="display:none;margin-top:10px;padding:12px;background:#fff7ed;border-radius:8px;font-size:12px;color:var(--text);">
+        <strong>யோசியுங்க:</strong><br>
+        <strong>1. Large orders bid பண்ண:</strong> Bahamas terminal போன்ற project-க்கு upfront working capital வேணும் — material வாங்க, team deploy பண்ண, 12 months build பண்ண, delivery-ல மட்டும் payment. Leveraged competitor ஒரே நேரத்தில் 3 projects commit பண்ண முடியாது; INOX பண்ணலாம்.<br><br>
+        <strong>2. Equity dilute பண்ணாம invest பண்ண:</strong> 5th Kandla facility — internally fund பண்ணலாம். Competitor debt இருந்தா equity raise அல்லது more debt எடுக்கணும்.<br><br>
+        <strong>3. Downturn survive:</strong> Global LNG slowdown 2 years வந்தாலும் INOX survive பண்ணும். Leveraged competitor fail ஆகலாம்.<br><br>
+        <strong>37% ROCE:</strong> ₹100 capital-க்கு ₹37 operating profit. Most Indian manufacturers 12–18% மட்டும் பண்றாங்க. இது pricing power மற்றும் moat-ஓட sign.<br><br>
+        <strong>உங்களுக்கு கேள்வி:</strong> INOX ROCE 37% vs MTAR ROE 11.8% — ஏன் இந்த difference? NWC days-ஐ compare பண்ணுங்க.
+      </div>
+    </div>
+
+    <div class="card" style="border-left:4px solid var(--gold);cursor:pointer;" onclick="inxSocToggle('ta4')">
+      <div style="font-weight:700;font-size:12.5px;color:var(--gold);">கே.4 · ₹1,830-ல Valuation</div>
+      <div style="font-size:12px;margin:6px 0;">Analyst consensus ₹1,320 target (CMP-ஐ விட 28% below). PAT growth 19.3%. P/E ~60x. இந்த stock buy பண்றது smart-ஆ?</div>
+      <div id="inxSocTa4" style="display:none;margin-top:10px;padding:12px;background:var(--gold-s);border-radius:8px;font-size:12px;color:var(--text);">
+        <strong>Calculate பண்ணுங்க:</strong><br>FY26 PAT ₹261 Cr. Market cap ₹17,407 Cr. P/E = ~66x. Growth rate = 19.3%. PEG = 66 ÷ 19.3 = 3.4x. PEG 2-ஐ விட அதிகமா இருந்தா expensive — இது 3.4x.<br><br>
+        <strong>Premium justify பண்றது:</strong> Zero debt, 37% ROCE, 75% promoter, new adjacencies (space, marine LNG). Real quality factors.<br><br>
+        <strong>Premium justify பண்ணாதது:</strong> Unconfirmed SpaceX narrative-ல 25% one-month rally. Sentiment, not fundamentals.<br><br>
+        <strong>Fair value framework:</strong> FY27E PAT growth 20% assume பண்ணா → PAT ~₹313 Cr. 40x forward P/E (quality premium) → fair value ~₹1,300–1,400. 50x forward → ~₹1,640. Current ₹1,830 = 58x forward — near perfection pricing.<br><br>
+        <strong>Final கேள்வி:</strong> 3 வருட holding period-க்கு நீங்க INOX-ஐ comfortable-ஆ என்ன price-ல வாங்குவீங்க? Stock chart பார்க்காம, fundamentals-ல இருந்து calculate பண்ணுங்க.
+      </div>
+    </div>
+
+  </div>
+  <div class="watermark" style="padding-top:4px;">🦉 Cauvery Socrates · CB Research · Think Before You Invest · Click any question to reveal the thinking framework</div>
+</div>
+
 </div><!-- /inox main -->
 </div><!-- /sec-INOX -->
 
@@ -1441,7 +1723,8 @@ var CO={
 
 <script>
 function showTab(co,id,btn){
-  const sec='#sec-'+co.toUpperCase();
+  const coMap={mtr:'MTAR',inox:'INOX'};
+  const sec='#sec-'+(coMap[co.toLowerCase()]||co.toUpperCase());
   const navId='#'+co.toLowerCase()+'-nav';
   document.querySelectorAll(sec+' .panel').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById(co.toLowerCase()+'-tab-'+id);
@@ -1802,6 +2085,23 @@ function initINOXCharts(){
 
 
 /* ─── Override showTab to handle INOX charts ─── */
+
+/* ─── Cauvery Socrates Toggle Functions ─── */
+function mtrSocToggle(id){
+  const el=document.getElementById('mtrSoc'+id.charAt(0).toUpperCase()+id.slice(1));
+  if(!el)return;
+  const isOpen=el.style.display!=='none';
+  // Close all in section
+  document.querySelectorAll('[id^="mtrSocEn"],[id^="mtrSocTa"]').forEach(e=>e.style.display='none');
+  if(!isOpen)el.style.display='block';
+}
+function inxSocToggle(id){
+  const el=document.getElementById('inxSoc'+id.charAt(0).toUpperCase()+id.slice(1));
+  if(!el)return;
+  const isOpen=el.style.display!=='none';
+  document.querySelectorAll('[id^="inxSocEn"],[id^="inxSocTa"]').forEach(e=>e.style.display='none');
+  if(!isOpen)el.style.display='block';
+}
 </script>
 
 </body>
