@@ -1221,7 +1221,7 @@ tr:last-child td{border-bottom:none;}
 <div class="page" id="page-sectors">
   <div class="hdr">
     <h1>🧭 Sector Impact — Reasoned, Not Scored</h1>
-    <p>34 sectors · each judged on its OWN business metrics · every 🟢/🔴 comes with the actual cause-and-effect from today's macro inputs</p>
+    <p><span id="si-sector-count">34</span> sectors · each judged on its OWN business metrics · every 🟢/🔴 comes with the actual cause-and-effect from today's macro inputs</p>
     <div class="hdr-meta">
       <span class="badge">🟢 Tailwind: <span id="si-green">—</span></span>
       <span class="badge">🔴 Headwind: <span id="si-red">—</span></span>
@@ -2305,7 +2305,29 @@ const GR_FILE_MAP=[
  {kw:'pv_sector',sectors:['Auto 4W']},
  {kw:'telecom',sectors:['Telecom']},
  {kw:'fmcg',sectors:['FMCG']},
- {kw:'mcx',sectors:['Exchanges / Depositories']}
+ {kw:'mcx',sectors:['Exchanges / Depositories']},
+ // ── added 3rd/4th week June 2026 batch ──
+ {kw:'broking',sectors:['Brokers / Wealth']},
+ {kw:'broker',sectors:['Brokers / Wealth']},
+ {kw:'hfc',sectors:['Housing Finance']},
+ {kw:'housing',sectors:['Housing Finance']},
+ {kw:'mtar',sectors:['Defence']},
+ {kw:'newage',sectors:['New Age / Platforms']},
+ {kw:'new_age',sectors:['New Age / Platforms']},
+ {kw:'new-age',sectors:['New Age / Platforms']},
+ {kw:'dairy',sectors:['Dairy']},
+ {kw:'fertiliz',sectors:['Fertilizers']},
+ {kw:'fertilis',sectors:['Fertilizers']},
+ {kw:'cams',sectors:['Exchanges / Depositories']},
+ {kw:'kfintech',sectors:['Exchanges / Depositories']},
+ {kw:'inox',sectors:['Capital Goods']},
+ {kw:'vernova',sectors:['Capital Goods']},
+ {kw:'electroplast',sectors:['EMS']},
+ {kw:'bluejet',sectors:['Pharma']},
+ {kw:'lg_electronics',sectors:['Consumer Durables']},
+ {kw:'durables',sectors:['Consumer Durables']},
+ {kw:'cera',sectors:['Building Materials']},
+ {kw:'sanitaryware',sectors:['Building Materials']}
 ];
 function grMapFile(entry){
   if(typeof entry==='object'&&entry.file) return {file:entry.file,sectors:entry.sectors||grKw(entry.file),split:entry.split||null,tokens:entry.tokens||null,exclude:entry.exclude||null,companies:entry.companies||null};
@@ -2748,6 +2770,11 @@ const SECTOR_IMPACT=[
  rules:[
   c=>c.sc('Capex')>=2?{p:2,r:`Infra + housing capex ${c.lab('Capex')} — cement volume is the most direct physical proxy of construction activity; utilisation and pricing power both improve.`}:null,
   c=>c.crude>=85?{p:-2,r:`Crude at ${c.crudeTxt} — pet coke, diesel freight and packing costs all track crude; every $10/bbl adds roughly ₹80–120/tonne to cost. EBITDA/tonne compresses unless prices are hiked.`}:c.crude<=70?{p:1,r:`Crude at ${c.crudeTxt} — fuel and freight relief flows straight to EBITDA/tonne; cement is among the biggest beneficiaries of cheap energy.`}:null]},
+{name:"Building Materials",group:"Manufacturing",icon:"🚪",links:["Real Estate/Housing★","RBI Rates","Crude (PVC/resin feedstock)"],
+ metrics:["Volume growth","Realisation / premiumisation mix","Dealer & channel inventory days","EBITDA margin","Capacity utilisation","Crude-linked input cost (pipes/laminates)"],
+ rules:[
+  c=>c.sc('Interest')>=2?{p:2,r:`Rate cuts (${c.lab('Interest')}) — cheaper home loans accelerate the housing cycle that sanitaryware, tiles, pipes and plywood ride a few quarters behind; demand tracks construction starts, not just completions.`}:c.sc('Interest')<=-2?{p:-2,r:`Rate hikes — housing construction starts slow first, and building-material offtake follows with a 2–3 quarter lag as projects already underway get finished ahead of new launches.`}:null,
+  c=>c.crude>=85?{p:-1,r:`Crude at ${c.crudeTxt} — PVC pipe and resin/laminate-based product makers see input costs rise directly; gas-fired ceramic/tile/sanitaryware players are largely insulated from crude itself.`}:null]},
 {name:"Metals",group:"Manufacturing",icon:"⛏",links:["Global/China★","Rupee"],
  metrics:["Realisation/tonne","EBITDA/tonne","Volume growth","China price/export trend","Net debt/EBITDA","Capex cycle stage"],
  rules:[
@@ -2763,6 +2790,11 @@ const SECTOR_IMPACT=[
  rules:[
   c=>c.crude>=85?{p:1,r:`Crude at ${c.crudeTxt} — high crude strengthens the case for ethanol blending economics and govt willingness to raise ethanol procurement prices; distillery-heavy players benefit.`}:null,
   c=>c.sc('Monsoon')<=-1?{p:-1,r:`Monsoon stress (${c.lab('Monsoon')}) — cane availability and recovery rates fall; crushing volumes and ethanol feedstock both shrink the following season.`}:c.sc('Monsoon')>=1?{p:1,r:`Good monsoon (${c.lab('Monsoon')}) — healthy cane crop supports crushing volumes and keeps cane cost inflation manageable.`}:null]},
+{name:"Fertilizers",group:"Manufacturing",icon:"🌱",links:["Monsoon★ (sowing & demand)","Govt Subsidy Policy","Crude/Gas Feedstock"],
+ metrics:["Sales volume (urea/DAP/NPK)","Subsidy receivable days","Gas/feedstock cost","Capacity utilisation","Realisation vs MRP","Non-subsidy (specialty) mix"],
+ rules:[
+  c=>c.sc('Monsoon')>=1?{p:2,r:`Good monsoon (${c.lab('Monsoon')}) — higher sowing area directly lifts fertiliser offtake; urea and DAP volumes track kharif acreage closely.`}:c.sc('Monsoon')<=-1?{p:-2,r:`Monsoon stress (${c.lab('Monsoon')}) — lower sowing area and farmer cash stress cut fertiliser volumes; dealer-level inventory builds.`}:null,
+  c=>c.crude>=85?{p:-1,r:`Crude at ${c.crudeTxt} — gas-linked feedstock cost for urea/ammonia rises; companies depend on timely subsidy reimbursement to protect margins.`}:c.crude<=70?{p:1,r:`Crude at ${c.crudeTxt} — cheaper gas feedstock improves urea economics and reduces the subsidy burden, helping receivable cycles.`}:null]},
 {name:"Chemicals / Specialty",group:"Manufacturing",icon:"🧪",links:["Crude (feedstock)★","China Dumping","Rupee"],
  metrics:["Volume vs realisation split","EBITDA margin trend","China dumping pressure","Capex / new product pipeline","ROCE","Destocking cycle stage"],
  rules:[
@@ -2824,11 +2856,21 @@ const SECTOR_IMPACT=[
  rules:[
   c=>c.sc('Inflation')>=2?{p:2,r:`Inflation comfortable (${c.lab('Inflation')}) — input costs (palm oil, packaging, agri) ease while consumer wallets recover; gross margin and volume growth improve together.`}:c.sc('Inflation')<=-1?{p:-2,r:`Elevated inflation (${c.lab('Inflation')}) — the double squeeze: input costs up AND consumer downtrading to smaller packs. Volume growth, the metric that matters, stalls.`}:null,
   c=>c.sc('Monsoon')>=1?{p:1,r:`Good monsoon (${c.lab('Monsoon')}) — rural is ~35–40% of FMCG sales; farm income recovery shows up in rural volume growth within 2 quarters.`}:c.sc('Monsoon')<=-1?{p:-1,r:`Weak monsoon (${c.lab('Monsoon')}) — rural demand, already the weak leg, deteriorates further; urban premiumisation can't fully offset.`}:null]},
+{name:"Dairy",group:"Consumption & Services",icon:"🥛",links:["Monsoon★ (fodder & yield)","Rural Demand","Feed Cost"],
+ metrics:["Milk procurement price (₹/litre)","Value-added product (VAP) mix %","Revenue per litre","EBITDA margin","Volume growth","Working capital cycle","Rural collection network"],
+ rules:[
+  c=>c.sc('Monsoon')>=1?{p:2,r:`Good monsoon (${c.lab('Monsoon')}) — fodder availability and milk yield improve directly; procurement cost stays manageable and volume growth follows within a quarter.`}:c.sc('Monsoon')<=-1?{p:-2,r:`Monsoon stress (${c.lab('Monsoon')}) — fodder shortage pushes up cattle feed and procurement cost just as rural cash flow weakens; milk availability tightens.`}:null,
+  c=>c.sc('Inflation')<=-1?{p:-1,r:`Elevated inflation (${c.lab('Inflation')}) — squeezed household budgets shift demand from value-added products (ghee, cheese, paneer) back to plain liquid milk, hurting the higher-margin VAP mix.`}:c.sc('Inflation')>=2?{p:1,r:`Inflation comfortable (${c.lab('Inflation')}) — consumers trade up to value-added dairy; VAP mix and realisation per litre both improve.`}:null]},
 {name:"Retail",group:"Consumption & Services",icon:"🛍",links:["Urban Consumption★","Inflation"],
  metrics:["SSSG (same-store sales growth)","Store addition pace","Gross margin","Inventory turns","Revenue/sq ft","Footfalls vs ticket size"],
  rules:[
   c=>c.sc('Inflation')<=-1?{p:-2,r:`Elevated inflation (${c.lab('Inflation')}) — discretionary retail is the first cut in a squeezed household budget; SSSG turns negative before FMCG volumes do.`}:c.sc('Inflation')>=2?{p:1,r:`Inflation easing (${c.lab('Inflation')}) — discretionary wallet recovers; footfalls and ticket sizes both improve.`}:null,
   c=>c.sc('Earnings')>=1?{p:1,r:`Income growth healthy (${c.lab('Earnings')}) — urban salaried spending power supports premium retail SSSG and justifies store expansion capex.`}:null]},
+{name:"Consumer Durables",group:"Consumption & Services",icon:"📺",links:["Urban Discretionary★","Inflation","Interest Rates (EMI purchases)"],
+ metrics:["Volume growth","Premiumisation mix","Channel inventory days","EBITDA margin","Summer-season sell-through (AC/cooling)","Rural penetration"],
+ rules:[
+  c=>c.sc('Inflation')<=-1?{p:-1,r:`Elevated inflation (${c.lab('Inflation')}) — discretionary durables purchases get deferred first as households protect essential spending; volume growth slows even where value growth holds up on price hikes.`}:c.sc('Inflation')>=2?{p:1,r:`Inflation comfortable (${c.lab('Inflation')}) — disposable income recovers and replacement-cycle plus premiumisation demand for appliances and electronics picks up.`}:null,
+  c=>c.sc('Interest')>=2?{p:1,r:`Rate cuts (${c.lab('Interest')}) — durables purchases are increasingly EMI/no-cost-finance driven; cheaper consumer credit directly expands the addressable buyer base for ACs, TVs and large appliances.`}:c.sc('Interest')<=-2?{p:-1,r:`Rate hikes — EMI cost rises on financed purchases, pushing marginal buyers to defer upgrades or trade down a price tier.`}:null]},
 {name:"Hotels",group:"Consumption & Services",icon:"🏨",links:["Urban Discretionary★","Corporate Travel"],
  metrics:["ARR growth","Occupancy %","RevPAR","Room pipeline (owned vs managed)","EBITDA margin","Corporate vs leisure mix"],
  rules:[
@@ -2917,6 +2959,7 @@ function renderSectorImpact(){
   document.getElementById('si-green').textContent=g;
   document.getElementById('si-red').textContent=r;
   document.getElementById('si-neu').textContent=n;
+  const scEl=document.getElementById('si-sector-count'); if(scEl) scEl.textContent=SECTOR_IMPACT.length;
   document.getElementById('si-drivers').textContent=`Crude ${ctx.crudeTxt.split(' ')[0]} · INR ${ctx.inrTxt.split(' ')[0]}`;
   // filter chips
   const fl=document.getElementById('si-filters');
