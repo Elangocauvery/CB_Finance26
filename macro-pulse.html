@@ -1221,7 +1221,7 @@ tr:last-child td{border-bottom:none;}
 <div class="page" id="page-sectors">
   <div class="hdr">
     <h1>🧭 Sector Impact — Reasoned, Not Scored</h1>
-    <p><span id="si-sector-count">34</span> sectors · each judged on its OWN business metrics · every 🟢/🔴 comes with the actual cause-and-effect from today's macro inputs</p>
+    <p><span id="si-sector-count">46</span> sectors · each judged on its OWN business metrics · every 🟢/🔴 comes with the actual cause-and-effect from today's macro inputs</p>
     <div class="hdr-meta">
       <span class="badge">🟢 Tailwind: <span id="si-green">—</span></span>
       <span class="badge">🔴 Headwind: <span id="si-red">—</span></span>
@@ -1506,7 +1506,7 @@ tr:last-child td{border-bottom:none;}
   <div class="hdr-inner">
     <div class="hdr-eyebrow">CB Research · EIL Research · Q4 FY26 · Elango Industries Limited</div>
     <div class="hdr-title">India Sector <span>Performance Ranker</span></div>
-    <div class="hdr-sub">30 Sectors · 37 Dashboards · Q4 FY26 Results · CB Score Composite Ranking · Not Investment Advice</div>
+    <div class="hdr-sub">33 Sectors · 37 Dashboards · Q4 FY26 Results · CB Score Composite Ranking · Not Investment Advice</div>
     <div class="hdr-chips">
       <span class="chip g">🏆 #1 Hotels (87)</span>
       <span class="chip g">💊 Pharma — Lupin +89% PAT</span>
@@ -1520,13 +1520,13 @@ tr:last-child td{border-bottom:none;}
 <!-- SUMMARY -->
 <div class="summary">
   <div class="summary-inner">
-    <div class="sum-stat"><span class="sum-val">30</span><span class="sum-lbl">Sectors Ranked</span></div>
+    <div class="sum-stat"><span class="sum-val">33</span><span class="sum-lbl">Sectors Ranked</span></div>
     <div class="sum-div"></div>
-    <div class="sum-stat"><span class="sum-val g">18</span><span class="sum-lbl">Green Sectors</span></div>
+    <div class="sum-stat"><span class="sum-val g">17</span><span class="sum-lbl">Green Sectors</span></div>
     <div class="sum-div"></div>
-    <div class="sum-stat"><span class="sum-val a">7</span><span class="sum-lbl">Mixed / Neutral</span></div>
+    <div class="sum-stat"><span class="sum-val a">14</span><span class="sum-lbl">Mixed / Neutral</span></div>
     <div class="sum-div"></div>
-    <div class="sum-stat"><span class="sum-val r">5</span><span class="sum-lbl">Red / Weak</span></div>
+    <div class="sum-stat"><span class="sum-val r">2</span><span class="sum-lbl">Red / Weak</span></div>
     <div class="sum-div"></div>
     <div class="sum-stat"><span class="sum-val">Q4 FY26</span><span class="sum-lbl">Period</span></div>
     <div class="sum-div"></div>
@@ -1539,7 +1539,7 @@ tr:last-child td{border-bottom:none;}
 <div class="controls">
   <div class="ctrl-row">
     <span class="ctrl-lbl">Filter:</span>
-    <button class="fbtn on" onclick="filter('all',this)">All 30</button>
+    <button class="fbtn on" onclick="filter('all',this)">All 33</button>
     <button class="fbtn" onclick="filter('top10',this)">Top 10</button>
     <button class="fbtn" onclick="filter('green',this)">Green ✅</button>
     <button class="fbtn" onclick="filter('mixed',this)">Mixed ⚡</button>
@@ -2861,6 +2861,12 @@ const SECTOR_IMPACT=[
   c=>c.sc('Capex')>=2?{p:2,r:`Policy + capex tailwind (${c.lab('Capex')}) — ALMM enforcement, PM Surya Ghar and 500GW-by-2030 targets keep module/EPC order books overflowing; execution is the only constraint.`}:null,
   c=>c.sc('Interest')>=2?{p:1,r:`Rate cuts (${c.lab('Interest')}) — solar project IRRs are hypersensitive to debt cost (75–80% leverage); every 50bps cut makes marginal projects bankable and accelerates ordering.`}:null,
   c=>c.crude>=85?{p:1,r:`Crude at ${c.crudeTxt} — expensive fossil energy strengthens the renewables substitution case and keeps IEX prices high enough to support merchant solar economics.`}:null]},
+{name:"Battery / Energy Storage",group:"Energy & Infra",icon:"🔋",links:["Govt Capex★ (PLI-ACC / BESS tenders)","Lead/Lithium Input Costs","Auto OEM Volumes"],
+ metrics:["Revenue mix (lead-acid SLI vs Li-ion/BESS)","EBITDA margin","Replacement vs OEM demand ratio","Order book — grid-scale BESS","Capacity build-out (GWh, ACC/gigafactory)","Lead/lithium/sulfur price pass-through"],
+ rules:[
+  c=>c.sc('Capex')>=2?{p:2,r:`Strong govt capex (${c.lab('Capex')}) — PLI-linked Advanced Chemistry Cell incentives and state-level BESS tenders directly expand the order pipeline for the lithium/grid-storage growth vertical, the highest-multiple part of this business even though it is still largely pre-revenue for most players.`}:c.sc('Capex')<=-1?{p:-1,r:`Capex slowdown (${c.lab('Capex')}) delays BESS tender award timelines and ACC-PLI disbursement schedules — the legacy lead-acid replacement business is largely unaffected, but the growth narrative stalls.`}:null,
+  c=>c.sc('Rupee')<=-2?{p:-1,r:`Sharp INR depreciation (${c.lab('Rupee')}) raises imported lithium-carbonate/cobalt costs for the new Li-ion/BESS lines; the legacy lead-acid business (largely domestic lead via recycling) is comparatively insulated.`}:null,
+  c=>c.sc('Interest')>=2?{p:1,r:`Rate cuts (${c.lab('Interest')}) lower financing costs for two/four-wheeler purchases (supporting OEM battery volumes) and speed up capital-intensive BESS/grid-storage project financing.`}:c.sc('Interest')<=-2?{p:-1,r:`Rate hikes raise financing costs for both auto purchases and capital-intensive BESS/grid-storage project economics simultaneously.`}:null]},
 {name:"Oil & Gas",group:"Energy & Infra",icon:"🛢",links:["Crude Price★ (dominant)"],
  metrics:["Crude realisation (upstream)","Marketing margin (OMC)","GRM (refiners)","Volume growth","Subsidy/LPG burden","Capex plans"],
  rules:[
@@ -2956,7 +2962,13 @@ const SECTOR_IMPACT=[
  rules:[
   c=>c.inr>=92?{p:2,r:`Rupee at ${c.inrTxt} — 40–50% of large-cap pharma revenue is USD-billed (US generics + CDMO); depreciation is a direct revenue and margin bonus, on top of the defensive earnings profile.`}:null,
   c=>c.sc('Global')<=-2?{p:1,r:`Global stress (${c.lab('Global')}) — medicine demand is recession-proof; pharma historically outperforms in risk-off phases. Combined with the INR tailwind, it is the classic defensive-plus-currency trade.`}:null,
-  c=>c.sc('Valuations')<=-1?{p:0,r:`One caution: after a strong run, check stock-level valuations vs the CDMO/generics growth actually delivered — the macro tailwind may already be priced in for some names.`}:null]}
+  c=>c.sc('Valuations')<=-1?{p:0,r:`One caution: after a strong run, check stock-level valuations vs the CDMO/generics growth actually delivered — the macro tailwind may already be priced in for some names.`}:null]},
+{name:"MedTech",group:"Pharma",icon:"🩺",links:["USD-INR★ (export bonus)","US Policy/USFDA","Healthcare Capex (Hospitals/Govt)"],
+ metrics:["Revenue growth (domestic vs export)","EBITDA margin","USFDA/CE inspection outcomes","New product/device approvals","Capacity utilisation","Acquisition integration margin drag"],
+ rules:[
+  c=>c.sc('Rupee')<=-1?{p:1,r:`INR depreciation (${c.lab('Rupee')}) is a direct revenue and margin bonus for USD/EUR-billed medical device exports — the same export-currency dynamic that benefits pharma.`}:c.sc('Rupee')>=1?{p:-1,r:`INR strengthening (${c.lab('Rupee')}) compresses the rupee value of dollar/euro export revenue for device makers.`}:null,
+  c=>c.sc('Global')<=-2?{p:-1,r:`Global risk-off (${c.lab('Global')}) can delay discretionary hospital capex and elective-procedure-linked device demand in export markets, even though core consumable demand (infusion, renal) stays largely defensive.`}:null,
+  c=>c.sc('Earnings')>=1?{p:1,r:`Healthy domestic economic momentum (${c.lab('Earnings')}) supports hospital capex cycles and private healthcare spending, lifting domestic device volumes alongside the export franchise.`}:null]}
 ];
 let SI_FILTER='All';
 function siVerdict(pts){
@@ -5247,6 +5259,7 @@ function buildSMData(){
       'Auto 4W':'Manufacturing','Auto Ancillaries':'Manufacturing','Tyres':'Manufacturing',
       'Pharma':'Manufacturing','Paints':'Manufacturing','Sugar / Ethanol':'Manufacturing',
       'Textiles':'Manufacturing','Metals':'Manufacturing','IT Services':'Manufacturing',
+      'Chemicals / Specialty':'Manufacturing','Battery / Energy Storage':'Energy','MedTech':'Manufacturing',
       'FMCG':'Consumption','Alcobev':'Consumption','Gold & Jewellery':'Consumption',
       'Hotels':'Consumption','Hospitals':'Consumption','Aviation':'Consumption',
       'Telecom':'Infrastructure','Cement':'Infrastructure','Railways':'Infrastructure',
@@ -5687,6 +5700,10 @@ const SECTORS=[
  companies:['Adani Green','Greenko','Shakti Pumps','Waaree','Premier Energies'],
  detail:{revNote:'Capacity additions strong; Shakti Pumps +40%; module cos +30%+',ebitdaNote:'Module cos 20–22%; asset-heavy IPPs 30–35% EBITDA',patNote:'PAT varies widely; high-capex IPPs still debt-heavy; equipment cos strong',outNote:'India 500 GW RE target; solar module exports growing; PM-KUSUM tailwind',risk:'Panel price deflation; grid connectivity delays; high leverage at IPPs',stars:4}},
 
+{name:'Battery / Energy Storage',group:'Energy',rev:'+6%',revN:6,ebitda:'11–12%',ebitdaN:11,pat:'↑ Mixed',outlook:3,cb:65,sent:'mixed',
+ companies:['Exide Industries','Amara Raja Energy & Mobility'],
+ detail:{revNote:'Exide FY26 revenue +4.1% (₹17,269 Cr) on record Auto OEM growth (+25%+ for 2 straight quarters); Amara Raja +7.5% (₹13,814 Cr) on home-energy and telecom-lithium momentum (telecom lithium packs crossed 1 GWh cumulative)',ebitdaNote:'Exide margin held at 11.3–11.7% despite sulfur/antimony cost spikes (sulfur ~5x YoY, ~₹150 Cr negative impact, offset by 5-6% price hikes); Amara Raja margin compressed to 10.9% (from 11.1–13.3% range over 6 quarters) on lead-acid competitive intensity',patNote:'Exide PAT +3.2% FY26, steady; Amara Raja FY26 PAT -5.2%, though Q4 surged 94%+ YoY partly on a one-off ₹181 Cr insurance claim (fire-damage settlement) — core profitability still under pressure ex-exceptional',outNote:'Both companies are mid-transition: Exide has invested ₹4,802 Cr cumulative in its Bengaluru lithium-ion gigafactory (6 GWh, scalable to 12 GWh) with customer samples from Q1 FY27; Amara Raja is building a Telangana giga-corridor (2 GWh Phase-1, targeting 16 GWh by FY30) plus a 5 GWh BESS plant. Neither new-energy bet contributes meaningful revenue yet — FY27-28 is when this should start converting',risk:'Legacy lead-acid margins under structural pressure from raw material volatility (sulfur, antimony, lead) and competitive intensity; new lithium-ion/BESS capex is large and pre-revenue, creating execution and capital-allocation risk before payoff',stars:3}},
+
 {name:'Railways',group:'Infrastructure',rev:'+20%',revN:20,ebitda:'14–20%',ebitdaN:17,pat:'↑ Good',outlook:4,cb:77,sent:'green',
  companies:['RVNL','IRFC','Rail Vikas Nigam','Titagarh','Texmaco','IRCTC'],
  detail:{revNote:'RVNL order book ₹95,000 Cr+; IRFC NII growing steadily',ebitdaNote:'RVNL ~14%; IRCTC ~32%; manufacturing cos 14–18%',patNote:'Consistent growth; IRCTC PAT ₹320 Cr Q4',outNote:'Vande Bharat expansion; freight corridor completion; ₹2.52L Cr budget FY27',risk:'Execution pace; order competition; IRCTC platform competition',stars:4}},
@@ -5706,6 +5723,10 @@ const SECTORS=[
 {name:'Pharma',group:'Manufacturing',rev:'+18%',revN:18,ebitda:'25–36%',ebitdaN:30,pat:'↑↑ Strong',outlook:4,cb:81,sent:'green',
  companies:['Sun Pharma','Lupin','Cipla','Dr Reddys','Divi\'s','Torrent','Aurobindo','Alkem','Laurus Labs','Zydus'],
  detail:{revNote:'Sun Pharma Rev ₹14,560 Cr (+13.6%); Lupin +31.9% to ₹7,475 Cr; India domestic pharma market +10.5% Q4 FY26; Laurus Labs FY26 rev +23%. Broad-based growth across domestic + US',ebitdaNote:'Lupin EBITDA margin 35.5% (+1,070 bps YoY — exceptional turnaround); Sun Pharma 27.1%; Divi\'s 28%+; Laurus 26.8%. Sector margins at multi-year highs driven by US mix, operating leverage, weak rupee tailwind',patNote:'Sun Pharma PAT ₹2,714 Cr (+26%); Lupin PAT ₹1,460 Cr (+89%); Laurus PAT +148% FY26; Dr Reddys weak (gRevlimid exclusivity expiry hit). Pack-level PAT strong ex-Reddys/Cipla',outNote:'4 structural tailwinds: (1) Weak INR — every ₹1 depreciation = +40–50 bps EBITDA for US exporters; (2) India domestic +10.5% — chronic therapies, Ayushman Bharat; (3) Sun US Innovative Medicines crossed $1 Bn first time; (4) CDMO/Laurus secular growth. US tariff risk on generics real but India supplies 40% of US generic volume — exemption likely for basics',risk:'US tariff extension to generics (10–15% revenue cut risk for high-US-exposure cos); gRevlimid exclusivity hit Dr Reddys Q4; API inflation 5–7% on China dependency; Sun Pharma specialty (Ilumya/Winlevi) tariff watch; Dr Reddys ₹453 Cr shelf-stock adjustment Q4',stars:4}},
+
+{name:'MedTech',group:'Manufacturing',rev:'+12%',revN:12,ebitda:'21–27%',ebitdaN:24,pat:'↓ Weak',outlook:3,cb:62,sent:'mixed',
+ companies:['Poly Medicure'],
+ detail:{revNote:'Poly Medicure FY26 consolidated revenue +12.3% to ₹1,875 Cr, record Q4 revenue +21.3% YoY, led by domestic (+19.6–25%) and steady international growth; FY27 guided to ₹2,300–2,400 Cr (+23–28%) on full-year consolidation of Citieffe/PendraCare acquisitions',ebitdaNote:'Standalone EBITDA margin held at 26.8% (within 25–27% guidance), but consolidated margin diluted to 24.4% by lower-margin European acquisitions (Citieffe, PendraCare); Q4 consolidated margin fell sharply to ~21% from ~27.6% YoY',patNote:'FY26 consolidated PAT -5.3% to ₹320.7 Cr despite double-digit revenue growth — Q4 PAT alone fell ~28-29% YoY as acquisition integration costs and raw-material/logistics headwinds hit the bottom line',outNote:'Management is deliberately trading near-term margin for a 5-year pivot into high-technology, high-complexity devices (cardiology, critical care, renal) — non-infusion segments now over 50% of revenue, up from 43% a year ago. FY27 guidance (25–27% standalone EBITDA) signals confidence in margin recovery once acquisitions are integrated. 35 new products launched in FY26, 390+ patents held',risk:'Newly-acquired European businesses (Citieffe, PendraCare) operate at structurally lower margins and will keep diluting consolidated profitability until fully integrated; Chinese import competition explicitly flagged by management as a Renal-segment risk',stars:3}},
 
 {name:'Banking',group:'Financials',rev:'+12%',revN:12,ebitda:'NIM-led',ebitdaN:3,pat:'↑ Mixed',outlook:3,cb:68,sent:'mixed',
  companies:['HDFC Bank','ICICI Bank','SBI','Kotak','Axis','IndusInd','Yes Bank','PNB','BOB'],
