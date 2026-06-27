@@ -392,5 +392,52 @@
       "Sula Vineyards",
       "GM Breweries"
     ]
+  },
+  {
+    "file": "Speciality_Chemicals_Sector_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Chemicals / Specialty"
+    ],
+    "companies": [
+      "Aarti Industries",
+      "Balaji Amines",
+      "Vinati Organics",
+      "Galaxy Surfactants",
+      "Alkyl Amines",
+      "Acutaas Chemicals",
+      "SRF",
+      "Deepak Nitrite"
+    ]
+  },
+  {
+    "file": "Battery_Sector_ExideAmararaja_Q4FY26.html",
+    "sectors": [
+      "Battery / Energy Storage"
+    ],
+    "companies": [
+      "Exide Industries",
+      "Amara Raja Energy & Mobility"
+    ]
+  },
+  {
+    "file": "Emmvee_Solar_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Solar / Renewables"
+    ]
+  },
+  {
+    "file": "MedTech_and_Pharma_Dashboard_Q4FY26.html",
+    "split": {
+      "Shaily": "Capital Goods",
+      "Poly Medicure": "MedTech",
+      "Emcure": "Pharma",
+      "Marksans": "Pharma"
+    }
+  },
+  {
+    "file": "PaceDigitek_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Battery / Energy Storage"
+    ]
   }
 ]
