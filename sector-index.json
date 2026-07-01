@@ -439,5 +439,39 @@
     "sectors": [
       "Battery / Energy Storage"
     ]
+  },
+  {
+    "file": "NitinSpinners_Q4FY26_CBResearch.html",
+    "sectors": [
+      "Textiles"
+    ]
+  },
+  {
+    "file": "PVC_Pipe_Industries_Sector_Q4FY26.html",
+    "sectors": [
+      "Pipes / PVC"
+    ]
+  },
+  {
+    "file": "Amusement_Parks_Sector_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Amusement Parks"
+    ]
+  },
+  {
+    "file": "Ports_Maritime_Infrastructure_Sector_Q4FY26.html",
+    "sectors": [
+      "Ports / Maritime Infra"
+    ]
+  },
+  {
+    "file": "Vedanta_Demerger_Dashboard_Q4FY26.html",
+    "split": {
+      "Vedanta Aluminium": "Metals",
+      "Vedanta Oil & Gas": "Oil & Gas",
+      "Vedanta Power": "Power (Gencos/Transmission)",
+      "Vedanta Base Metals": "Metals",
+      "Vedanta Steel & Ferrous Materials": "Metals"
+    }
   }
 ]
