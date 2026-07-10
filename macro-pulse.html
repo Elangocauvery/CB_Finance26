@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v18 (Ranker v5 LT Engine + Conviction) · Build: 20260705-1301 IST</title>
+<title>CB Finance26™ — Macro Pulse · v19 (Ranker v5 LT Engine + Conviction) · Build: 20260710-1330 IST — NSE Market Intel single source; 276/280 companies symbol-mapped</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -1006,17 +1006,8 @@ tr:last-child td{border-bottom:none;}
 
     <div class="card">
       <h2><span class="ico">⚡</span>Volatility & Breadth</h2>
-      <div class="sec">From NSE VIX page and market data</div>
+      <div class="sec">Advances/Declines only — VIX &amp; PCR are now entered once, in NSE Market Intel</div>
       <div class="entry-grid">
-        <div class="entry-item">
-          <label>India VIX</label>
-          <input type="number" id="md-vix" placeholder="e.g. 14.5" step="0.01" value="13.05">
-          <div class="sig" id="sig-vix"></div>
-        </div>
-        <div class="entry-item">
-          <label>VIX % Change</label>
-          <input type="number" id="md-vix-chg" placeholder="e.g. -2.3" step="0.01" value="-2.5">
-        </div>
         <div class="entry-item">
           <label>Advances (stocks)</label>
           <input type="number" id="md-adv" placeholder="e.g. 1450" step="1">
@@ -1026,17 +1017,11 @@ tr:last-child td{border-bottom:none;}
           <input type="number" id="md-dec" placeholder="e.g. 870" step="1">
           <div class="sig" id="sig-adec"></div>
         </div>
-        <div class="entry-item">
-          <label>Nifty 50 PCR</label>
-          <input type="number" id="md-pcr" placeholder="e.g. 1.12" step="0.01" value="1.19">
-          <div class="sig" id="sig-pcr"></div>
-        </div>
-        <div class="entry-item">
-          <label>Bank Nifty PCR</label>
-          <input type="number" id="md-bnpcr" placeholder="e.g. 0.95" step="0.01">
-          <div class="sig" id="sig-bnpcr"></div>
-        </div>
       </div>
+      <div id="md-fo-readout" style="margin-top:10px;padding:10px 12px;background:#f8f9fc;border-radius:8px;font-size:11px;color:#3a3f5c;line-height:1.7;">
+        <div style="color:var(--muted);">Loading latest VIX / PCR from NSE Market Intel…</div>
+      </div>
+      <div style="font-size:10px;color:var(--muted);margin-top:6px;">Edit these from <a href="javascript:void(0)" onclick="document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));showPage('mi');" style="color:#ff7c00;text-decoration:underline;">NSE Market Intel → F&amp;O tab</a>.</div>
     </div>
   </div>
 
@@ -1160,61 +1145,20 @@ tr:last-child td{border-bottom:none;}
   </div>
 
   <div class="g2">
-    <!-- ENTRY FORM -->
+    <!-- ENTRY MOVED — this page is now a read-only view of NSE Market Intel data -->
     <div class="card">
-      <h2><span class="ico">✏️</span>Daily FII / DII Entry</h2>
-      <div class="sec">Enter figures from NSE FII/DII report (EOD)</div>
-      <div class="entry-grid">
-        <div class="entry-item">
-          <label>Date</label>
-          <input type="date" id="fd-date" value="2026-06-27">
+      <h2><span class="ico">📡</span>Data Source</h2>
+      <div class="sec">This page now reads from a single source, so there's no separate entry form here anymore</div>
+      <div style="background:#fff3e0;border:1px solid #ffcc80;border-radius:9px;padding:14px;font-size:12px;color:#3a3f5c;line-height:1.8;">
+        FII / DII figures, Nifty PCR and BankNifty PCR are entered <strong>once</strong>, in
+        <strong>NSE Market Intel → FII/DII tab</strong> (and → F&amp;O tab for PCR). Everything on
+        this page — the KPI cards, signal panel and history below — reflects that data
+        automatically, so it can never drift out of sync with what NSE Market Intel shows.
+        <div style="margin-top:10px;">
+          <a href="javascript:void(0)" onclick="document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));showPage('mi');" style="color:#ff7c00;font-weight:800;text-decoration:underline;">
+            → Go to NSE Market Intel to add today's entry
+          </a>
         </div>
-        <div class="entry-item">
-          <label>FII Buy Value (₹Cr)</label>
-          <input type="number" id="fd-fii-buy" placeholder="e.g. 12500" step="1">
-        </div>
-        <div class="entry-item">
-          <label>FII Sell Value (₹Cr)</label>
-          <input type="number" id="fd-fii-sell" placeholder="e.g. 10200" step="1">
-        </div>
-        <div class="entry-item">
-          <label>FII Net (₹Cr)</label>
-          <input type="number" id="fd-fii-net" placeholder="Auto or override" step="1" value="383.80">
-          <div class="sig" id="sig-fii-net"></div>
-        </div>
-        <div class="entry-item">
-          <label>DII Buy Value (₹Cr)</label>
-          <input type="number" id="fd-dii-buy" placeholder="e.g. 9800" step="1">
-        </div>
-        <div class="entry-item">
-          <label>DII Sell Value (₹Cr)</label>
-          <input type="number" id="fd-dii-sell" placeholder="e.g. 7600" step="1">
-        </div>
-        <div class="entry-item">
-          <label>DII Net (₹Cr)</label>
-          <input type="number" id="fd-dii-net" placeholder="Auto or override" step="1" value="5747.80">
-          <div class="sig" id="sig-dii-net"></div>
-        </div>
-        <div class="entry-item">
-          <label>Nifty 50 PCR</label>
-          <input type="number" id="fd-pcr" placeholder="e.g. 1.12" step="0.01" value="1.19">
-          <div class="sig" id="sig-fd-pcr"></div>
-        </div>
-        <div class="entry-item">
-          <label>Bank Nifty PCR</label>
-          <input type="number" id="fd-bnpcr" placeholder="e.g. 0.95" step="0.01">
-          <div class="sig" id="sig-fd-bnpcr"></div>
-        </div>
-        <div class="entry-item">
-          <label>Notes (optional)</label>
-          <input type="text" id="fd-notes" placeholder="e.g. Budget day, expiry week">
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:4px;align-items:center;flex-wrap:wrap;">
-        <button class="save-btn" onclick="saveFIIDII()">💾 Save Entry</button>
-        <button onclick="autoCalcFIIDII()" style="background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;padding:8px 16px;border-radius:16px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Segoe UI',system-ui,sans-serif;">
-          ⚡ Auto-calc Net from Buy/Sell
-        </button>
       </div>
     </div>
 
@@ -1551,7 +1495,7 @@ tr:last-child td{border-bottom:none;}
     <div class="leg-item"><span class="leg-swatch" style="background:#fffbeb;border:1.5px solid #f59e0b;"></span>Score 2</div>
     <div class="leg-item"><span class="leg-swatch" style="background:#fff1f4;border:1.5px solid #e11d48;"></span>Score 1 (Weak)</div>
     <div class="leg-item"><span class="leg-swatch" style="background:#fdf4ff;border:1.5px solid #7c3aed;"></span>Seasonality</div>
-    <span style="font-size:10px;color:var(--slate);">33 sectors · each with 8 tailored metrics + Seasonality · CB Score = weighted composite</span>
+    <span style="font-size:10px;color:var(--slate);">39 sectors · each with 8 tailored metrics + Seasonality · CB Score = weighted composite</span>
   </div>
 </div>
 
@@ -1671,7 +1615,7 @@ tr:last-child td{border-bottom:none;}
   <div class="hdr-inner">
     <div class="hdr-eyebrow">CB Research · EIL Research · Q4 FY26 · Elango Industries Limited</div>
     <div class="hdr-title">India Sector <span>Performance Ranker</span></div>
-    <div class="hdr-sub">33 Sectors · 37 Dashboards · Q4 FY26 Results · CB Score Composite Ranking · Not Investment Advice</div>
+    <div class="hdr-sub">39 Sectors · 63+ Dashboards · Q4 FY26 Results · Synced 09-Jul-2026 with standalone Sector Ranker · CB Score Composite Ranking · Not Investment Advice</div>
     <div class="hdr-chips">
       <span class="chip g">🏆 #1 Hotels (87)</span>
       <span class="chip g">💊 Pharma — Lupin +89% PAT</span>
@@ -3207,6 +3151,9 @@ function showPage(id,tab){
   // Refresh live NSE → CB Score nudge with whatever PE/Delivery/Bulk-Block
   // data has been entered since this page last loaded.
   if(id==='mi' && typeof miInitTabs==='function') miInitTabs();
+  // Market Data & FII/DII are read-only views of NSE Market Intel data — refresh on open
+  if(id==='market'){ if(typeof renderMDHistory==='function')renderMDHistory(); if(typeof updateSignalPanel==='function')updateSignalPanel(); }
+  if(id==='fiidii'){ if(typeof renderFDHistory==='function')renderFDHistory(); if(typeof updateFIIKPIs==='function')updateFIIKPIs(); if(typeof updateFIISignal==='function')updateFIISignal(); if(typeof renderFlowChart==='function')renderFlowChart(); }
   if(id==='cr' && typeof render==='function'){ if(typeof showAdminBadge==='function')showAdminBadge(); render(); }
   if(id==='sr' && typeof recomputeSectorLiveRanks==='function'){ if(typeof showAdminBadge==='function')showAdminBadge(); recomputeSectorLiveRanks(); if(typeof renderAll==='function') renderAll(); }
   if(id==='cv' && typeof cvRender==='function'){ if(typeof showAdminBadge==='function')showAdminBadge(); cvRender(); }
@@ -3305,11 +3252,39 @@ function loadSel(){
 }
 // Market data storage
 const MD_KEY='cbf26_mktdata_v1';
-const FD_KEY='cbf26_fiidii_v1';
+// FII/DII no longer has its own storage — NSE Market Intel (localStorage keys 'cbr_fii'
+// and 'cbr_fo') is the single source of truth. getFDHistory() adapts that data into the
+// shape the FII/DII page's KPIs/signal panel/chart already expect, so those functions
+// didn't need to change. saveFDHistory is kept as a harmless no-op in case anything still
+// calls it — entry now only happens via NSE Market Intel's "Add FII / DII entry" form.
+function getFDHistory(){
+  let fii=[], fo=[];
+  try{fii=JSON.parse(localStorage.getItem('cbr_fii')||'[]');}catch(e){}
+  try{fo=JSON.parse(localStorage.getItem('cbr_fo')||'[]');}catch(e){}
+  const foByDate={}; fo.forEach(r=>{ if(r&&r.date) foByDate[r.date]=r; });
+  return fii.filter(r=>r&&r.date).map(r=>{
+    const fb=r.fb?Number(r.fb):null, fs=r.fs?Number(r.fs):null;
+    const db=r.db?Number(r.db):null, ds=r.ds?Number(r.ds):null;
+    const f=foByDate[r.date]||{};
+    return {
+      date:r.date,
+      fiiBuy:fb, fiiSell:fs, fiiNet:(fb!=null||fs!=null)?(fb||0)-(fs||0):null,
+      diiBuy:db, diiSell:ds, diiNet:(db!=null||ds!=null)?(db||0)-(ds||0):null,
+      pcr:f.pcr?Number(f.pcr):null, bnpcr:f.bnpcr?Number(f.bnpcr):null,
+      notes:r.src||''
+    };
+  }).sort((a,b)=>a.date.localeCompare(b.date));
+}
+function saveFDHistory(){ /* deprecated — see getFDHistory() note above */ }
 function getMDHistory(){ try{return JSON.parse(localStorage.getItem(MD_KEY)||'[]');}catch(e){return[];} }
 function saveMDHistory(arr){ try{localStorage.setItem(MD_KEY,JSON.stringify(arr.slice(-90)));}catch(e){} }
-function getFDHistory(){ try{return JSON.parse(localStorage.getItem(FD_KEY)||'[]');}catch(e){return[];} }
-function saveFDHistory(arr){ try{localStorage.setItem(FD_KEY,JSON.stringify(arr.slice(-90)));}catch(e){} }
+// Latest India VIX / PCR reading from NSE Market Intel's F&O tab ('cbr_fo' storage) —
+// single source of truth so Market Data and FII/DII pages never need their own copy.
+function getLatestFo(){
+  let fo=[]; try{fo=JSON.parse(localStorage.getItem('cbr_fo')||'[]');}catch(e){}
+  fo=fo.filter(r=>r&&r.date).sort((a,b)=>b.date.localeCompare(a.date));
+  return fo[0]||null;
+}
 
 // ── SCORE / ALLOC HELPERS ─────────────────────────────────────────────────
 const mscore=()=>sel.reduce((s,idx,i)=>s+MACRO_INDICATORS[i].options[idx].score,0);
@@ -3340,9 +3315,11 @@ function initApp(){
   renderRiskCards();
   updateAll();
   renderMDHistory();
+  updateSignalPanel();
   renderFDHistory();
   renderFlowChart();
   updateFIIKPIs();
+  updateFIISignal();
   try{const u=localStorage.getItem(GR_URL_KEY);if(u!=null){const el=document.getElementById('grBaseUrl');if(el)el.value=u;}}catch(e){}
   const grc=grLoadCache();
   if(grc){const st=document.getElementById('grStatus');if(st)st.innerHTML='💾 Cached: '+grc.files.filter(f=>f.agg).length+' file(s) · last loaded '+new Date(grc.ts).toLocaleString()+' — click Fetch to refresh';}
@@ -3522,6 +3499,7 @@ function vixSig(v){ if(v<12) return 'Very Low — Complacency'; if(v<16) return 
 
 // ── MARKET DATA ENTRY ──────────────────────────────────────────────────────
 function saveMarketData(){
+  const fo=getLatestFo()||{};
   const entry={
     date: document.getElementById('md-date')?.value||new Date().toISOString().split('T')[0],
     nifty: parseFloat(document.getElementById('md-nifty')?.value)||null,
@@ -3529,18 +3507,19 @@ function saveMarketData(){
     pe: parseFloat(document.getElementById('md-pe')?.value)||null,
     pb: parseFloat(document.getElementById('md-pb')?.value)||null,
     divY: parseFloat(document.getElementById('md-divy')?.value)||null,
-    vix: parseFloat(document.getElementById('md-vix')?.value)||null,
-    vixChg: parseFloat(document.getElementById('md-vix-chg')?.value)||null,
+    // VIX / PCR are no longer typed here — pulled from NSE Market Intel's latest F&O entry
+    vix: fo.vix?parseFloat(fo.vix):null,
+    vixChg: null,
     adv: parseFloat(document.getElementById('md-adv')?.value)||null,
     dec: parseFloat(document.getElementById('md-dec')?.value)||null,
-    pcr: parseFloat(document.getElementById('md-pcr')?.value)||null,
-    bnpcr: parseFloat(document.getElementById('md-bnpcr')?.value)||null,
+    pcr: fo.pcr?parseFloat(fo.pcr):null,
+    bnpcr: fo.bnpcr?parseFloat(fo.bnpcr):null,
     crude: parseFloat(document.getElementById('md-crude')?.value)||null,
     inr: parseFloat(document.getElementById('md-inr')?.value)||null,
     cpi: parseFloat(document.getElementById('md-cpi')?.value)||null,
     repo: parseFloat(document.getElementById('md-repo')?.value)||null,
   };
-  if(!entry.nifty&&!entry.pe&&!entry.vix){alert('Please enter at least one data point.');return;}
+  if(!entry.nifty&&!entry.pe&&!entry.vix){alert('Please enter at least one data point (or add today\'s VIX/PCR in NSE Market Intel first).');return;}
   const hist=getMDHistory();
   const existing=hist.findIndex(h=>h.date===entry.date);
   if(existing>=0) hist[existing]=entry; else hist.push(entry);
@@ -3552,10 +3531,10 @@ function saveMarketData(){
   showSave();
 }
 function clearMarketForm(){
-  ['md-nifty','md-nifty-chg','md-pe','md-pb','md-divy','md-vix','md-vix-chg','md-adv','md-dec','md-pcr','md-bnpcr','md-crude','md-inr','md-cpi','md-repo'].forEach(id=>{
+  ['md-nifty','md-nifty-chg','md-pe','md-pb','md-divy','md-adv','md-dec','md-crude','md-inr','md-cpi','md-repo'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.value='';
   });
-  ['sig-nifty','sig-pe','sig-vix','sig-adec','sig-pcr','sig-bnpcr','sig-crude','sig-inr','sig-cpi'].forEach(id=>{
+  ['sig-nifty','sig-pe','sig-adec','sig-crude','sig-inr','sig-cpi'].forEach(id=>{
     const el=document.getElementById(id); if(el) el.textContent='';
   });
 }
@@ -3575,11 +3554,24 @@ function renderMDHistory(){
     <td>${h.adv&&h.dec?`${h.adv}/${h.dec}`:'—'}</td>
   </tr>`).join('');
 }
+// Populates the read-only VIX/PCR readout on the Market Data page from NSE Market Intel
+function renderMdFoReadout(){
+  const el=document.getElementById('md-fo-readout');if(!el)return;
+  const fo=getLatestFo();
+  if(!fo){el.innerHTML='<div style="color:var(--muted);">No VIX/PCR entered yet in NSE Market Intel → F&O tab.</div>';return;}
+  const vix=fo.vix?parseFloat(fo.vix):null, pcr=fo.pcr?parseFloat(fo.pcr):null, bnpcr=fo.bnpcr?parseFloat(fo.bnpcr):null;
+  const parts=[];
+  if(vix!=null) parts.push(`<strong>India VIX:</strong> ${vix} <span style="color:${vix>20?'#b71c1c':vix<14?'#006b30':'#b35c00'};">${vixSig(vix)}</span>`);
+  if(pcr!=null) parts.push(`<strong>Nifty PCR:</strong> ${pcr} <span style="color:${pcr>1.1?'#006b30':pcr<0.8?'#b71c1c':'#b35c00'};">${pcrSignal(pcr)}</span>`);
+  if(bnpcr!=null) parts.push(`<strong>BankNifty PCR:</strong> ${bnpcr}`);
+  el.innerHTML = parts.length ? `${parts.join(' &nbsp;·&nbsp; ')}<div style="color:var(--muted);margin-top:4px;">as of ${fo.date}</div>` : '<div style="color:var(--muted);">No VIX/PCR entered yet in NSE Market Intel → F&O tab.</div>';
+}
 function updateSignalPanel(){
   const el=document.getElementById('signalPanel');if(!el)return;
+  const fo=getLatestFo()||{};
   const pe=parseFloat(document.getElementById('md-pe')?.value);
-  const vix=parseFloat(document.getElementById('md-vix')?.value);
-  const pcr=parseFloat(document.getElementById('md-pcr')?.value);
+  const vix=fo.vix?parseFloat(fo.vix):NaN;
+  const pcr=fo.pcr?parseFloat(fo.pcr):NaN;
   const crude=parseFloat(document.getElementById('md-crude')?.value);
   const inr=parseFloat(document.getElementById('md-inr')?.value);
   const adv=parseFloat(document.getElementById('md-adv')?.value);
@@ -3591,7 +3583,7 @@ function updateSignalPanel(){
   if(!isNaN(crude)) rows.push({l:'Crude $/bbl',v:`$${crude}`,s:crude<60?'🟢 Very Low':crude<75?'🟢 Comfortable':crude<85?'🟡 Manageable':crude<100?'🔴 Pressure':'🔴 Crisis',c:crude>=85?'#b71c1c':crude<75?'#006b30':'#b35c00'});
   if(!isNaN(inr)) rows.push({l:'INR/USD',v:`₹${inr}`,s:inr<84?'🟢 Strong':inr<88?'🟡 Stable':inr<92?'🟡 Mild Weakness':inr<96?'🔴 Depreciating':'🔴 Sharp Fall (RBI zone)',c:inr>=92?'#b71c1c':inr<84?'#006b30':'#b35c00'});
   if(!isNaN(adv)&&!isNaN(dec)){const ratio=(adv/dec).toFixed(2);rows.push({l:'Adv/Dec Ratio',v:ratio,s:adv>dec*1.5?'🟢 Strong Breadth':adv>dec?'🟡 Moderate':dec>adv*1.5?'🔴 Weak Breadth':'🔴 Declining',c:adv>dec*1.5?'#006b30':dec>adv*1.5?'#b71c1c':'#b35c00'});}
-  if(!rows.length){el.innerHTML='<div style="color:var(--muted);font-size:11px;">Enter numbers to see signals.</div>';return;}
+  if(!rows.length){el.innerHTML='<div style="color:var(--muted);font-size:11px;">Enter numbers to see signals.</div>';renderMdFoReadout();return;}
   el.innerHTML=rows.map(r=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f5f7fa;">
     <span style="font-size:11px;font-weight:600;color:var(--soft);">${r.l}</span>
     <span style="font-size:12px;font-weight:900;color:${r.c};">${r.v}</span>
@@ -3599,47 +3591,13 @@ function updateSignalPanel(){
   </div>`).join('');
   // Update input signals
   if(!isNaN(pe)){const s=document.getElementById('sig-pe');if(s){s.textContent=peSig(pe);s.style.color=pe>25?'#b71c1c':pe<18?'#006b30':'#b35c00';}}
-  if(!isNaN(vix)){const s=document.getElementById('sig-vix');if(s){s.textContent=vixSig(vix);s.style.color=vix>20?'#b71c1c':vix<14?'#006b30':'#b35c00';}}
-  if(!isNaN(pcr)){const s=document.getElementById('sig-pcr');if(s){s.textContent=pcrSignal(pcr);s.style.color=pcr>1.1?'#006b30':pcr<0.8?'#b71c1c':'#b35c00';}}
+  renderMdFoReadout();
 }
 
 // ── FII/DII ────────────────────────────────────────────────────────────────
-function autoCalcFIIDII(){
-  const buy=parseFloat(document.getElementById('fd-fii-buy')?.value);
-  const sell=parseFloat(document.getElementById('fd-fii-sell')?.value);
-  if(!isNaN(buy)&&!isNaN(sell)){ const net=document.getElementById('fd-fii-net'); if(net) net.value=(buy-sell).toFixed(0); }
-  const dbuy=parseFloat(document.getElementById('fd-dii-buy')?.value);
-  const dsell=parseFloat(document.getElementById('fd-dii-sell')?.value);
-  if(!isNaN(dbuy)&&!isNaN(dsell)){ const dnet=document.getElementById('fd-dii-net'); if(dnet) dnet.value=(dbuy-dsell).toFixed(0); }
-  updateFIISignal();
-}
-function saveFIIDII(){
-  const fiiNet=parseFloat(document.getElementById('fd-fii-net')?.value);
-  const diiNet=parseFloat(document.getElementById('fd-dii-net')?.value);
-  if(isNaN(fiiNet)&&isNaN(diiNet)){alert('Please enter at least FII Net or DII Net value.');return;}
-  const entry={
-    date:document.getElementById('fd-date')?.value||new Date().toISOString().split('T')[0],
-    fiiBuy:parseFloat(document.getElementById('fd-fii-buy')?.value)||null,
-    fiiSell:parseFloat(document.getElementById('fd-fii-sell')?.value)||null,
-    fiiNet:isNaN(fiiNet)?null:fiiNet,
-    diiBuy:parseFloat(document.getElementById('fd-dii-buy')?.value)||null,
-    diiSell:parseFloat(document.getElementById('fd-dii-sell')?.value)||null,
-    diiNet:isNaN(diiNet)?null:diiNet,
-    pcr:parseFloat(document.getElementById('fd-pcr')?.value)||null,
-    bnpcr:parseFloat(document.getElementById('fd-bnpcr')?.value)||null,
-    notes:document.getElementById('fd-notes')?.value||''
-  };
-  const hist=getFDHistory();
-  const existing=hist.findIndex(h=>h.date===entry.date);
-  if(existing>=0) hist[existing]=entry; else hist.push(entry);
-  hist.sort((a,b)=>a.date.localeCompare(b.date));
-  saveFDHistory(hist);
-  renderFDHistory();
-  updateFIIKPIs();
-  renderFlowChart();
-  renderMarketSnapshot();
-  showSave();
-}
+// Manual entry (autoCalcFIIDII / saveFIIDII) removed — this page is now a read-only
+// view driven by getFDHistory(), which itself reads NSE Market Intel's 'cbr_fii' /
+// 'cbr_fo' storage. Entry only happens on the NSE Market Intel > FII/DII (and F&O) tabs.
 function updateFIIKPIs(){
   const hist=getFDHistory();
   if(!hist.length) return;
@@ -3918,7 +3876,28 @@ const GR_FILE_MAP=[
  {kw:'lg_electronics',sectors:['Consumer Durables']},
  {kw:'durables',sectors:['Consumer Durables']},
  {kw:'cera',sectors:['Building Materials']},
- {kw:'sanitaryware',sectors:['Building Materials']}
+ {kw:'sanitaryware',sectors:['Building Materials']},
+ {kw:'amusement',sectors:['Amusement Parks']},
+ {kw:'park',sectors:['Amusement Parks']},
+ {kw:'wonderla',sectors:['Amusement Parks']},
+ {kw:'imagicaa',sectors:['Amusement Parks']},
+ {kw:'battery',sectors:['Battery']},
+ {kw:'exideamararaja',sectors:['Battery']},
+ {kw:'port',sectors:['Ports/Maritime']},
+ {kw:'maritime',sectors:['Ports/Maritime']},
+ {kw:'apsez',sectors:['Ports/Maritime']},
+ {kw:'pvcpipe',sectors:['PVC Pipes']},
+ {kw:'pvc_pipe',sectors:['PVC Pipes']},
+ {kw:'chemical',sectors:['Speciality Chemicals']},
+ {kw:'specialitychem',sectors:['Speciality Chemicals']},
+ {kw:'acutaas',sectors:['Speciality Chemicals']},
+ {kw:'pharmachem',sectors:['Speciality Chemicals']},
+ {kw:'reit',sectors:['REIT/InvIT']},
+ {kw:'invit',sectors:['REIT/InvIT']},
+ {kw:'nbfc_top',sectors:['NBFC (Lending)']},
+ {kw:'steel_fy26',sectors:['Metals']},
+ {kw:'2wcompanies',sectors:['Auto 2W']},
+ {kw:'ather',sectors:['Auto 2W']}
 ];
 function grMapFile(entry){
   if(typeof entry==='object'&&entry.file) return {file:entry.file,sectors:entry.sectors||grKw(entry.file),split:entry.split||null,tokens:entry.tokens||null,exclude:entry.exclude||null,companies:entry.companies||null};
@@ -4566,7 +4545,19 @@ const SECTOR_IMPACT=[
  rules:[
   c=>c.sc('Rupee')<=-1?{p:1,r:`INR depreciation (${c.lab('Rupee')}) is a direct revenue and margin bonus for USD/EUR-billed medical device exports — the same export-currency dynamic that benefits pharma.`}:c.sc('Rupee')>=1?{p:-1,r:`INR strengthening (${c.lab('Rupee')}) compresses the rupee value of dollar/euro export revenue for device makers.`}:null,
   c=>c.sc('Global')<=-2?{p:-1,r:`Global risk-off (${c.lab('Global')}) can delay discretionary hospital capex and elective-procedure-linked device demand in export markets, even though core consumable demand (infusion, renal) stays largely defensive.`}:null,
-  c=>c.sc('Earnings')>=1?{p:1,r:`Healthy domestic economic momentum (${c.lab('Earnings')}) supports hospital capex cycles and private healthcare spending, lifting domestic device volumes alongside the export franchise.`}:null]}
+  c=>c.sc('Earnings')>=1?{p:1,r:`Healthy domestic economic momentum (${c.lab('Earnings')}) supports hospital capex cycles and private healthcare spending, lifting domestic device volumes alongside the export franchise.`}:null]},
+
+{name:'Amusement Parks',group:'Consumption & Services',icon:'🎢',links:['Discretionary Spend★','Monsoon/Weather','Urban Employment'],
+ metrics:['Footfall growth','Per-capita spend (F&B/merchandise)','EBITDA margin','Resort/hospitality mix','Capex payback','Regional concentration risk'],
+ rules:[null,null]},
+
+{name:'Ports/Maritime',group:'Infrastructure',icon:'⚓',links:['Global Trade Volumes★','Container Freight Rates','Govt Capex (Sagarmala)'],
+ metrics:['Cargo volume growth (MMT)','Container market share','EBITDA margin','Capacity utilisation','Hinterland connectivity','Tariff regulation (major ports)'],
+ rules:[null,null]},
+
+{name:'PVC Pipes',group:'Manufacturing',icon:'🚰',links:['Real Estate/Housing★','Crude/PVC-EDC Spread','Agri Capex (irrigation)'],
+ metrics:['Volume growth','PVC-EDC spread (resin margin)','CPVC/value-added mix','EBITDA margin','China import dependency','Dealer inventory days'],
+ rules:[null,null]}
 ];
 let SI_FILTER='All';
 function siVerdict(pts){
@@ -4757,6 +4748,7 @@ function miInitTabs(){
     p.className='panel'+(t.id==='fii'?' show':'');
     p.id='mi-p-'+t.id;mainEl.appendChild(p);
   });
+  if(typeof miPurgeUntracked==='function')miPurgeUntracked();
   miRender('fii');
 }
 function miShowPanel(id){
@@ -5139,21 +5131,50 @@ async function miCheckServer(){
     miSetServerStatus(true,j.last_fetch||'');
   }catch{miSetServerStatus(false,'');}
 }
+// Bulk/Block and Promoter/Insider records should ONLY ever contain your
+// tracked companies. The fetcher now enforces that going forward, but a
+// stale record fetched BEFORE that filter existed doesn't get touched by
+// the upsert merge below (nothing new is being fetched for a symbol that's
+// no longer tracked, so there's nothing to overwrite it with) — it just
+// sits there forever unless something actively removes it. This does that,
+// using the same symbol list the rest of the app already trusts.
+let MI_TRACKED_SYMS_CACHE=null;
+function miTrackedSymSet(){
+  if(!MI_TRACKED_SYMS_CACHE) MI_TRACKED_SYMS_CACHE=new Set(Object.values(MI_NAME_TO_SYMBOL).map(s=>String(s).toUpperCase()));
+  return MI_TRACKED_SYMS_CACHE;
+}
+function miPurgeUntracked(){
+  const syms=miTrackedSymSet();
+  let removed=0;
+  for(const k of ['bulk','promoter']){
+    const rows=load(k);
+    const kept=rows.filter(r=>r.sym && syms.has(String(r.sym).toUpperCase()));
+    if(kept.length!==rows.length){ removed+=(rows.length-kept.length); save(k,kept); }
+  }
+  return removed;
+}
+// Building block of an incoming/existing record's identity. Most record types
+// (bulk, delivery, PE, sector, promoter) have a sym/idx that, with date and
+// type, makes each row unique. FII/DII, F&O and VIX have NEITHER — there's
+// only ever one record per date — so their key collapses to just the date.
+function miRecordKey(r){
+  return [r.date||'', r.sym||'', r.idx||'', r.type||'', r.co||''].join('|');
+}
 function miMergeIntoLocalStorage(serverData){
-  let added=0;
+  let added=0, updated=0;
   for(const k of Object.keys(serverData)){
     const incoming=serverData[k]||[];
     if(!incoming.length)continue;
     const existing=load(k);
-    const seen=new Set(existing.map(r=>JSON.stringify(
-      Object.fromEntries(Object.entries(r).filter(([kk])=>['date','sym','type','co','cl','nm','idx'].includes(kk)))
-    )));
-    const fresh=incoming.filter(r=>!seen.has(JSON.stringify(
-      Object.fromEntries(Object.entries(r).filter(([kk])=>['date','sym','type','co','cl','nm','idx'].includes(kk)))
-    )));
-    if(fresh.length){save(k,[...existing,...fresh]);added+=fresh.length;}
+    const byKey=new Map(existing.map(r=>[miRecordKey(r),r]));
+    for(const r of incoming){
+      const key=miRecordKey(r);
+      if(byKey.has(key)) updated++; else added++;
+      byKey.set(key,r);   // fresh data always wins — replaces stale/blank rows for the same key
+    }
+    save(k,Array.from(byKey.values()));
   }
-  return added;
+  return {added,updated};
 }
 async function miLoadFromServer(){
   const btn=event.target;const origText=btn.textContent;
@@ -5162,9 +5183,10 @@ async function miLoadFromServer(){
     const r=await fetch(MI_SERVER+'/api/data',{signal:AbortSignal.timeout(8000)});
     if(!r.ok)throw new Error('HTTP '+r.status);
     const j=await r.json();
-    const added=miMergeIntoLocalStorage(j.data||{});
+    const {added,updated}=miMergeIntoLocalStorage(j.data||{});
+    const purged=(typeof miPurgeUntracked==='function')?miPurgeUntracked():0;
     miSetServerStatus(true,j.last_fetch||'');
-    miShowToast('✓ Loaded '+added+' new records from server');
+    miShowToast(`✓ ${added} new, ${updated} updated`+(purged?`, ${purged} untracked removed`:''));
     miRender(miActiveTab);
     if(typeof miAutoLinkIndicators==='function'){miAutoLinkIndicators();renderAllIndicators();updateAll();}
     if(typeof render==='function')render();
@@ -5441,6 +5463,139 @@ const MI_NAME_TO_SYMBOL={
   'Welspun':'WELCORP',  // verify symbol
   'Yes Bank':'YESBANK',
   'Zydus':'ZYDUSLIFE',
+  // ── Added from Symbol Update workbook, verified against live NSE data ──
+  'ACME Solar Holdings':'ACMESOLAR',
+  'AR Share & Stock Brokers':'ARSSBL',
+  'AXISCADES Technologies':'AXISCADES',
+  'Aarti Industries':'AARTIIND',
+  'Acutaas Chemicals':'ACUTAAS',
+  'Adani Energy Solutions (AESL)':'ADANIENSOL',
+  'Adani Ports (APSEZ)':'ADANIPORTS',
+  'Aditya Birla Fashion (ABFRL)':'ABFRL',
+  'Alkyl Amines':'ALKYLAMINE',
+  'Allcargo Terminals':'ATL',
+  'Allied Blenders (ABD)':'ABDL',
+  'Altius Telecom InvIT':'ALTIUSINVIT',
+  'Amara Raja Energy & Mobility':'ARE&M',
+  'Angel One':'ANGELONE',
+  'Apar Industries':'APARINDS',
+  'Apollo Micro Systems':'APOLLO',
+  'Astral Limited':'ASTRAL',
+  'Ather Energy':'ATHERENERG',
+  'Avadh Sugar & Energy':'AVADHSUGAR',
+  'Avalon Technologies':'AVALON',
+  'BHEL':'BHEL',
+  'Bajaj Hindusthan Sugar':'BAJAJHIND',
+  'Balaji Amines':'BALAMINES',
+  'Bank of Maharashtra':'MAHABANK',
+  'Bannari Amman Sugars':'BANARISUG',
+  'Beta Drugs':'BETA',
+  'Blue Jet Healthcare':'BLUEJET',
+  'Brookfield India REIT':'BIRET',
+  'CAMS':'CAMS',
+  'Canara Bank':'CANBK',
+  'Central Bank of India':'CENTRALBK',
+  'Cera Sanitaryware':'CERA',
+  'City Union Bank':'CUB',
+  'CleanMax Enviro Energy':'CLEANMAX',
+  'Coal India':'COALINDIA',
+  'Colgate-Palmolive India':'COLPAL',
+  'Deepak Nitrite':'DEEPAKNTR',
+  'Dhampur Sugar Mills':'DHAMPURSUG',
+  "Divi's Laboratories":'DIVISLAB',
+  'Dodla Dairy':'DODLA',
+  'Dwarikesh Sugar':'DWARKESH',
+  'Embassy REIT':'EMBASSY',
+  'Emcure Pharmaceuticals':'EMCURE',
+  'Emmvee Photovoltaic':'EMMVEE',
+  'Exide Industries':'EXIDEIND',
+  'Finolex Industries':'FINPIPE',
+  'Fujiyama Power Systems':'UTLSOLAR',
+  'GE Vernova T&D India':'GVT&D',
+  'GM Breweries':'GMBREW',
+  'Galaxy Surfactants':'GALAXYSURF',
+  'Godrej Consumer Products (GCPL)':'GODREJCP',
+  'Gokaldas Exports':'GOKEX',
+  'Groww (Billionbrains)':'GROWW',
+  'Gujarat Pipavav Port':'GPPL',
+  'HDFC Life':'HDFCLIFE',
+  'Hatsun Agro Product':'HATSUN',
+  'Heritage Foods':'HERITGFOOD',
+  'Himatsingka Seide':'HIMATSEIDE',
+  'ICICI Lombard':'ICICIGI',
+  'ICICI Prudential Life':'ICICIPRULI',
+  'IDBI Bank':'IDBI',
+  'IDFC First Bank':'IDFCFIRSTB',
+  'IRB InvIT Fund':'IRBINVIT',
+  'ITC Limited':'ITC',
+  'Imagicaaworld':'IMAGICAA',
+  'IndiGrid Infrastructure Trust':'INDIGRID',
+  'Indian Bank':'INDIANB',
+  'Indian Overseas Bank':'IOB',
+  'Indo Count Industries':'ICIL',
+  'JSW Infrastructure':'JSWINFRA',
+  'KFin Technologies':'KFINTECH',
+  'KPI Green Energy':'KPIGREEN',
+  'Karnataka Bank':'KTKBANK',
+  'Knowledge Realty Trust (KRT)':'KRT',
+  'LG Electronics India':'LGEINDIA',
+  'LIC':'LICI',
+  'MTAR Technologies':'MTARTECH',
+  'Marksans Pharma':'MARKSANS',
+  'Medi Assist':'MEDIASSIST',
+  'Mindspace REIT':'MINDSPACE',
+  'Motilal Oswal':'MOTILALOFS',
+  'NTPC Green Energy':'NTPCGREEN',
+  'National Highways Infra Trust (NHIT)':'NHIT',
+  'Nexus Select Trust':'NXST',
+  'Nicco Parks':'NICCOPAR',
+  'Nitin Spinners':'NITINSPIN',
+  'Niva Bupa Health Insurance':'NIVABUPA',
+  'PG Electroplast':'PGEL',
+  'Pace Digitek':'PACEDIGITK',
+  'Parag Milk Foods':'PARAGMILK',
+  'Pearl Global Industries':'PGIL',
+  'Poly Medicure':'POLYMED',
+  'PowerGrid InvIT':'PGINVIT',
+  'Privi Speciality Chemicals':'PRIVISCL',
+  'RBL Bank':'RBLBANK',
+  'Raymond Lifestyle':'RAYMONDLSL',
+  'SBI Life':'SBILIFE',
+  'SP Apparels':'SPAL',
+  'SRF Limited':'SRF',
+  'Shaily Engineering Plastics':'SHAILY',
+  'Shanti Gold International (SGIL)':'SHANTIGOLD',
+  'Shilpa Medicare':'SHILPAMED',
+  'Shree Renuka Sugars':'RENUKA',
+  'Shyam Metalics':'SHYAMMETL',
+  'South Indian Bank':'SOUTHBANK',
+  'Star Health Insurance':'STARHEALTH',
+  'Sterling & Wilson Renewable Energy':'SWSOLAR',
+  'Sudeep Pharma':'SUDEEPPHRM',
+  'Sula Vineyards':'SULA',
+  'Supreme Industries':'SUPREMEIND',
+  'Swiggy':'SWIGGY',
+  'Syrma SGS Technology':'SYRMA',
+  'TVS Infrastructure InvIT':'TVSINVIT',
+  'Tamilnad Mercantile Bank':'TMB',
+  'Tata Consumer Products':'TATACONSUM',
+  'Thermax':'THERMAX',
+  'Tilaknagar Industries':'TI',
+  'Trident Limited':'TRIDENT',
+  'Triveni Turbine':'TRITURBINE',
+  'Union Bank of India':'UNIONBANK',
+  'Uttam Sugar Mills':'UTTAMSUGAR',
+  'V2 Retail':'V2RETAIL',
+  'Vedanta Aluminium':'VAML',
+  'Vedanta Iron & Steel':'VISL',
+  'Vedanta Ltd (Residual)':'VEDL',
+  'Vedanta Oil & Gas':'VOGL',
+  'Vedanta Power':'VEDPOWER',
+  'Vinati Organics':'VINATIORGA',
+  'Waaree Renewable Technologies':'WAAREERTL',
+  'Welspun Living':'WELSPUNLIV',
+  'Wonderla Holidays':'WONDERLA',
+  'YES Bank':'YESBANK',
 };
 
 // ══ COMPANY RANKER (merged) ══
@@ -6537,7 +6692,159 @@ let CR_DATA=[
 {id:138,name:"Anand Rathi Wealth",sector:"Brokers / Wealth",group:"Financials",mcap:18000,mcap_rank:127,desc:"Mass affluent + NRI; sticky SIPs",cb:95,alloc:"Rs.0.8L",season:1,asOf:"2026-07-06",flag:"",scores:[5,5,5,4,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:139,name:"Nippon India AMC",sector:"AMC",group:"Financials",mcap:28000,mcap_rank:97,desc:"ETF + direct plan specialist",cb:95,alloc:"Rs.1.1L",season:1,asOf:"2026-07-06",flag:"",scores:[5,5,5,4,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:140,name:"Suzlon Energy",sector:"Solar / Renewables",group:"Energy",mcap:58000,mcap_rank:65,desc:"Wind EV; installation HALTS in monsoon Q2",cb:74,alloc:"Rs.0",season:9,asOf:"2026-07-06",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,9],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
-{id:141,name:"CG Power",sector:"Capital Goods",group:"Manufacturing",mcap:151000,mcap_rank:31,desc:"Murugappa; motors+T&D; CG Semi OSAT live Jul-26 (semicon optionality)",cb:74,alloc:"Rs.0",season:9,asOf:"2026-07-06",flag:"",scores:[4,3,5,5,5,5,4,4,2,1,9],ver:[true,false,true,false,true,true,false,false,false,true,false],hist:[]}
+{id:141,name:"CG Power",sector:"Capital Goods",group:"Manufacturing",mcap:151000,mcap_rank:31,desc:"Murugappa; motors+T&D; CG Semi OSAT live Jul-26 (semicon optionality)",cb:74,alloc:"Rs.0",season:9,asOf:"2026-07-06",flag:"",scores:[4,3,5,5,5,5,4,4,2,1,9],ver:[true,false,true,false,true,true,false,false,false,true,false],hist:[]},
+
+// ============================================================
+// SYNCED 09-Jul-2026 from standalone Company Ranker (139 companies,
+// ids 142-280 in THIS file — renumbered to avoid colliding with your
+// manually-added & verified id:141 CG Power above, which is untouched).
+// Original Company Ranker ids for these were 141-279 (Canara Bank
+// through Emami). scores[] generated via THIS file's own
+// defaultScores()+PARAMS (10-param LT model) from each company's
+// authored cb — all unverified (ver:false) until you review them here.
+// Sectors not yet in this file's 33-sector PARAMS (Insurance, Speciality
+// Chemicals, Amusement Parks, Battery, Ports/Maritime, PVC Pipes) fall
+// back to the Capital Goods param template per getParamsForSector().
+// ============================================================
+{id:142,name:"Canara Bank",sector:"Banking",group:"Financials",mcap:119506,desc:"Q4: NII ₹9,500Cr(+0.6%), PAT ₹4,506Cr(-9.9%) | GNPA 1.84%, NIM 2.54%, RoA 1.02%, RoE 16.94%, CAR 17.07%, CASA ~30%, Adv +15.1%, PCR 94.2%",cb:62,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:143,name:"Bank of Maharashtra",sector:"Banking",group:"Financials",mcap:60648,desc:"Q4: NII ₹3,702Cr(+18.8%), PAT ₹2,014Cr(+34.9%) | GNPA 1.45%, NIM 3.95%, RoA 1.97%, RoE 26.61%, CAR 18.36%, CASA 52.5%, Adv +21.7%, PCR 98.6%",cb:88,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,5,5,3,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:144,name:"Indian Overseas Bank",sector:"Banking",group:"Financials",mcap:0,desc:"Q4: NII ₹3,470Cr(+11.1%), PAT ₹1,505Cr(+43.2%) | GNPA 1.42%, NIM 3.35%, RoA 1.32%, CAR 19.78%, CASA 41.5%, Adv +24.2%, PCR 97.5% (RoE n/a)",cb:76,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:145,name:"IDBI Bank",sector:"Banking",group:"Financials",mcap:81987,desc:"Q4: NII ₹3,851Cr(+17.1%), PAT ₹1,943Cr(-5.3%) | GNPA 2.32%, NIM 4.15%, RoA 1.75%, RoE 13.99%, CAR 26.65%, CASA 44.6%, Adv +16%, PCR 99.4%",cb:72,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:146,name:"Union Bank of India",sector:"Banking",group:"Financials",mcap:0,desc:"Q4: NII ₹9,406Cr(-1.1%), PAT ₹5,316Cr(+6.6%) | GNPA 2.82%, NIM 2.64%, RoA 1.36%, RoE 18.04%, CAR 18.10%, CASA 35.2%, Adv +9.7%, PCR 95.0%",cb:65,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:147,name:"Indian Bank",sector:"Banking",group:"Financials",mcap:0,desc:"Q4: NII ₹7,110Cr(+11.3%), PAT ₹3,103Cr(+5.0%) | GNPA 1.98%, NIM 3.24%, RoE 18.98%, CASA 39.7%, Adv +13.4%, PCR 98.3% (RoA/CAR n/a)",cb:72,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:148,name:"Kotak Mahindra Bank",sector:"Banking",group:"Financials",mcap:0,desc:"Q4: NII ₹7,876Cr(+8.1%), PAT ₹4,027Cr(+13.4%) | GNPA 1.20%, NIM 4.67%, RoA 2.14%, RoE 12.27%, CAR 22.4%, CASA 43.3%, Adv +16%, PCR 79%",cb:80,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:149,name:"IDFC First Bank",sector:"Banking",group:"Financials",mcap:0,desc:"Q4: NII ₹5,677Cr(+15.7%), PAT ₹319Cr(+4.9%; normalised ₹746Cr +145%) | GNPA 1.61%, NIM 5.93%, CAR 15.60%, CASA 49.8%, Adv +20% (RoA/RoE/PCR n/a)",cb:75,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:150,name:"YES Bank",sector:"Banking",group:"Financials",mcap:62321,desc:"Q4: NII ₹2,638Cr(+15.9%), PAT ₹1,068Cr(+44.7%) | GNPA 1.30%, NIM 2.70%, RoA 1.00%, RoE 8.40%, CAR 15.30%, CASA 35.1%, Adv +11.1%, PCR 81.9%",cb:56,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:151,name:"RBL Bank",sector:"Banking",group:"Financials",mcap:0,desc:"Q4: NII ₹1,671Cr(+6.9%), PAT ₹230Cr(+233%) | GNPA 1.45%, NIM 4.41%, RoA 0.43%, RoE 4.17%, CAR 14.25%, CASA 33.6%, Adv +23%, PCR 73.6%",cb:59,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:152,name:"Karnataka Bank",sector:"Banking",group:"Financials",mcap:0,desc:"Q4: NII ₹843Cr(+7.9%), PAT ₹408Cr(+61.9%) | GNPA 2.78%, NIM 3.07%, RoA 1.27%, RoE 12.69%, CAR 20.07%, CASA 33.6%, Adv +6.9%, PCR 83.5%",cb:64,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:153,name:"South Indian Bank",sector:"Banking",group:"Financials",mcap:10811,desc:"Q4: NII ₹915Cr(+5.4%), PAT ₹408Cr(+19.3%) | GNPA 1.43%, NIM 2.95%, RoA 1.00%, RoE 12.62%, CAR ~17.8%, CASA 32.1%, Adv +14.5%, PCR 94.1%",cb:61,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:154,name:"City Union Bank",sector:"Banking",group:"Financials",mcap:19746,desc:"Q4: NII ₹786Cr(+31%), PAT ₹360Cr(+25%) | GNPA 1.91%, NIM 3.87%, RoA 1.49%, RoE 12.64%, CAR 21.92%, CASA ~28%, Adv +26%, PCR 84%",cb:73,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:155,name:"Tamilnad Mercantile Bank",sector:"Banking",group:"Financials",mcap:11850,desc:"Q4: NII ₹704Cr(+23.9%), PAT ₹374Cr(+28.1%) | GNPA 0.73%, NIM 4.18%, RoA 2.05%, RoE 15.03%, CAR 33.73%, CASA 28.1%, Adv +20.3%, PCR 96.1%",cb:81,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:156,name:"Angel One",sector:"Brokers/Wealth",group:"Financials",mcap:0,desc:"Q4: Rev ₹1,459 Cr (+38.2%), EBITDA ₹609 Cr (41.7%), PAT ₹320 Cr (+83.9%)",cb:83,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:157,name:"Motilal Oswal",sector:"Brokers/Wealth",group:"Financials",mcap:0,desc:"Q4: Rev ₹1,850 Cr (+68.2%), EBITDA ₹814 Cr (44.0%), PAT ₹661 Cr (+25.2%)",cb:79,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:158,name:"AR Share & Stock Brokers",sector:"Brokers/Wealth",group:"Financials",mcap:0,desc:"Q4: Rev ₹256 Cr (+28%), EBITDA ₹110 Cr (43.2%), PAT ₹42 Cr (+133%)",cb:83,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:159,name:"Groww (Billionbrains)",sector:"Brokers/Wealth",group:"Financials",mcap:0,desc:"Q4: Rev ₹1,505 Cr (+87.9%), EBITDA ₹939 Cr (62.4%), PAT ₹686 Cr (+122%)",cb:94,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,5,5,4,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:160,name:"CAMS",sector:"Exchanges",group:"Financials",mcap:0,desc:"Q4: Rev ₹395 Cr (+11.0%), EBITDA ₹184 Cr (46.5%), PAT ₹125 Cr (+11.2%)",cb:50,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:161,name:"KFin Technologies",sector:"Exchanges",group:"Financials",mcap:0,desc:"Q4: Rev ₹362 Cr (+23.8%), EBITDA ₹128 Cr (~35.5%), PAT ₹81 Cr (−4.6%) [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:38,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:162,name:"Shree Renuka Sugars",sector:"Sugar/Ethanol",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹2,547 Cr (−6.1%), EBITDA ₹39 Cr (1.5%), PAT −₹122 Cr (loss) [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:20,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:163,name:"Bajaj Hindusthan Sugar",sector:"Sugar/Ethanol",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹1,669 Cr (+7.4%), EBITDA ₹372 Cr (22.3%), PAT ₹391 Cr (sharp ▲)",cb:75,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:164,name:"Dalmia Bharat Sugar",sector:"Sugar/Ethanol",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ~₹1,180 Cr (−5%), EBITDA ~₹190 Cr (~16%), PAT ₹104 Cr (−48%) [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:39,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:165,name:"Dwarikesh Sugar",sector:"Sugar/Ethanol",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹425 Cr (−7.3%), EBITDA ~₹75 Cr (~17.6%), PAT ₹57 Cr (+24%) [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:54,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:166,name:"Avadh Sugar & Energy",sector:"Sugar/Ethanol",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹672 Cr (−0.9%), EBITDA ~₹100 Cr (~15%), PAT ₹56 Cr (−22%) [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:39,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:167,name:"Uttam Sugar Mills",sector:"Sugar/Ethanol",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹470 Cr (−17%), EBITDA ₹92 Cr (19.5%), PAT ₹55 Cr (−17%) [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:39,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:168,name:"Dhampur Sugar Mills",sector:"Sugar/Ethanol",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹690 Cr (−5%), EBITDA ~₹95 Cr (~13.8%), PAT ₹46 Cr (▼) [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:38,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:169,name:"Bannari Amman Sugars",sector:"Sugar/Ethanol",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹282 Cr (−43%), EBITDA ₹4 Cr (1.3%), PAT ₹42 Cr (+18%) [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:35,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:170,name:"Heritage Foods",sector:"Dairy",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹840 Cr (+12%), EBITDA margin ~8.4%, PAT ₹41 Cr (+58%)",cb:61,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:171,name:"Hatsun Agro Product",sector:"Dairy",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹2,218 Cr (+14%), EBITDA margin ~11.2%, PAT ₹59 Cr (+24%)",cb:56,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:172,name:"Dodla Dairy",sector:"Dairy",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹868 Cr (+16%), EBITDA margin ~9.8%, PAT ₹56 Cr (+19%)",cb:63,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:173,name:"Parag Milk Foods",sector:"Dairy",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹861 Cr (+9%), EBITDA margin ~7.2%, PAT ₹24 Cr (+15%)",cb:37,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:174,name:"SAIL",sector:"Metals",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹30,813 Cr (record FY26), EBITDA ~₹5,500 Cr†, PAT ₹1,680 Cr [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:58,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:175,name:"Shyam Metalics",sector:"Metals",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹5,240 Cr (+27%), EBITDA ₹756 Cr (14.4%), PAT ₹312 Cr [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:77,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:176,name:"Allied Blenders (ABD)",sector:"Alcobev",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ~₹1,050 Cr* (+8.1%), PAT ~₹70 Cr* (+~100%); FY26 margin ~13.9%",cb:70,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:177,name:"Tilaknagar Industries",sector:"Alcobev",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹949 Cr (+147.5%), PAT −₹15 Cr (interest); FY26 margin 17.9%",cb:94,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,5,5,4,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:178,name:"Globus Spirits",sector:"Alcobev",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹632 Cr (+7%), PAT ₹21 Cr (+280%); FY26 margin ~10.7%",cb:70,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:179,name:"Sula Vineyards",sector:"Alcobev",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ~₹139 Cr (−3.8%), PAT ₹8.6 Cr (−63.5%); FY26 margin 17.4% [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:20,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:180,name:"GM Breweries",sector:"Alcobev",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹812 Cr (+22.5%), PAT ₹54 Cr (+19% FY); FY26 margin 7.5%",cb:76,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:181,name:"GE Vernova T&D India",sector:"Capital Goods",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹1,637 Cr (+42%), EBITDA margin 27.1%, PAT +103%; orders ₹8,610 Cr",cb:88,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,5,5,3,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:182,name:"LG Electronics India",sector:"Consumer Durables",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹8,054 Cr (+8.1%), margin ~9%, PAT −3%; record quarter",cb:52,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:183,name:"Cera Sanitaryware",sector:"Building Materials",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹644 Cr (+11.4%), margin 13.1%, PAT −17.2%; brass cost drag",cb:65,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:184,name:"PG Electroplast",sector:"EMS",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹1,717 Cr (−10.1%), margin 8.4%, PAT −33.5%; AC demand weak",cb:48,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:185,name:"Blue Jet Healthcare",sector:"Pharma",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹235 Cr (−31.1%), margin 31%, PAT −25%; debt-free",cb:60,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:186,name:"Shaily Engineering Plastics",sector:"EMS",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹237 Cr (+8.7%), EBITDA ₹69 Cr (29.3%), PAT ₹40 Cr (+40.5%)",cb:61,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:187,name:"Apar Industries",sector:"Cables & Wires",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹6,603 Cr (+26.7%), margin 8.8%, PAT ₹254 Cr (adj +14%)",cb:60,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:188,name:"MTAR Technologies",sector:"Defence",group:"Manufacturing",mcap:26800,desc:"Q4: Rev ₹306 Cr (+67.2%), EBITDA ₹62 Cr (20.2%), PAT ₹44 Cr (+222%); FY26 Rev ₹876 Cr (+29.6%); mcap ~₹26,800 Cr, P/E ~285x [src: MTAR_Technologies_Q4FY26]",cb:88,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,5,5,3,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:189,name:"Apollo Micro Systems",sector:"Defence",group:"Manufacturing",mcap:11449,desc:"Peer ref in MTAR dashboard: CMP ₹337.5, mcap ~₹11,449 Cr, P/E ~158x — full analysis pending [src: MTAR_Technologies_Q4FY26]",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:190,name:"Avalon Technologies",sector:"EMS",group:"Manufacturing",mcap:7039,desc:"Peer ref in MTAR dashboard: CMP ₹1,131, mcap ~₹7,039 Cr, P/E ~87x — full analysis pending [src: MTAR_Technologies_Q4FY26]",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:191,name:"AXISCADES Technologies",sector:"Defence",group:"Manufacturing",mcap:7253,desc:"Peer ref in MTAR dashboard: CMP ₹1,684, mcap ~₹7,253 Cr, P/E ~92x — full analysis pending [src: MTAR_Technologies_Q4FY26]",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:192,name:"Coal India",sector:"Coal/Mining",group:"Energy",mcap:0,desc:"GoI OFS May-2026: floor ₹412 (10.1% disc), ~₹5,078 Cr raise for 2%; cash-monopoly, high dividend; stock ~₹436–458 [src: SectorWire (Market Breaking News)]",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:193,name:"Central Bank of India",sector:"Banking",group:"Financials",mcap:0,desc:"GoI OFS for SEBI MPS norms; exited RBI PCA framework — credit costs normalising, NIM recovering [src: SectorWire (Market Breaking News)]",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:194,name:"NTPC Green Energy",sector:"Solar/Renewables",group:"Energy",mcap:0,desc:"Competitive-bid RE model (SECI/NTMN), no CERC ceiling; AAA parent = lowest cost of capital; 500 GW 2030 tailwind [src: SectorWire (Market Breaking News)]",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:195,name:"Hitachi Energy India",sector:"Capital Goods",group:"Manufacturing",mcap:0,desc:"Q4 profit surge, ahead of estimates — 52-wk high; grid capex supercycle (PGCIL ₹9L Cr plan + data centres) [src: SectorWire (Market Breaking News)]",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:196,name:"Shanti Gold International (SGIL)",sector:"Gold & Jewellery",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹658.9Cr(+121.6%), EBITDA margin 10.2%(+310bps), PAT ₹51.9Cr(+465.4%); B2B gold manufacturer/jeweller supplier, 3x capacity expansion planned; CORRECTED 09-Jul-2026 — entity confirmed via gold_analysis_with_Shanthi dashboard as Shanti Gold International Ltd (SGIL), not Shanthi Gears",cb:88,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,5,5,3,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:197,name:"Swiggy",sector:"E-commerce",group:"Consumption & Services",mcap:0,desc:"IOCC AoA vote failed May-2026 — remains foreign-controlled, broker-only under FEMA PN2/2018; Instamart inventory model blocked [src: SectorWire (Market Breaking News)]",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:198,name:"Wonderla Holidays",sector:"Amusement Parks",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹135.85Cr(+40.4%), EBITDA margin 35.2%, PAT ₹16.42Cr(+49.2%); FY26 footfall 32.19L",cb:94,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,5,5,4,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:199,name:"Imagicaaworld",sector:"Amusement Parks",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹91.86Cr(-2.7%), EBITDA margin 33.0%, PAT ₹0.40Cr(-97.5% YoY); FY26 PAT collapsed to ₹0.64Cr [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:45,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:200,name:"Nicco Parks",sector:"Amusement Parks",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹15.35Cr(-12.7%), Op margin -1.17% (loss), PAT -₹0.72Cr; single-park struggling",cb:20,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:201,name:"Exide Industries",sector:"Battery",group:"Manufacturing",mcap:0,desc:"FY26: Rev ₹17,269Cr(+4.1%), EBITDA margin 11.3%, PAT ₹1,111Cr(+3.2%); Q4 auto OEM +25%, zero debt",cb:39,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:202,name:"Amara Raja Energy & Mobility",sector:"Battery",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹3,460Cr(+16%), EBITDA margin 10.86%; FY26 PAT ₹1,207Cr*; New Energy Business +60%",cb:58,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:203,name:"Emmvee Photovoltaic",sector:"Solar/Renewables",group:"Energy",mcap:0,desc:"Q4: Rev ₹1,738.81Cr(+62.3%), EBITDA margin 32.84%, PAT margin 22.57%; FY26 Rev +116.2%, 10.3GW module capacity",cb:94,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,5,5,4,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:204,name:"ACME Solar Holdings",sector:"Solar/Renewables",group:"Energy",mcap:0,desc:"Q4: Rev ₹705Cr(+30.7%), EBITDA margin 90.2%, PAT ₹138Cr(+13.3%); FY26 PAT +98.5%, D/E improved to 2.01x",cb:70,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:205,name:"Poly Medicure",sector:"MedTech/Pharma",group:"Manufacturing",mcap:0,desc:"FY26: Rev ₹1,875.3Cr(+12.3%), EBITDA margin 24.4% (consol), PAT ₹320.7Cr(-5.3%) [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:53,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:206,name:"Emcure Pharmaceuticals",sector:"Pharma",group:"Manufacturing",mcap:0,desc:"FY26: Rev ₹9,204Cr(+16.6%), EBITDA margin 19.4%, PAT ₹941Cr(+33.1%)",cb:69,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:207,name:"Marksans Pharma",sector:"Pharma",group:"Manufacturing",mcap:0,desc:"FY26: Rev ₹2,950.9Cr(+12.5%, total income), EBITDA margin 20.4%, PAT ₹420.1Cr(+9.8%)",cb:52,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:208,name:"Nitin Spinners",sector:"Textiles",group:"Manufacturing",mcap:2946,desc:"Q4: Rev ₹859.79Cr(+2.2%), EBITDA margin 15.17%, PAT ₹57.36Cr(+23.7%); exports 63% of Q4 mix, D/E improved to 0.76x",cb:48,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:209,name:"Pace Digitek",sector:"Power (Gencos)",group:"Manufacturing",mcap:0,desc:"FY26: Rev ₹2,641Cr(+8.3%), EBITDA margin 17.2% (Q4 14.9%), PAT ₹307Cr(+10.1%); BESS pivot 40% of FY26 rev, ROE 13.6%",cb:44,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:210,name:"Adani Ports (APSEZ)",sector:"Ports/Maritime",group:"Infrastructure",mcap:0,desc:"Q4: Rev ₹10,738Cr(+26.5%), EBITDA margin 56.1%, PAT ₹3,329Cr(+10.4%); FY26 cargo 653 MMT, container mkt share 45.5%",cb:84,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:211,name:"JSW Infrastructure",sector:"Ports/Maritime",group:"Infrastructure",mcap:0,desc:"Q4: Rev ₹1,522Cr(+18.6%), EBITDA margin 50.5%, PAT ₹418Cr(-17.9%); FY26 cargo 122 MT (+4%) [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:67,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:212,name:"Gujarat Pipavav Port",sector:"Ports/Maritime",group:"Infrastructure",mcap:0,desc:"Q4: Rev ₹317Cr(+26.1%), EBITDA margin 70.4% (best-in-class), PAT ₹142Cr(+30.5%)",cb:94,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,5,5,4,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:213,name:"Allcargo Terminals",sector:"Ports/Maritime",group:"Infrastructure",mcap:0,desc:"Q4: Rev ₹208Cr(+11.8%), EBITDA margin 21.2%, PAT ₹8.8Cr (turnaround from -₹2.4Cr loss)",cb:75,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:214,name:"Finolex Industries",sector:"PVC Pipes",group:"Manufacturing",mcap:11900,desc:"Q4: Rev ₹1,313.88Cr(+12.1%), EBITDA margin 25.34% (best-in-class), PAT ₹254.22Cr(+69.2%); CB Rating 6.0/10 per dashboard",cb:80,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:215,name:"Supreme Industries",sector:"PVC Pipes",group:"Manufacturing",mcap:47330,desc:"Q4: Rev ₹3,528Cr(+17%), EBITDA margin 17.69%, PAT ₹433.57Cr(+47.5% consol); debt-free; CB Rating 7.3/10",cb:81,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:216,name:"Astral Limited",sector:"PVC Pipes",group:"Manufacturing",mcap:37000,desc:"Q4: Rev ₹2,088.5Cr(+24.2%), EBITDA margin 19.16%, PAT ₹213Cr(+18.8%); CB Rating 7.0/10, Buy consensus",cb:83,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:217,name:"Aarti Industries",sector:"Speciality Chemicals",group:"Manufacturing",mcap:0,desc:"FY26: Rev ₹8,286Cr(+14%), EBITDA margin 14.1%, PAT ₹419Cr(+26.6%); Net D/E 0.72x, moderate debt flag",cb:66,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:218,name:"Balaji Amines",sector:"Speciality Chemicals",group:"Manufacturing",mcap:0,desc:"FY26: Rev ₹1,425Cr(+2%), EBITDA margin 20.0%, PAT ₹169Cr(+6.7%); near-debt-free [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:69,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:219,name:"Vinati Organics",sector:"Speciality Chemicals",group:"Manufacturing",mcap:0,desc:"FY26: Rev ₹2,227Cr(-0.9%), EBITDA margin 31.8% (best-in-class), PAT ₹444Cr(+9.5%); debt-free, global ATBS leader",cb:78,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:220,name:"Galaxy Surfactants",sector:"Speciality Chemicals",group:"Manufacturing",mcap:0,desc:"FY26: Rev ₹5,270Cr(+24.1%), EBITDA margin 9.4% (commodity squeeze), PAT ₹267Cr(-12.3%); net cash [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:30,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:221,name:"Alkyl Amines",sector:"Speciality Chemicals",group:"Manufacturing",mcap:0,desc:"FY26: Rev ₹1,536Cr(-2.3%), EBITDA margin 17.6%, PAT ₹180Cr(-3.3%); MIPA dumping pressure, DGTR anti-dumping response [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:51,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:222,name:"SRF Limited",sector:"Speciality Chemicals",group:"Manufacturing",mcap:0,desc:"FY26: Rev ₹15,787Cr(+7.4%), EBITDA margin 23.5%, PAT ₹1,835Cr(+46.7%); BOPP film oversupply managed via deferred investment",cb:94,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,5,5,4,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:223,name:"Deepak Nitrite",sector:"Speciality Chemicals",group:"Manufacturing",mcap:0,desc:"FY26: Rev ₹7,887Cr(-4.8%), EBITDA margin 13.2%, PAT ₹551Cr(-21.0%); moderate debt flag [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:41,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:224,name:"Welspun Living",sector:"Textiles",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹2,435Cr(-8.0%), EBITDA margin 10.8%, PAT ₹104Cr(-21.3%); home textiles [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:26,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:225,name:"Indo Count Industries",sector:"Textiles",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹1,057.7Cr(+3.4%), EBITDA margin 8.2%, PAT ₹24.2Cr(+15%); home textiles export",cb:44,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:226,name:"Himatsingka Seide",sector:"Textiles",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹600Cr(-2%, estimate), EBITDA margin 15.8%, PAT ₹12Cr(-40%); results not yet formally declared [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:33,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:227,name:"Trident Limited",sector:"Textiles",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹1,633Cr(-12.4%), EBITDA margin 15.05%, PAT ₹102Cr(-23.5%); yarn+home+integrated [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:33,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:228,name:"SP Apparels",sector:"Textiles",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹365Cr(-6%), EBITDA margin 12.2%, PAT ₹18.5Cr(-39.2%); kids apparel exporter [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:33,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:229,name:"Gokaldas Exports",sector:"Textiles",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹1,087Cr(+5%), EBITDA margin 12.4%, PAT ₹36Cr(-32%); apparel exports [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:40,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:230,name:"Pearl Global Industries",sector:"Textiles",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹1,200Cr(+22%), EBITDA margin 14.5%, PAT ₹72Cr(+18%); apparel exports strongest growth in pack [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:77,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:231,name:"Raymond Lifestyle",sector:"Textiles",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹1,810Cr(+15%), EBITDA margin 8.4%, PAT -₹52Cr (loss); apparel + integrated, India-UK FTA tailwind [CB score corrected 09-Jul: fixed a scoring-parser bug affecting \"declining/negative\" bands]",cb:48,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:232,name:"Vedanta Ltd (Residual)",sector:"Metals",group:"Manufacturing",mcap:0,desc:"Post-demerger residual entity; anchor holding Hindustan Zinc 63.4%; listing price ₹305; consol Q4 Rev ₹51,524Cr(+29%), PAT ₹9,352Cr(+89%)",cb:50,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:233,name:"Vedanta Aluminium",sector:"Metals",group:"Manufacturing",mcap:0,desc:"Demerged entity; FY26 EBITDA ₹16,600Cr; listing price ₹527",cb:47,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:234,name:"Vedanta Oil & Gas",sector:"Oil & Gas",group:"Energy",mcap:0,desc:"Demerged entity; listing price ₹38; net debt position neutral",cb:43,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:235,name:"Vedanta Power",sector:"Power (Gencos)",group:"Energy",mcap:0,desc:"Demerged entity; listing price ₹41.8; 4,780 MW capacity",cb:38,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:236,name:"Vedanta Iron & Steel",sector:"Metals",group:"Manufacturing",mcap:0,desc:"Demerged entity; listing price ₹20; 1.5 MTPA capacity",cb:34,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:237,name:"BHEL",sector:"Capital Goods",group:"Manufacturing",mcap:133000,desc:"Q4: Rev ₹12,310Cr(+36.9%), EBITDA margin 14.2%(+499bps), PAT ₹1,290Cr(+155.8%); Power segment +53.6%, order book ~₹2.4L Cr",cb:82,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:238,name:"Thermax",sector:"Capital Goods",group:"Manufacturing",mcap:55400,desc:"Q4: Rev ₹3,428Cr, EBITDA margin ~10.9%, PAT ₹244.3Cr(+18.7%); Energy/Environment/Chemical segments",cb:55,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:239,name:"Triveni Turbine",sector:"Capital Goods",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹679.6Cr, EBITDA margin 21.2% (best-in-class), PAT ₹101.9Cr(+7.7%); steam turbines",cb:69,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:240,name:"Acutaas Chemicals",sector:"Speciality Chemicals",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹432.8Cr(+40.3%), EBITDA margin 42.4% (best-in-class), PAT ₹134.3Cr(+114.1%); Pharma intermediates→CDMO pivot; CBF26: CB-A",cb:94,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,5,5,4,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:241,name:"Privi Speciality Chemicals",sector:"Speciality Chemicals",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹721.5Cr(+17.6%), EBITDA margin 25.4%, PAT ₹93.7Cr(+40.9%); Aroma chemicals; CBF26: CB-A(FY)/CB-B(Q4)",cb:87,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:242,name:"Shilpa Medicare",sector:"Pharma",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹437.0Cr(+32.1%), EBITDA margin 28.0%, PAT ₹107.8Cr(+643% YoY, low base); API+Formulations; CBF26: CB-A",cb:88,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,5,5,3,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:243,name:"Sudeep Pharma",sector:"Pharma",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹182.3Cr(+15.7%), EBITDA margin 34.3% (best-in-class), PAT ₹48.5Cr(+9.7%); Excipients; exports 60% of FY26",cb:65,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:244,name:"Beta Drugs",sector:"Pharma",group:"Manufacturing",mcap:0,desc:"Q4: Rev ~₹94Cr(flat), EBITDA margin ~24%, PAT ~₹10.3Cr(+18%); Oncology formulations; CBF26: CB-C",cb:67,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:245,name:"V2 Retail",sector:"Retail/Apparel",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹797Cr(+60%), EBITDA margin 13.7%, PAT +₹17.5Cr; 136 net store adds FY26, D/E 3.35x rising",cb:77,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:246,name:"Aditya Birla Fashion (ABFRL)",sector:"Retail/Apparel",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹1,990Cr, EBITDA margin 15.7%, PAT -₹163.8Cr (loss); Pantaloons/TMRW growth, Debt/EBITDA ~7.3x very high",cb:57,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:247,name:"LIC",sector:"Insurance",group:"Financials",mcap:0,desc:"FY26: Total Premium/GWP ₹5,35,984Cr(+9.8%), APE ₹66,961Cr, VNB ₹14,179Cr (21.2% margin), PAT ₹57,419Cr; EV ₹7,89,185Cr, Solvency 235%, market share 56.66%",cb:39,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:248,name:"ICICI Prudential Life",sector:"Insurance",group:"Financials",mcap:0,desc:"FY26: GWP ₹24,810Cr(+9.9%), APE ₹10,641Cr, VNB ₹2,629Cr (24.7% margin), PAT ₹1,600Cr; EV ₹52,989Cr, Solvency 212%",cb:39,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:249,name:"Axis Max Life",sector:"Insurance",group:"Financials",mcap:0,desc:"FY26: GWP ₹38,877Cr(+17%), APE ₹10,485Cr, VNB ₹2,647Cr (25.2% margin), PAT ₹106Cr* (one-off impacted); EV ₹28,871Cr",cb:76,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:250,name:"HDFC Life",sector:"Insurance",group:"Financials",mcap:0,desc:"FY26: GWP ₹79,493Cr(+12%), APE ₹16,641Cr, VNB ₹4,034Cr (~24.2% margin), PAT ₹1,910Cr; EV ₹62,139Cr, Solvency 177%",cb:57,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:251,name:"SBI Life",sector:"Insurance",group:"Financials",mcap:0,desc:"FY26: GWP ~₹1,02,000Cr(+16%), APE ₹27,270Cr, VNB ₹6,670Cr (27.5% margin — best-in-class), PAT ₹2,470Cr; EV ₹80,790Cr, Solvency 190%",cb:76,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:252,name:"Star Health Insurance",sector:"Insurance",group:"Financials",mcap:0,desc:"FY26: GWP ₹20,369Cr(+16%), Combined Ratio 98.8%, PAT ₹911Cr; Q4 PAT swung to -₹55Cr (one-off); standalone health market leader 31% share",cb:76,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:253,name:"Niva Bupa Health Insurance",sector:"Insurance",group:"Financials",mcap:0,desc:"FY26: GWP ₹9,433Cr(+27% — fastest-growing insurer), Combined Ratio 101.4%, PAT ₹366Cr; Q4 GWP +39%",cb:94,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,5,5,4,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:254,name:"ICICI Lombard",sector:"Insurance",group:"Financials",mcap:0,desc:"FY26: GDPI ₹30,618Cr(+8.4%), Combined Ratio 103.4%, PAT ₹2,772Cr, ROE 17.0%, Solvency 2.67x",cb:39,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:255,name:"Medi Assist",sector:"Insurance",group:"Financials",mcap:0,desc:"FY26: Rev ₹905Cr(+25%), EBITDA margin 19.3%, PAT (reported) ₹89.3Cr, PAT (adjusted) ₹68.8Cr; health insurance TPA",cb:86,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:256,name:"Adani Energy Solutions (AESL)",sector:"Power (Gencos)",group:"Energy",mcap:0,desc:"Q4: Rev ₹4,400Cr(+7%), EBITDA margin ~28.8%, PAT ₹684Cr(+6% reported, +28% adjusted); FY26 EBITDA +12.7%; transmission+distribution",cb:45,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:257,name:"Syrma SGS Technology",sector:"EMS",group:"Manufacturing",mcap:21000,desc:"Q4: Rev ₹1,465Cr(+58.5% — fastest in EMS pack), EBITDA margin 11.9%(+30bps), PAT ₹101Cr(+55%); FY26 Rev +27%, no single customer >15% concentration",cb:82,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:258,name:"Embassy REIT",sector:"REIT/InvIT",group:"Financials",mcap:39916,desc:"Office REIT: Dist. Yield ~6.2%, DPU ₹6.50(Q4), Occupancy ~95%, P/NAV 0.87x, Net Debt/GAV ~26%, WALE 5.5yrs, AAA rated",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:259,name:"Mindspace REIT",sector:"REIT/InvIT",group:"Financials",mcap:18900,desc:"Office REIT: Dist. Yield ~8.3%, DPU ~₹6.50(Q3), Occupancy ~94.5%, P/NAV 0.90x, Net Debt/GAV ~25%, AAA rated",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:260,name:"Brookfield India REIT",sector:"REIT/InvIT",group:"Financials",mcap:18000,desc:"Office REIT: Dist. Yield ~7.7%, DPU ₹5.40(Q3), Occupancy 92%, P/NAV 0.89x, Net Debt/GAV ~29%, AA+ rated",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:261,name:"Nexus Select Trust",sector:"REIT/InvIT",group:"Financials",mcap:23881,desc:"Retail REIT: Dist. Yield ~7.0%, DPU ₹2.37(Q3), Occupancy ~95%+, P/NAV 0.79x, Net Debt/GAV ~27%, AA rated",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:262,name:"Knowledge Realty Trust (KRT)",sector:"REIT/InvIT",group:"Financials",mcap:52570,desc:"Office REIT (Sattva, listed Aug-2025): Dist. Yield ~5.5%, DPU ₹1.62(Q4), Occupancy 92%, P/NAV 0.96x, Net Debt/GAV ~18%, WALE 8.4yrs, AA+ rated",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:263,name:"National Highways Infra Trust (NHIT)",sector:"REIT/InvIT",group:"Financials",mcap:30990,desc:"Toll Road InvIT (NHAI-sponsored): Dist. Yield ~5.5%, DPU ₹2.47(Q2), Revenue ₹1,001Cr(Q2), LTV ~45%, AAA rated",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:264,name:"IndiGrid Infrastructure Trust",sector:"REIT/InvIT",group:"Financials",mcap:16520,desc:"Power Transmission InvIT (KKR+Sterlite): Dist. Yield ~9.2%, DPU ₹4.00(Q3), Revenue ₹908Cr(Q3), LTV ~50%, AAA rated",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:265,name:"PowerGrid InvIT",sector:"REIT/InvIT",group:"Financials",mcap:8468,desc:"Power Transmission InvIT (PGCIL-sponsored): Dist. Yield ~12.9% (highest yield), DPU ₹3.00(Q3), Revenue ₹317Cr(Q3), LTV ~40%, AAA rated",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:266,name:"IRB InvIT Fund",sector:"REIT/InvIT",group:"Financials",mcap:4860,desc:"Toll Road InvIT: Dist. Yield ~8.5%, DPU ₹1.30(Q3), Revenue ~₹450Cr(Q3), LTV ~48%, AA+ rated",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:267,name:"Highways Infra Trust",sector:"REIT/InvIT",group:"Financials",mcap:15930,desc:"Toll Road InvIT (NHAI/Brookfield): Dist. Yield ~7.5%, DPU ~₹2.00, Revenue ~₹400Cr(est), LTV ~45%, AA+ rated",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:268,name:"TVS Infrastructure InvIT",sector:"REIT/InvIT",group:"Financials",mcap:1300,desc:"Logistics/Warehousing InvIT (listed Jul-2025): Dist. Yield ~7.5%, DPU ~₹1.95(est), Revenue ~₹80Cr(Q3 est), LTV ~30%, AA rated",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:269,name:"Altius Telecom InvIT",sector:"REIT/InvIT",group:"Financials",mcap:457,desc:"Telecom Towers InvIT: Dist. Yield ~6.5%, DPU ~₹2.50, Revenue ~₹25Cr(est), LTV ~35%, AA rated",cb:0,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:270,name:"Fujiyama Power Systems",sector:"Solar/Renewables",group:"Energy",mcap:0,desc:"Q4: Rev ₹901Cr(+87.5%), EBITDA margin ~18.5%, PAT ₹106Cr(+107%); rooftop module mfr+B2C, 3,568 MW capacity",cb:82,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:271,name:"Sterling & Wilson Renewable Energy",sector:"Solar/Renewables",group:"Energy",mcap:0,desc:"Q4: Rev ₹1,946Cr(-22.8%), EBITDA margin 9.6%, PAT ₹135Cr(2x YoY); EPC+O&M, 27.3 GWp EPC delivered, recovery play",cb:41,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:272,name:"Waaree Renewable Technologies",sector:"Solar/Renewables",group:"Energy",mcap:0,desc:"Q4: Rev ₹1,102Cr(+131%), EBITDA margin 18.76%, PAT ₹156Cr(+66%); EPC arm (distinct from Waaree Energies mfr), 2.83 GWp EPC",cb:82,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:273,name:"CleanMax Enviro Energy",sector:"Solar/Renewables",group:"Energy",mcap:0,desc:"Q4: Rev ₹557Cr(+25%), EBITDA margin ~63%, PAT ₹45Cr(+165%); C&I OPEX model, 3.1 GW operational, data-centre demand tailwind",cb:80,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:274,name:"KPI Green Energy",sector:"Solar/Renewables",group:"Energy",mcap:0,desc:"Q4: Rev ~₹250Cr(growing), EBITDA margin ~28%, PAT ~₹50Cr(growing); CPP+IPP model, ~1,200 MW estimated capacity, RPO compliance beneficiary",cb:56,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:275,name:"Ather Energy",sector:"Auto 2W",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹1,175Cr(+74% — fastest in 2W pack), EBITDA margin -2.5% (loss), PAT -₹100Cr (loss); EV 2W pure-play, loss narrowing trajectory",cb:20,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:276,name:"ITC Limited",sector:"FMCG",group:"Consumption & Services",mcap:0,desc:"Q3 FY26: Rev ₹21,578Cr(+7.1%), EBITDA margin 35.0% (best-in-class), PAT ₹5,340Cr(+9.9%); diversified FMCG/cigarettes/hotels/paper conglomerate",cb:78,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:277,name:"Godrej Consumer Products (GCPL)",sector:"FMCG",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹3,900Cr(+11.0%), EBITDA margin 21.7%, PAT ₹452Cr(+9.7%); home & personal care",cb:57,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:278,name:"Tata Consumer Products",sector:"FMCG",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹5,434Cr(+17.9%), EBITDA margin 14.6% (lowest in pack), PAT ₹424Cr(+22.0%); tea/coffee/salt + Starbucks JV",cb:47,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:279,name:"Colgate-Palmolive India",sector:"FMCG",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹1,570Cr(+~8%), EBITDA margin 30.4% (best-in-class), PAT ₹310Cr(+~8%); oral care dominant share",cb:78,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:280,name:"Emami",sector:"FMCG",group:"Consumption & Services",mcap:0,desc:"Q3 FY26: Rev ₹1,152Cr(+9.8%), EBITDA margin 33.4% (2nd best), PAT ₹319Cr(+14.5%); personal care/healthcare",cb:86,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 ];
 
 let nextId=300;
@@ -6552,7 +6859,19 @@ CR_DATA.forEach(d=>{
   if(!d.ver || d.ver.length!==d.scores.length) d.ver = d.scores.map(()=>false);
   if(!d.flag) d.flag='';
   if(!d.hist) d.hist=[];
-  d.cb = calcCBFor(d); // fundamentals+macro — the live NSE nudge stacks on top as cbLive
+  // FIX (09-Jul-2026): previously calcCBFor(d) ran unconditionally here, which
+  // silently overwrote every UNVERIFIED company's authored cb with a lossy
+  // recalculation — defaultScores() collapses any cb>=88 into the SAME coarse
+  // synthetic pattern, so companies with different authored scores (e.g. BSE=90
+  // vs 360 One WAM=96) became indistinguishable except by Seasonality, which
+  // then silently re-ranked them. Since ~none of the dataset has genuine
+  // per-parameter verification yet (ver all false), this was corrupting nearly
+  // every score on every page load. Now: only recalculate when the company has
+  // at least one REAL verified parameter (i.e. you've actually edited it here in
+  // Macro Pulse) — matching the "explicit scores win" comment above as intended.
+  // Unverified companies keep their authored cbSeed untouched.
+  const hasRealEdit = d.ver.some(v=>v===true);
+  d.cb = hasRealEdit ? calcCBFor(d) : d.cbSeed;
 });
 const ORIG_DATA = JSON.parse(JSON.stringify(CR_DATA));
 
@@ -7432,8 +7751,8 @@ function saveMetrics(){
     if(wInp) WEIGHTS[pi] = Math.max(0.01, parseInt(wInp.value||1)/100);
     // opts already updated live via onchange
   });
-  // Recalc all companies
-  CR_DATA.forEach(d=>{ d.cb=calcCBFor(d); });
+  // Recalc all companies (unverified companies keep their authored cbSeed — see fix note above)
+  CR_DATA.forEach(d=>{ d.cb = (d.ver&&d.ver.some(v=>v===true)) ? calcCBFor(d) : (d.cbSeed!=null?d.cbSeed:d.cb); });
   // Show toast
   const toast=document.getElementById('mtr-toast');
   toast.classList.add('show');
@@ -7478,7 +7797,7 @@ const SECTORS=[
  detail:{revNote:'IHCL +14%, ITC Hotels +18%, SAMHI +19.4% — broad-based',ebitdaNote:'Lemon Tree 52%, Chalet 48.8%, Juniper 44%; sector best-in-class margins',patNote:'IHCL ₹646 Cr (+26%), Juniper PAT doubled FY26, SAMHI turnaround',outNote:'India hotel cycle in upcycle phase; RevPAR +9–16% across pack; supply tight',risk:'New supply FY27–28; Juniper one-off tax; SAMHI leverage',stars:5}},
 
 {name:'Power (Gencos/Transmission)',group:'Energy',rev:'+18%',revN:18,ebitda:'28–42%',ebitdaN:34,pat:'↑↑ Strong',outlook:5,cb:86,sent:'green',
- companies:['NTPC','Power Grid','Adani Power','Tata Power','CESC','Torrent Power','NHPC','JSW Energy'],
+ companies:['NTPC','Power Grid','Adani Power','Tata Power','CESC','Torrent Power','NHPC','JSW Energy','Vedanta Power','Pace Digitek'],
  detail:{revNote:'NTPC capacity additions; Adani Power +22%; transmission capex surge',ebitdaNote:'Regulated utilities ~42%; merchant players ~28–32%',patNote:'NTPC PAT +18%, Power Grid steady; merchant margins up on peak tariffs',outNote:'India peak demand 250 GW+ FY26; 500 GW RE target by 2030 drives capex',risk:'Fuel cost pass-through lags; regulatory risk in state DISCOMs',stars:5}},
 
 {name:'Power Financiers',group:'Financials',rev:'+22%',revN:22,ebitda:'NII-led',ebitdaN:72,pat:'↑↑ Record',outlook:5,cb:85,sent:'green',
@@ -7486,24 +7805,20 @@ const SECTORS=[
  detail:{revNote:'NII growth 20–25%; loan book at record levels across all three',ebitdaNote:'NIM ~3.5–3.8%; credit cost near zero on PSU/RE project loans',patNote:'PFC PAT ₹7,200 Cr+; REC ₹4,500 Cr+; IREDA strong RE book growth',outNote:'₹11L Cr power sector capex pipeline; sovereign backing = negligible NPAs',risk:'RE project delays; concentrated sectoral exposure',stars:5}},
 
 {name:'Capital Goods',group:'Manufacturing',rev:'+17%',revN:17,ebitda:'13–18%',ebitdaN:15,pat:'↑ Good',outlook:4,cb:82,sent:'green',
- companies:['Siemens','ABB','Hitachi Energy','Voltamp','Bosch','L&T (CapGoods)'],
+ companies:['Siemens','ABB','Hitachi Energy','Voltamp','Bosch','L&T (CapGoods)','BHEL','Thermax','Triveni Turbine'],
  detail:{revNote:'Order inflows at record; Siemens +19%, ABB +16%; T&D surge',ebitdaNote:'ABB 18%+, Siemens 17%; Voltamp 22% (transformer boom)',patNote:'Sector PAT up 20–35%; transformer cos outperformed',outNote:'T&D investment super-cycle; data centre, RE, railways all driving orders',risk:'Execution capacity; input cost inflation; valuation stretched',stars:4}},
 
 {name:'Exchanges / Depositories',group:'Financials',rev:'+24%',revN:24,ebitda:'55–70%',ebitdaN:62,pat:'↑↑ Strong',outlook:4,cb:81,sent:'green',
- companies:['BSE','MCX','CDSL','NSDL','IEX'],
- detail:{revNote:'BSE +35% (options boom); MCX +28%; CDSL Demat accounts 18 Cr+',ebitdaNote:'Inherent high-margin monopoly / duopoly businesses',patNote:'BSE PAT +50%+; CDSL +20%; MCX margins expanding post tech migration',outNote:'Retail investor participation structural; SIP flows ₹25K Cr/month',risk:'SEBI regulatory changes; BSE-NSE competition; IEX volume volatility',stars:4}},
+ companies:['BSE','MCX','CDSL','NSDL','IEX','CAMS','KFin Technologies'],
+ detail:{revNote:'BSE +35% (options boom); MCX +28%; CDSL Demat accounts 18 Cr+; CAMS Q4 rev +11%, KFin +23.8%',ebitdaNote:'Inherent high-margin monopoly / duopoly businesses; CAMS 46.5% EBITDA margin, KFin 35.5%',patNote:'BSE PAT +50%+; CDSL +20%; MCX margins expanding post tech migration; CAMS PAT +11.2%, KFin PAT -4.6% (employee cost surge)',outNote:'Retail investor participation structural; SIP flows ₹25K Cr/month; MF RTA duopoly (CAMS/KFin) rides SIP AUM growth',risk:'SEBI regulatory changes; BSE-NSE competition; IEX volume volatility; RTA pricing pressure',stars:4}},
 
 {name:'Cables & Wires',group:'Manufacturing',rev:'+16%',revN:16,ebitda:'11–14%',ebitdaN:12,pat:'↑ Good',outlook:4,cb:79,sent:'green',
  companies:['Polycab','KEI','Finolex Cables','RR Kabel','Havells','Sterlite'],
  detail:{revNote:'Polycab +18%, KEI +22%; infrastructure and real estate driving volumes',ebitdaNote:'~11–14%; input costs (copper) pass-through keeps margins relatively stable',patNote:'PAT growth 15–25% across pack',outNote:'Housing boom, T&D expansion, EV charging infra all multi-year demand drivers',risk:'Copper price spike compresses margins; competition from unorganised',stars:4}},
 
 {name:'Solar / Renewables',group:'Energy',rev:'+28%',revN:28,ebitda:'20–35%',ebitdaN:27,pat:'↑ Mixed',outlook:4,cb:78,sent:'green',
- companies:['Adani Green','Greenko','Shakti Pumps','Waaree','Premier Energies'],
+ companies:['Adani Green','Greenko','Shakti Pumps','Waaree','Premier Energies','Emmvee Photovoltaic','ACME Solar Holdings'],
  detail:{revNote:'Capacity additions strong; Shakti Pumps +40%; module cos +30%+',ebitdaNote:'Module cos 20–22%; asset-heavy IPPs 30–35% EBITDA',patNote:'PAT varies widely; high-capex IPPs still debt-heavy; equipment cos strong',outNote:'India 500 GW RE target; solar module exports growing; PM-KUSUM tailwind',risk:'Panel price deflation; grid connectivity delays; high leverage at IPPs',stars:4}},
-
-{name:'Battery / Energy Storage',group:'Energy',rev:'+6%',revN:6,ebitda:'11–12%',ebitdaN:11,pat:'↑ Mixed',outlook:3,cb:65,sent:'mixed',
- companies:['Exide Industries','Amara Raja Energy & Mobility'],
- detail:{revNote:'Exide FY26 revenue +4.1% (₹17,269 Cr) on record Auto OEM growth (+25%+ for 2 straight quarters); Amara Raja +7.5% (₹13,814 Cr) on home-energy and telecom-lithium momentum (telecom lithium packs crossed 1 GWh cumulative)',ebitdaNote:'Exide margin held at 11.3–11.7% despite sulfur/antimony cost spikes (sulfur ~5x YoY, ~₹150 Cr negative impact, offset by 5-6% price hikes); Amara Raja margin compressed to 10.9% (from 11.1–13.3% range over 6 quarters) on lead-acid competitive intensity',patNote:'Exide PAT +3.2% FY26, steady; Amara Raja FY26 PAT -5.2%, though Q4 surged 94%+ YoY partly on a one-off ₹181 Cr insurance claim (fire-damage settlement) — core profitability still under pressure ex-exceptional',outNote:'Both companies are mid-transition: Exide has invested ₹4,802 Cr cumulative in its Bengaluru lithium-ion gigafactory (6 GWh, scalable to 12 GWh) with customer samples from Q1 FY27; Amara Raja is building a Telangana giga-corridor (2 GWh Phase-1, targeting 16 GWh by FY30) plus a 5 GWh BESS plant. Neither new-energy bet contributes meaningful revenue yet — FY27-28 is when this should start converting',risk:'Legacy lead-acid margins under structural pressure from raw material volatility (sulfur, antimony, lead) and competitive intensity; new lithium-ion/BESS capex is large and pre-revenue, creating execution and capital-allocation risk before payoff',stars:3}},
 
 {name:'Railways',group:'Infrastructure',rev:'+20%',revN:20,ebitda:'14–20%',ebitdaN:17,pat:'↑ Good',outlook:4,cb:77,sent:'green',
  companies:['RVNL','IRFC','Rail Vikas Nigam','Titagarh','Texmaco','IRCTC'],
@@ -7522,12 +7837,8 @@ const SECTORS=[
  detail:{revNote:'Gold price +30% YoY driving revenue; Titan +22%; Kalyan +28%',ebitdaNote:'~7–12%; margins steady despite gold price; making charges protect margins',patNote:'Volume growth + price tailwind = strong PAT for franchisee cos',outNote:'Wedding season robust; Gold at ₹95,000+/10g; hallmarking drives organised play',risk:'Gold price correction; high gold inventory risk; Titan valuation premium',stars:4}},
 
 {name:'Pharma',group:'Manufacturing',rev:'+18%',revN:18,ebitda:'25–36%',ebitdaN:30,pat:'↑↑ Strong',outlook:4,cb:81,sent:'green',
- companies:['Sun Pharma','Lupin','Cipla','Dr Reddys','Divi\'s','Torrent','Aurobindo','Alkem','Laurus Labs','Zydus'],
+ companies:['Sun Pharma','Lupin','Cipla','Dr Reddys','Divi\'s','Torrent','Aurobindo','Alkem','Laurus Labs','Zydus','Poly Medicure','Emcure Pharmaceuticals','Marksans Pharma','Shilpa Medicare','Sudeep Pharma','Beta Drugs'],
  detail:{revNote:'Sun Pharma Rev ₹14,560 Cr (+13.6%); Lupin +31.9% to ₹7,475 Cr; India domestic pharma market +10.5% Q4 FY26; Laurus Labs FY26 rev +23%. Broad-based growth across domestic + US',ebitdaNote:'Lupin EBITDA margin 35.5% (+1,070 bps YoY — exceptional turnaround); Sun Pharma 27.1%; Divi\'s 28%+; Laurus 26.8%. Sector margins at multi-year highs driven by US mix, operating leverage, weak rupee tailwind',patNote:'Sun Pharma PAT ₹2,714 Cr (+26%); Lupin PAT ₹1,460 Cr (+89%); Laurus PAT +148% FY26; Dr Reddys weak (gRevlimid exclusivity expiry hit). Pack-level PAT strong ex-Reddys/Cipla',outNote:'4 structural tailwinds: (1) Weak INR — every ₹1 depreciation = +40–50 bps EBITDA for US exporters; (2) India domestic +10.5% — chronic therapies, Ayushman Bharat; (3) Sun US Innovative Medicines crossed $1 Bn first time; (4) CDMO/Laurus secular growth. US tariff risk on generics real but India supplies 40% of US generic volume — exemption likely for basics',risk:'US tariff extension to generics (10–15% revenue cut risk for high-US-exposure cos); gRevlimid exclusivity hit Dr Reddys Q4; API inflation 5–7% on China dependency; Sun Pharma specialty (Ilumya/Winlevi) tariff watch; Dr Reddys ₹453 Cr shelf-stock adjustment Q4',stars:4}},
-
-{name:'MedTech',group:'Manufacturing',rev:'+12%',revN:12,ebitda:'21–27%',ebitdaN:24,pat:'↓ Weak',outlook:3,cb:62,sent:'mixed',
- companies:['Poly Medicure'],
- detail:{revNote:'Poly Medicure FY26 consolidated revenue +12.3% to ₹1,875 Cr, record Q4 revenue +21.3% YoY, led by domestic (+19.6–25%) and steady international growth; FY27 guided to ₹2,300–2,400 Cr (+23–28%) on full-year consolidation of Citieffe/PendraCare acquisitions',ebitdaNote:'Standalone EBITDA margin held at 26.8% (within 25–27% guidance), but consolidated margin diluted to 24.4% by lower-margin European acquisitions (Citieffe, PendraCare); Q4 consolidated margin fell sharply to ~21% from ~27.6% YoY',patNote:'FY26 consolidated PAT -5.3% to ₹320.7 Cr despite double-digit revenue growth — Q4 PAT alone fell ~28-29% YoY as acquisition integration costs and raw-material/logistics headwinds hit the bottom line',outNote:'Management is deliberately trading near-term margin for a 5-year pivot into high-technology, high-complexity devices (cardiology, critical care, renal) — non-infusion segments now over 50% of revenue, up from 43% a year ago. FY27 guidance (25–27% standalone EBITDA) signals confidence in margin recovery once acquisitions are integrated. 35 new products launched in FY26, 390+ patents held',risk:'Newly-acquired European businesses (Citieffe, PendraCare) operate at structurally lower margins and will keep diluting consolidated profitability until fully integrated; Chinese import competition explicitly flagged by management as a Renal-segment risk',stars:3}},
 
 {name:'Banking',group:'Financials',rev:'+12%',revN:12,ebitda:'NIM-led',ebitdaN:3,pat:'↑ Mixed',outlook:3,cb:68,sent:'mixed',
  companies:['HDFC Bank','ICICI Bank','SBI','Kotak','Axis','IndusInd','Yes Bank','PNB','BOB'],
@@ -7566,11 +7877,11 @@ const SECTORS=[
  detail:{revNote:'Volume +8–10% but realisations flat/down; pricing discipline weak',ebitdaNote:'UltraTech 20%; Shree 23%; ACC/Ambuja 18%; costs easing (petcoke)',patNote:'Margins recovering vs H1 FY26 but YoY still soft; UltraTech best placed',outNote:'Capacity additions peaking; infra & housing demand FY27; pricing critical',risk:'Oversupply risk; pricing war; energy cost spikes',stars:3}},
 
 {name:'Metals',group:'Manufacturing',rev:'+5%',revN:5,ebitda:'12–20%',ebitdaN:15,pat:'↑ Volatile',outlook:3,cb:58,sent:'mixed',
- companies:['Tata Steel','JSW Steel','SAIL','Hindalco','NALCO','Vedanta'],
+ companies:['Tata Steel','JSW Steel','SAIL','Hindalco','NALCO','Vedanta Ltd (Residual)','Vedanta Aluminium','Vedanta Iron & Steel'],
  detail:{revNote:'Steel realisations weak on China dumping; Aluminium better on LME',ebitdaNote:'Hindalco 20%+; NALCO strong; steel cos 12–15% on lower realisations',patNote:'Steel PAT under pressure; Aluminium pack outperformed',outNote:'Anti-dumping duties on China steel positive signal; LME Aluminium supportive',risk:'China steel exports; global demand slowdown; coking coal costs',stars:3}},
 
 {name:'Oil & Gas',group:'Energy',rev:'+4%',revN:4,ebitda:'18–32%',ebitdaN:24,pat:'↓ Mixed',outlook:3,cb:57,sent:'mixed',
- companies:['Reliance Industries','ONGC','BPCL','IOC','HPCL','Petronet LNG'],
+ companies:['Reliance Industries','ONGC','BPCL','IOC','HPCL','Petronet LNG','Vedanta Oil & Gas'],
  detail:{revNote:'OMC revenues soft on lower crude; RIL O2C stable; Upstream +5%',ebitdaNote:'OMCs: marketing margins normalised at ₹3–4/ltr; upstream 28–32%',patNote:'OMCs PAT compressed vs FY25 windfall; ONGC PAT stable; RIL flat',outNote:'Gas pricing clarity; city gas distribution growth; petrochemicals recovery',risk:'Crude price collapse risk; LPG subsidy burden; Saudi OSP hikes',stars:3}},
 
 {name:'Paints',group:'Manufacturing',rev:'+7%',revN:7,ebitda:'17–20%',ebitdaN:18,pat:'↑ Moderate',outlook:3,cb:61,sent:'mixed',
@@ -7586,7 +7897,7 @@ const SECTORS=[
  detail:{revNote:'Premiumisation trend; United Spirits +11%; Radico +14% (prestige+ mix)',ebitdaNote:'~12–16%; Radico 16%+; state excise duty structures compress margins',patNote:'Radico PAT +18%; United Spirits steady; category premiumisation helping',outNote:'Premiumisation is multi-year; beer penetration growing; spirits + beer',risk:'State-by-state policy risk; high excise; raw material (ENA, barley) costs',stars:3}},
 
 {name:'Textiles',group:'Manufacturing',rev:'+8%',revN:8,ebitda:'10–16%',ebitdaN:12,pat:'↑ Modest',outlook:3,cb:59,sent:'mixed',
- companies:['Vardhman Textiles','Arvind','Raymond','Page Industries','Welspun','KPR Mill'],
+ companies:['Vardhman Textiles','Arvind','Raymond Lifestyle','Page Industries','Welspun Living','KPR Mill','Nitin Spinners','Indo Count Industries','Himatsingka Seide','Trident Limited','SP Apparels','Gokaldas Exports','Pearl Global Industries'],
  detail:{revNote:'Export recovery slow; domestic branded (Page Industries) better at +10%',ebitdaNote:'~10–16%; spinning margins squeezed; branded players hold better',patNote:'Page Industries strong; export-oriented cos mixed',outNote:'China+1 a longer-term story; PLI for technical textiles; Bangladesh recovery',risk:'Cotton price volatility; EU recession impact on exports; Bangladesh competition',stars:3}},
 
 {name:'Recycling',group:'Manufacturing',rev:'+18%',revN:18,ebitda:'8–14%',ebitdaN:11,pat:'↑ Good',outlook:4,cb:70,sent:'green',
@@ -7601,6 +7912,46 @@ const SECTORS=[
  companies:['IndiGo (InterGlobe)','Air India (Tata)','SpiceJet','Akasa Air'],
  detail:{revNote:'IndiGo +16% revenue; industry passenger +14%; IndiGo 60%+ market share',ebitdaNote:'IndiGo ~18% EBITDAR; engine grounding (GTF) a drag on ASK',patNote:'IndiGo PAT under pressure — engine issues ground 60+ aircraft; Air India loss',outNote:'Structural aviation growth; AI fleet refresh; IndiGo GTF resolution key FY27',risk:'Engine grounding (P&W GTF); ATF prices; Air India cash burn',stars:2}},
 
+// ============================================================
+// POST-06-JUN-2026 SECTOR ADDITIONS — Q4 FY26 ACTUALS ONLY
+// Added 09-Jul-2026 from Broking_Sector_Q4FY26 and Dairy_Sector_Q4FY26
+// dashboards. CB = simple average of member companies' fact-based
+// CB Scores (Company Ranker ids 155-158, 169-172).
+// ============================================================
+{name:'Brokers / Wealth',group:'Financials',rev:'+66%',revN:66,ebitda:'42–62%',ebitdaN:52,pat:'↑↑ Very Strong',outlook:5,cb:85,sent:'green',added:'2026-07-09',
+ companies:['360 One WAM','Anand Rathi Wealth','Angel One','Motilal Oswal','AR Share & Stock Brokers','Groww (Billionbrains)'],
+ detail:{revNote:'Groww +87.9%; Motilal +68.2%; Angel One +38.2%; AR Share +28% — broad-based Q4 FY26 surge on volumes + wealth AUM',ebitdaNote:'Groww 62.4% EBITDA margin (highest in pack); Motilal 44%; Angel One 41.7%; AR Share 43%',patNote:'Groww PAT +122%; AR Share +133%; Angel One +83.9%; Motilal +25.2% — discount + full-service broking both scaling profitably',outNote:'Retail participation structural; SIP flows + F&O volumes underpin growth; Groww listing validates scale economics',risk:'SEBI F&O regulatory tightening; discount-broking price competition; market-cycle sensitivity',stars:5}},
+
+{name:'Dairy',group:'Consumption & Services',rev:'+13%',revN:13,ebitda:'7–11%',ebitdaN:9,pat:'↑ Moderate',outlook:3,cb:54,sent:'amber',added:'2026-07-09',
+ companies:['Heritage Foods','Hatsun Agro Product','Dodla Dairy','Parag Milk Foods'],
+ detail:{revNote:'Dodla +16%; Hatsun +14%; Heritage +12%; Parag +9% — steady volume-led growth, South India milk demand resilient',ebitdaNote:'Margins thin (7.2–11.2%) — milk procurement cost inflation offsetting value-added product mix gains',patNote:'Heritage PAT +58% (low base); Dodla +19%; Hatsun +24%; Parag +15% — operating leverage kicking in on scale',outNote:'VAP (value-added products) mix shift — ice cream, curd, cheese — key margin lever; East Africa optionality for Dodla',risk:'Raw milk price volatility; monsoon-dependent procurement; intense regional competition',stars:3}},
+
+// ============================================================
+// BATCH 2 SECTOR ADDITIONS — 09-Jul-2026 — Q4 FY26 ACTUALS
+// ============================================================
+{name:'Amusement Parks',group:'Consumption & Services',rev:'+10%',revN:10,ebitda:'22–35%',ebitdaN:29,pat:'↓ Mixed',outlook:3,cb:55,sent:'amber',added:'2026-07-09',
+ companies:['Wonderla Holidays','Imagicaaworld','Nicco Parks'],
+ detail:{revNote:'Wonderla +40.4% Q4 (footfall +30%); Imagicaaworld -2.7% (weak Hyderabad park); Nicco -12.7% (single-park, declining)',ebitdaNote:'Wonderla 35.2% (best-in-class, resort mix helping); Imagicaaworld 33.0% but PAT collapsed; Nicco negative margin',patNote:'Wonderla PAT +49.2% Q4 but FY26 -25.2% (high base); Imagicaaworld PAT -97.5% (from ₹15.7Cr to ₹0.4Cr); Nicco loss-making',outNote:'Wonderla clear sector leader — resort diversification + disciplined capex; smaller peers structurally challenged by seasonality and single-asset risk',risk:'Monsoon/weather dependency; high fixed-cost base; footfall sensitivity to disposable income',stars:3}},
+
+{name:'Battery',group:'Manufacturing',rev:'+8%',revN:8,ebitda:'~11%',ebitdaN:11,pat:'↑ Modest',outlook:4,cb:52,sent:'amber',added:'2026-07-09',
+ companies:['Exide Industries','Amara Raja Energy & Mobility'],
+ detail:{revNote:'Exide Q4 +9.4% (auto OEM +25%); Amara Raja Q4 +16% (New Energy Business/Li-ion +60%)',ebitdaNote:'Exide 11.7% Q4, 11.3% FY26 (flat); Amara Raja 10.86% Q4 — lead-acid margins structurally thin',patNote:'Exide FY26 PAT +3.2% (zero debt); Amara Raja FY26 PAT ~+12% (D/E ~5%)',outNote:'Li-ion pivot underway at both — Amara Raja NEB scaling faster; EV 2W/4W and grid BESS the multi-year opportunity; lead-acid replacement demand stable base',risk:'Lead cost volatility; Li-ion capex intensity (~₹750-1,000 Cr/GWh); China cell-supply dependency near-term',stars:4}},
+
+{name:'Ports/Maritime',group:'Infrastructure',rev:'+21%',revN:21,ebitda:'50–70%',ebitdaN:57,pat:'↑ Good',outlook:4,cb:77,sent:'green',added:'2026-07-09',
+ companies:['Adani Ports (APSEZ)','JSW Infrastructure','Gujarat Pipavav Port','Allcargo Terminals'],
+ detail:{revNote:'APSEZ +26.5% (653 MMT cargo, 45.5% container share); JSW Infra +18.6%; Gujarat Pipavav +26.1%; Allcargo +11.8%',ebitdaNote:'Gujarat Pipavav 70.4% (best-in-class); APSEZ 56.1%; JSW Infra 50.5%; Allcargo 21.2%',patNote:'APSEZ PAT +10.4%; Gujarat Pipavav +30.5%; Allcargo turnaround (+₹8.8Cr from -₹2.4Cr loss); JSW Infra -17.9% (one-off)',outNote:'India cargo volumes structurally rising with trade growth; APSEZ dominant scale; smaller ports offer higher margin/growth optionality',risk:'Global trade slowdown; capex intensity for capacity expansion; regulatory/environmental clearances',stars:4}},
+
+{name:'PVC Pipes',group:'Manufacturing',rev:'+18%',revN:18,ebitda:'17–25%',ebitdaN:21,pat:'↑↑ Strong',outlook:4,cb:81,sent:'green',added:'2026-07-09',
+ companies:['Finolex Industries','Supreme Industries','Astral Limited'],
+ detail:{revNote:'Finolex +12.1% (backward-integrated PVC resin); Supreme +17%; Astral +24.2% (fastest, plumbing +24%)',ebitdaNote:'Finolex 25.34% (best-in-class, resin integration edge); Astral 19.16%; Supreme 17.69%',patNote:'Finolex PAT +69.2% (resin spread recovery); Supreme +47.5% consol; Astral +18.8%',outNote:'CPVC/value-added mix shift structural tailwind; Grasim-Lubrizol JV (Vilayat, 50K MTPA Phase 1) signals import-substitution opportunity ahead — Astral most exposed, Finolex/Supreme relatively insulated',risk:'PVC-EDC spread volatility; China import dependency (~60-68%) for resin; monsoon-linked construction seasonality',stars:4}},
+
+{name:'Speciality Chemicals',group:'Manufacturing',rev:'+10%',revN:10,ebitda:'13–35%',ebitdaN:22,pat:'↑ Mixed',outlook:4,cb:68,sent:'amber',added:'2026-07-09',
+ companies:['Aarti Industries','Balaji Amines','Vinati Organics','Galaxy Surfactants','Alkyl Amines','SRF Limited','Deepak Nitrite','Acutaas Chemicals','Privi Speciality Chemicals'],
+ detail:{revNote:'Acutaas +40.3% (CDMO pivot); Galaxy +24.1%; SRF +7.4%; Aarti +14%; Deepak Nitrite -4.8% (weak); Vinati -0.9%; Alkyl -2.3%',ebitdaNote:'Acutaas 42.4% (best-in-class); Vinati 31.8% (debt-free, ATBS global leader); Galaxy just 9.4% (commodity squeeze); most others 13-25%',patNote:'Acutaas PAT +114.1% (standout); SRF +46.7%; Aarti +26.6%; Deepak Nitrite -21.0% (weakest); Galaxy -12.3%',outNote:'Bifurcated sector — CDMO/specialty players (Acutaas, Vinati) compounding profitably; commodity-exposed names (Galaxy, Deepak Nitrite) facing margin pressure from China competition and pricing',risk:'China dumping/oversupply in commodity chemicals; MIPA/BOPP anti-dumping disputes ongoing; raw material cost volatility',stars:4}},
+
+{name:'Insurance',group:'Financials',rev:'+15%',revN:15,ebitda:'n/a',ebitdaN:0,pat:'↑ Mixed',outlook:4,cb:55,sent:'amber',added:'2026-07-09',
+ companies:['LIC','ICICI Prudential Life','Axis Max Life','HDFC Life','SBI Life','Star Health Insurance','Niva Bupa Health Insurance','ICICI Lombard','Medi Assist'],
+ detail:{revNote:'Niva Bupa GWP +27% (fastest-growing); Axis Max +17%; SBI Life +16%; HDFC Life +12%; LIC +9.8% (dominant scale, 56.66% share)',ebitdaNote:'Not applicable in conventional sense — insurers measured on VNB margin (SBI Life 27.5% best-in-class) and Combined Ratio (Star Health 98.8%, ICICI Lombard 103.4%) instead of EBITDA',patNote:'Mixed — LIC PAT ₹57,419Cr (scale); SBI Life ₹2,470Cr; Axis Max PAT depressed by one-off (₹106Cr); Star Health swung to Q4 loss on provisioning',outNote:'GST reform (0% on protection Sep-2025) structural tailwind for life/health; SAHI (health) growing fastest at +21.9% vs industry; VNB margin expansion across large-caps signals mix shift to protection/non-par',risk:'Regulatory (IRDAI Master Circular changes); interest rate sensitivity for embedded value; combined ratio discipline in health (Niva Bupa >100%)',stars:4}},
 ];
 
 // De-duplicate by name
@@ -8741,7 +9092,7 @@ if(document.readyState==='complete'&&sessionStorage.getItem('cbf26_auth')==='gra
 //  nudge layer stacks on top automatically inside render())
 // ════════════════════════════════════════════════════════════
 
-function recalcAll(){ CR_DATA.forEach(d=>{ d.cb = calcCBFor(d); }); render(); }
+function recalcAll(){ CR_DATA.forEach(d=>{ d.cb = (d.ver&&d.ver.some(v=>v===true)) ? calcCBFor(d) : (d.cbSeed!=null?d.cbSeed:d.cb); }); render(); }
 
 // ── Mode toggle ──
 function setMode(m, btn){
