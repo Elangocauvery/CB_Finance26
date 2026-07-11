@@ -466,13 +466,12 @@
   },
   {
     "file": "Vedanta_Demerger_Dashboard_Q4FY26.html",
-    "split": {
-      "Vedanta Aluminium": "Metals",
-      "Vedanta Oil & Gas": "Oil & Gas",
-      "Vedanta Power": "Power (Gencos/Transmission)",
-      "Vedanta Base Metals": "Metals",
-      "Vedanta Steel & Ferrous Materials": "Metals"
-    }
+    "sectors": [
+      "Metals",
+      "Oil & Gas",
+      "Power (Gencos/Transmission)"
+    ],
+    "note": "consolidated pre-demerger financials only — 5-way split deferred until VAML/VOGL/VEDPOWER/VISL file standalone results"
   },
   {
     "file": "TCS_Q1FY27_Results_Analysis.html",
