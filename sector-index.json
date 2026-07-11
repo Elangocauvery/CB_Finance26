@@ -473,5 +473,55 @@
       "Vedanta Base Metals": "Metals",
       "Vedanta Steel & Ferrous Materials": "Metals"
     }
+  },
+  {
+    "file": "TCS_Q1FY27_Results_Analysis.html",
+    "sectors": [
+      "IT Services"
+    ]
+  },
+  {
+    "file": "IT_Services_Sector_5year_Trends_Dashboard_Q4FY26.html",
+    "sectors": [
+      "IT Services"
+    ]
+  },
+  {
+    "file": "acme-solar-q4fy26-dashboard.html",
+    "sectors": [
+      "Solar / Renewables"
+    ]
+  },
+  {
+    "file": "bhel-q4fy26-dashboard.html",
+    "sectors": [
+      "Capital Goods"
+    ]
+  },
+  {
+    "file": "CB_Research_Banking_Q1FY27_bom_Ib.html",
+    "sectors": [
+      "Banking"
+    ]
+  },
+  {
+    "file": "V2Retail_ABFashion_Dashboard_Q4FY26.html",
+    "sectors": [
+      "Retail"
+    ],
+    "companies": [
+      "V2 Retail",
+      "Aditya Birla Fashion and Retail"
+    ]
+  },
+  {
+    "file": "cb-pharma-chem-q4fy26-dashboard.html",
+    "split": {
+      "Sudeep Pharma": "Pharma",
+      "Beta Drugs": "Pharma",
+      "Shilpa Medicare": "Pharma",
+      "Privi Speciality Chemicals": "Chemicals / Specialty",
+      "Acutaas Chemicals": "Chemicals / Specialty"
+    }
   }
 ]
