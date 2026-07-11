@@ -4965,7 +4965,7 @@ function miRenderDelivery(){
   <span class="rec-count">${rows.length} of ${data.length} records</span>
 </div>
 <div class="tbl-wrap"><table>
-  <thead><tr><th>Date</th><th>Symbol</th><th>Company</th><th>Traded Vol</th><th>Delivery Vol</th><th>Del %</th><th>Prev Del %</th><th>Chg</th><th>5D Avg %</th><th>Signal</th><th></th></tr></thead>
+  <thead><tr><th>Date</th><th>Symbol</th><th>Company</th><th>Open</th><th>Close</th><th>Traded Vol</th><th>Delivery Vol</th><th>Del %</th><th>Prev Del %</th><th>Chg</th><th>5D Avg %</th><th>Signal</th><th></th></tr></thead>
   <tbody>${rows.length?rows.map(r=>{
     const p=r.tv&&r.dv?(Number(r.dv)/Number(r.tv)*100):null;
     const ch=p&&r.pv?(p-Number(r.pv)):null;
@@ -4974,6 +4974,8 @@ function miRenderDelivery(){
     return`<tr>
       <td><strong>${r.date}</strong></td>
       <td style="font-weight:600">${r.sym}</td><td>${r.co}</td>
+      <td>${r.op?'₹'+fmtN(r.op):'—'}</td>
+      <td>${r.cp?'₹'+fmtN(r.cp):'—'}</td>
       <td>${fmtN(r.tv)}</td><td>${fmtN(r.dv)}</td>
       <td class="${p?p>65?'pos':p<40?'neg':'muted':''}">${p?p.toFixed(1)+'%':'—'}</td>
       <td>${r.pv?r.pv+'%':'—'}</td>
@@ -4981,7 +4983,7 @@ function miRenderDelivery(){
       <td>${r.av?r.av+'%':'—'}</td>
       <td class="${p?p>75?'pos':p<40?'neg':'muted':''}">${sig}</td>
       <td><button class="del-btn" onclick="delEntry('delivery',${idx})">✕</button></td>
-    </tr>`}).join(''):`<tr><td colspan="11" class="empty">No delivery entries yet.</td></tr>`}
+    </tr>`}).join(''):`<tr><td colspan="13" class="empty">No delivery entries yet.</td></tr>`}
   </tbody>
 </table></div>`;
 }
@@ -5180,21 +5182,25 @@ function miMergeIntoLocalStorage(serverData){
   }
   return {added,updated};
 }
+async function miLoadFromServerCore(){
+  const r=await fetch(MI_SERVER+'/api/data',{signal:AbortSignal.timeout(8000)});
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  const j=await r.json();
+  const {added,updated}=miMergeIntoLocalStorage(j.data||{});
+  const purged=(typeof miPurgeUntracked==='function')?miPurgeUntracked():0;
+  miSetServerStatus(true,j.last_fetch||'');
+  miRender(miActiveTab);
+  if(typeof miAutoLinkIndicators==='function'){miAutoLinkIndicators();renderAllIndicators();updateAll();}
+  if(typeof render==='function')render();
+  if(typeof renderAll==='function')renderAll();
+  return {added,updated,purged};
+}
 async function miLoadFromServer(){
   const btn=event.target;const origText=btn.textContent;
   btn.classList.add('loading');btn.textContent='Loading...';
   try{
-    const r=await fetch(MI_SERVER+'/api/data',{signal:AbortSignal.timeout(8000)});
-    if(!r.ok)throw new Error('HTTP '+r.status);
-    const j=await r.json();
-    const {added,updated}=miMergeIntoLocalStorage(j.data||{});
-    const purged=(typeof miPurgeUntracked==='function')?miPurgeUntracked():0;
-    miSetServerStatus(true,j.last_fetch||'');
+    const {added,updated,purged}=await miLoadFromServerCore();
     miShowToast(`✓ ${added} new, ${updated} updated`+(purged?`, ${purged} untracked removed`:''));
-    miRender(miActiveTab);
-    if(typeof miAutoLinkIndicators==='function'){miAutoLinkIndicators();renderAllIndicators();updateAll();}
-    if(typeof render==='function')render();
-    if(typeof renderAll==='function')renderAll();
   }catch(e){
     miShowToast('Server not reachable. Run: python server.py',true);
     miSetServerStatus(false,'');
@@ -5204,9 +5210,21 @@ async function miTriggerFetch(){
   try{
     const r=await fetch(MI_SERVER+'/api/fetch',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(5000)});
     if(!r.ok)throw new Error();
-    miShowToast('✓ Fetch started — data ready in ~60 seconds');
+    miShowToast('✓ Fetch started — auto-loading into the sheet in ~65 seconds…');
+    // Previously the fetch ran server-side and the terminal showed the results,
+    // but nothing told the browser to pull them in — data sat in latest.json
+    // until you separately clicked "Load Latest Data". This closes that gap.
+    setTimeout(async()=>{
+      try{
+        const {added,updated,purged}=await miLoadFromServerCore();
+        miShowToast(`✓ Auto-loaded: ${added} new, ${updated} updated`+(purged?`, ${purged} untracked removed`:''));
+      }catch(e){
+        miShowToast('Auto-load failed — click "Load Latest Data" manually to check.',true);
+      }
+    },65000);
   }catch{miShowToast('Could not reach server. Run: python server.py',true);}
 }
+
 
 // ── AUTO-LINK: drive 3 of the 13 macro indicators from NSE-fetched data ──
 // (FII Flow Trend + DII Activity from cbr_fii, Market Valuations from cbr_pe).
