@@ -1711,6 +1711,10 @@ tr:last-child td{border-bottom:none;}
     <h1 style="font-family:'Playfair Display',serif;font-size:22px;color:#fff;">🎯 CB Conviction — Q4 FY26</h1>
     <p style="font-size:12px;color:#cbd5e1;margin-top:4px;">Four lenses fused into one ranking: <strong style="color:#ffab40;">actual Q4 prints</strong> (from published CB Research dashboards) × <strong style="color:#ffab40;">CB fundamental score</strong> × <strong style="color:#ffab40;">live macro</strong> (13 indicators) × <strong style="color:#ffab40;">market pulse</strong> (NSE data). ஒரு பங்கு நான்கு கண்ணோட்டங்களிலும் வலுவாக இருந்தால் மட்டுமே உயர்ந்த நம்பிக்கை.</p>
     <p id="cv-admin-banner" style="font-size:12px;color:#cbd5e1;margin-top:4px;display:none;">📡 Admin view: market-layer breakdowns (momentum, delivery trend, PE band, deals, promoter/institutional activity) are rendered on each card. Members see only layer status and the final conviction.</p>
+    <div id="cv-export-bar" style="display:none;margin-top:10px;align-items:center;gap:10px;">
+      <button class="btn-auto" onclick="cvExportSnapshot()">💾 Export CB Score Snapshot</button>
+      <span id="cv-export-status" style="font-size:11px;color:#cbd5e1;"></span>
+    </div>
   </div>
   <div id="cv-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px;"></div>
   <div id="cv-filters" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;"></div>
@@ -9583,12 +9587,71 @@ function cvCard(x){
       cvLayerChip('M','🧭 Macro',x.L.M)+cvLayerChip('T','📡 Market',x.L.T)+
     '</div>'+reasons+divHtml+agreeHtml+'</div>';
 }
+// ── CB SCORE HISTORY SNAPSHOT (feeds the backtest — see server.py /api/cb_history) ──
+// Exports the 4 fused lenses (Earnings/Fundamental/Macro/Market) + blended
+// conviction for every company cvCompute() scores, dated to today. Without
+// this, calcCB()/cvCompute() only ever exist in-memory for the moment the
+// tab is open — nothing is kept to compare against forward returns later.
+const CV_EXPORT_KEY='cbr_cv_last_export_date';
+async function cvExportSnapshot(auto){
+  const btn = auto ? null : (typeof event!=='undefined' ? event.target : null);
+  const orig = btn ? btn.textContent : '';
+  if(btn){ btn.textContent='Exporting…'; btn.disabled=true; }
+  const statusEl=document.getElementById('cv-export-status');
+  try{
+    const all = cvCompute();
+    const dateStr = (typeof today==='function') ? today() : new Date().toISOString().slice(0,10);
+    const snapshot={};
+    all.forEach(function(x){
+      const key = x.sym || x.d.name;
+      snapshot[key] = {
+        name: x.d.name, sector: x.d.sector,
+        E: x.L.E ? x.L.E.score : null,   // Earnings (Q4 print)
+        F: x.L.F ? x.L.F.score : null,   // Fundamental CB Score (v5 params)
+        M: x.L.M ? x.L.M.score : null,   // Macro sector overlay
+        T: x.L.T ? x.L.T.score : null,   // Market pulse (NSE live)
+        conv: x.conv, avail: x.avail
+      };
+    });
+    const r = await fetch(MI_SERVER+'/api/cb_history', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({date:dateStr, data:snapshot}),
+      signal: AbortSignal.timeout(8000)
+    });
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const j = await r.json();
+    localStorage.setItem(CV_EXPORT_KEY, dateStr);
+    const msg = `✓ Snapshot saved for ${dateStr} — ${Object.keys(snapshot).length} companies (${j.total_dates||'?'} dates in history)`;
+    if(typeof miShowToast==='function') miShowToast(msg);
+    if(statusEl) statusEl.textContent='Last export: '+dateStr;
+  }catch(e){
+    const msg='Could not save snapshot. Run: python server.py — '+e.message;
+    if(!auto && typeof miShowToast==='function') miShowToast(msg, true);
+    if(statusEl) statusEl.textContent=auto ? '' : msg;
+  }finally{
+    if(btn){ btn.textContent=orig; btn.disabled=false; }
+  }
+}
+// Fires once per calendar day, only in admin mode, only after cvRender() has
+// actually computed scores — piggybacks on the existing "open the dashboard"
+// habit instead of requiring a separate manual click every day.
+function cvMaybeAutoExport(){
+  if(typeof isAdminMode!=='function' || !isAdminMode()) return;
+  const todayStr = (typeof today==='function') ? today() : new Date().toISOString().slice(0,10);
+  if(localStorage.getItem(CV_EXPORT_KEY)===todayStr) return;
+  cvExportSnapshot(true);
+}
+
 function cvRender(){
   var grid=document.getElementById('cv-grid'); if(!grid) return;
   cvSnapshotGR();                                // keep quarter snapshot fresh
   var banner=document.getElementById('cv-admin-banner');
-  if(banner) banner.style.display=((typeof isAdminMode==='function')&&isAdminMode())?'block':'none';
+  var exportBar=document.getElementById('cv-export-bar');
+  var isAdmin=(typeof isAdminMode==='function')&&isAdminMode();
+  if(banner) banner.style.display=isAdmin?'block':'none';
+  if(exportBar) exportBar.style.display=isAdmin?'flex':'none';
   var all=cvCompute();
+  if(isAdmin) cvMaybeAutoExport();
   var groups=['All']; all.forEach(function(x){ if(x.d.group&&groups.indexOf(x.d.group)<0) groups.push(x.d.group); });
   var fl=document.getElementById('cv-filters');
   if(fl) fl.innerHTML=groups.map(function(g){
