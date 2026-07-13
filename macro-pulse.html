@@ -4789,6 +4789,7 @@ function miRenderFii(){
     <div class="fld"><label>Source</label><select id="fi-src"><option>Trendlyne</option><option>NSE</option><option>BSE</option><option>SEBI</option></select></div>
   </div>
   <button class="btn primary" onclick="miAddFii()">+ Add Entry</button>
+  <button class="btn" style="margin-left:8px;" onclick="if(confirm('Remove duplicate/blank FII-DII rows, keeping the row with real data for each date?'))miCleanupFiiDupes()">🧹 Clean duplicate/blank rows</button>
 </div>
 <div class="toolbar">
   <label>Filter by date:</label>${dateDropdown(getDates(data),'fii-ds','miRenderFii()')}
@@ -4822,8 +4823,32 @@ function miRenderFii(){
 }
 function miAddFii(){
   const d=load('fii');
-  d.push({date:document.getElementById('fi-d').value,fb:document.getElementById('fi-fb').value,fs:document.getElementById('fi-fs').value,db:document.getElementById('fi-db').value,ds:document.getElementById('fi-ds').value,mf:document.getElementById('fi-mf').value,fo:document.getElementById('fi-fo').value,src:document.getElementById('fi-src').value});
+  const entry={date:document.getElementById('fi-d').value,fb:document.getElementById('fi-fb').value,fs:document.getElementById('fi-fs').value,db:document.getElementById('fi-db').value,ds:document.getElementById('fi-ds').value,mf:document.getElementById('fi-mf').value,fo:document.getElementById('fi-fo').value,src:document.getElementById('fi-src').value};
+  // Only one record per date (see miRecordKey) — if a row for this date
+  // already exists (e.g. a blank NSE stub from auto-fetch, or a prior
+  // manual entry), overwrite it in place instead of adding a duplicate.
+  const idx=d.findIndex(x=>x.date===entry.date);
+  if(idx>=0) d[idx]=entry; else d.push(entry);
   save('fii',d);miRenderFii();
+}
+// One-time cleanup for duplicate FII/DII rows already sitting in storage
+// from before the fix above — collapses to one record per date, preferring
+// whichever row actually has non-zero data over an all-blank/zero stub.
+function miCleanupFiiDupes(){
+  const d=load('fii');
+  const byDate=new Map();
+  for(const r of d){
+    const hasData=[r.fb,r.fs,r.db,r.ds].some(v=>Number(v||0)!==0);
+    const existing=byDate.get(r.date);
+    if(!existing){ byDate.set(r.date,r); continue; }
+    const existingHasData=[existing.fb,existing.fs,existing.db,existing.ds].some(v=>Number(v||0)!==0);
+    // Prefer the row with real data; if both/neither have data, keep the later one.
+    if(hasData||!existingHasData) byDate.set(r.date,r);
+  }
+  const before=d.length, after=byDate.size;
+  save('fii',Array.from(byDate.values()));
+  miRenderFii();
+  miShowToast(`✓ Cleaned FII/DII: ${before} → ${after} rows (${before-after} duplicate/blank removed)`);
 }
 
 function miRenderBulk(){
@@ -5163,7 +5188,16 @@ function miPurgeUntracked(){
 // (bulk, delivery, PE, sector, promoter) have a sym/idx that, with date and
 // type, makes each row unique. FII/DII, F&O and VIX have NEITHER — there's
 // only ever one record per date — so their key collapses to just the date.
-function miRecordKey(r){
+function miRecordKey(r,storeKey){
+  // FII/DII, F&O and VIX have no sym/idx/type/co — there's only ever ONE
+  // record per date for these, so the key must be date-only. Previously
+  // this always joined sym/idx/type/co too, which meant a server-fetched
+  // stub row (zero values, blank fields) and a manually-entered Trendlyne
+  // row for the SAME date could end up with different keys if either side
+  // carried a stray field — so both survived instead of the fresh one
+  // replacing the stale one. That's what produced the blank "Neutral/NSE"
+  // rows alternating with real Trendlyne rows in the FII/DII table.
+  if(storeKey==='fii'||storeKey==='fo') return r.date||'';
   return [r.date||'', r.sym||'', r.idx||'', r.type||'', r.co||''].join('|');
 }
 function miMergeIntoLocalStorage(serverData){
@@ -5172,9 +5206,9 @@ function miMergeIntoLocalStorage(serverData){
     const incoming=serverData[k]||[];
     if(!incoming.length)continue;
     const existing=load(k);
-    const byKey=new Map(existing.map(r=>[miRecordKey(r),r]));
+    const byKey=new Map(existing.map(r=>[miRecordKey(r,k),r]));
     for(const r of incoming){
-      const key=miRecordKey(r);
+      const key=miRecordKey(r,k);
       if(byKey.has(key)) updated++; else added++;
       byKey.set(key,r);   // fresh data always wins — replaces stale/blank rows for the same key
     }
