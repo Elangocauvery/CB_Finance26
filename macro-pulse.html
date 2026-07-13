@@ -2463,9 +2463,10 @@ tr:last-child td{border-bottom:none;}
 <div class="page" id="page-credibility">
   <div class="header">
     <h1>&#127941; Stock Credibility Tracker</h1>
-    <p>Top CB Score stocks ranked at go-live — track how they actually perform over 1M, 3M, 6M, 1Y and 3Y. Scores vs real outcomes.</p>
+    <p id="credPageSubtitle">Top Conviction stocks ranked at go-live — track how they actually perform over 1M, 3M, 6M, 1Y and 3Y. Scores vs real outcomes.</p>
     <div class="header-meta">
       <span class="badge">Go-Live: <span id="goLiveDateBadge">Not set</span></span>
+      <span class="badge">Basis: <span id="scoreBasisBadge">Conviction</span></span>
       <span class="badge">Tracking: <span id="trackingCountBadge">0 stocks</span></span>
       <span class="badge">Last Updated: <span id="lastUpdatedBadge">—</span></span>
     </div>
@@ -2476,7 +2477,16 @@ tr:last-child td{border-bottom:none;}
     <div style="font-size:32px;">&#128197;</div>
     <div style="flex:1;min-width:200px;">
       <div style="font-size:14px;font-weight:800;color:#1a1e2e;margin-bottom:4px;">Set Your Go-Live Date</div>
-      <div style="font-size:12px;font-weight:500;color:#5a4a40;line-height:1.6;">This locks in today's CB Score rankings as the baseline. From this date, all 1M / 3M / 6M / 1Y / 3Y windows are calculated. You enter actual stock prices at each checkpoint to measure how CB Score predictions held up.</div>
+      <div style="font-size:12px;font-weight:500;color:#5a4a40;line-height:1.6;">This locks in today's top-30 ranking as the baseline. From this date, all 1M / 3M / 6M / 1Y / 3Y windows are calculated. You enter actual stock prices at each checkpoint to measure how the ranking held up.</div>
+      <div style="margin-top:10px;display:flex;gap:14px;align-items:center;">
+        <span style="font-size:11px;font-weight:800;color:#1a1e2e;">Rank by:</span>
+        <label style="font-size:11.5px;font-weight:700;color:#1a1e2e;display:flex;align-items:center;gap:5px;cursor:pointer;">
+          <input type="radio" name="credScoreBasis" value="conviction" checked> CB Conviction <span style="font-weight:500;color:#5a4a40;">(fundamentals + earnings + macro + market)</span>
+        </label>
+        <label style="font-size:11.5px;font-weight:700;color:#1a1e2e;display:flex;align-items:center;gap:5px;cursor:pointer;">
+          <input type="radio" name="credScoreBasis" value="cb"> CB Score <span style="font-weight:500;color:#5a4a40;">(fundamentals only)</span>
+        </label>
+      </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end;flex-shrink:0;">
       <input type="date" id="goLiveDateInput" style="border:1.5px solid #ffb74d;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:700;font-family:'Poppins',sans-serif;outline:none;background:#fff;color:#1a1e2e;">
@@ -2500,8 +2510,8 @@ tr:last-child td{border-bottom:none;}
   <div class="card full">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
       <div>
-        <h2 style="margin:0;"><span class="icon">&#128200;</span>Stock Performance vs CB Score</h2>
-        <div class="section-title" style="margin:4px 0 0;">Top CB Score stocks at go-live — enter actual prices at each checkpoint to track real performance</div>
+        <h2 style="margin:0;"><span class="icon">&#128200;</span>Stock Performance vs <span id="credTitleBasis">Conviction</span></h2>
+        <div class="section-title" style="margin:4px 0 0;">Top-ranked stocks at go-live — enter actual prices at each checkpoint to track real performance</div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button onclick="exportCredibilityCSV()" style="background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;padding:7px 14px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:'Poppins',sans-serif;">&#128202; Export CSV</button>
@@ -2512,10 +2522,10 @@ tr:last-child td{border-bottom:none;}
       <table id="credTable">
         <thead>
           <tr>
-            <th>CB Rank</th>
+            <th id="credRankHeader">Rank</th>
             <th>Company</th>
             <th>Sector</th>
-            <th>CB Score</th>
+            <th id="credScoreHeader">Conviction</th>
             <th>Base Price<br><span style="font-weight:500;text-transform:none;letter-spacing:0;">(Go-Live)</span></th>
             <th id="credPeriodHeader">Current Price<br><span style="font-weight:500;text-transform:none;letter-spacing:0;" id="credPeriodSubHeader">Enter to track</span></th>
             <th>Return %</th>
@@ -2532,7 +2542,7 @@ tr:last-child td{border-bottom:none;}
       </table>
     </div>
     <div style="margin-top:12px;padding:10px 14px;background:#fff8f0;border-left:3px solid #ff7c00;border-radius:8px;font-size:11px;font-weight:600;color:#5a3a00;line-height:1.7;">
-      <strong>How it works:</strong> When you set a go-live date, the top 30 highest CB Score stocks are locked in as your baseline. Enter their actual market prices at each time checkpoint (1M, 3M, 6M, 1Y, 3Y from go-live). The tracker shows if the high-score stocks actually outperformed. This builds a real credibility record for the CB Finance26 framework. <strong>Not financial advice.</strong>
+      <strong>How it works:</strong> When you set a go-live date, the top 30 highest-ranked stocks (by Conviction or CB Score — your choice above) are locked in as your baseline. Enter their actual market prices at each time checkpoint (1M, 3M, 6M, 1Y, 3Y from go-live). The tracker shows if the top-ranked stocks actually outperformed. This builds a real credibility record for the CB Finance26 framework. <strong>Not financial advice.</strong>
     </div>
   </div>
 
@@ -3309,6 +3319,18 @@ function fmtNum(v,dec=0){ if(v===null||v===undefined||v==='') return '—'; cons
 function initApp(){
   loadSel();
   showAdminBadge();
+  // One-time auto-heal for the FII/DII duplicate-row bug (see miCleanupFiiDupes) —
+  // runs itself on first load of this fixed build so existing data gets
+  // corrected without needing to find and click the cleanup button. Guarded
+  // by a flag so it only ever runs once per browser.
+  try{
+    if(!localStorage.getItem('cbr_fii_dedup_v1') && typeof miCleanupFiiDupes==='function'){
+      const before=load('fii').length;
+      miCleanupFiiDupes();
+      localStorage.setItem('cbr_fii_dedup_v1','1');
+      console.log('[auto-heal] FII/DII dedup ran once, started with',before,'rows');
+    }
+  }catch(e){}
   if(typeof miAutoLinkIndicators==='function')miAutoLinkIndicators();
   // Set default dates
   const today=new Date().toISOString().split('T')[0];
@@ -4847,8 +4869,12 @@ function miCleanupFiiDupes(){
   }
   const before=d.length, after=byDate.size;
   save('fii',Array.from(byDate.values()));
-  miRenderFii();
-  miShowToast(`✓ Cleaned FII/DII: ${before} → ${after} rows (${before-after} duplicate/blank removed)`);
+  // These only make sense if the FII/DII panel has actually been built
+  // (it's created lazily on first visit to NSE Market Intel — see
+  // miInitTabs) — guard so this is also safe to call at page-load time.
+  if(document.getElementById('mi-p-fii')) miRenderFii();
+  if(document.getElementById('mi-toast')) miShowToast(`✓ Cleaned FII/DII: ${before} → ${after} rows (${before-after} duplicate/blank removed)`);
+  return {before,after,removed:before-after};
 }
 
 function miRenderBulk(){
@@ -8646,7 +8672,7 @@ function renderCredKpis() {
     <div class="kpi-card kpi-gold">
       <div class="kpi-label">Avg Return</div>
       <div class="kpi-val" style="color:#e65100;font-size:22px;">${avgReturn}${avgReturn !== '—' ? '%' : ''}</div>
-      <div class="kpi-sub">Top 30 CB Score stocks</div>
+      <div class="kpi-sub">Top 30 ${credState.scoreBasis==='conviction'?'Conviction':'CB Score'} stocks</div>
     </div>
     <div class="kpi-card kpi-purple">
       <div class="kpi-label">Beat Benchmark</div>
@@ -8743,10 +8769,20 @@ function renderCredibilityPage() {
     return;
   }
 
-  // Update header badges
+  // Update header badges — label everything by which score actually
+  // ranked this cohort (older locked-in data defaults to CB Score since
+  // scoreBasis didn't exist before this feature).
+  const basis = credState.scoreBasis || 'cb';
+  const basisLabel = basis === 'conviction' ? 'CB Conviction' : 'CB Score';
   document.getElementById('goLiveDateBadge').textContent = credState.goLiveDate;
+  document.getElementById('scoreBasisBadge').textContent = basisLabel;
   document.getElementById('trackingCountBadge').textContent = (credState.stocks||[]).length + ' stocks';
   document.getElementById('lastUpdatedBadge').textContent = new Date().toLocaleDateString('en-IN');
+  const titleBasisEl = document.getElementById('credTitleBasis'); if (titleBasisEl) titleBasisEl.textContent = basisLabel;
+  const rankHeaderEl = document.getElementById('credRankHeader'); if (rankHeaderEl) rankHeaderEl.textContent = basis==='conviction' ? 'Conv. Rank' : 'CB Rank';
+  const scoreHeaderEl = document.getElementById('credScoreHeader'); if (scoreHeaderEl) scoreHeaderEl.textContent = basisLabel;
+  const subEl = document.getElementById('credPageSubtitle');
+  if (subEl) subEl.textContent = 'Top ' + basisLabel + ' stocks ranked at go-live — track how they actually perform over 1M, 3M, 6M, 1Y and 3Y. Scores vs real outcomes.';
 
   // Hide banner if already set
   const banner = document.getElementById('goLiveBanner');
@@ -9108,17 +9144,37 @@ function setGoLiveDate() {
   const inp = document.getElementById('goLiveDateInput');
   const dateVal = inp ? inp.value : '';
   if (!dateVal) { alert('Please select a go-live date first.'); return; }
-  const top30 = [...(typeof CR_DATA!=='undefined'?CR_DATA:[])]
-    .sort((a,b) => (b.cbLive!==undefined?b.cbLive:b.cb) - (a.cbLive!==undefined?a.cbLive:a.cb))
-    .slice(0, 30)
-    .map(c => ({
-      name: c.name, sector: c.sector,
-      cbScore: (c.cbLive!==undefined?c.cbLive:c.cb),
-      rank: c.id || null, basePrice: null,
-      periods: { '1m': null, '3m': null, '6m': null, '1y': null, '3y': null }
+  const basisEl = document.querySelector('input[name="credScoreBasis"]:checked');
+  const basis = basisEl ? basisEl.value : 'conviction';
+  let top30;
+  if (basis === 'conviction' && typeof cvCompute === 'function') {
+    // Rank by the fused 4-lens CB Conviction score instead of the plain
+    // fundamentals-only CB Score. cvCompute() already sorts descending by
+    // conv and only assigns .rank to companies with >=3 lenses available,
+    // so we lean on that same ordering here.
+    const conv = cvCompute();
+    top30 = conv.slice(0, 30).map(x => ({
+      name: x.d.name, sector: x.d.sector,
+      cbScore: x.conv, rank: x.rank || null, basePrice: null,
+      periods: { '1m': null, '3m': null, '6m': null, '1y': null, '3y': null },
+      // snapshot of the 4 lenses at go-live time, for reference only —
+      // doesn't affect tracking, just lets you see what drove the call
+      lensSnapshot: { E: x.L.E?x.L.E.score:null, F: x.L.F?x.L.F.score:null, M: x.L.M?x.L.M.score:null, T: x.L.T?x.L.T.score:null, avail: x.avail }
     }));
+  } else {
+    top30 = [...(typeof CR_DATA!=='undefined'?CR_DATA:[])]
+      .sort((a,b) => (b.cbLive!==undefined?b.cbLive:b.cb) - (a.cbLive!==undefined?a.cbLive:a.cb))
+      .slice(0, 30)
+      .map(c => ({
+        name: c.name, sector: c.sector,
+        cbScore: (c.cbLive!==undefined?c.cbLive:c.cb),
+        rank: c.id || null, basePrice: null,
+        periods: { '1m': null, '3m': null, '6m': null, '1y': null, '3y': null }
+      }));
+  }
   credState = {
     goLiveDate: dateVal, lockedAt: new Date().toISOString(),
+    scoreBasis: basis,
     nifty500Base: null,
     nifty500Periods: { '1m': null, '3m': null, '6m': null, '1y': null, '3y': null },
     stocks: top30
@@ -9129,7 +9185,7 @@ function setGoLiveDate() {
   renderCredibilityPage();
   const n = document.createElement('div');
   n.className = 'notify-flash';
-  n.textContent = 'Go-Live locked! ' + top30.length + ' stocks tracked from ' + dateVal;
+  n.textContent = 'Go-Live locked! ' + top30.length + ' stocks tracked from ' + dateVal + ' (ranked by ' + (basis==='conviction'?'CB Conviction':'CB Score') + ')';
   document.body.appendChild(n);
   setTimeout(() => n.remove(), 3000);
 }
@@ -9566,11 +9622,29 @@ function cvCompute(){
     var L={
       E: cvEarnings(d),
       F: (function(){
-        // v5: use the PURE parameter score here (calcCB on scores) — d.cb already
-        // includes the manual macro overlay, and macro is counted in the M lens.
-        var f=(typeof calcCB==='function'&&d.scores&&d.scores.length)?calcCB(d.scores):(d.cb||0);
+        // Only recompute from the pure parameter score (calcCB on d.scores,
+        // macro overlay excluded — that's the M lens's job) when this company
+        // has at least one genuinely VERIFIED parameter. For the rest — which
+        // as of 09-Jul-2026 is effectively the whole 280-company dataset —
+        // d.scores is just the coarse auto-generated defaultScores() placeholder,
+        // not real per-parameter data. Running calcCB on that placeholder was
+        // silently disagreeing with the actual CB Score shown in Company Ranker
+        // (defaultScores() collapses many different authored scores onto the
+        // same handful of score patterns — see the fix note above CR_DATA.forEach).
+        // That's what caused "CB Conviction is different from Company Ranker."
+        // Fix: for unverified companies, use the authored cbSeed directly — the
+        // exact number Company Ranker displays. It carries no macro overlay
+        // (overlay is only added by calcCBFor once a company is verified), so
+        // it's safe to fuse here without double-counting the M lens.
+        var hasRealEdit = d.ver && d.ver.some(function(v){return v===true;});
+        var f = hasRealEdit
+          ? ((typeof calcCB==='function'&&d.scores&&d.scores.length) ? calcCB(d.scores) : (d.cbSeed!=null?d.cbSeed:(d.cb||0)))
+          : (d.cbSeed!=null ? d.cbSeed : (d.cb||0));
         f=Math.max(0,Math.min(100,Math.round(f)));
-        return {score:f, parts:['CB Score '+f+' (v5 computed 10-param model; macro overlay excluded — lives in M lens)']};
+        var note = hasRealEdit
+          ? 'CB Score '+f+' (v5 computed from verified parameters; macro overlay excluded — lives in M lens)'
+          : 'CB Score '+f+' (authored Company Ranker score)';
+        return {score:f, parts:[note]};
       })(),
       M: null, T: cvMarket(sym)
     };
