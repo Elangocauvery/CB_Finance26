@@ -1289,7 +1289,7 @@ tr:last-child td{border-bottom:none;}
   </div>
   <div class="card" style="margin-bottom:14px;">
     <div class="sec">📊 Ground Reality — link your published sector research</div>
-    <div style="font-size:10.5px;color:#3a3f5c;line-height:1.65;margin-bottom:9px;">Pull actual Q4 numbers from your sector dashboards so every macro signal is cross-checked against real results. <strong>Hosted:</strong> click Fetch (reads sector-index.json from the same folder on your GitHub Pages). <strong>Testing locally:</strong> use Load files from computer.</div>
+    <div style="font-size:10.5px;color:#3a3f5c;line-height:1.65;margin-bottom:9px;">Pull actual <span id="grQtrLabel">Q1 FY27</span> numbers from your sector dashboards so every macro signal is cross-checked against real results. <strong>Hosted:</strong> click Fetch (reads sector-index.json from the same folder on your GitHub Pages). <strong>Testing locally:</strong> use Load files from computer.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
       <input id="grBaseUrl" type="text" placeholder="Base URL (blank = same folder as this app)" style="flex:1;min-width:220px;padding:8px 11px;border:1px solid var(--border-hi);border-radius:8px;background:#f8f9fc;color:var(--text);font-size:11px;font-family:inherit;">
       <button onclick="grFetchAll()" style="padding:8px 16px;border-radius:8px;border:none;background:#ff7c00;color:#fff;font-size:11px;font-weight:800;cursor:pointer;">🔄 Fetch from GitHub</button>
@@ -1708,8 +1708,8 @@ tr:last-child td{border-bottom:none;}
 <!-- ═══ CONVICTION ENGINE (Earnings × Fundamentals × Macro × Market) ═══ -->
 <div class="page" id="page-cv">
   <div class="hdr" style="background:linear-gradient(135deg,#1a1e2e,#2a3050);padding:18px 24px;border-radius:12px;margin-bottom:16px;">
-    <h1 style="font-family:'Playfair Display',serif;font-size:22px;color:#fff;">🎯 CB Conviction — Q4 FY26</h1>
-    <p style="font-size:12px;color:#cbd5e1;margin-top:4px;">Four lenses fused into one ranking: <strong style="color:#ffab40;">actual Q4 prints</strong> (from published CB Research dashboards) × <strong style="color:#ffab40;">CB fundamental score</strong> × <strong style="color:#ffab40;">live macro</strong> (13 indicators) × <strong style="color:#ffab40;">market pulse</strong> (NSE data). ஒரு பங்கு நான்கு கண்ணோட்டங்களிலும் வலுவாக இருந்தால் மட்டுமே உயர்ந்த நம்பிக்கை.</p>
+    <h1 style="font-family:'Playfair Display',serif;font-size:22px;color:#fff;">🎯 CB Conviction — <span id="convHeaderQtrLabel">Q1 FY27</span></h1>
+    <p style="font-size:12px;color:#cbd5e1;margin-top:4px;">Four lenses fused into one ranking: <strong style="color:#ffab40;">actual <span id="convQtrLabel">Q1 FY27</span> prints</strong> (from published CB Research dashboards) × <strong style="color:#ffab40;">CB fundamental score</strong> × <strong style="color:#ffab40;">live macro</strong> (13 indicators) × <strong style="color:#ffab40;">market pulse</strong> (NSE data). ஒரு பங்கு நான்கு கண்ணோட்டங்களிலும் வலுவாக இருந்தால் மட்டுமே உயர்ந்த நம்பிக்கை.</p>
     <p id="cv-admin-banner" style="font-size:12px;color:#cbd5e1;margin-top:4px;display:none;">📡 Admin view: market-layer breakdowns (momentum, delivery trend, PE band, deals, promoter/institutional activity) are rendered on each card. Members see only layer status and the final conviction.</p>
     <div id="cv-export-bar" style="display:none;margin-top:10px;align-items:center;gap:10px;">
       <button class="btn-auto" onclick="cvExportSnapshot()">💾 Export CB Score Snapshot</button>
@@ -9966,6 +9966,17 @@ function copyExport(){
 // ════════════════════════════════════════════════════════════════════════
 
 var CV_CURRENT_QTR = 'Q1FY27';
+// Keep every "Q1 FY27" quarter-label span in sync with CV_CURRENT_QTR
+// automatically, so bumping the quarter next time is a ONE-LINE change
+// here -- not a text hunt across the file. Covers: Ground Reality section,
+// Conviction page header, Conviction intro paragraph.
+(function syncQtrLabels(){
+  var pretty = CV_CURRENT_QTR.replace(/^Q(\d)FY(\d+)$/, 'Q$1 FY$2');
+  ['grQtrLabel','convQtrLabel','convHeaderQtrLabel'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.textContent = pretty;
+  });
+})();
 var CV_SNAP_PREFIX = 'cbf26_gr_snap_';
 var CV_W = {E:0.30, F:0.30, M:0.20, T:0.20};   // renormalised over available layers
 // "Price Conviction" — an alternate weighting tuned toward what actually
