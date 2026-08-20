@@ -563,6 +563,10 @@
         "file": "Life_Insurance_hdfc_icici_Q1FY27.html",
         "sectors": [
             "Insurance"
+        ],
+        "companies": [
+            "ICICI Prudential Life",
+            "HDFC Life"
         ]
     },
     {
@@ -772,7 +776,7 @@
             "Oil & Gas"
         ],
         "companies": [
-            "Reliance Industries"
+            "RIL"
         ]
     },
     {
