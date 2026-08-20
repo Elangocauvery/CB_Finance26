@@ -641,6 +641,9 @@
         "file": "Q1FY27_JioFinancialServices.html",
         "sectors": [
             "NBFC (Lending)"
+        ],
+        "companies": [
+            "Jio Financial Services"
         ]
     },
     {
@@ -683,6 +686,9 @@
         "file": "Q1FY27_ONGC_5Aug.html",
         "sectors": [
             "Oil & Gas"
+        ],
+        "companies": [
+            "ONGC"
         ]
     },
     {
@@ -743,6 +749,9 @@
         "file": "Q1FY27_syrmasgs.html",
         "sectors": [
             "EMS"
+        ],
+        "companies": [
+            "Syrma SGS Technology"
         ]
     },
     {
@@ -761,6 +770,9 @@
         "file": "RIL_Q1FY27_Business_Investment_Analysis.html",
         "sectors": [
             "Oil & Gas"
+        ],
+        "companies": [
+            "Reliance Industries"
         ]
     },
     {
