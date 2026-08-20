@@ -2484,6 +2484,9 @@ tr:last-child td{border-bottom:none;}
           <input type="radio" name="credScoreBasis" value="conviction" checked> CB Conviction <span style="font-weight:500;color:#5a4a40;">(fundamentals + earnings + macro + market)</span>
         </label>
         <label style="font-size:11.5px;font-weight:700;color:#1a1e2e;display:flex;align-items:center;gap:5px;cursor:pointer;">
+          <input type="radio" name="credScoreBasis" value="priceconv"> Price Conviction <span style="font-weight:500;color:#5a4a40;">(earnings + market-weighted — tuned for near-term price moves)</span>
+        </label>
+        <label style="font-size:11.5px;font-weight:700;color:#1a1e2e;display:flex;align-items:center;gap:5px;cursor:pointer;">
           <input type="radio" name="credScoreBasis" value="cb"> CB Score <span style="font-weight:500;color:#5a4a40;">(fundamentals only)</span>
         </label>
       </div>
@@ -4725,6 +4728,93 @@ document.addEventListener('keydown', e=>{
   if(e.ctrlKey && e.altKey && e.shiftKey && (e.key==='C'||e.key==='c')){ e.preventDefault(); tryAdminUnlock(); }
   if(e.ctrlKey && e.altKey && e.shiftKey && (e.key==='X'||e.key==='x')){ e.preventDefault(); adminLock(); }
 });
+// ════════════════════════════════════════════════════════════
+// FULL DATA BACKUP / RESTORE
+// Every entry you make (FII/DII, delivery, bulk/block, credibility
+// tracker, sector actuals, etc.) lives ONLY in this browser's
+// localStorage for THIS exact file. If you're handed a newer version of
+// this file later — a bug fix, a new feature — and save/open it as a
+// different file (different name or folder, e.g. Chrome auto-renaming a
+// re-download to "(1).html"), the browser treats it as a totally separate
+// storage bucket. Nothing carries over automatically, and it looks like
+// your data "disappeared" even though nothing was ever deleted — it's
+// just sitting in the OLD file's storage, unreachable from the new one.
+// This widget lets you export everything to one JSON file and re-import
+// it into any newer version of the file, so updates never cost you data.
+function miExportAllData(){
+  const dump={};
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    dump[k]=localStorage.getItem(k);
+  }
+  const payload=JSON.stringify({exportedAt:new Date().toISOString(),origin:location.href,data:dump},null,0);
+  const a=document.createElement('a');
+  a.href='data:application/json;charset=utf-8,'+encodeURIComponent(payload);
+  a.download='CBResearch_FullBackup_'+new Date().toISOString().slice(0,10)+'.json';
+  a.style.display='none';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+}
+function miImportAllData(inputEl){
+  const file=inputEl.files&&inputEl.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const parsed=JSON.parse(e.target.result);
+      const data=parsed.data||parsed; // tolerate a raw {key:value} dump too
+      let n=0;
+      Object.keys(data).forEach(k=>{ localStorage.setItem(k, data[k]); n++; });
+      alert('✓ Restored '+n+' storage keys from backup. The page will now reload to apply everything.');
+      location.reload();
+    }catch(err){
+      alert('Could not read that backup file — it may be corrupted or not a CB Research backup JSON.');
+      console.error('[miImportAllData]', err);
+    }
+  };
+  reader.readAsText(file);
+  inputEl.value='';
+}
+function miShowBackupWidget(){
+  if(document.getElementById('cbr-backup-widget')) return;
+  // Respect a permanent "don't show this again" choice.
+  if(localStorage.getItem('cbr_backup_widget_hidden')==='1') return;
+  const w=document.createElement('div');
+  w.id='cbr-backup-widget';
+  // Small round icon in a corner that's unlikely to sit over form controls,
+  // and — crucially — collapsed by default. The earlier version was a
+  // permanently-expanded 230px panel pinned bottom-right, which sat right
+  // on top of the "+Add Entry"/bulk-paste buttons in NSE Market Intel and
+  // blocked clicks on them. Now it only expands when you click it.
+  w.style.cssText='position:fixed;bottom:14px;right:14px;z-index:99999;font-family:"Segoe UI",system-ui,sans-serif;';
+  w.innerHTML=`
+    <div id="cbr-backup-icon" onclick="miToggleBackupWidget(true)" title="Data backup" style="width:38px;height:38px;border-radius:50%;background:#fff;border:1.5px solid #ffb74d;box-shadow:0 2px 10px rgba(0,0,0,0.18);display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;">💾</div>
+    <div id="cbr-backup-panel" style="display:none;background:#fff;border:1.5px solid #ffb74d;border-radius:12px;padding:10px 12px;box-shadow:0 4px 18px rgba(0,0,0,0.15);max-width:230px;position:absolute;bottom:46px;right:0;">
+      <div style="font-size:11px;font-weight:800;color:#1a1e2e;margin-bottom:6px;">💾 Data Backup</div>
+      <div style="font-size:9.5px;color:#6b7498;margin-bottom:8px;line-height:1.5;">Your entries live in this browser only. Back up before switching files/browsers.</div>
+      <button onclick="miExportAllData()" style="width:100%;background:#e6f4ef;color:#006b30;border:1px solid #00a854;padding:6px 8px;border-radius:7px;font-size:10.5px;font-weight:700;cursor:pointer;margin-bottom:6px;">⬇ Export full backup</button>
+      <label style="display:block;width:100%;background:#e3f2fd;color:#1565c0;border:1px solid #90caf9;padding:6px 8px;border-radius:7px;font-size:10.5px;font-weight:700;cursor:pointer;text-align:center;box-sizing:border-box;margin-bottom:6px;">
+        ⬆ Restore from backup
+        <input type="file" accept=".json" style="display:none;" onchange="miImportAllData(this)">
+      </label>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:#b0bcd8;">
+        <span onclick="miToggleBackupWidget(false)" style="cursor:pointer;">collapse</span>
+        <span onclick="if(confirm('Hide the backup button permanently? You can still export/import anytime by asking me to bring it back, or via browser console: localStorage.removeItem(\\'cbr_backup_widget_hidden\\')'))miHideBackupWidgetForever()" style="cursor:pointer;">don't show again</span>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(w);
+}
+function miToggleBackupWidget(open){
+  const panel=document.getElementById('cbr-backup-panel');
+  if(panel) panel.style.display=open?'block':'none';
+}
+function miHideBackupWidgetForever(){
+  localStorage.setItem('cbr_backup_widget_hidden','1');
+  const w=document.getElementById('cbr-backup-widget');
+  if(w) w.remove();
+}
+document.addEventListener('DOMContentLoaded', ()=>{ try{miShowBackupWidget();}catch(e){} });
+if(document.readyState!=='loading'){ try{miShowBackupWidget();}catch(e){} }
 const save=(k,d)=>localStorage.setItem('cbr_'+k,JSON.stringify(d));
 const sign=v=>Number(v)>=0?'+':'';
 const pct=v=>v!==''&&v!==null&&!isNaN(v)?sign(v)+Number(v).toFixed(2)+'%':'—';
@@ -4784,6 +4874,12 @@ function miShowPanel(id){
 function miRender(id){miShowPanel(id);MI_RENDERS[id]&&MI_RENDERS[id]();}
 
 // ── ported tab content (identical logic to cbmarketintelv2.html, ids namespaced) ──
+// Remembers the last date used in the FII/DII "Add Entry" form so the date
+// field doesn't silently snap back to today() after every save (see fix
+// note in miAddFii below — that reset was the root cause of backfilled
+// historical entries quietly landing on today's date and overwriting each
+// other instead of saving under their intended dates).
+let miFiiLastDate=null;
 function miRenderFii(){
   const data=load('fii').sort((a,b)=>b.date.localeCompare(a.date));
   const dSel=getSel('fii-ds');
@@ -4801,7 +4897,7 @@ function miRenderFii(){
 <div class="fc">
   <div class="fc-title">Add FII / DII entry</div>
   <div class="fg">
-    <div class="fld"><label>Date</label><input type="date" id="fi-d" value="${today()}"></div>
+    <div class="fld"><label>Date</label><input type="date" id="fi-d" value="${miFiiLastDate||today()}"></div>
     <div class="fld"><label>FII Buy (₹ Cr)</label><input type="number" id="fi-fb" placeholder="14200"></div>
     <div class="fld"><label>FII Sell (₹ Cr)</label><input type="number" id="fi-fs" placeholder="12800"></div>
     <div class="fld"><label>DII Buy (₹ Cr)</label><input type="number" id="fi-db" placeholder="8700"></div>
@@ -4812,6 +4908,18 @@ function miRenderFii(){
   </div>
   <button class="btn primary" onclick="miAddFii()">+ Add Entry</button>
   <button class="btn" style="margin-left:8px;" onclick="if(confirm('Remove duplicate/blank FII-DII rows, keeping the row with real data for each date?'))miCleanupFiiDupes()">🧹 Clean duplicate/blank rows</button>
+  <button class="btn" style="margin-left:8px;" onclick="miFindSuspiciousFii()">🔍 Find corrupted rows</button>
+  <div style="margin-top:16px;border-top:1px dashed #dde1ec;padding-top:12px;">
+    <div class="fc-title">📋 Bulk paste (many dates at once)</div>
+    <div class="note" style="margin-bottom:8px;">Paste directly from Trendlyne's FII/DII table (Date, FII Purchase, FII Sales, FII Net, DII Purchase, DII Sales, DII Net) — just select the rows on the page and copy/paste here, comma-formatted numbers like <code>23,273.71</code> are handled correctly now. Or use the compact format: <code>date,FII Buy,FII Sell,DII Buy,DII Sell,MF Net,FII F&amp;O Net,Source</code> (MF/F&amp;O/Source optional). Date can be <code>2026-07-03</code>, <code>03-07-2026</code> or <code>03-Jul-2026</code>.</div>
+    <textarea id="fi-bulk" rows="6" style="width:100%;border:1px solid #dde1ec;border-radius:8px;padding:8px 10px;font-size:11px;font-family:'Poppins',monospace;box-sizing:border-box;" placeholder="2026-07-03,13337,11982,18676,20630,,, Trendlyne
+2026-07-02,14018,14330,17392,15607,,, Trendlyne
+2026-07-01,11623,12764,17137,13977,,, Trendlyne"></textarea>
+    <div style="margin-top:8px;">
+      <button class="btn primary" onclick="miBulkAddFii()">📥 Add all rows</button>
+      <span id="fi-bulk-result" style="margin-left:10px;font-size:11px;font-weight:700;"></span>
+    </div>
+  </div>
 </div>
 <div class="toolbar">
   <label>Filter by date:</label>${dateDropdown(getDates(data),'fii-ds','miRenderFii()')}
@@ -4843,15 +4951,124 @@ function miRenderFii(){
   </tbody>
 </table></div>`;
 }
+// Normalizes several common date formats down to ISO yyyy-mm-dd. Handles
+// the three formats people actually paste from Trendlyne/Excel/NSE:
+// 2026-07-03, 03-07-2026 (DD-MM-YYYY, the Indian convention), and
+// 03-Jul-2026. Returns null if it can't confidently parse the string.
+function miNormDateISO(raw){
+  const s=(raw||'').trim();
+  if(!s) return null;
+  let m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if(m) return s;
+  m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if(m){ // DD-MM-YYYY (Indian convention, not US MM-DD-YYYY)
+    const dd=m[1].padStart(2,'0'), mm=m[2].padStart(2,'0');
+    return `${m[3]}-${mm}-${dd}`;
+  }
+  m=s.match(/^(\d{1,2})[\-\s]([A-Za-z]{3,})[\-\s](\d{4})$/);
+  if(m){
+    const months={jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12'};
+    const mon=months[m[2].slice(0,3).toLowerCase()];
+    if(mon) return `${m[3]}-${mon}-${m[1].padStart(2,'0')}`;
+  }
+  return null;
+}
+// Strips comma thousand-separators from a numeric-looking field (e.g.
+// "23,273.71" -> "23273.71"). Safe to apply broadly since by the time this
+// runs, the field has already been correctly split out — any remaining
+// comma inside it can only be a thousands separator, not a delimiter.
+function miNum(v){
+  if(v==null) return '';
+  const n=String(v).replace(/,/g,'').trim();
+  return n===''?'':n;
+}
+function miBulkAddFii(){
+  const raw=document.getElementById('fi-bulk').value;
+  const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l.length);
+  if(!lines.length){ document.getElementById('fi-bulk-result').textContent='Paste some rows first.'; return; }
+  const d=load('fii');
+  let added=0, updated=0, skipped=0; const errors=[];
+  lines.forEach((line,i)=>{
+    // CRITICAL: prefer tab as the delimiter when the line has one (this is
+    // what you get pasting straight out of a webpage table, e.g. Trendlyne,
+    // or an Excel selection). Only fall back to comma-splitting if there's
+    // no tab — because real FII/DII figures are comma-formatted numbers
+    // (23,273.71), and splitting on every comma AND every tab at once
+    // shreds those numbers into extra fields, corrupting every column
+    // after the first. This was the root cause of the garbled rows.
+    const parts = line.includes('\t')
+      ? line.split('\t').map(p=>p.trim())
+      : line.split(',').map(p=>p.trim());
+    const date=miNormDateISO(parts[0]);
+    if(!date){ skipped++; errors.push(`Line ${i+1}: could not parse date in "${line.slice(0,40)}"`); return; }
+    let entry;
+    if(parts.length>=7){
+      // Trendlyne's native table layout: Date, FII Gross Purchase, FII
+      // Gross Sales, FII Net, DII Gross Purchase, DII Gross Sales, DII Net
+      // [, Source]. The Net columns (index 3 and 6) are ignored on purpose
+      // — this app recalculates Net itself from Buy/Sell, so we don't need
+      // to trust or store Trendlyne's own net figure separately.
+      entry={date, fb:miNum(parts[1]), fs:miNum(parts[2]), db:miNum(parts[4]), ds:miNum(parts[5]), mf:'', fo:'', src:parts[7]||'Trendlyne'};
+    } else if(parts.length>=5){
+      // Compact custom format: Date, FII Buy, FII Sell, DII Buy, DII Sell
+      // [, MF Net, FII F&O Net, Source]
+      entry={date, fb:miNum(parts[1]), fs:miNum(parts[2]), db:miNum(parts[3]), ds:miNum(parts[4]), mf:miNum(parts[5]), fo:miNum(parts[6]), src:parts[7]||'Trendlyne'};
+    } else {
+      skipped++; errors.push(`Line ${i+1}: only ${parts.length} fields found, need at least 5 — "${line.slice(0,40)}"`); return;
+    }
+    const idx=d.findIndex(x=>x.date===entry.date);
+    if(idx>=0){ d[idx]=entry; updated++; } else { d.push(entry); added++; }
+  });
+  save('fii',d);
+  document.getElementById('fi-bulk').value='';
+  miRenderFii();
+  const resultEl=document.getElementById('fi-bulk-result');
+  if(resultEl) resultEl.textContent=`✓ ${added} added, ${updated} updated${skipped?`, ${skipped} skipped — see console`:''}`;
+  if(errors.length) console.warn('[miBulkAddFii] skipped lines:', errors);
+}
+// Flags FII/DII rows that are almost certainly corrupted leftovers from
+// the comma-splitting bug above — genuine daily FII/DII gross figures are
+// essentially always in the thousands of crores, so anything under 500
+// on both Buy and Sell for a given date is a strong signal it's a
+// fragment of a shredded number rather than a real (small) trading day.
+function miFindSuspiciousFii(){
+  const d=load('fii');
+  const suspects=d.filter(r=>{
+    const fb=Number(r.fb||0), fs=Number(r.fs||0), db=Number(r.db||0), ds=Number(r.ds||0);
+    const anyNonZero = fb||fs||db||ds;
+    return anyNonZero && fb<500 && fs<500 && db<500 && ds<500;
+  });
+  if(!suspects.length){ alert('No suspicious rows found — FII/DII data looks clean.'); return; }
+  const list=suspects.map(r=>`${r.date}: FII ${r.fb}/${r.fs}  DII ${r.db}/${r.ds}`).join('\n');
+  if(confirm(`Found ${suspects.length} likely-corrupted row(s) (implausibly small values):\n\n${list}\n\nDelete these so you can re-paste them correctly?`)){
+    const dates=new Set(suspects.map(r=>r.date));
+    save('fii', d.filter(r=>!dates.has(r.date)));
+    miRenderFii();
+    miShowToast(`✓ Removed ${suspects.length} suspicious row(s). Re-paste that date range using bulk paste.`);
+  }
+}
+function miPrevTradingDayISO(iso){
+  const d=new Date(iso+'T00:00:00');
+  d.setDate(d.getDate()-1);
+  while(d.getDay()===0||d.getDay()===6) d.setDate(d.getDate()-1); // skip Sat/Sun
+  return d.toISOString().slice(0,10);
+}
 function miAddFii(){
   const d=load('fii');
   const entry={date:document.getElementById('fi-d').value,fb:document.getElementById('fi-fb').value,fs:document.getElementById('fi-fs').value,db:document.getElementById('fi-db').value,ds:document.getElementById('fi-ds').value,mf:document.getElementById('fi-mf').value,fo:document.getElementById('fi-fo').value,src:document.getElementById('fi-src').value};
+  if(!entry.date){ alert('Please pick a date before adding.'); return; }
   // Only one record per date (see miRecordKey) — if a row for this date
   // already exists (e.g. a blank NSE stub from auto-fetch, or a prior
   // manual entry), overwrite it in place instead of adding a duplicate.
   const idx=d.findIndex(x=>x.date===entry.date);
   if(idx>=0) d[idx]=entry; else d.push(entry);
-  save('fii',d);miRenderFii();
+  save('fii',d);
+  // Auto-step the date field to the previous trading day for the next
+  // backfill entry, instead of letting it reset to today() — that reset
+  // was silently causing backfilled historical rows to save under today's
+  // date and overwrite each other. Skips Sat/Sun since NSE doesn't trade then.
+  miFiiLastDate=miPrevTradingDayISO(entry.date);
+  miRenderFii();
 }
 // One-time cleanup for duplicate FII/DII rows already sitting in storage
 // from before the fix above — collapses to one record per date, preferring
@@ -4860,10 +5077,10 @@ function miCleanupFiiDupes(){
   const d=load('fii');
   const byDate=new Map();
   for(const r of d){
-    const hasData=[r.fb,r.fs,r.db,r.ds].some(v=>Number(v||0)!==0);
+    const hasData=[r.fb,r.fs,r.db,r.ds,r.mf,r.fo].some(v=>Number(v||0)!==0);
     const existing=byDate.get(r.date);
     if(!existing){ byDate.set(r.date,r); continue; }
-    const existingHasData=[existing.fb,existing.fs,existing.db,existing.ds].some(v=>Number(v||0)!==0);
+    const existingHasData=[existing.fb,existing.fs,existing.db,existing.ds,existing.mf,existing.fo].some(v=>Number(v||0)!==0);
     // Prefer the row with real data; if both/neither have data, keep the later one.
     if(hasData||!existingHasData) byDate.set(r.date,r);
   }
@@ -4935,6 +5152,7 @@ function miAddBulk(){
   save('bulk',d);miRenderBulk();
 }
 
+let miFoLastDate=null;
 function miRenderFo(){
   const data=load('fo').sort((a,b)=>b.date.localeCompare(a.date));
   const dSel=getSel('fo-ds');
@@ -4944,7 +5162,7 @@ function miRenderFo(){
 <div class="fc">
   <div class="fc-title">Add F&O data</div>
   <div class="fg">
-    <div class="fld"><label>Date</label><input type="date" id="fo-d" value="${today()}"></div>
+    <div class="fld"><label>Date</label><input type="date" id="fo-d" value="${miFoLastDate||today()}"></div>
     <div class="fld"><label>Nifty PCR</label><input type="number" id="fo-pcr" step="0.01" placeholder="1.08"></div>
     <div class="fld"><label>BankNifty PCR</label><input type="number" id="fo-bnpcr" step="0.01" placeholder="0.94"></div>
     <div class="fld"><label>India VIX</label><input type="number" id="fo-vix" step="0.01" placeholder="14.82"></div>
@@ -4954,7 +5172,28 @@ function miRenderFo(){
     <div class="fld"><label>Nifty OI Chg %</label><input type="number" id="fo-oc" step="0.01" placeholder="±4.2"></div>
     <div class="fld"><label>Nifty Close</label><input type="number" id="fo-nf" placeholder="24432"></div>
   </div>
+  <div style="margin:10px 0;background:#f7f9fc;border:1px dashed #c7d0e6;border-radius:8px;padding:10px 12px;">
+    <div style="font-size:11px;font-weight:800;color:#1a1e2e;margin-bottom:4px;">🔎 Auto-fill FII Long/Short OI from Trendlyne's Participant-wise OI table</div>
+    <div class="note" style="margin-bottom:6px;">Select and copy the whole "Client Type" table (Retail/DII/FII/Pro columns) from Trendlyne's Participant-wise OI page and paste it below — it finds the "Future Index Long" and "Future Index Short" rows and pulls the FII column into the two fields above automatically.</div>
+    <textarea id="fo-poi-paste" rows="3" style="width:100%;border:1px solid #dde1ec;border-radius:8px;padding:6px 8px;font-size:10.5px;font-family:'Poppins',monospace;box-sizing:border-box;" placeholder="Client Type	Retail Clients	Retail Change	...	FII	FII Change	...
+Future Index Long	228,874	-29,131	...	32,009	-7,962	...
+Future Index Short	62,043	-15,562	...	287,122	3,528	..."></textarea>
+    <div style="margin-top:6px;">
+      <button class="btn" onclick="miExtractParticipantOI()">⬇ Extract FII OI into fields above</button>
+      <span id="fo-poi-result" style="margin-left:10px;font-size:11px;font-weight:700;"></span>
+    </div>
+  </div>
   <button class="btn primary" onclick="miAddFo()">+ Add Entry</button>
+  <div style="margin-top:16px;border-top:1px dashed #dde1ec;padding-top:12px;">
+    <div class="fc-title">📋 Bulk paste (many dates at once)</div>
+    <div class="note" style="margin-bottom:8px;">Paste rows copied from Trendlyne PCR/OI pages or Moneycontrol — column order: <code>Date, Nifty PCR, BankNifty PCR, India VIX, FII Index F Long OI, FII Index F Short OI, Max Pain (Nifty), Nifty OI Chg %, Nifty Close</code>. Tab-separated (straight paste from a table) or comma-separated both work; comma-formatted numbers like <code>24,432</code> are handled correctly. Leave a cell blank if that source doesn't report it. Date can be <code>2026-07-03</code>, <code>03-07-2026</code> or <code>03-Jul-2026</code>.</div>
+    <textarea id="fo-bulk" rows="6" style="width:100%;border:1px solid #dde1ec;border-radius:8px;padding:8px 10px;font-size:11px;font-family:'Poppins',monospace;box-sizing:border-box;" placeholder="14-Jul-2026	1.08	0.94	14.82	185000	142000	24500	4.2	24432
+11-Jul-2026	1.02	0.91	15.10	179000	151000	24400	-1.8	24310"></textarea>
+    <div style="margin-top:8px;">
+      <button class="btn primary" onclick="miBulkAddFo()">📥 Add all rows</button>
+      <span id="fo-bulk-result" style="margin-left:10px;font-size:11px;font-weight:700;"></span>
+    </div>
+  </div>
 </div>
 <div class="toolbar">
   <label>Date:</label>${dateDropdown(getDates(data),'fo-ds','miRenderFo()')}
@@ -4985,10 +5224,78 @@ function miRenderFo(){
   </tbody>
 </table></div>`;
 }
+// Parses a pasted copy of Trendlyne's "Participant-wise OI" table
+// (Client Type × Retail/DII/FII/Pro, each with Value/Change/Change%) and
+// pulls just the FII column from the "Future Index Long" and "Future
+// Index Short" rows — the two numbers this app's F&O form actually needs.
+// Column order per the table header: Client Type, Retail, RetailChg,
+// RetailChg%, DII, DIIChg, DIIChg%, FII, FIIChg, FIIChg%, Pro, ... — so
+// the FII value sits at index 7 regardless of how many trailing Pro/Total
+// columns are present, as long as the row uses tabs (or 2+ spaces) between
+// cells, which is what you get pasting straight out of a webpage table.
+function miExtractParticipantOI(){
+  const raw=document.getElementById('fo-poi-paste').value;
+  const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l.length);
+  let fiiLong=null, fiiShort=null;
+  lines.forEach(line=>{
+    const cells = line.includes('\t') ? line.split('\t').map(c=>c.trim()) : line.split(/\s{2,}/).map(c=>c.trim());
+    const label=(cells[0]||'').toLowerCase();
+    if(label==='future index long' || label.startsWith('future index long')){
+      fiiLong = miNum(cells[7]);
+    } else if(label==='future index short' || label.startsWith('future index short')){
+      fiiShort = miNum(cells[7]);
+    }
+  });
+  const resultEl=document.getElementById('fo-poi-result');
+  if(fiiLong==null && fiiShort==null){
+    if(resultEl) resultEl.textContent='Could not find "Future Index Long/Short" rows — check the paste includes those rows.';
+    return;
+  }
+  if(fiiLong!=null) document.getElementById('fo-fl').value=fiiLong;
+  if(fiiShort!=null) document.getElementById('fo-fs').value=fiiShort;
+  if(resultEl) resultEl.textContent=`✓ Filled: FII Long=${fiiLong??'—'}, FII Short=${fiiShort??'—'}`;
+}
 function miAddFo(){
   const d=load('fo');
-  d.push({date:document.getElementById('fo-d').value,nf:document.getElementById('fo-nf').value,pcr:document.getElementById('fo-pcr').value,bnpcr:document.getElementById('fo-bnpcr').value,vix:document.getElementById('fo-vix').value,fl:document.getElementById('fo-fl').value,fs:document.getElementById('fo-fs').value,mp:document.getElementById('fo-mp').value,oc:document.getElementById('fo-oc').value});
-  save('fo',d);miRenderFo();
+  const entry={date:document.getElementById('fo-d').value,nf:document.getElementById('fo-nf').value,pcr:document.getElementById('fo-pcr').value,bnpcr:document.getElementById('fo-bnpcr').value,vix:document.getElementById('fo-vix').value,fl:document.getElementById('fo-fl').value,fs:document.getElementById('fo-fs').value,mp:document.getElementById('fo-mp').value,oc:document.getElementById('fo-oc').value};
+  if(!entry.date){ alert('Please pick a date before adding.'); return; }
+  // Same fix as FII/DII: one record per date, upsert instead of always
+  // pushing a duplicate, and auto-step the date field back a trading day
+  // instead of letting it silently reset to today() after every save.
+  const idx=d.findIndex(x=>x.date===entry.date);
+  if(idx>=0) d[idx]=entry; else d.push(entry);
+  save('fo',d);
+  miFoLastDate=miPrevTradingDayISO(entry.date);
+  miRenderFo();
+}
+function miBulkAddFo(){
+  const raw=document.getElementById('fo-bulk').value;
+  const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l.length);
+  if(!lines.length){ document.getElementById('fo-bulk-result').textContent='Paste some rows first.'; return; }
+  const d=load('fo');
+  let added=0, updated=0, skipped=0; const errors=[];
+  lines.forEach((line,i)=>{
+    // Same tab-preferred delimiter rule as FII/DII bulk paste — avoids
+    // shredding comma-formatted numbers like "24,432" or "185,000".
+    const parts = line.includes('\t')
+      ? line.split('\t').map(p=>p.trim())
+      : line.split(',').map(p=>p.trim());
+    const date=miNormDateISO(parts[0]);
+    if(!date){ skipped++; errors.push(`Line ${i+1}: could not parse date in "${line.slice(0,40)}"`); return; }
+    if(parts.length<2){ skipped++; errors.push(`Line ${i+1}: no data fields found`); return; }
+    // Column order: Date, Nifty PCR, BankNifty PCR, India VIX,
+    // FII Index F Long OI, FII Index F Short OI, Max Pain (Nifty),
+    // Nifty OI Chg %, Nifty Close — matches the Add F&O Data form order.
+    const entry={date, pcr:miNum(parts[1]), bnpcr:miNum(parts[2]), vix:miNum(parts[3]), fl:miNum(parts[4]), fs:miNum(parts[5]), mp:miNum(parts[6]), oc:miNum(parts[7]), nf:miNum(parts[8])};
+    const idx=d.findIndex(x=>x.date===entry.date);
+    if(idx>=0){ d[idx]=entry; updated++; } else { d.push(entry); added++; }
+  });
+  save('fo',d);
+  document.getElementById('fo-bulk').value='';
+  miRenderFo();
+  const resultEl=document.getElementById('fo-bulk-result');
+  if(resultEl) resultEl.textContent=`✓ ${added} added, ${updated} updated${skipped?`, ${skipped} skipped — see console`:''}`;
+  if(errors.length) console.warn('[miBulkAddFo] skipped lines:', errors);
 }
 
 function miRenderDelivery(){
@@ -8430,20 +8737,42 @@ function clearHoldings() {
 function exportCredibilityCSV() {
   if (!credState) { alert('No credibility data. Set go-live date first.'); return; }
   const p = currentCredPeriod;
-  let csv = 'CB Rank,Company,Sector,CB Score,NSE Rank,Base Price,'+PERIOD_LABELS[p]+' Price,Return %,Nifty 500 Return %,Alpha %\n';
+  const basisLabel = miCredBasisLabel(credState.scoreBasis);
+  const rankLabel = credState.scoreBasis === 'cb' ? 'CB Rank' : 'Conv. Rank';
+  let csv = rankLabel+',Company,Sector,'+basisLabel+',NSE Rank,Base Price,'+PERIOD_LABELS[p]+' Price,Return %,Nifty 500 Return %,Alpha %\n';
   const niftyBase = credState.nifty500Base;
   const niftyP = credState.nifty500Periods[p];
   const niftyRet = (niftyBase && niftyP) ? ((niftyP - niftyBase) / niftyBase * 100).toFixed(2) : '';
   (credState.stocks||[]).forEach((s,i) => {
     const ret = getReturn(s, p);
     const alpha = (ret !== null && niftyRet !== '') ? (ret - parseFloat(niftyRet)).toFixed(2) : '';
-    csv += `${i+1},"${s.name}","${s.sector}",${s.cbScore},${s.rank||''},${ s.basePrice||''},${s.periods[p]||''},${ret!==null?ret.toFixed(2):''},${niftyRet},${alpha}\n`;
+    // Escape any stray commas/quotes in text fields so columns don't shift.
+    const esc = v => '"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+    csv += [i+1, esc(s.name), esc(s.sector), s.cbScore, s.rank||'', s.basePrice||'', s.periods[p]||'', ret!==null?ret.toFixed(2):'', niftyRet, alpha].join(',') + '\n';
   });
-  const blob = new Blob([csv], {type:'text/csv'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'CBFinance26_Credibility_'+p+'_'+credState.goLiveDate+'.csv';
-  a.click();
+  // Use a data: URI rather than a blob: object URL, and attach the link to
+  // the DOM before clicking it. Plain blob:-URL clicks on an unattached
+  // <a> are silently dropped by several browsers when the page is opened
+  // from file:// (as these exported HTML files usually are) rather than
+  // served over http(s) — that's what was making Export CSV appear to do
+  // nothing. A BOM prefix is added so Excel reads the file as UTF-8 cleanly.
+  const bom = '\uFEFF';
+  const filename = 'CBFinance26_Credibility_'+(credState.scoreBasis||'cb')+'_'+p+'_'+credState.goLiveDate+'.csv';
+  try {
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(bom+csv);
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  } catch(e) {
+    // Fallback for very old/locked-down browsers: open in a new tab so the
+    // user can manually save it via Ctrl+S / right-click → Save As.
+    const w = window.open();
+    if (w) { w.document.write('<pre>'+csv.replace(/</g,'&lt;')+'</pre>'); w.document.title = filename; }
+    else alert('Could not trigger download automatically. Please allow pop-ups and try again, or copy the data manually.');
+  }
 }
 
 function handleDrop(e) {
@@ -8672,7 +9001,7 @@ function renderCredKpis() {
     <div class="kpi-card kpi-gold">
       <div class="kpi-label">Avg Return</div>
       <div class="kpi-val" style="color:#e65100;font-size:22px;">${avgReturn}${avgReturn !== '—' ? '%' : ''}</div>
-      <div class="kpi-sub">Top 30 ${credState.scoreBasis==='conviction'?'Conviction':'CB Score'} stocks</div>
+      <div class="kpi-sub">Top 30 ${miCredBasisLabel(credState.scoreBasis)} stocks</div>
     </div>
     <div class="kpi-card kpi-purple">
       <div class="kpi-label">Beat Benchmark</div>
@@ -8773,13 +9102,13 @@ function renderCredibilityPage() {
   // ranked this cohort (older locked-in data defaults to CB Score since
   // scoreBasis didn't exist before this feature).
   const basis = credState.scoreBasis || 'cb';
-  const basisLabel = basis === 'conviction' ? 'CB Conviction' : 'CB Score';
+  const basisLabel = miCredBasisLabel(basis);
   document.getElementById('goLiveDateBadge').textContent = credState.goLiveDate;
   document.getElementById('scoreBasisBadge').textContent = basisLabel;
   document.getElementById('trackingCountBadge').textContent = (credState.stocks||[]).length + ' stocks';
   document.getElementById('lastUpdatedBadge').textContent = new Date().toLocaleDateString('en-IN');
   const titleBasisEl = document.getElementById('credTitleBasis'); if (titleBasisEl) titleBasisEl.textContent = basisLabel;
-  const rankHeaderEl = document.getElementById('credRankHeader'); if (rankHeaderEl) rankHeaderEl.textContent = basis==='conviction' ? 'Conv. Rank' : 'CB Rank';
+  const rankHeaderEl = document.getElementById('credRankHeader'); if (rankHeaderEl) rankHeaderEl.textContent = basis==='cb' ? 'CB Rank' : 'Conv. Rank';
   const scoreHeaderEl = document.getElementById('credScoreHeader'); if (scoreHeaderEl) scoreHeaderEl.textContent = basisLabel;
   const subEl = document.getElementById('credPageSubtitle');
   if (subEl) subEl.textContent = 'Top ' + basisLabel + ' stocks ranked at go-live — track how they actually perform over 1M, 3M, 6M, 1Y and 3Y. Scores vs real outcomes.';
@@ -9140,6 +9469,11 @@ function getCBScore(symbol, sector) {
   }
   return 60;
 }
+function miCredBasisLabel(basis){
+  if(basis==='priceconv') return 'Price Conviction';
+  if(basis==='conviction') return 'CB Conviction';
+  return 'CB Score';
+}
 function setGoLiveDate() {
   const inp = document.getElementById('goLiveDateInput');
   const dateVal = inp ? inp.value : '';
@@ -9147,12 +9481,15 @@ function setGoLiveDate() {
   const basisEl = document.querySelector('input[name="credScoreBasis"]:checked');
   const basis = basisEl ? basisEl.value : 'conviction';
   let top30;
-  if (basis === 'conviction' && typeof cvCompute === 'function') {
-    // Rank by the fused 4-lens CB Conviction score instead of the plain
-    // fundamentals-only CB Score. cvCompute() already sorts descending by
-    // conv and only assigns .rank to companies with >=3 lenses available,
-    // so we lean on that same ordering here.
-    const conv = cvCompute();
+  if ((basis === 'conviction' || basis === 'priceconv') && typeof cvCompute === 'function') {
+    // Rank by the fused Conviction score — standard weights (Earnings 30 /
+    // Fundamental 30 / Macro 20 / Market 20) for 'conviction', or the
+    // Price Conviction weights (Earnings 35 / Fundamental 15 / Macro 20 /
+    // Market 30 — see CV_W_PRICE) for 'priceconv', which downweights the
+    // slow-moving Fundamental lens and leans into what actually moves
+    // price near-term. cvCompute() already sorts descending by conv and
+    // only assigns .rank to companies with >=3 lenses available.
+    const conv = cvCompute(basis==='priceconv' ? CV_W_PRICE : CV_W);
     top30 = conv.slice(0, 30).map(x => ({
       name: x.d.name, sector: x.d.sector,
       cbScore: x.conv, rank: x.rank || null, basePrice: null,
@@ -9185,7 +9522,7 @@ function setGoLiveDate() {
   renderCredibilityPage();
   const n = document.createElement('div');
   n.className = 'notify-flash';
-  n.textContent = 'Go-Live locked! ' + top30.length + ' stocks tracked from ' + dateVal + ' (ranked by ' + (basis==='conviction'?'CB Conviction':'CB Score') + ')';
+  n.textContent = 'Go-Live locked! ' + top30.length + ' stocks tracked from ' + dateVal + ' (ranked by ' + miCredBasisLabel(basis) + ')';
   document.body.appendChild(n);
   setTimeout(() => n.remove(), 3000);
 }
@@ -9358,6 +9695,15 @@ function copyExport(){
 var CV_CURRENT_QTR = 'Q1FY27';
 var CV_SNAP_PREFIX = 'cbf26_gr_snap_';
 var CV_W = {E:0.30, F:0.30, M:0.20, T:0.20};   // renormalised over available layers
+// "Price Conviction" — an alternate weighting tuned toward what actually
+// moves price near-term (earnings surprises, macro catalysts, existing
+// price/delivery momentum) rather than static business quality. Standard
+// Conviction weights Fundamental equally with Earnings, which is right for
+// "is this a good business" but wrong for "will this move soon" — quality
+// is priced in over quarters/years, not weeks. This mode down-weights
+// Fundamental and pushes weight into Market Pulse (the most direct
+// real-time proxy for what the market is already doing) and Earnings.
+var CV_W_PRICE = {E:0.35, F:0.15, M:0.20, T:0.30};
 var CV_FILTER = 'All';
 var CV_MACRO_CACHE = null;                       // sector -> {pts,hits} per render
 
@@ -9612,7 +9958,8 @@ function cvDivergence(L){
   }
   return null;
 }
-function cvCompute(){
+function cvCompute(weights){
+  var W = weights || CV_W;
   CV_MACRO_CACHE = null;
   var seen={}, out=[];
   var list = (typeof CR_DATA!=='undefined'&&Array.isArray(CR_DATA))?CR_DATA:[];
@@ -9653,7 +10000,7 @@ function cvCompute(){
     // weighted fusion over available layers, weights renormalised
     var wSum=0, tot=0, avail=0;
     ['E','F','M','T'].forEach(function(k){
-      if(L[k]){ wSum+=CV_W[k]; tot+=L[k].score*CV_W[k]; avail++; }
+      if(L[k]){ wSum+=W[k]; tot+=L[k].score*W[k]; avail++; }
     });
     var base = wSum>0 ? tot/wSum : 0;
     // agreement bonus/penalty across available layers
