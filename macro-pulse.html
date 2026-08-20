@@ -4063,11 +4063,49 @@ function grParseHTML(htmlText,fname,opts){
     }
   }
   if(!cos.length){
+    // Priority 3.6: GROUPED-COLUMNS comparison table -- two or more companies
+    // side by side, each with its OWN current/prior/YoY sub-columns, e.g.
+    // "Metric | ICICI Pru Life Q1FY27 | Q1FY26 | YoY | HDFC Life Q1FY27 | ...".
+    // Differs from the plain transposed format above (which assumes exactly
+    // one column per company); anchor columns are detected by a quarter
+    // pattern embedded directly in the header text.
+    for(const tbl of [...doc.querySelectorAll('table')]){
+      let thEls=[...tbl.querySelectorAll('thead th')];
+      if(!thEls.length){ const tr1=tbl.querySelector('tr'); if(tr1&&tr1.querySelector('th')) thEls=[...tr1.querySelectorAll('th')]; }
+      if(thEls.length<4) continue;
+      const thRaw=thEls.map(t=>t.textContent.trim());
+      if(!/metric|parameter|item|particulars/i.test(thRaw[0])) continue;
+      const anchors=[];
+      for(let i=1;i<thRaw.length;i++){
+        const m=thRaw[i].match(/^(.*?)\s*Q([1-4])\s*FY\s*(\d{2,4})\s*$/i);
+        if(m&&m[1].trim().length>=2) anchors.push({i,name:m[1].trim()});
+      }
+      if(anchors.length<2) continue;
+      const yoyIdx=idx=>{ const end=anchors.find(a=>a.i>idx)?.i??thRaw.length; for(let k=idx+1;k<end;k++){ if(/yoy/i.test(thRaw[k])) return k; } return -1; };
+      const rows=[...tbl.querySelectorAll('tbody tr,tr')].filter(tr=>!tr.querySelector('th'));
+      const findRow=re=>rows.find(tr=>re.test((tr.cells[0]?.textContent||'').toLowerCase())&&!/margin|ratio|yoy|growth|%/.test((tr.cells[0]?.textContent||'').toLowerCase()));
+      const revRow=findRow(/premium income|revenue|total income|nii\b/)||findRow(/^ape\b/);
+      const patRow=findRow(/\bpat\b|net profit/);
+      if(!revRow) continue;
+      const num=(tr,i)=>{ if(!tr||!tr.cells[i]) return NaN; const t=tr.cells[i].textContent.replace(/[₹~%★+,]/g,'').trim(); if(/^[—-]+$/.test(t)) return NaN; return parseFloat(t); };
+      const pct=(tr,i)=>{ if(!tr||!tr.cells[i]) return NaN; const m=tr.cells[i].textContent.match(/(-?[\d.]+)\s*%/); return m?parseFloat(m[1]):NaN; };
+      const tmp3=[];
+      anchors.forEach(a=>{
+        const rv=num(revRow,a.i); if(isNaN(rv)||rv<=0) return;
+        const yi=yoyIdx(a.i);
+        let yy=yi>=0?pct(revRow,yi):NaN;
+        const pt=patRow?num(patRow,a.i):NaN;
+        tmp3.push({name:a.name,rev:rv,revYoY:isNaN(yy)?null:yy,ebitda:null,pat:isNaN(pt)?0:pt,greens:0,reds:0,ambers:0});
+      });
+      if(tmp3.length>=2){ cos.push(...tmp3); fmt='grouped-columns'; break; }
+    }
+  }
+  if(!cos.length){
     // Priority 4: per-company metric tables (Item | Q4 | Change) under company section headings
     fmt='metric-tables';
     let marks=[...doc.querySelectorAll('.co-name')];
     if(!marks.length) marks=[...doc.querySelectorAll('h1,h2,h3,.card-label')];
-    const GENERIC=/quarterly|annual|results|performance|charts?$|snapshot|cb assist|overview|summary|analyst|key |valuation|comparison|segment|revenue|business|financial|p&l|balance|borrowing|asset|crisis|timeline|merger|views|metrics|loan/i;
+    const GENERIC=/quarterly|annual|results|performance|charts?$|snapshot|cb assist|overview|summary|analyst|key |valuation|comparison|segment|revenue|business|financial|p&l|balance|borrowing|asset|crisis|timeline|merger|views|metrics|loan|reaction|sentiment|commentary|guidance/i;
     // company headings follow the "CompanyName — descriptive suffix" convention; the suffix
     // (e.g. "— Business & Investment Analysis", "— Quarterly Financial Summary") often contains
     // GENERIC words, so test GENERIC only against the part BEFORE the dash, not the whole heading.
@@ -4080,12 +4118,12 @@ function grParseHTML(htmlText,fname,opts){
       if(!thEls.length){ const tr1=tbl.querySelector('tr'); if(tr1&&tr1.querySelector('th')) thEls=[...tr1.querySelectorAll('th')]; }
       const thRaw=thEls.map(t=>t.textContent);
       const ths=thRaw.map(t=>t.toLowerCase());
-      if(!ths.length||!(ths[0].includes('item')||ths[0].includes('metric'))) return;
+      if(!ths.length||!(ths[0].includes('item')||ths[0].includes('metric')||ths[0].includes('particulars'))) return;
       const iChg=ths.findIndex(h=>(h.includes('change')||h.includes('yoy'))&&!h.includes('qoq'));
       // identify quarter columns generically (Q1 FY26, Q4 FY25, etc.) instead of hardcoding the
       // current quarter, so this keeps working next quarter without edits. Prefer the ★-marked
       // "latest actual" column; else pick the most recent (FY,Q) among quarter columns found.
-      const qCols=[]; thRaw.forEach((raw,i)=>{ const m=raw.replace(/★/g,'').trim().match(/^Q([1-4])\s*FY\s*(\d{2})$/i); if(m) qCols.push({i,q:+m[1],fy:+m[2],star:raw.includes('★')}); });
+      const qCols=[]; thRaw.forEach((raw,i)=>{ const m=raw.replace(/★/g,'').trim().match(/^Q([1-4])\s*FY\s*(\d{2})\b/i); if(m) qCols.push({i,q:+m[1],fy:+m[2],star:raw.includes('★')}); });
       let valIdx=-1,pyIdx=-1;
       const starCol=qCols.find(c=>c.star);
       if(starCol) valIdx=starCol.i;
@@ -4111,8 +4149,22 @@ function grParseHTML(htmlText,fname,opts){
         else { const cand=marks.find(m=>m.textContent.toLowerCase().includes(tok)); if(cand) cname=core(cand.textContent); }
       }
       let usedOrdered=false;
-      if(!cname&&compList&&hasQ4){ if(coCursor<opts.companies.length){ cname=opts.companies[coCursor]; usedOrdered=true; } }
-      if(!cname){ const mk=lastMarkBefore(tbl); if(!mk) return; cname=core(mk.textContent); }
+      if(!cname&&compList&&hasQ4){
+        if(opts.companies.length===1){ cname=opts.companies[0]; }
+        else if(coCursor<opts.companies.length){ cname=opts.companies[coCursor]; usedOrdered=true; }
+      }
+      if(!cname){ const mk=lastMarkBefore(tbl); if(mk) cname=core(mk.textContent); }
+      if(!cname){
+        // Fallback: single-company dashboards sometimes have no clean heading
+        // marker before the table (no .co-name, or the h1 glues the company
+        // name directly onto descriptive text with no dash to split on). The
+        // <title> tag reliably follows "CompanyName — description" or
+        // "CompanyName — description | Site" across this file set, so use it
+        // as a last resort rather than dropping the table's data entirely.
+        const tt=(doc.querySelector('title')&&doc.querySelector('title').textContent||'').split(/\s*[—|]\s*/)[0].trim();
+        if(tt&&tt.length<=60&&!GENERIC.test(tt)) cname=tt;
+      }
+      if(!cname) return;
       cname=cname.replace(/[^\w\s().&,-]/g,'').trim();
       if(!cname||cname.length>60) return;
       let rev=null,pat=null,yoy=null,ebitda=null;
@@ -4121,12 +4173,12 @@ function grParseHTML(htmlText,fname,opts){
         const tds=[...tr.cells]; if(tds.length<2) return;
         const lbl=tds[0].textContent.toLowerCase();
         const v=cellNum(tds,valIdx);
-        if(rev==null&&!isNaN(v)&&(lbl.includes('total revenue')||lbl.includes('revenue from operations')||lbl.includes('total income')||/^revenue\b/.test(lbl))){
+        if(rev==null&&!isNaN(v)&&(lbl.includes('total revenue')||lbl.includes('revenue from operations')||lbl.includes('total income')||/^revenue\b/.test(lbl)||(lbl.includes('revenue')&&!/yoy|growth|%|mix|share|concentration/.test(lbl)))){
           rev=v;
           if(iChg>=0&&tds[iChg]){ const t=tds[iChg].textContent; const m=t.match(/(-?[\d.]+)\s*%/); if(m){ yoy=parseFloat(m[1]); if(t.includes('\u25BC')&&yoy>0) yoy=-yoy; } }
           if(yoy==null){ const pv=cellNum(tds,pyIdx); if(!isNaN(pv)&&pv!==0) yoy=+(((v-pv)/Math.abs(pv))*100).toFixed(1); }
         }
-        if(pat==null&&!isNaN(v)&&(/(^|\s)pat(\s|$|\b)/.test(lbl)||lbl.includes('net profit'))) pat=v;
+        if(pat==null&&!isNaN(v)&&(/\bpat\b/.test(lbl)||lbl.includes('net profit'))) pat=v;
         if(ebitda==null&&/ebitda/.test(lbl)&&/margin/.test(lbl)){ const t=tds[valIdx]?tds[valIdx].textContent:''; const m=t.match(/(-?[\d.]+)\s*%/); if(m) ebitda=parseFloat(m[1]); }
       });
       if(rev==null) return;
@@ -4173,14 +4225,56 @@ function grParseHTML(htmlText,fname,opts){
           ebitda:null,pat:cur(mPat)||0,greens:g,reds:r,ambers:0});
       });
     }
+    if(!cos.length){
+      // Priority 5.5: single-entity const <NAME> = {Metric:{Period:value}}
+      // (no company-nesting level, unlike the multi-bank const DATA above) --
+      // used by dashboards whose visible tables are JS template literals
+      // (${...}) rendered client-side, so the raw fetched HTML has no
+      // static numbers at all; the real data lives in this object instead.
+      const tryNames=['GROUP','COMPANY','ENTITY','FIN','CONSOL','GRP'];
+      let obj=null;
+      for(const nm of tryNames){ obj=grab('const '+nm); if(obj) break; }
+      if(obj&&typeof obj==='object'){
+        const metrics=Object.keys(obj);
+        const firstVal=metrics.length?obj[metrics[0]]:null;
+        const isFlat=firstVal&&typeof firstVal==='object'&&!Array.isArray(firstVal)&&
+          Object.values(firstVal).every(v=>v==null||typeof v==='number');
+        if(isFlat){
+          const periods=Object.keys(firstVal);
+          const qp=periods.map(p=>{const m=p.match(/^Q([1-4])FY(\d{2,4})$/i); return m?{p,q:+m[1],fy:+m[2]}:null;}).filter(Boolean);
+          qp.sort((a,b)=>(b.fy-a.fy)||(b.q-a.q));
+          const cur=qp[0];
+          const prev=cur?qp.find(x=>x.q===cur.q&&x.fy<cur.fy):null;
+          const mFind=re=>metrics.find(m=>re.test(m.toLowerCase()));
+          const mRev=mFind(/^revops$|revenue|totalincome|nii/)||metrics[0];
+          const mPat=mFind(/^pat$|netprofit/);
+          const mEb=mFind(/^ebitda$/)||mFind(/ebitda/);
+          if(cur&&obj[mRev]){
+            const rv=obj[mRev][cur.p], rv0=prev?obj[mRev][prev.p]:null;
+            const yy=(rv!=null&&rv0)?+(((rv-rv0)/Math.abs(rv0))*100).toFixed(1):null;
+            const pt=mPat?obj[mPat][cur.p]:null;
+            const eb=mEb?obj[mEb][cur.p]:null;
+            const tt=(doc.querySelector('title')&&doc.querySelector('title').textContent||'').split(/\s*[—|]\s*/)[0].trim();
+            const nm=(opts.companies&&opts.companies.length===1)?opts.companies[0]:tt;
+            if(rv!=null&&nm){ cos.push({name:nm,rev:rv,revYoY:yy,ebitda:eb,pat:pt||0,greens:0,reds:0,ambers:0}); fmt='single-entity-js'; }
+          }
+        }
+      }
+    }
   }
   if(!cos.length) return null;
   // dedupe by name, treating "Vardhman" and "Vardhman Textiles" as the same company
-  const kept=[];
+  const kept=[]; const keptVals=[];
   cos=cos.filter(c=>{
     const n=c.name.toLowerCase().trim();
     if(kept.some(k=>k===n||(n.length>=3&&k.startsWith(n))||(k.length>=3&&n.startsWith(k)))) return false;
-    kept.push(n); return true;
+    // Also catch same-company duplicates that use an unrelated name spelling
+    // (e.g. "ONGC" vs "Oil & Natural Gas Corporation Ltd" from two redundant
+    // tables in one file) by matching on identical rev+pat figures -- prefer
+    // keeping the longer, more descriptive name of the pair.
+    const dupIdx=keptVals.findIndex(v=>v.rev===c.rev&&v.pat===c.pat&&c.rev!=null&&c.rev!==0);
+    if(dupIdx>=0) return false;
+    kept.push(n); keptVals.push({rev:c.rev,pat:c.pat}); return true;
   });
   // period detection
   const pm=htmlText.match(/Q[1-4]\s*FY\s*\d{2}/i);
