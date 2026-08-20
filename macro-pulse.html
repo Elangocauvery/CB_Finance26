@@ -4371,6 +4371,12 @@ const SECTOR_IMPACT=[
  rules:[
   c=>c.sc('Interest')<=-2?{p:1,r:`Higher rates — counterintuitively mildly positive: higher bond yields improve solvency ratios and non-par product attractiveness.`}:c.sc('Interest')>=2?{p:0,r:`Rate cuts — guaranteed-return (non-par) products get harder to price profitably, but ULIPs benefit from equity buoyancy. Net neutral-to-mild effect.`}:null,
   c=>c.sc('Earnings')>=1?{p:1,r:`Healthy economy (${c.lab('Earnings')}) — discretionary protection and savings products track household income confidence; APE growth follows.`}:null]},
+{name:"MFI",group:"Financials",icon:"🌾",links:["Monsoon★","RBI Rates","Liquidity"],
+ metrics:["AUM growth","PAR 30/90 (portfolio at risk)","Cost of funds","NIM","Credit cost / provisioning","Borrower additions","Disbursement growth"],
+ rules:[
+  c=>c.sc('Monsoon')>=2?{p:2,r:`Strong monsoon (${c.lab('Monsoon')}) — MFI collections are tied to rural household income more directly than any other lending segment; a good kharif season lifts repayment rates and pulls PAR down fast.`}:c.sc('Monsoon')<=-1?{p:-2,r:`Weak/delayed monsoon (${c.lab('Monsoon')}) — rural cash flows tighten first and hardest here; expect PAR 30/90 to rise and credit costs to follow within 1-2 quarters.`}:null,
+  c=>c.sc('Interest')>=2?{p:1,r:`Rate cuts (${c.lab('Interest')}) — MFIs borrow from banks/NBFCs at wholesale rates; lower funding cost widens spreads, though pass-through to borrower rates is capped by RBI's qualifying-asset pricing norms.`}:c.sc('Interest')<=-2?{p:-1,r:`Rate hikes (${c.lab('Interest')}) — funding cost rises faster than the sector can reprice lending given regulatory rate caps; margin pressure bites harder here than at an unregulated NBFC.`}:null,
+  c=>c.sc('Liquidity')<=-1?{p:-2,r:`Tight liquidity (${c.lab('Liquidity')}) — MFIs sit lowest in the funding pecking order; bank credit lines tighten first here when systemic liquidity turns scarce, directly capping disbursement growth.`}:c.sc('Liquidity')>=2?{p:1,r:`Surplus liquidity (${c.lab('Liquidity')}) — bank funding lines open up, easing the sector's structurally higher cost of funds.`}:null]},
 // ════ MANUFACTURING ════
 {name:"Defence",group:"Manufacturing",icon:"🛡️",links:["Defence Budget★","Global Tensions★"],
  metrics:["Order book / revenue ratio","Order inflow guidance","Execution (revenue growth)","EBITDA margin","Indigenisation content","Working capital days","Export wins"],
