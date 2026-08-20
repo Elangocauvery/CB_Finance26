@@ -4090,12 +4090,13 @@ function grParseHTML(htmlText,fname,opts){
       const num=(tr,i)=>{ if(!tr||!tr.cells[i]) return NaN; const t=tr.cells[i].textContent.replace(/[₹~%★+,]/g,'').trim(); if(/^[—-]+$/.test(t)) return NaN; return parseFloat(t); };
       const pct=(tr,i)=>{ if(!tr||!tr.cells[i]) return NaN; const m=tr.cells[i].textContent.match(/(-?[\d.]+)\s*%/); return m?parseFloat(m[1]):NaN; };
       const tmp3=[];
-      anchors.forEach(a=>{
+      anchors.forEach((a,idx)=>{
         const rv=num(revRow,a.i); if(isNaN(rv)||rv<=0) return;
         const yi=yoyIdx(a.i);
         let yy=yi>=0?pct(revRow,yi):NaN;
         const pt=patRow?num(patRow,a.i):NaN;
-        tmp3.push({name:a.name,rev:rv,revYoY:isNaN(yy)?null:yy,ebitda:null,pat:isNaN(pt)?0:pt,greens:0,reds:0,ambers:0});
+        const nm=(opts.companies&&opts.companies[idx])?opts.companies[idx]:a.name;
+        tmp3.push({name:nm,rev:rv,revYoY:isNaN(yy)?null:yy,ebitda:null,pat:isNaN(pt)?0:pt,greens:0,reds:0,ambers:0});
       });
       if(tmp3.length>=2){ cos.push(...tmp3); fmt='grouped-columns'; break; }
     }
