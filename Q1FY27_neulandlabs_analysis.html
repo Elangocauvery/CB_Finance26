@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neuland Laboratories — Q1 FY27 Business & Investment Analysis | CB Research</title>
+<style>
+  :root{
+    --ink:#1c1f26; --slate:#5a6270; --line:#e6e2da;
+    --paper:#ffffff; --paper-soft:#faf9f6;
+    --orange:#ff8a3d; --orange-deep:#e8672a; --orange-tint:#fff1e6;
+    --green:#1f8a4c; --green-tint:#eaf7ef;
+    --red:#c93a3a; --red-tint:#fdecec;
+    --amber:#b8860b; --amber-tint:#fdf6e3;
+    --blue:#2a5ea8; --blue-tint:#eaf1fb;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    line-height:1.5;
+  }
+  .wrap{max-width:980px; margin:0 auto; padding:0 20px 60px;}
+
+  /* ── Header ─────────────────────────────────────────── */
+  .topbar{
+    background:var(--paper); border-bottom:3px solid var(--orange);
+    padding:22px 20px 18px; margin-bottom:26px;
+  }
+  .topbar-inner{max-width:980px; margin:0 auto;}
+  .eyebrow{
+    font-size:11px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase;
+    color:var(--orange-deep); margin-bottom:6px;
+  }
+  h1.co-name{
+    font-size:30px; font-weight:800; margin:0 0 6px; color:var(--ink); letter-spacing:-0.3px;
+  }
+  .meta-row{
+    display:flex; flex-wrap:wrap; gap:8px 18px; font-size:13px; color:var(--slate); font-weight:600;
+  }
+  .meta-row span b{color:var(--ink);}
+
+  /* ── Stat strip ─────────────────────────────────────── */
+  .stat-strip{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:1px;
+    background:var(--line); border:1px solid var(--line); border-radius:10px;
+    overflow:hidden; margin-bottom:28px;
+  }
+  .stat{background:var(--paper); padding:16px 14px; text-align:center;}
+  .stat .num{font-size:24px; font-weight:800; color:var(--ink);}
+  .stat .num.up{color:var(--green);}
+  .stat .lbl{font-size:11px; color:var(--slate); font-weight:600; text-transform:uppercase; letter-spacing:.5px; margin-top:3px;}
+
+  /* ── Section ────────────────────────────────────────── */
+  .sec{margin-bottom:32px;}
+  .sec-title{
+    font-size:18px; font-weight:800; color:var(--ink); margin:0 0 4px;
+    display:flex; align-items:center; gap:8px;
+  }
+  .sec-sub{font-size:13px; color:var(--slate); margin:0 0 14px;}
+
+  table{width:100%; border-collapse:collapse; font-size:13.5px;}
+  th{
+    background:var(--paper-soft); text-align:left; padding:9px 12px;
+    font-weight:700; color:var(--ink); border-bottom:2px solid var(--line);
+    white-space:nowrap;
+  }
+  td{padding:9px 12px; border-bottom:1px solid var(--line); color:var(--ink);}
+  tr:last-child td{border-bottom:none;}
+  td.num, th.num{text-align:right; font-variant-numeric:tabular-nums;}
+  td.hero{font-weight:800;}
+  .up{color:var(--green); font-weight:700;}
+  .down{color:var(--red); font-weight:700;}
+  .flat{color:var(--slate); font-weight:600;}
+  .tbl-wrap{border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+
+  /* ── Narrative ──────────────────────────────────────── */
+  .note-list{padding:0; margin:0; list-style:none;}
+  .note-list li{
+    padding:10px 0 10px 30px; border-bottom:1px solid var(--line); position:relative; font-size:14px;
+  }
+  .note-list li:last-child{border-bottom:none;}
+  .note-list li b.n{
+    position:absolute; left:0; top:10px; color:var(--orange-deep); font-weight:800; font-size:13px;
+  }
+
+  /* ── Rating box ─────────────────────────────────────── */
+  .cb-band{
+    display:inline-flex; align-items:center; gap:8px; padding:10px 18px;
+    background:var(--orange-tint); border:1.5px solid var(--orange); border-radius:10px;
+    font-weight:800; font-size:15px; color:var(--orange-deep); margin-bottom:16px;
+  }
+  .param-table td.wt{color:var(--slate); font-size:12px;}
+  .dot{display:inline-flex; gap:2px;}
+  .dot span{width:8px; height:8px; border-radius:50%; background:var(--line);}
+  .dot span.on{background:var(--orange);}
+
+  /* ── Macro box ──────────────────────────────────────── */
+  .macro-box{
+    background:var(--green-tint); border:1.5px solid var(--green); border-radius:10px;
+    padding:16px 18px; font-size:13.5px; margin-bottom:10px;
+  }
+  .macro-box .tag{
+    display:inline-block; background:var(--green); color:#fff; font-size:11px; font-weight:800;
+    padding:3px 9px; border-radius:5px; margin-bottom:8px; letter-spacing:.4px;
+  }
+
+  /* ── Risk box ───────────────────────────────────────── */
+  .risk-box{
+    background:var(--amber-tint); border:1.5px solid var(--amber); border-radius:10px;
+    padding:16px 18px; font-size:13.5px;
+  }
+  .risk-box .tag{
+    display:inline-block; background:var(--amber); color:#fff; font-size:11px; font-weight:800;
+    padding:3px 9px; border-radius:5px; margin-bottom:8px; letter-spacing:.4px;
+  }
+
+  /* ── Verdict ────────────────────────────────────────── */
+  .verdict{
+    background:var(--ink); color:#fff; border-radius:12px; padding:24px 26px; margin-top:8px;
+  }
+  .verdict .grade{
+    display:inline-block; background:var(--orange); color:#fff; font-weight:800; font-size:20px;
+    padding:6px 16px; border-radius:8px; margin-bottom:10px;
+  }
+  .verdict p{margin:0; font-size:14px; line-height:1.65; color:#e8e6e0;}
+  .verdict p+p{margin-top:10px;}
+
+  .disc{
+    font-size:11px; color:var(--slate); border-top:1px solid var(--line); margin-top:36px;
+    padding-top:16px; line-height:1.6;
+  }
+
+  .toggle-btn{
+    background:var(--paper); border:1.5px solid var(--orange); color:var(--orange-deep);
+    font-weight:700; font-size:12.5px; padding:7px 14px; border-radius:7px; cursor:pointer;
+    margin-bottom:12px;
+  }
+  .toggle-btn:hover{background:var(--orange-tint);}
+  .hidden{display:none;}
+
+  @media (max-width:640px){
+    .stat-strip{grid-template-columns:repeat(2,1fr);}
+    h1.co-name{font-size:24px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="eyebrow">CB Research · Pharma (CDMO) · Q1 FY27 Business & Investment Analysis</div>
+    <h1 class="co-name">Neuland Laboratories</h1>
+    <div class="meta-row">
+      <span>NSE: <b>NEULANDLAB</b></span>
+      <span>BSE: <b>524558</b></span>
+      <span>Segment: <b>API CDMO (GDS + CMS)</b></span>
+      <span>Quarter ended: <b>30 June 2026</b></span>
+      <span>Sector: <b>Pharma (CDMO)</b></span>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- STAT STRIP -->
+  <div class="stat-strip">
+    <div class="stat"><div class="num up">₹641.5 Cr</div><div class="lbl">Revenue · +119.2% YoY</div></div>
+    <div class="stat"><div class="num up">35.5%</div><div class="lbl">EBITDA Margin · +2,390 bps YoY</div></div>
+    <div class="stat"><div class="num up">₹147.4 Cr</div><div class="lbl">PAT · +962% YoY</div></div>
+    <div class="stat"><div class="num up">35.8%</div><div class="lbl">ROCE (Q1 FY27)</div></div>
+  </div>
+
+  <!-- Q1 FY27 HEADLINE TABLE -->
+  <div class="sec">
+    <h2 class="sec-title">📊 Q1 FY27 Headline Results</h2>
+    <p class="sec-sub">All figures ₹ Crore unless stated. Source: company results, Q1 FY27 investor presentation.</p>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Line Item</th><th class="num">Q1 FY27</th><th class="num">Q1 FY26</th><th class="num">Q4 FY26</th><th class="num">YoY Δ</th></tr></thead>
+      <tbody>
+        <tr><td class="hero">Total Income</td><td class="num hero">650.1</td><td class="num">~300.6</td><td class="num">788.7</td><td class="num up">+116.3%</td></tr>
+        <tr><td>Revenue from Operations</td><td class="num">641.5</td><td class="num">292.7</td><td class="num">776.3</td><td class="num up">+119.2%</td></tr>
+        <tr><td>EBITDA</td><td class="num">231.1</td><td class="num">~35.0</td><td class="num">~307–314</td><td class="num up">+448.2%</td></tr>
+        <tr><td>EBITDA Margin</td><td class="num">35.5%</td><td class="num">~11.6%</td><td class="num">40.5%</td><td class="num up">+~2,390 bps</td></tr>
+        <tr><td>PBT</td><td class="num">197.5</td><td class="num">~17.4</td><td class="num">287</td><td class="num up">+1,036.7%</td></tr>
+        <tr><td class="hero">PAT (Consolidated)</td><td class="num hero">147.4</td><td class="num">13.9</td><td class="num">212.7</td><td class="num up">+~962%</td></tr>
+        <tr><td>Working Capital Days</td><td class="num">84</td><td class="num">145</td><td class="num">137</td><td class="num up">Sharp improvement</td></tr>
+        <tr><td>Q1 FY27 Capex Outflow</td><td class="num">121.6</td><td class="num">—</td><td class="num">—</td><td class="num flat">Entering higher-capex phase</td></tr>
+        <tr><td>Net Debt Position</td><td class="num up">(308.5)</td><td class="num">—</td><td class="num">(156.8)</td><td class="num up">Net cash, improving</td></tr>
+        <tr><td>ROCE / Current Ratio / D/E</td><td class="num">35.8% / 2.1x / 0.1x</td><td class="num">—</td><td class="num">—</td><td class="num flat">Strong, low-leverage</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- QUARTERLY TREND -->
+  <div class="sec">
+    <h2 class="sec-title">📈 5-Quarter Trend — Read the Trend, Not the Single Print</h2>
+    <p class="sec-sub">Management's own guidance: judge Neuland over 4–6 quarters, given the business's inherent lumpiness.</p>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Quarter</th><th class="num">Revenue</th><th class="num">QoQ</th><th class="num">EBITDA Margin</th><th class="num">PAT</th><th class="num">QoQ PAT</th></tr></thead>
+      <tbody>
+        <tr><td>Q1 FY26 (Jun-25)</td><td class="num">293</td><td class="num flat">—</td><td class="num">11.6%</td><td class="num">14</td><td class="num flat">—</td></tr>
+        <tr><td>Q2 FY26 (Sep-25)</td><td class="num">514</td><td class="num up">+75.4%</td><td class="num">30.4%</td><td class="num">97</td><td class="num up">+592.9%</td></tr>
+        <tr><td>Q3 FY26 (Dec-25)</td><td class="num">440</td><td class="num down">-14.4%</td><td class="num">19.0%</td><td class="num">41</td><td class="num down">-57.7%</td></tr>
+        <tr><td>Q4 FY26 (Mar-26)</td><td class="num">776</td><td class="num up">+76.4%</td><td class="num">40.5%</td><td class="num">213</td><td class="num up">+419.5%</td></tr>
+        <tr><td class="hero">Q1 FY27 (Jun-26)</td><td class="num hero">641</td><td class="num down">-17.4%</td><td class="num hero">35.5%</td><td class="num hero">147</td><td class="num down">-30.8%</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- FY26 ANNUAL -->
+  <div class="sec">
+    <h2 class="sec-title">🗓️ FY26 Full-Year Summary</h2>
+    <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Metric</th><th class="num">FY26</th><th class="num">YoY Growth</th></tr></thead>
+      <tbody>
+        <tr><td>Revenue from Operations</td><td class="num">2,023</td><td class="num up">+36.98%</td></tr>
+        <tr><td>EBITDA</td><td class="num">580</td><td class="num up">+76%</td></tr>
+        <tr><td>EBITDA Margin</td><td class="num">~29%</td><td class="num up">from ~22% FY25</td></tr>
+        <tr><td>PBT</td><td class="num">489</td><td class="num up">+41.2%</td></tr>
+        <tr><td>PAT</td><td class="num">364</td><td class="num up">+39.94%</td></tr>
+        <tr><td>EPS (₹)</td><td class="num">283.71</td><td class="num flat">—</td></tr>
+        <tr><td>Dividend</td><td class="num">₹34/share (340%)</td><td class="num flat">—</td></tr>
+        <tr><td>Operating Cash Flow</td><td class="num">347</td><td class="num up">from 317 (FY25)</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- BUSINESS NARRATIVE -->
+  <div class="sec">
+    <h2 class="sec-title">🔍 What Actually Happened This Quarter</h2>
+    <ul class="note-list">
+      <li><b class="n">1</b>The headline numbers are exceptional by any benchmark: 119.2% revenue growth, 448.2% EBITDA growth, and ~962% PAT growth YoY, with EBITDA margin expanding ~2,390 bps to 35.5% — a standout quarter for an Indian API/CDMO company, and the reason the stock hit a fresh all-time high on results day.</li>
+      <li><b class="n">2</b>This remains, by Neuland's own history, an inherently lumpy business. Revenue fell ~17.4% QoQ from Q4 FY26's record base, and CMS commercial growth is concentrated in a handful of molecules — the CMS segment alone was 67% of Q1 FY27 revenue. Management has said consistently for years that the trend across 4–6 quarters matters more than any single print.</li>
+      <li><b class="n">3</b>Management itself is flagging the margin as elevated. The 35.5% EBITDA margin was explicitly attributed to favourable FX and customer mix, against a long-term guidance of 25%+ — a meaningful gap that argues for treating this quarter as a strong outlier to confirm over time, not a new baseline.</li>
+      <li><b class="n">4</b>Balance sheet and returns are genuinely improving, not just earnings. ROCE reached 35.8% in Q1 FY27, current ratio stands at 2.1x, D/E at a low 0.1x, and net debt turned further net-cash (-₹308.5 Cr vs -₹156.8 Cr at Q4 FY26 end) — working capital days nearly halved sequentially too. This is real operational progress alongside the headline growth, not just an earnings beat.</li>
+      <li><b class="n">5</b>Valuation has run far ahead, and results day pushed it further. The stock traded at roughly 68–71x trailing earnings even before this print; the post-result rally to a fresh all-time high stretches that further, above most pre-result brokerage targets. The bar for coming quarters is sustained execution on CMS/peptide/Gland Pharma commercialisation — not just another headline beat.</li>
+    </ul>
+  </div>
+
+  <!-- MACRO TAILWIND -->
+  <div class="sec">
+    <h2 class="sec-title">🌍 Macro Layer — Why CDMO, Specifically</h2>
+    <div class="macro-box">
+      <span class="tag">Pharma (CDMO) · +2 Strong Tailwind</span>
+      <div>Neuland sits in the <b>Pharma (CDMO)</b> sub-sector built specifically to separate names like this from domestic-formulation pharma (Sun Pharma, Torrent-type). The current tailwind: China+1 sourcing shift and the Biosecure Act push global biopharma outsourcing toward Indian CDMOs, and the weak rupee (~₹95.5/USD) directly lifts USD-billed CDMO revenue on translation. This is the same structural tailwind behind Laurus Labs' CDMO segment growing 67% YoY this quarter — Neuland's print fits the same pattern, not an isolated event.</div>
+    </div>
+  </div>
+
+  <!-- CB SCORE RATING -->
+  <div class="sec">
+    <h2 class="sec-title">⭐ CB Score — Earnings Quality Rating (10-Parameter Model)</h2>
+    <p class="sec-sub">Pharma sector model · weights match your live CB Score formula (14/13/10/9/10/8/5/4/10/10% + 7% seasonality)</p>
+
+    <div class="cb-band">🏆 Draft CB Score: ≈ 73 / 100 — for your review, not final</div>
+
+    <div class="tbl-wrap">
+    <table class="param-table">
+      <thead><tr><th>Parameter</th><th>Weight</th><th>Score</th><th>Basis (real Q1 FY27 / FY26 data)</th></tr></thead>
+      <tbody>
+        <tr><td>📈 Revenue Growth (YoY %)</td><td class="wt">14%</td><td><div class="dot"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div> 5</td><td>+119.2% — far above the &gt;24% band</td></tr>
+        <tr><td>💰 EBITDA Margin (%)</td><td class="wt">13%</td><td><div class="dot"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div> 5</td><td>35.5% — above &gt;30% band; <i>caveat: mgmt flags this as elevated vs 25%+ long-term guidance</i></td></tr>
+        <tr><td>📊 PAT Growth (YoY %)</td><td class="wt">10%</td><td><div class="dot"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div> 5</td><td>+962% — far above the &gt;40% band</td></tr>
+        <tr><td>⭐ ROCE (%)</td><td class="wt">9%</td><td><div class="dot"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div> 5</td><td>35.8% (Q1 FY27) — above &gt;30% band</td></tr>
+        <tr><td>🏅 RoE (%)</td><td class="wt">10%</td><td><div class="dot"><span class="on"></span><span class="on"></span><span class="on"></span></div> 3</td><td>21.2% (FY26) — falls in the 15–22% band, just under the next tier</td></tr>
+        <tr><td>🇺🇸 US FDA Compliance</td><td class="wt">8%</td><td><div class="dot"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div> 5*</td><td>Multiple facilities cleared by USFDA/EDQM/PMDA/ANVISA; no Warning Letter or Import Alert found — <i>*inferred from absence of adverse findings, please confirm</i></td></tr>
+        <tr><td>🏦 Debt-Equity Ratio</td><td class="wt">5%</td><td><div class="dot"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div> 5</td><td>D/E 0.1x, net cash of ₹308.5 Cr — top band</td></tr>
+        <tr><td>💵 OCF vs PAT</td><td class="wt">4%</td><td><div class="dot"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span></div> 4</td><td>FY26 OCF ₹347 Cr / PAT ₹364 Cr ≈ 95% — 80–100% band</td></tr>
+        <tr><td>⚖️ Valuation vs 5-Yr Band</td><td class="wt">10%</td><td><div class="dot"><span class="on"></span></div> 1</td><td>~68–71x trailing P/E, fresh all-time high, above most brokerage targets — richly valued</td></tr>
+        <tr><td>🪙 PEG / Earnings Yield vs G-Sec</td><td class="wt">10%</td><td><div class="dot"><span class="on"></span></div> 1</td><td>Earnings yield ≈1.4% at ~70x P/E, well under the 3% floor — priced for perfection</td></tr>
+        <tr><td>🌦️ Seasonality</td><td class="wt">7%</td><td><div class="dot"><span class="on"></span><span class="on"></span><span class="on"></span></div> 3*</td><td>No strong quarter-specific seasonal pattern typical for API/CDMO — <i>*default, not analyst-confirmed</i></td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- EARNINGS QUALITY RATING (house scale) -->
+  <div class="sec">
+    <h2 class="sec-title">🎯 CBF26 Earnings Rating</h2>
+    <div class="verdict">
+      <span class="grade">CB-A · Strong</span>
+      <p>Reflects genuine earnings quality and momentum this quarter — real revenue and margin expansion, not accounting or one-off driven, backed by improving balance sheet metrics (ROCE, net cash, working capital days).</p>
+      <p><b>Standard house caveat:</b> this measures earnings quality only, not valuation, and is not a buy/sell/hold call. The valuation and PEG parameters above (Score 1 on both) are exactly where that caveat bites hardest — a CB-A earnings quarter sitting inside a richly-valued stock are two separate facts, not a contradiction.</p>
+    </div>
+  </div>
+
+  <!-- RISK BOX -->
+  <div class="sec">
+    <h2 class="sec-title">⚠️ What Would Change This View</h2>
+    <div class="risk-box">
+      <span class="tag">Watch these, not just the next headline number</span>
+      <ul style="margin:8px 0 0; padding-left:18px;">
+        <li>EBITDA margin reverting toward the 25%+ guided range over the next 1–2 quarters — expected and not itself bad news, but the market's reaction to that normalisation matters given today's valuation</li>
+        <li>CMS customer concentration — a handful of molecules drive commercial CMS growth; any single-customer order timing shift shows up disproportionately in the quarterly print</li>
+        <li>Capex execution — ₹121.6 Cr outflow this quarter signals entry into a higher-capex phase; watch that new capacity converts to revenue on the guided timeline</li>
+        <li>Valuation re-rating risk both ways — at ~70x trailing earnings, any growth disappointment carries an outsized share-price reaction relative to the earnings miss itself</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="disc">
+    <b>CB Research Disclaimer:</b> This analysis is a qualitative composite assessment based on Q1 FY27 reported results and publicly available investor communications, for CB Research members only. Not SEBI-registered investment advice — no buy/sell/hold recommendation is made or implied. The CB Score above is a draft for analyst review, not a final published score; USFDA compliance and Seasonality parameters are flagged where inferred rather than directly confirmed and should be verified before this score is treated as final. · Elango Industries Limited (BSE: 513452) · EIL Research
+  </div>
+
+</div>
+</body>
+</html>
