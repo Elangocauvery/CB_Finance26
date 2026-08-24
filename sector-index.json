@@ -563,10 +563,6 @@
         "file": "Life_Insurance_hdfc_icici_Q1FY27.html",
         "sectors": [
             "Insurance"
-        ],
-        "companies": [
-            "ICICI Prudential Life",
-            "HDFC Life"
         ]
     },
     {
@@ -645,9 +641,6 @@
         "file": "Q1FY27_JioFinancialServices.html",
         "sectors": [
             "NBFC (Lending)"
-        ],
-        "companies": [
-            "Jio Financial Services"
         ]
     },
     {
@@ -690,9 +683,6 @@
         "file": "Q1FY27_ONGC_5Aug.html",
         "sectors": [
             "Oil & Gas"
-        ],
-        "companies": [
-            "ONGC"
         ]
     },
     {
@@ -753,9 +743,6 @@
         "file": "Q1FY27_syrmasgs.html",
         "sectors": [
             "EMS"
-        ],
-        "companies": [
-            "Syrma SGS Technology"
         ]
     },
     {
@@ -774,15 +761,76 @@
         "file": "RIL_Q1FY27_Business_Investment_Analysis.html",
         "sectors": [
             "Oil & Gas"
-        ],
-        "companies": [
-            "RIL"
         ]
     },
     {
         "file": "amc-icici-hdfc-q1fy27.html",
         "sectors": [
             "AMC"
+        ]
+    },
+    {
+        "file": "CB_Research_-_SFB_Sector_Q1_FY27.html",
+        "sectors": [
+            "Banking (SFB)"
+        ]
+    },
+    {
+        "file": "Q1FY27_Battery_exideamararaja.html",
+        "sectors": [
+            "Battery / Energy Storage"
+        ]
+    },
+    {
+        "file": "Q1FY27_Defence_Sector_Companies.html",
+        "sectors": [
+            "Defence"
+        ]
+    },
+    {
+        "file": "Q1FY27_Dixon_syrma_Amber_PgE_keynes.html",
+        "sectors": [
+            "EMS"
+        ]
+    },
+    {
+        "file": "Q1FY27_GEVernovaTD_Apar_Siemens_ABB_Hitachi.html",
+        "sectors": [
+            "Capital Goods (Power/T&D)"
+        ]
+    },
+    {
+        "file": "Q1FY27_GoldJewellerySector_Lalitha_IPO.html",
+        "sectors": [
+            "Gold & Jewellery"
+        ]
+    },
+    {
+        "file": "Q1FY27_HospitalSector.html",
+        "sectors": [
+            "Hospitals"
+        ]
+    },
+    {
+        "file": "Q1FY27_PassengerCars_TataMotors_Maruti_Hyundai.html",
+        "sectors": [
+            "Auto 4W (Mass-Market)",
+            "Auto 4W (SUV/Premium)"
+        ]
+    },
+    {
+        "file": "Q1FY27_Solar_Companies.html",
+        "sectors": [
+            "Solar / Renewables"
+        ]
+    },
+    {
+        "file": "Q1FY27_TataComm_Netweb_Azad_VarunBev.html",
+        "sectors": [
+            "Telecom",
+            "EMS",
+            "Capital Goods (General Industrial)",
+            "FMCG (Urban/Premium-Skew)"
         ]
     }
 ]
