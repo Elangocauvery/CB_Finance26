@@ -1722,6 +1722,28 @@ tr:last-child td{border-bottom:none;}
   <div id="cv-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;"></div>
   <div id="cv-tierb-title" style="display:none;margin:22px 0 10px;font-size:12px;font-weight:800;color:#b35c00;text-transform:uppercase;letter-spacing:0.6px;">⚠️ Insufficient coverage — fewer than 3 lenses have data (ranking not comparable)</div>
   <div id="cv-grid-b" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;"></div>
+
+  <div style="background:#fff;border:1.5px solid #e6e2da;border-radius:12px;padding:20px 22px;margin-top:24px;">
+    <div style="font-size:13px;font-weight:800;color:#1c1f26;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">ℹ️ How the Conviction score is built — the 4 lenses</div>
+    <table style="width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:12px;">
+      <thead><tr style="border-bottom:2px solid #e6e2da;">
+        <th style="text-align:left;padding:6px 10px;color:#5a6270;font-weight:700;">Lens</th>
+        <th style="text-align:left;padding:6px 10px;color:#5a6270;font-weight:700;">Weight</th>
+        <th style="text-align:left;padding:6px 10px;color:#5a6270;font-weight:700;">What it measures</th>
+        <th style="text-align:left;padding:6px 10px;color:#5a6270;font-weight:700;">Source</th>
+      </tr></thead>
+      <tbody>
+        <tr style="border-bottom:1px solid #e6e2da;"><td style="padding:6px 10px;font-weight:700;">E — Earnings</td><td style="padding:6px 10px;">30%</td><td style="padding:6px 10px;">Real, actual results this quarter</td><td style="padding:6px 10px;color:#5a6270;">Ground Reality Bridge — parsed from your published sector dashboards</td></tr>
+        <tr style="border-bottom:1px solid #e6e2da;"><td style="padding:6px 10px;font-weight:700;">F — Fundamental</td><td style="padding:6px 10px;">30%</td><td style="padding:6px 10px;">CB Score — qualitative business-quality composite</td><td style="padding:6px 10px;color:#5a6270;">Company Ranker's 10 sector-tailored parameters</td></tr>
+        <tr style="border-bottom:1px solid #e6e2da;"><td style="padding:6px 10px;font-weight:700;">M — Macro</td><td style="padding:6px 10px;">20%</td><td style="padding:6px 10px;">How today's macro favours this company's sub-sector specifically</td><td style="padding:6px 10px;color:#5a6270;">Sector Impact rules (39 sectors, sub-segment-aware)</td></tr>
+        <tr><td style="padding:6px 10px;font-weight:700;">T — Market</td><td style="padding:6px 10px;">20%</td><td style="padding:6px 10px;">Live trading signals</td><td style="padding:6px 10px;color:#5a6270;">NSE Market Intel — delivery %, bulk/block, PE, price action</td></tr>
+      </tbody>
+    </table>
+    <div style="font-size:12px;color:#5a6270;line-height:1.6;">
+      Combined as <b style="color:#1c1f26;">E×0.30 + F×0.30 + M×0.20 + T×0.20</b>, re-weighted proportionally if a lens is missing. A company needs at least <b style="color:#1c1f26;">3 of 4 lenses populated</b> to be ranked in the main list — below that, it falls into the low-coverage section above, since the ranking isn't comparable with only 1–2 lenses. Because Earnings and Fundamental together carry 60% of the score, a company with genuinely strong actual results and a high CB Score will stay near the top regardless of Macro-layer refinement — Macro mainly sharpens ordering <i>within</i> and near a sector, not the overall leaderboard.
+    </div>
+  </div>
+
   <div class="footer">CB Research · EIL Research · Elango Industries Limited (BSE: 513452) · CB Conviction Engine · For members only · Research ranking, not SEBI-registered investment advice — no buy/sell recommendation is made or implied.</div>
 </div>
 
