@@ -4842,6 +4842,12 @@ const SECTOR_IMPACT=[
   c=>c.inr>=92?{p:2,r:`Rupee at ${c.inrTxt} — 40–50% of large-cap pharma revenue is USD-billed (US generics + CDMO); depreciation is a direct revenue and margin bonus, on top of the defensive earnings profile.`}:null,
   c=>c.sc('Global')<=-2?{p:1,r:`Global stress (${c.lab('Global')}) — medicine demand is recession-proof; pharma historically outperforms in risk-off phases. Combined with the INR tailwind, it is the classic defensive-plus-currency trade.`}:null,
   c=>c.sc('Valuations')<=-1?{p:0,r:`One caution: after a strong run, check stock-level valuations vs the CDMO/generics growth actually delivered — the macro tailwind may already be priced in for some names.`}:null]},
+{name:"Pharma (CDMO)",group:"Pharma",icon:"🧬",links:["China+1/Biosecure Act★","USD-INR (export bonus)","Global Biopharma Capex Cycle"],
+ metrics:["CDMO/CMS revenue mix %","Order-book conversion","Capacity utilisation","New molecule/DMF filings","Customer concentration","EBITDA margin vs guided range","Capex intensity"],
+ rules:[
+  c=>c.sc('Global')>=1?{p:2,r:`Global sentiment steady-to-positive (${c.lab('Global')}) — CDMO order flow tracks global biopharma R&D and outsourcing spend more directly than domestic-formulation pharma does; this is the dominant driver, ahead of any domestic macro factor.`}:null,
+  c=>c.inr>=92?{p:2,r:`Rupee at ${c.inrTxt} — CDMO revenue is almost entirely USD-billed against largely INR costs; depreciation is a near-direct margin transfer, more concentrated here than in blended domestic+export pharma names.`}:null,
+  c=>true?{p:0,r:`Structural watch, not tied to any single indicator: the China+1/Biosecure Act sourcing shift toward Indian CDMOs is the multi-year thesis here — same driver behind Laurus Labs' CDMO segment growing 67% YoY this quarter. This is a standing tailwind, not a cyclical one, so weight it independent of the quarter's macro readings.`}:null]},
 {name:"MedTech",group:"Pharma",icon:"🩺",links:["USD-INR★ (export bonus)","US Policy/USFDA","Healthcare Capex (Hospitals/Govt)"],
  metrics:["Revenue growth (domestic vs export)","EBITDA margin","USFDA/CE inspection outcomes","New product/device approvals","Capacity utilisation","Acquisition integration margin drag"],
  rules:[
@@ -7507,6 +7513,8 @@ let CR_DATA=[
 {id:278,name:"Tata Consumer Products",sector:"FMCG (Rural-Skew)",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹5,434Cr(+17.9%), EBITDA margin 14.6% (lowest in pack), PAT ₹424Cr(+22.0%); tea/coffee/salt + Starbucks JV",cb:47,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:279,name:"Colgate-Palmolive India",sector:"FMCG (Urban/Premium-Skew)",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹1,570Cr(+~8%), EBITDA margin 30.4% (best-in-class), PAT ₹310Cr(+~8%); oral care dominant share",cb:78,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:280,name:"Emami",sector:"FMCG (Rural-Skew)",group:"Consumption & Services",mcap:0,desc:"Q3 FY26: Rev ₹1,152Cr(+9.8%), EBITDA margin 33.4% (2nd best), PAT ₹319Cr(+14.5%); personal care/healthcare",cb:86,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+,
+{id:281,name:"Neuland Laboratories",sector:"Pharma (CDMO)",group:"Manufacturing",mcap:29451,mcap_rank:95,desc:"API CDMO (GDS+CMS); Q1FY27 PAT +962%, CMS-led",cb:73,alloc:"Rs.0",season:1,asOf:"2026-08-24",flag:"",scores:[5,5,5,5,3,5,5,4,1,1,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]}
 ];
 
 let nextId=300;
