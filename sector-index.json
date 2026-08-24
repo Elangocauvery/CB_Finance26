@@ -676,7 +676,10 @@
     {
         "file": "Q1FY27_NeulandLabs.html",
         "sectors": [
-            "Pharma"
+            "Pharma (CDMO)"
+        ],
+        "companies": [
+            "Neuland Laboratories"
         ]
     },
     {
