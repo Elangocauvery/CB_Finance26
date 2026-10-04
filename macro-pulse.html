@@ -5047,6 +5047,7 @@ async function tryAdminUnlock(){
     // whatever browser this happens to be running in.
     if(typeof showAdminBadge==='function') showAdminBadge();
     if(typeof miStartAdminPolling==='function') miStartAdminPolling();
+    try{ if(typeof cvRender==='function'&&document.getElementById('page-cv')?.classList.contains('active')) cvRender(); }catch(e){}
     alert('Admin mode ON for this session — live NSE factor breakdown is now visible (only to you, only on this device). The "NSE Market Intel" tab should now appear in the nav bar above.');
   } else {
     alert('Incorrect passphrase.');
@@ -5055,6 +5056,7 @@ async function tryAdminUnlock(){
 function adminLock(){
   sessionStorage.removeItem('cbf26_admin');
   if(typeof showAdminBadge==='function') showAdminBadge();
+  try{ if(typeof cvRender==='function'&&document.getElementById('page-cv')?.classList.contains('active')) cvRender(); }catch(e){}
   // If currently on the admin-only NSE Market Intel tab, bounce back to Dashboard
   const miPage = document.getElementById('page-mi');
   if(miPage && miPage.classList.contains('active') && typeof showPage==='function') showPage('dash', null);
