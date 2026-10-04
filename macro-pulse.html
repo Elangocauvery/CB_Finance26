@@ -5821,20 +5821,34 @@ function miShowToast(msg,isErr=false){
   t.textContent=msg;t.className='toast'+(isErr?' err':'');
   t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);
 }
+// v20: while a fetch is running the server is busy and may answer slowly —
+// show "Fetching…" (amber) instead of flipping to red "offline".
+let MI_FETCHING=false, MI_LAST_FETCH='';
 function miSetServerStatus(online,lastFetch){
   const el=document.getElementById('mi-server-status');
   if(!el)return;
-  el.textContent=online?'● Server online':'● Server offline';
-  el.className=online?'':'off';
+  if(MI_FETCHING){ el.textContent='● Fetching from NSE…'; el.className=''; el.style.background='#b45309'; el.style.color='#fff7ed'; }
+  else { el.style.background=''; el.style.color=''; el.textContent=online?'● Server online':'● Server offline'; el.className=online?'':'off'; }
+  if(lastFetch) MI_LAST_FETCH=lastFetch;
   const lbl=document.getElementById('mi-last-fetch-label');
   if(lastFetch&&lbl)lbl.textContent='Last fetch: '+lastFetch;
 }
-async function miCheckServer(){
+// Uses the small /api/status endpoint (new server.py); falls back to /api/data for older servers.
+async function miServerStatus(timeoutMs){
   try{
-    const r=await fetch(MI_SERVER+'/api/data',{signal:AbortSignal.timeout(2000)});
-    const j=await r.json();
-    miSetServerStatus(true,j.last_fetch||'');
-  }catch{miSetServerStatus(false,'');}
+    const r=await fetch(MI_SERVER+'/api/status',{signal:AbortSignal.timeout(timeoutMs)});
+    if(r.ok) return await r.json();
+    if(r.status!==404) return null;
+  }catch(e){ if(e&&e.name!=='TimeoutError'&&e.name!=='AbortError') return null; }
+  try{
+    const r=await fetch(MI_SERVER+'/api/data',{signal:AbortSignal.timeout(timeoutMs*3)});
+    const j=await r.json(); return {status:'ok',last_fetch:j.last_fetch,running:null};
+  }catch(e){ return null; }
+}
+async function miCheckServer(){
+  const st=await miServerStatus(MI_FETCHING?15000:6000);
+  if(st){ if(st.running===true) MI_FETCHING=true; miSetServerStatus(true,st.last_fetch||''); }
+  else miSetServerStatus(MI_FETCHING,'');   // busy during fetch ≠ offline
 }
 // Bulk/Block and Promoter/Insider records should ONLY ever contain your
 // tracked companies. The fetcher now enforces that going forward, but a
@@ -5891,7 +5905,7 @@ function miMergeIntoLocalStorage(serverData){
   return {added,updated};
 }
 async function miLoadFromServerCore(){
-  const r=await fetch(MI_SERVER+'/api/data',{signal:AbortSignal.timeout(8000)});
+  const r=await fetch(MI_SERVER+'/api/data',{signal:AbortSignal.timeout(30000)});
   if(!r.ok)throw new Error('HTTP '+r.status);
   const j=await r.json();
   const {added,updated}=miMergeIntoLocalStorage(j.data||{});
@@ -5915,22 +5929,42 @@ async function miLoadFromServer(){
   }finally{btn.classList.remove('loading');btn.textContent=origText;}
 }
 async function miTriggerFetch(){
+  if(MI_FETCHING){ miShowToast('A fetch is already running — please wait.'); return; }
+  const before=MI_LAST_FETCH;
+  MI_FETCHING=true; miSetServerStatus(true,'');
   try{
-    const r=await fetch(MI_SERVER+'/api/fetch',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(5000)});
-    if(!r.ok)throw new Error();
-    miShowToast('✓ Fetch started — auto-loading into the sheet in ~65 seconds…');
-    // Previously the fetch ran server-side and the terminal showed the results,
-    // but nothing told the browser to pull them in — data sat in latest.json
-    // until you separately clicked "Load Latest Data". This closes that gap.
-    setTimeout(async()=>{
-      try{
-        const {added,updated,purged}=await miLoadFromServerCore();
-        miShowToast(`✓ Auto-loaded: ${added} new, ${updated} updated`+(purged?`, ${purged} untracked removed`:''));
-      }catch(e){
-        miShowToast('Auto-load failed — click "Load Latest Data" manually to check.',true);
-      }
-    },65000);
-  }catch{miShowToast('Could not reach server. Run: python server.py',true);}
+    const r=await fetch(MI_SERVER+'/api/fetch',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(15000)});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+  }catch(e){
+    // A timeout usually means the server is busy; only a refused connection means it is really off.
+    if(e && e.name!=='TimeoutError' && e.name!=='AbortError'){
+      MI_FETCHING=false; miSetServerStatus(false,'');
+      miShowToast('Could not reach server. Run: python server.py',true); return;
+    }
+  }
+  miShowToast('✓ Fetch running — the sheet will update automatically when NSE data is ready…');
+  const t0=Date.now();
+  const finish=async(note)=>{
+    MI_FETCHING=false;
+    try{
+      const {added,updated,purged}=await miLoadFromServerCore();
+      miShowToast(`✓ Loaded: ${added} new, ${updated} updated`+(purged?`, ${purged} untracked removed`:'')+(note||''));
+    }catch(e){ miShowToast('Load failed — click "Load Latest Data" to retry.',true); }
+  };
+  const poll=async()=>{
+    const secs=(Date.now()-t0)/1000;
+    const st=await miServerStatus(15000);
+    if(st && st.running===false){                       // new server.py: knows exactly when fetcher.py ends
+      return finish(st.exit_code?` · fetcher exited with code ${st.exit_code} — check the server window`:'');
+    }
+    if(st && st.running===null && (st.last_fetch!==before || secs>=90)){   // older server.py: best guess
+      return finish(st.last_fetch!==before?'':' (update server.py for exact completion tracking)');
+    }
+    if(secs>480){ MI_FETCHING=false; miCheckServer(); miShowToast('Fetch is taking over 8 minutes — check the server window, then click "Load Latest Data".',true); return; }
+    miSetServerStatus(true,'');
+    setTimeout(poll,8000);
+  };
+  setTimeout(poll,8000);
 }
 
 
