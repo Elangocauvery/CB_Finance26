@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v19 (Ranker v5 LT Engine + Conviction) · Build: 20260710-1330 IST — NSE Market Intel single source; 276/280 companies symbol-mapped</title>
+<title>CB Finance26™ — Macro Pulse · v20 (Quarter-aware Ground Reality + share-analysis repo)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -1289,9 +1289,10 @@ tr:last-child td{border-bottom:none;}
   </div>
   <div class="card" style="margin-bottom:14px;">
     <div class="sec">📊 Ground Reality — link your published sector research</div>
-    <div style="font-size:10.5px;color:#3a3f5c;line-height:1.65;margin-bottom:9px;">Pull actual <span id="grQtrLabel">Q1 FY27</span> numbers from your sector dashboards so every macro signal is cross-checked against real results. <strong>Hosted:</strong> click Fetch (reads sector-index.json from the same folder on your GitHub Pages). <strong>Testing locally:</strong> use Load files from computer.</div>
+    <div style="font-size:10.5px;color:#3a3f5c;line-height:1.65;margin-bottom:9px;">Pull actual <span id="grQtrLabel">Q1 FY27</span> numbers from your sector dashboards so every macro signal is cross-checked against real results. <strong>Hosted:</strong> click Fetch — reads sector-index.json from this app's folder; each dashboard is looked for here first, then in the second repo (share-analysis). <strong>Only the latest quarter's results are used</strong> — older quarters are shown as stale and ignored. <strong>Testing locally:</strong> use Load files from computer.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
       <input id="grBaseUrl" type="text" placeholder="Base URL (blank = same folder as this app)" style="flex:1;min-width:220px;padding:8px 11px;border:1px solid var(--border-hi);border-radius:8px;background:#f8f9fc;color:var(--text);font-size:11px;font-family:inherit;">
+      <input id="grAltBase" type="text" value="https://share-analysis.cauverybusiness.in" placeholder="Second repo (e.g. ../share-analysis or full https URL)" title="Files not found in the main folder are fetched from here" style="flex:1;min-width:200px;padding:8px 11px;border:1px solid var(--border-hi);border-radius:8px;background:#f8f9fc;color:var(--text);font-size:11px;font-family:inherit;">
       <button onclick="grFetchAll()" style="padding:8px 16px;border-radius:8px;border:none;background:#ff7c00;color:#fff;font-size:11px;font-weight:800;cursor:pointer;">🔄 Fetch from GitHub</button>
       <label style="padding:8px 16px;border-radius:8px;border:1px solid var(--border-hi);background:#fff;color:#3a3f5c;font-size:11px;font-weight:700;cursor:pointer;">📁 Load files from computer<input type="file" accept=".html,.htm" multiple style="display:none;" onchange="grPickFiles(this.files)"></label>
     </div>
@@ -3373,6 +3374,7 @@ function initApp(){
   updateFIIKPIs();
   updateFIISignal();
   try{const u=localStorage.getItem(GR_URL_KEY);if(u!=null){const el=document.getElementById('grBaseUrl');if(el)el.value=u;}}catch(e){}
+  try{const a=localStorage.getItem(GR_ALT_KEY);if(a!=null){const el=document.getElementById('grAltBase');if(el)el.value=a;}}catch(e){}
   const grc=grLoadCache();
   if(grc){const st=document.getElementById('grStatus');if(st)st.innerHTML='💾 Cached: '+grc.files.filter(f=>f.agg).length+' file(s) · last loaded '+new Date(grc.ts).toLocaleString()+' — click Fetch to refresh';}
 }
@@ -3849,6 +3851,7 @@ function showSave(){
 // and cross-checks them against the macro reasoning above.
 const GR_KEY='cbf26_sector_actuals_v1';
 const GR_URL_KEY='cbf26_gr_baseurl_v1';
+const GR_ALT_KEY='cbf26_gr_altbase_v1';
 // filename keyword → Macro Pulse sector name(s)
 const GR_FILE_MAP=[
  {kw:'pharma',sectors:['Pharma']},
@@ -3978,10 +3981,18 @@ function grEmit(en,parsed){
   return out.length?out:[{file:en.file,sectors:en.sectors,agg:grAggregate(parsed),cos:cvSlimCos(parsed.cos)}];
 }
 function grKw(fname){
-  const f=fname.toLowerCase(); const out=[];
+  const f=String(fname).split('/').pop().toLowerCase(); const out=[];
   GR_FILE_MAP.forEach(m=>{ if(f.includes(m.kw)) m.sectors.forEach(s=>{ if(!out.includes(s)) out.push(s); }); });
   return out;
 }
+// ── QUARTER AWARENESS (v20) ──
+// Only the newest quarter found in the loaded files counts. Older prints are
+// kept for QoQ comparison only and never drive signals.
+function grQtrKey(s){ const m=/Q[\s_-]*([1-4])[\s_-]*FY[\s_-]*(\d{2})/i.exec(String(s||'')); return m?{q:+m[1],fy:+m[2],key:(+m[2])*4+(+m[1]),label:'Q'+m[1]+'FY'+m[2]}:null; }
+function grFileQtr(f){ if(!f) return null; const b=String(f.file||'').split('/').pop(); return grQtrKey(b)||grQtrKey(f.agg&&f.agg.period)||grQtrKey(f.period)||null; }
+function grLatestQtr(cache){ cache=cache||grLoadCache(); if(!cache||!cache.files) return null; let best=null; cache.files.forEach(f=>{ if(!f.agg&&!(f.cos&&f.cos.length)) return; const q=grFileQtr(f); if(q&&(!best||q.key>best.key)) best=q; }); return best; }
+function grPretty(label){ return String(label||'').replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2'); }
+function grBaseName(f){ return String(f||'').split('/').pop(); }
 function grLoadCache(){ try{return JSON.parse(localStorage.getItem(GR_KEY)||'null');}catch(e){return null;} }
 function grSaveCache(d){ try{localStorage.setItem(GR_KEY,JSON.stringify(d));}catch(e){} }
 // ── PARSER: works on your real file formats ──
@@ -4325,40 +4336,58 @@ function grAggregate(parsed){
 async function grFetchAll(){
   const st=document.getElementById('grStatus');
   const base=(document.getElementById('grBaseUrl')?.value||'').trim().replace(/\/+$/,'');
-  try{localStorage.setItem(GR_URL_KEY,base);}catch(e){}
-  const url=p=>base?base+'/'+p:p;
+  const alt=(document.getElementById('grAltBase')?.value||'').trim().replace(/\/+$/,'');
+  try{localStorage.setItem(GR_URL_KEY,base);localStorage.setItem(GR_ALT_KEY,alt);}catch(e){}
+  const isAbs=p=>/^https?:\/\//i.test(p);
+  const join=(b,p)=>isAbs(p)?p:(b?b+'/'+p:p);
   const log=m=>{ if(st) st.innerHTML=m; };
+  // try main folder first, then the second repo (share-analysis)
+  async function getText(p){
+    const tries=[{u:join(base,p),from:'main'}];
+    if(alt&&!isAbs(p)) tries.push({u:join(alt,p),from:'alt'});
+    let lastErr='not found';
+    for(const t of tries){
+      try{ const r=await fetch(t.u,{cache:'no-store'}); if(r.ok) return {text:await r.text(),from:isAbs(p)?'url':t.from}; lastErr='HTTP '+r.status; }
+      catch(e){ lastErr=e.message; }
+    }
+    throw new Error(lastErr);
+  }
   log('Fetching sector-index.json …');
   let index;
   try{
-    const r=await fetch(url('sector-index.json'),{cache:'no-store'});
+    const r=await fetch(join(base,'sector-index.json'),{cache:'no-store'});
     if(!r.ok) throw new Error('HTTP '+r.status);
     index=await r.json();
   }catch(e){
-    log('❌ Could not fetch sector-index.json ('+e.message+'). If you are testing locally (file://), use "Load files from computer" instead — fetching works once this app is hosted on your GitHub Pages alongside the sector files.');
+    log('❌ Could not fetch sector-index.json ('+e.message+'). If you are testing locally (file://), use "Load files from computer" instead — fetching works once this app is hosted on your GitHub Pages.');
     return;
   }
   const entries=(Array.isArray(index)?index:[]).map(grMapFile);
   const out={ts:Date.now(),files:[]};
   for(const en of entries){
-    log('Fetching '+en.file+' …');
+    log('Fetching '+grBaseName(en.file)+' …');
     try{
-      const r=await fetch(url(en.file),{cache:'no-store'});
-      if(!r.ok) throw new Error('HTTP '+r.status);
-      const parsed=grParseHTML(await r.text(),en.file,{tokens:en.tokens,companies:en.companies});
-      if(parsed) grEmit(en,parsed).forEach(e=>out.files.push(e));
+      const got=await getText(en.file);
+      const parsed=grParseHTML(got.text,en.file,{tokens:en.tokens,companies:en.companies});
+      if(parsed) grEmit(en,parsed).forEach(e=>{ e.from=got.from; out.files.push(e); });
       else out.files.push({file:en.file,sectors:en.sectors,err:'no parseable table found'});
     }catch(e){ out.files.push({file:en.file,sectors:en.sectors,err:e.message}); }
   }
   grSaveCache(out);
-  const lines=out.files.map(f=>f.agg
-    ?'✅ '+f.file+' — '+f.agg.n+' companies parsed ('+(f.agg.period||'period n/a')+') → '+f.sectors.join(', ')
-    :'❌ '+f.file+' — '+f.err+(String(f.err).includes('404')?' (file not found at this address — check exact spelling/case in repo vs index)':String(f.err).includes('parseable')?' (file is reachable but its tables have no data attributes — send this file to Claude to adapt the parser)':''));
-  const failedCount=out.files.filter(f=>f.err).length;
-  const okEntries=entries.length-failedCount;
-  const totalRecords=out.files.filter(f=>f.agg).length;
-  log(okEntries+' of '+entries.length+' files loaded ('+totalRecords+' sector records after multi-company splits) · '+new Date(out.ts).toLocaleString()+'<br>'+lines.join('<br>'));
+  const latest=grLatestQtr(out);
+  const srcTag={main:'',alt:' · share-analysis',url:' · full URL'};
+  const lines=out.files.map(f=>{
+    if(!f.agg) return '❌ '+grBaseName(f.file)+' — '+f.err+(String(f.err).includes('404')?' (not found in main folder or second repo — check exact spelling/case)':String(f.err).includes('parseable')?' (reachable but no readable table — send this file to Claude to adapt the parser)':'');
+    const q=grFileQtr(f);
+    const isCur=latest&&q&&q.key===latest.key;
+    return (isCur?'✅ ':'⏸ ')+grBaseName(f.file)+' ['+(q?q.label:'period?')+(srcTag[f.from]||'')+'] — '+f.agg.n+' cos → '+f.sectors.join(', ')+(isCur?'':' <span style="color:#9aa0b8;">(stale — ignored)</span>');
+  });
+  const ok=out.files.filter(f=>f.agg);
+  const cur=ok.filter(f=>{const q=grFileQtr(f);return latest&&q&&q.key===latest.key;}).length;
+  const fromAlt=ok.filter(f=>f.from==='alt').length;
+  log('<strong>Current quarter: '+(latest?grPretty(latest.label):'not detected')+'</strong> · '+cur+' current record(s) used · '+(ok.length-cur)+' older record(s) ignored · '+fromAlt+' loaded from second repo · '+out.files.filter(f=>f.err).length+' failed · '+new Date(out.ts).toLocaleString()+'<br>'+lines.join('<br>'));
   renderSectorImpact();
+  if(typeof cvRender==='function'&&document.getElementById('page-cv')?.classList.contains('active')) cvRender();
 }
 // ── LOCAL FILE PICKER (works without hosting) ──
 function grPickFiles(fileList){
@@ -4389,7 +4418,11 @@ function grPickFiles(fileList){
 function grForSector(name){
   const cache=grLoadCache(); if(!cache) return null;
   const hits=cache.files.filter(f=>f.agg&&f.sectors.includes(name));
-  return hits.length?hits:null;
+  if(!hits.length) return null;
+  const latest=grLatestQtr(cache);
+  const cur=hits.filter(f=>{const q=grFileQtr(f);return latest&&q&&q.key===latest.key;});
+  const stale=hits.filter(f=>cur.indexOf(f)<0);
+  return {cur,stale,latest};
 }
 // combined verdict: macro pts × results tone
 function grCombined(macroPts,tone){
@@ -4405,14 +4438,19 @@ function grCombined(macroPts,tone){
   return {e:'🟡🟡',t:'Neutral on both lenses — no strong signal either way',c:'#b35c00',bg:'#fff8ee'};
 }
 function grSection(sectorName,macroPts){
-  const hits=grForSector(sectorName);
-  if(!hits) return `<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#f8f9fc;border:1px dashed var(--border);font-size:9.5px;color:var(--muted);">📂 No CB Research file yet for this sector — macro view only. Publish a sector dashboard and add it to sector-index.json.</div>`;
-  return hits.map(h=>{
+  const r=grForSector(sectorName);
+  if(!r) return `<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#f8f9fc;border:1px dashed var(--border);font-size:9.5px;color:var(--muted);">📂 No CB Research file yet for this sector — macro view only. Publish a sector dashboard and add it to sector-index.json.</div>`;
+  const curLbl=r.latest?grPretty(r.latest.label):'latest quarter';
+  const oldQs=[...new Set(r.stale.map(f=>{const q=grFileQtr(f);return q?grPretty(q.label):'undated';}))].join(', ');
+  if(!r.cur.length) return `<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#f8f9fc;border:1px dashed var(--border);font-size:9.5px;color:var(--muted);">⏸ No ${curLbl} results file yet for this sector. Older print (${oldQs}) is stale and not used — macro view only.</div>`;
+  const staleNote=r.stale.length?`<div style="margin-top:5px;font-size:9px;color:#9aa0b8;">⏸ ${r.stale.length} older file(s) (${oldQs}) ignored — superseded by ${curLbl}.</div>`:'';
+  return r.cur.map(h=>{
     const a=h.agg;
     const cv=grCombined(macroPts,a.tone);
+    const fn=grBaseName(h.file);
     const toneTxt=a.tone==='strong'?'🟢 Strong prints':a.tone==='weak'?'🔴 Weak prints':'🟡 Mixed prints';
     return `<div style="margin-top:8px;padding:9px 11px;border-radius:8px;background:${cv.bg};border:1px solid ${cv.c}30;">
-      <div style="font-size:9px;font-weight:800;color:${cv.c};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">📊 Ground reality — ${a.period||'latest'} actuals (${h.file.length>34?h.file.substring(0,32)+'…':h.file})</div>
+      <div style="font-size:9px;font-weight:800;color:${cv.c};text-transform:uppercase;letter-spacing:0.5px;margin-bottom:5px;">📊 Ground reality — ${curLbl} actuals (${fn.length>34?fn.substring(0,32)+'…':fn})</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px;">
         <span style="font-size:10px;color:#3a3f5c;"><strong>${a.n}</strong> companies</span>
         <span style="font-size:10px;color:#3a3f5c;">Revenue <strong>₹${a.totalRev.toLocaleString('en-IN')}Cr</strong></span>
@@ -4423,7 +4461,7 @@ function grSection(sectorName,macroPts){
       ${a.top.length?`<div style="font-size:9.5px;color:#5a6080;margin-bottom:6px;">Margin leaders: ${a.top.join(' · ')}</div>`:''}
       <div style="font-size:10px;font-weight:700;color:${cv.c};line-height:1.55;">${cv.e} ${cv.t}</div>
     </div>`;
-  }).join('');
+  }).join('')+staleNote;
 }
 
 // ── SECTOR IMPACT ENGINE ──────────────────────────────────────────────────
@@ -4900,6 +4938,7 @@ function siVerdict(pts){
 }
 function renderSectorImpact(){
   const grid=document.getElementById('sectorImpactGrid'); if(!grid) return;
+  if(typeof cvSyncQtr==='function') cvSyncQtr();
   const ctx=macroCtx();
   let g=0,r=0,n=0;
   const cards=SECTOR_IMPACT.map(s=>{
@@ -7076,6 +7115,46 @@ const PARAMS = {
      opts:['1. PEG >3 or earnings yield <3% — priced for perfection','2. PEG 2–3 / yield 3–4.5% — stretched','3. PEG 1.3–2 / yield 4.5–6% — acceptable','4. PEG 0.8–1.3 / yield 6–7.5% (≈ G-sec) — good','5. PEG <0.8 / yield >7.5% — growth cheaper than bonds']},
   ],
 
+  // ════════════════════════════════════════════════════════
+  // DISRUPTOR / PRE-PROFIT GROWTH TRACK (added 01-Sep-2026)
+  // For loss-making, high-growth, scale-stage businesses (EV 2W/4W,
+  // new-age platforms, etc.) where PAT/EBITDA/ROCE/ROE/P-E-based params
+  // structurally floor the score near zero regardless of how the
+  // business or stock is actually performing (see Ather Energy case:
+  // CB 20 on the Auto 2W rubric vs a ~300% 6-month rally). This model
+  // trades static-profitability params for trajectory/optionality params.
+  // Applies to a company only when d.paramModel is set to this key —
+  // d.sector is left unchanged so sector-level grouping, fund-flow
+  // tagging and symbol lookups keep working as before. Reusable for
+  // other pre-profit growth names (e.g. Ola Electric, Swiggy) later —
+  // just set paramModel on that company's CR_DATA row.
+  // Same 10-slot weight structure as every other model (positions 0-7
+  // = growth/quality 0.73, positions 8-9 = valuation 0.20) so calcCB
+  // needs no changes.
+  // ════════════════════════════════════════════════════════
+  'Disruptor / Pre-Profit Growth': [
+    {key:'rev',   label:'Revenue Growth (YoY %)',   icon:'📈',
+     opts:['1. Revenue growth <15% — losing pace','2. Revenue growth 15–30%','3. Revenue growth 30–50%','4. Revenue growth 50–75%','5. Revenue growth >75% — hyper-growth']},
+    {key:'lossnarrow', label:'Loss Narrowing / Path to Breakeven', icon:'🩹',
+     opts:['1. Losses widening YoY','2. Losses flat to modestly narrower','3. Losses narrowing 20–50% YoY','4. Losses narrowing >50% YoY, breakeven visible','5. At or through EBITDA/PAT breakeven']},
+    {key:'gmtrend', label:'Gross Margin Trend',       icon:'💵',
+     opts:['1. Gross margin contracting','2. Flat gross margin','3. Gross margin improving modestly','4. Gross margin improving materially','5. Gross margin at/near mature-industry level']},
+    {key:'mktsh', label:'Market Share / Category Position', icon:'🏆',
+     opts:['1. Losing share — sub-scale','2. Share broadly flat','3. Gradual share gains','4. Clear, sustained share gainer','5. Emerging category leader']},
+    {key:'opex',  label:'Operating Leverage (Opex vs Revenue growth)', icon:'⚙️',
+     opts:['1. Opex growing faster than revenue','2. Opex growth ≈ revenue growth','3. Opex growth modestly below revenue growth','4. Opex growth well below revenue growth','5. Strong operating leverage — fixed-cost base largely built out']},
+    {key:'runway',label:'Cash Runway / Balance Sheet Strength', icon:'🏦',
+     opts:['1. <12 months runway at current burn','2. 12–24 months','3. 24–36 months','4. >36 months or self-funding','5. Net cash, no external funding needed to reach breakeven']},
+    {key:'tam',   label:'TAM Expansion / New Platform Optionality', icon:'🚀',
+     opts:['1. No new product/TAM triggers','2. Minor line extensions only','3. One meaningful new product/price-point','4. Major new platform opening a materially larger TAM','5. Multiple concurrent TAM-expanding triggers (new platform + capacity + category)']},
+    {key:'anchor',label:'Strategic / Anchor Ownership Trend', icon:'🤝',
+     opts:['1. Anchor/promoter/strategic investors reducing stake','2. Ownership broadly stable','3. Modest fresh institutional interest','4. Marquee strategic or FII stake building','5. Sustained, large-scale strategic/anchor accumulation']},
+    {key:'valgr', label:'Valuation vs Growth (EV/Sales vs growth rate)', icon:'⚖️',
+     opts:['1. EV/Sales far above what growth justifies — priced for perfection','2. Rich — trading at or above most brokerage targets','3. Fair — broadly in line with brokerage targets','4. Reasonable relative to growth and TAM','5. Cheap relative to growth — targets well above CMP']},
+    {key:'target', label:'Brokerage Target-Price Revision Momentum', icon:'🪙',
+     opts:['1. Targets being cut','2. Targets static','3. Isolated target raises','4. Broad-based upward target revisions','5. Sustained, sector-wide upward revision cycle']},
+  ],
+
   Textiles: [
     {key:'rev',   label:'Revenue Growth (YoY %)',   icon:'📈',
      opts:['1. Revenue growth <3%','2. Revenue growth 3–8%','3. Revenue growth 8–14%','4. Revenue growth 14–22%','5. Revenue growth >22%']},
@@ -7103,6 +7182,14 @@ const PARAMS = {
 // Helper — get params for a sector
 function getParamsForSector(sector){
   return PARAMS[sector] || PARAMS['Capital Goods']; // fallback
+}
+// Helper — get params for a COMPANY. Checks d.paramModel first (an override
+// used for pre-profit/disruptor names that don't fit their sector's default
+// profitability rubric — see 'Disruptor / Pre-Profit Growth' above) before
+// falling back to the sector-default model. d.sector itself is untouched.
+function getParamsForCompany(d){
+  if(d && d.paramModel && PARAMS[d.paramModel]) return PARAMS[d.paramModel];
+  return getParamsForSector(d ? d.sector : null);
 }
 
 // Store originals for reset
@@ -7530,7 +7617,7 @@ let CR_DATA=[
 {id:272,name:"Waaree Renewable Technologies",sector:"Solar / Renewables",group:"Energy",mcap:0,desc:"Q4: Rev ₹1,102Cr(+131%), EBITDA margin 18.76%, PAT ₹156Cr(+66%); EPC arm (distinct from Waaree Energies mfr), 2.83 GWp EPC",cb:82,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:273,name:"CleanMax Enviro Energy",sector:"Solar / Renewables",group:"Energy",mcap:0,desc:"Q4: Rev ₹557Cr(+25%), EBITDA margin ~63%, PAT ₹45Cr(+165%); C&I OPEX model, 3.1 GW operational, data-centre demand tailwind",cb:80,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:274,name:"KPI Green Energy",sector:"Solar / Renewables",group:"Energy",mcap:0,desc:"Q4: Rev ~₹250Cr(growing), EBITDA margin ~28%, PAT ~₹50Cr(growing); CPP+IPP model, ~1,200 MW estimated capacity, RPO compliance beneficiary",cb:56,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
-{id:275,name:"Ather Energy",sector:"Auto 2W",group:"Manufacturing",mcap:0,desc:"Q4: Rev ₹1,175Cr(+74% — fastest in 2W pack), EBITDA margin -2.5% (loss), PAT -₹100Cr (loss); EV 2W pure-play, loss narrowing trajectory",cb:20,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,2,2,2,2,2,1,1,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:275,name:"Ather Energy",sector:"Auto 2W",group:"Manufacturing",paramModel:"Disruptor / Pre-Profit Growth",mcap:68223,mcap_rank:60,desc:"Q1FY27: Rev ₹1,175Cr(+74% — fastest in 2W pack), EBITDA margin -2.5% (loss narrowing sharply), PAT loss narrowed >70% YoY; 3rd-largest E2W by volume, gaining share; EL platform/Konarc opens mass-market TAM; Hero MotoCorp raised stake to 32.8%, BlackRock buying — scored on Disruptor/Pre-Profit Growth track, not the standard Auto 2W profitability rubric (see 01-Sep-2026 note above PARAMS)",cb:84,alloc:"Rs.0",season:1,asOf:"2026-09-01",flag:"",scores:[5,5,4,5,4,3,5,5,2,4,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:276,name:"ITC Limited",sector:"FMCG (Urban/Premium-Skew)",group:"Consumption & Services",mcap:0,desc:"Q3 FY26: Rev ₹21,578Cr(+7.1%), EBITDA margin 35.0% (best-in-class), PAT ₹5,340Cr(+9.9%); diversified FMCG/cigarettes/hotels/paper conglomerate",cb:78,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:277,name:"Godrej Consumer Products (GCPL)",sector:"FMCG (Rural-Skew)",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹3,900Cr(+11.0%), EBITDA margin 21.7%, PAT ₹452Cr(+9.7%); home & personal care",cb:57,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:278,name:"Tata Consumer Products",sector:"FMCG (Rural-Skew)",group:"Consumption & Services",mcap:0,desc:"Q4: Rev ₹5,434Cr(+17.9%), EBITDA margin 14.6% (lowest in pack), PAT ₹424Cr(+22.0%); tea/coffee/salt + Starbucks JV",cb:47,alloc:"Rs.0",season:1,asOf:"2026-07-09",flag:"",scores:[2,3,3,3,2,3,1,2,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
@@ -7589,7 +7676,7 @@ function buildVS(d){
   const v4c=d.scores.slice(0,nBase).filter(s=>s>=4).length;
   // V6 = count of params with score ≥4 (out of 8 base params)
   // S6 = count of params with score = 5 (perfect)
-  const params = getParamsForSector(d.sector);
+  const params = getParamsForCompany(d);
   // Which params got 4+
   const v4names = params.filter((_,i)=>d.scores[i]>=4).map(p=>p.label).join(', ') || 'None';
   const v5names = params.filter((_,i)=>d.scores[i]===5).map(p=>p.label).join(', ') || 'None';
@@ -7672,8 +7759,8 @@ function buildCard(d, rank){
   }
 
   // ── ADMIN VIEW (owner only) — full classification breakdown, unchanged ──
-  const model = modelFor2(d.sector);
-  const params = getParamsForSector(d.sector);
+  const model = d.paramModel || modelFor2(d.sector);
+  const params = getParamsForCompany(d);
   const sv = d.scores[d.scores.length-1]; // season always last
   const aff = getSeasonAffinity(sv);
   const isQtrMatch = qtrFilter!=='all' && aff.qtr===qtrFilter;
@@ -7717,7 +7804,7 @@ function buildCard(d, rank){
         <div class="card-name">${d.name}${qStar}</div>
         <div class="card-tags">
           <span class="tag tag-sec">${d.sector}</span>
-          <span class="tag tag-model">${d.sector} model</span>
+          <span class="tag tag-model"${d.paramModel?` title="Scored on the Disruptor/Pre-Profit Growth rubric, not the standard ${d.sector} rubric — see param labels below"`:''}>${model} model${d.paramModel?' 🚀':''}</span>
           ${seasonTagHtml}
         </div>
         <div class="card-desc">${d.desc}</div>
@@ -10001,13 +10088,16 @@ var CV_CURRENT_QTR = 'Q1FY27';
 // automatically, so bumping the quarter next time is a ONE-LINE change
 // here -- not a text hunt across the file. Covers: Ground Reality section,
 // Conviction page header, Conviction intro paragraph.
-(function syncQtrLabels(){
+// v20: current quarter = newest quarter found in loaded dashboards (falls back to the value above)
+function cvSyncQtr(){
+  try{ var q=grLatestQtr(); if(q) CV_CURRENT_QTR=q.label; }catch(e){}
   var pretty = CV_CURRENT_QTR.replace(/^Q(\d)FY(\d+)$/, 'Q$1 FY$2');
   ['grQtrLabel','convQtrLabel','convHeaderQtrLabel'].forEach(function(id){
     var el = document.getElementById(id);
     if (el) el.textContent = pretty;
   });
-})();
+}
+cvSyncQtr();
 var CV_SNAP_PREFIX = 'cbf26_gr_snap_';
 var CV_W = {E:0.30, F:0.30, M:0.20, T:0.20};   // renormalised over available layers
 // "Price Conviction" — an alternate weighting tuned toward what actually
@@ -10034,10 +10124,16 @@ function cvSnapshotGR(){
   try{
     var cache = grLoadCache(); if(!cache||!cache.files||!cache.files.length) return;
     var key = CV_SNAP_PREFIX + CV_CURRENT_QTR;
-    var slim = {ts:cache.ts, files:cache.files.filter(function(f){return f.cos&&f.cos.length;})
-      .map(function(f){return {file:f.file, sectors:f.sectors, cos:f.cos, period:f.agg?f.agg.period:''};})};
+    var slim = {ts:cache.ts, files:cache.files.filter(function(f){var q=grFileQtr(f);return f.cos&&f.cos.length&&q&&q.label===CV_CURRENT_QTR;})
+      .map(function(f){return {file:f.file, sectors:f.sectors, cos:f.cos, period:(grFileQtr(f)||{}).label||''};})};
     if(slim.files.length) localStorage.setItem(key, JSON.stringify(slim));
   }catch(e){}
+}
+function cvPrevFiles(all){
+  var pq=cvPrevQtr(CV_CURRENT_QTR); if(!pq) return [];
+  var pf=(all||[]).filter(function(f){var q=grFileQtr(f);return q&&q.label===pq;});
+  if(!pf.length){ var snap=cvLoadSnap(pq); if(snap&&snap.files) pf=snap.files.filter(function(f){var q=grFileQtr(f);return q&&q.label===pq;}); }
+  return pf;
 }
 function cvLoadSnap(q){
   try{ return JSON.parse(localStorage.getItem(CV_SNAP_PREFIX+q)||'null'); }catch(e){ return null; }
@@ -10073,8 +10169,10 @@ function cvSectorAvgYoY(sector, files){
 }
 function cvEarnings(d){
   var cache = grLoadCache();
-  var files = cache && cache.files ? cache.files.filter(function(f){return f.cos&&f.cos.length;}) : null;
-  if(!files||!files.length) return null;
+  var all = cache && cache.files ? cache.files.filter(function(f){return f.cos&&f.cos.length;}) : [];
+  // v20: only the current quarter's prints count — older quarters are stale
+  var files = all.filter(function(f){var q=grFileQtr(f);return q&&q.label===CV_CURRENT_QTR;});
+  if(!files.length) return null;
   var hit = cvFindCo(d, files); if(!hit) return null;
   var c = hit.c, parts=[], score=50;
   // (1) own-print tone: this company's greens vs reds
@@ -10096,9 +10194,10 @@ function cvEarnings(d){
   }
   if(c.e!=null) parts.push('EBITDA '+c.e+'%');
   // (3) QoQ momentum vs previous-quarter snapshot (accrues from next quarter on)
-  var prev = cvLoadSnap(cvPrevQtr(CV_CURRENT_QTR));
-  if(prev&&prev.files){
-    var ph = cvFindCo(d, prev.files);
+  // previous quarter used ONLY as a comparison base for QoQ momentum
+  var prevFiles = cvPrevFiles(all);
+  if(prevFiles.length){
+    var ph = cvFindCo(d, prevFiles);
     if(ph&&ph.c){
       if(c.e!=null&&ph.c.e!=null){
         var dE=c.e-ph.c.e;
@@ -10432,6 +10531,7 @@ function cvMaybeAutoExport(){
 
 function cvRender(){
   var grid=document.getElementById('cv-grid'); if(!grid) return;
+  cvSyncQtr();
   cvSnapshotGR();                                // keep quarter snapshot fresh
   var banner=document.getElementById('cv-admin-banner');
   var exportBar=document.getElementById('cv-export-bar');
@@ -10469,8 +10569,11 @@ function cvRender(){
     var msgs=[];
     if(!withE) msgs.push('📂 No earnings prints loaded — open <strong>Sector Impact</strong> and run the Ground Reality Bridge fetch (or re-fetch: older caches lack per-company data added in v18).');
     if(!withT) msgs.push('📡 No NSE market data — open <strong>NSE Market Intel</strong> → Load Latest Data (needs the v18 fetcher for price fields).');
-    if(cvLoadSnap(cvPrevQtr(CV_CURRENT_QTR))) msgs.push('📈 Previous-quarter snapshot found — QoQ earnings momentum is being scored.');
-    else msgs.push('🕐 QoQ earnings momentum will activate automatically from next quarter (this quarter\'s snapshot is now saved).');
+    var gc=grLoadCache(); var allF=gc&&gc.files?gc.files.filter(function(f){return f.cos&&f.cos.length;}):[];
+    var staleN=allF.filter(function(f){var q=grFileQtr(f);return !q||q.label!==CV_CURRENT_QTR;}).length;
+    msgs.push('🗓 Earnings lens uses <strong>'+CV_CURRENT_QTR.replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2')+'</strong> prints only'+(staleN?' — '+staleN+' older-quarter record(s) ignored':'')+'. Switches automatically when the next quarter\'s files are published.');
+    if(cvPrevFiles(allF).length) msgs.push('📈 '+cvPrevQtr(CV_CURRENT_QTR)+' prints found — used only as the comparison base for QoQ momentum.');
+    else msgs.push('🕐 QoQ earnings momentum activates once previous-quarter prints are available.');
     st.innerHTML=msgs.join('<br>');
   }
   grid.innerHTML=tierA.map(cvCard).join('')||'<div style="font-size:12px;color:#5a6080;">No companies with 3+ lens coverage in this group yet.</div>';
