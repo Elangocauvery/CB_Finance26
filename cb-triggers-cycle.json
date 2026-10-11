@@ -1,23 +1,1162 @@
 {
-  "updated": "2026-10-04",
-  "sectors": {},
-  "sectorTriggers": {},
+  "updated": "2026-10-11",
+  "note": "v22 research pass — Q1 FY27 prints, RBI Oct-26 hike, Brent >$100, monsoon 87% LPA. Price stage (Weinstein) is computed live from NSE closes, not stored here.",
+  "sectors": {
+    "Defence": {
+      "phase": "P3",
+      "note": "BEL order book Rs72,258 Cr with FY27 inflow guidance >Rs55,000 Cr (28-Jul-26); GRSE Q1 revenue +38.5%, HAL PAT +15% (Aug-26); Aerospace & Defence sales +31.4% in Q1 aggregate. BEL margin miss and weak Q1 inflows are watch-points, not yet a P4 signal. [Source: PL Research 28-Jul-26; PSU Connect Aug-26; Bajaj Broking Q1 tracker 30-Jul-26]",
+      "date": "2026-10-11"
+    },
+    "AMC": {
+      "phase": "S3",
+      "note": "S2 signals: DII deployment ~Rs76,030 Cr in Sep-26, Nippon record PAT and share gains. S3 signals: Nifty -6.1% in Sep-26 and -8.1% over 1 yr cuts equity AUM; Capital Markets index -7.2% in Sep. Indicators disagree, so the lower stage (Maturing) is used. [Source: Multibagg FII tracker 3-Oct-26; Finnovate sector returns Sep-26]",
+      "date": "2026-10-11"
+    },
+    "Exchanges / Depositories": {
+      "phase": "P4",
+      "note": "BSE record quarter (PAT +66%, 5-Aug-26) but MCX profit -22% QoQ as volumes normalised after a record quarter; Capital Markets index -7.2% in Sep-26. Record volumes plus first QoQ decline = late cycle. [Source: Kotak Neo 5-Aug-26; IIFL 5-Aug-26; Finnovate Sep-26]",
+      "date": "2026-10-11"
+    },
+    "Brokers / Wealth": {
+      "phase": "P4",
+      "note": "Volumes and fees at record levels in FY26-Q1 FY27 while Nifty fell 6.1% in Sep-26 and FPIs sold >Rs3 lakh Cr YTD. P3 vs P4 disagreement resolved to P4. [Source: Finnovate Sep-26; Multibagg 3-Oct-26]",
+      "date": "2026-10-11"
+    },
+    "Solar / Renewables": {
+      "phase": "S2",
+      "note": "India on track for a record ~50 GW solar year in 2026 with ALMM-II (cells) driving H1 installs; cell supply tight. Module over-capacity (ICRA) is carried as a separate sector negative trigger. [Source: Wood Mackenzie / pv-magazine 14-Aug-26; TaiyangNews H1-26; ICRA via pv-magazine]",
+      "date": "2026-10-11"
+    },
+    "Pharma": {
+      "phase": "P4",
+      "note": "Record margins at leaders (Sun gross margin 80.5%, Lupin EBITDA +50%) while key US exclusivities roll off (Lupin: 3 products ~50% EPS face competition from Q2 FY27) and the US imposes a 100% tariff on patented drugs (generics exempt for now). Record margins + fading exclusivities = late cycle. [Source: PL Research 10-Aug-26; India Briefing (Sec 232, Apr-26); Cofacto Sun call Jul-26]",
+      "date": "2026-10-11"
+    },
+    "Pharma (CDMO)": {
+      "phase": "S2",
+      "note": "CDMO deliveries driving Laurus (PAT +126%) and Neuland (PAT ~10x) in Q1 FY27; China+1/Biosecure sourcing shift continuing. [Source: Indian Pharma Post Jul-26; Multibagg Neuland Q1 Aug-26]",
+      "date": "2026-10-11"
+    },
+    "Power Financiers (PFC/REC/IREDA)": {
+      "phase": "P4",
+      "note": "PFC NII -4.45% YoY and standalone loans -0.7% QoQ; REC revenue -3%, profit -6% YoY; asset quality still clean (PFC GNPA 1.11%). RBI hiked repo to 5.50% in Oct-26, raising wholesale funding cost. Stalling growth with clean books = late cycle. [Source: Cofacto PFC Q1; Mercom REC Q1 Aug-26; RBI MPC Oct-26]",
+      "date": "2026-10-11"
+    },
+    "Capital Goods (Power/T&D)": {
+      "phase": "P4",
+      "note": "P3 signals: Hitachi orders +26% (ex-HVDC), record backlog Rs32,222 Cr; ABB orders +50%. P4 signals: capacity expansion announced across majors (GE Vernova Rs1,000 Cr, Hitachi 20th plant), GE gross margin -4 ppt, ABB margin pressure. Disagreement resolved to the lower phase. [Source: Hitachi Energy release Aug-26; ABB India Q2 CY26; Cofacto GVT&D call Aug-26]",
+      "date": "2026-10-11"
+    },
+    "EMS": {
+      "phase": "S3",
+      "note": "S2 signals: Netweb revenue +172%, Syrma +67%. S3 signals: India smartphone shipments -3% YoY in Q1 2026 (six-year low), Dixon guiding only 12-15% FY27 growth on flat phones. Resolved to Maturing. [Source: Sahi 17-Jul-26; Autocar Pro Jul-26; Investywise Netweb Jul-26]",
+      "date": "2026-10-11"
+    },
+    "Chemicals (Specialty/Performance)": {
+      "phase": "P3",
+      "note": "Destocking over; SRF best-ever quarter (PAT +76%), Acutaas PAT +70% YoY, chemicals led Q1 profit growth. SRF itself flags normalisation ahead, so P2 is not used. [Source: Angel One SRF Q1 Jul-26; Bajaj Broking Q1 tracker]",
+      "date": "2026-10-11"
+    },
+    "Insurance": {
+      "phase": "P3",
+      "note": "Health insurance expanding on GST exemption; Niva Bupa retail share >11%, PAT +93%. Insurance aggregate profit -15% in early Q1 data is life-insurer led. [Source: Angel One Niva Bupa Q1; Bajaj Broking Q1 tracker]",
+      "date": "2026-10-11"
+    },
+    "Railways": {
+      "phase": "P1",
+      "note": "Nifty India Railways PSU -24.5% over 1 yr (Sep-26) = bad news priced; RVNL Q1 order inflow up ~4x and EBITDA margin +275 bps. Order turn (P2 sign) vs depressed prices (P1) -> P1. [Source: Finnovate Sep-26; Cofacto RVNL Q1]",
+      "date": "2026-10-11"
+    },
+    "Hospitals": {
+      "phase": "P4",
+      "note": "Bed additions everywhere; Max Q1 PAT only +4.9% on new-bed dilution; healthcare-services sales +2.6% in early Q1 aggregate. [Source: Kotak Neo Max Q1 Aug-26; Bajaj Broking Q1 tracker]",
+      "date": "2026-10-11"
+    },
+    "Banking (PSU)": {
+      "phase": "P4",
+      "note": "Q1 bank profit +27.8% with GNPA near cycle lows (BoM 1.45%), but RBI moved to 'calibrated tightening' (repo 5.50%, Oct-26) and FPIs are heavy sellers. Peak-profit, low-credit-cost = late cycle. [Source: Bajaj Broking Q1 tracker; RBI MPC Oct-26]",
+      "date": "2026-10-11"
+    },
+    "NBFC (Gold Loan)": {
+      "phase": "P4",
+      "note": "Muthoot AUM +43% YoY but driven by gold price (pledged tonnage fell 209->197 t); NIM fell 13.38%->10.41% QoQ on competition. [Source: INDmoney 3-Aug-26]",
+      "date": "2026-10-11"
+    },
+    "Hotels": {
+      "phase": "P3",
+      "note": "IHCL Q1 revenue +15% (record); ARR cycle intact. Brent >$100 and war risk are carried as a sector negative trigger. [Source: Kotak Neo IHCL Q1 Jul-26; HDFC Sky 19-Sep-26]",
+      "date": "2026-10-11"
+    }
+  },
+  "sectorTriggers": {
+    "Solar / Renewables": [
+      {
+        "name": "Module over-capacity / consolidation (ICRA)",
+        "sign": "-",
+        "I": 3,
+        "C": 0.7,
+        "W": 0.7,
+        "P": 1,
+        "status": "Announced",
+        "source": "ICRA via pv-magazine, 2026",
+        "date": "2026-08-14",
+        "pts": 1.47
+      }
+    ],
+    "Brokers / Wealth": [
+      {
+        "name": "Market correction cuts equity AUM / fees (Nifty -6.1% Sep-26, FPI exodus)",
+        "sign": "-",
+        "I": 3,
+        "C": 0.7,
+        "W": 1,
+        "P": 1,
+        "status": "Executing",
+        "source": "Finnovate Sep-26; Multibagg 3-Oct-26",
+        "date": "2026-10-03",
+        "pts": 2.1
+      }
+    ],
+    "AMC": [
+      {
+        "name": "Market correction cuts equity AUM / fees (Nifty -6.1% Sep-26, FPI exodus)",
+        "sign": "-",
+        "I": 3,
+        "C": 0.7,
+        "W": 1,
+        "P": 1,
+        "status": "Executing",
+        "source": "Finnovate Sep-26; Multibagg 3-Oct-26",
+        "date": "2026-10-03",
+        "pts": 2.1
+      },
+      {
+        "name": "Record DII / SIP deployment (~Rs76,030 Cr DII in Sep-26)",
+        "sign": "+",
+        "I": 2,
+        "C": 1,
+        "W": 1,
+        "P": 1,
+        "status": "Executing",
+        "source": "Multibagg 3-Oct-26",
+        "date": "2026-10-03",
+        "pts": 2
+      }
+    ],
+    "Power Financiers (PFC/REC/IREDA)": [
+      {
+        "name": "RBI repo hike to 5.50% raises wholesale funding cost",
+        "sign": "-",
+        "I": 2,
+        "C": 1,
+        "W": 0.7,
+        "P": 1,
+        "status": "Approved",
+        "source": "RBI MPC, 7-Oct-26 (TheTaxCorp)",
+        "date": "2026-10-07",
+        "pts": 1.4
+      }
+    ],
+    "Hotels": [
+      {
+        "name": "Brent >$100 / Gulf war risk may slow travel",
+        "sign": "-",
+        "I": 2,
+        "C": 0.4,
+        "W": 0.7,
+        "P": 1,
+        "status": "Watch",
+        "source": "HDFC Sky 19-Sep-26",
+        "date": "2026-09-19",
+        "pts": 0.56
+      }
+    ]
+  },
   "companies": {
-    "Neuland Laboratories": {
+    "BEL": {
+      "lifecycle": "Mature",
+      "earnCycle": 25,
+      "earnNote": "EBITDA 25.1% vs >28% guidance — falling",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
       "triggers": [
         {
-          "name": "cdmo business",
+          "name": "FY27 order inflow guidance >Rs55,000 Cr (QRSAM pending)",
+          "sign": "+",
+          "I": 3,
+          "C": 0.4,
+          "W": 1,
+          "P": 1,
+          "status": "Announced",
+          "source": "PL Research / NiftyTrader, 28-Jul-26",
+          "date": "2026-07-28",
+          "pts": 1.2
+        },
+        {
+          "name": "Margin guidance (>28%) at risk after Q1 miss",
+          "sign": "-",
+          "I": 2,
+          "C": 0.7,
+          "W": 1,
+          "P": 1,
+          "status": "Watch",
+          "source": "NiftyTrader, 28-Jul-26",
+          "date": "2026-07-28",
+          "pts": 1.4
+        }
+      ],
+      "researchCY": 58,
+      "researchTG": 48
+    },
+    "MTAR Technologies": {
+      "lifecycle": "Scaling",
+      "earnCycle": 85,
+      "earnNote": "PAT +364% from depressed base — rising from bottom third",
+      "valCycle": 30,
+      "valNote": "~80% rally in 6 months — above band (est.)",
+      "triggers": [
+        {
+          "name": "Clean-energy customer PO raised Rs2,279 Cr -> Rs3,100 Cr",
+          "sign": "+",
+          "I": 3,
+          "C": 0.7,
+          "W": 0.7,
+          "P": 0.4,
+          "status": "Approved",
+          "source": "DSIJ, 30-Jul-26",
+          "date": "2026-07-30",
+          "pts": 0.59
+        }
+      ],
+      "sectorBlend": [
+        {
+          "phase": "S2",
+          "w": 0.6,
+          "why": "clean-energy (fuel-cell) supply ~60%"
+        },
+        {
+          "phase": "P3",
+          "w": 0.4,
+          "why": "defence/aerospace/nuclear ~40%"
+        }
+      ],
+      "researchCY": 71,
+      "researchTG": 55
+    },
+    "Mazagon Dock": {
+      "lifecycle": "Mature",
+      "earnCycle": 70,
+      "earnNote": "EBITDA margin 15.2%, EBITDA +48% — rising mid-range",
+      "valCycle": 55,
+      "valNote": "brokers see 30-37% upside — in band (est.)",
+      "triggers": [
+        {
+          "name": "P75I six-submarine contract (~Rs99,000 Cr) finalisation",
+          "sign": "+",
+          "I": 5,
+          "C": 0.4,
+          "W": 1,
+          "P": 1,
+          "status": "Announced",
+          "source": "Business Today (Antique, HDFC Sec), 2-Aug-26",
+          "date": "2026-08-02",
+          "pts": 2
+        },
+        {
+          "name": "Order book goal ~Rs1 lakh Cr by FY27 (P17B, LPD, MCMV)",
           "sign": "+",
           "I": 3,
           "C": 0.4,
           "W": 0.7,
           "P": 1,
           "status": "Announced",
-          "source": "q1 fy27, Aug 2026",
-          "date": "2026-09-01",
+          "source": "Business Today (Choice), 2-Aug-26",
+          "date": "2026-08-02",
+          "pts": 0.84
+        },
+        {
+          "name": "Revenue growth to moderate FY27-28; HDFC cut PAT CAGR to 7%",
+          "sign": "-",
+          "I": 2,
+          "C": 0.7,
+          "W": 0.7,
+          "P": 1,
+          "status": "Announced",
+          "source": "Business Today (HDFC Sec), 2-Aug-26",
+          "date": "2026-08-02",
+          "pts": 0.98
+        }
+      ],
+      "researchCY": 65,
+      "researchTG": 65
+    },
+    "HAL": {
+      "lifecycle": "Mature",
+      "earnCycle": 50,
+      "earnNote": "margins steady",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [
+        {
+          "name": "GE F404 deliveries step up (24/yr FY27, 30/yr FY28) unblocking Tejas Mk1A",
+          "sign": "+",
+          "I": 4,
+          "C": 0.7,
+          "W": 0.7,
+          "P": 1,
+          "status": "Approved",
+          "source": "idrw (HAL CMD), 9-Feb-26; Sahi engine receipts",
+          "date": "2026-02-09",
+          "pts": 1.96
+        }
+      ],
+      "researchCY": 62,
+      "researchTG": 66
+    },
+    "Garden Reach": {
+      "lifecycle": "Mature",
+      "earnCycle": 70,
+      "earnNote": "PAT growing faster than revenue — rising mid-range",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [],
+      "tgReviewed": true,
+      "researchCY": 65,
+      "researchTG": 50
+    },
+    "Nippon India AMC": {
+      "lifecycle": "Mature",
+      "earnCycle": 70,
+      "earnNote": "record PAT, margin rising",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [],
+      "researchCY": 58,
+      "researchTG": 49
+    },
+    "Emmvee Photovoltaic": {
+      "lifecycle": "Scaling",
+      "earnCycle": 40,
+      "earnNote": "35.2% EBITDA is a record — at/near high",
+      "valCycle": 55,
+      "valNote": "listed <5 yrs; no band (est.)",
+      "triggers": [
+        {
+          "name": "9.9 GW order book; FY27 EBITDA target Rs2,400 Cr",
+          "sign": "+",
+          "I": 4,
+          "C": 0.7,
+          "W": 1,
+          "P": 1,
+          "status": "Executing",
+          "source": "Sahi / SolarQuarter, 16-Jul-26",
+          "date": "2026-07-16",
+          "pts": 2.8
+        },
+        {
+          "name": "Rs5,500 Cr integration / expansion plan",
+          "sign": "+",
+          "I": 3,
+          "C": 0.4,
+          "W": 0.4,
+          "P": 1,
+          "status": "Announced",
+          "source": "Sahi, Jul-26",
+          "date": "2026-07-16",
+          "pts": 0.48
+        }
+      ],
+      "researchCY": 69,
+      "researchTG": 64
+    },
+    "Waaree Energies": {
+      "lifecycle": "Scaling",
+      "earnCycle": 25,
+      "earnNote": "PAT +15% on revenue +79% — margin falling",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [
+        {
+          "name": "Order book Rs61,500 Cr",
+          "sign": "+",
+          "I": 3,
+          "C": 0.7,
+          "W": 1,
+          "P": 1,
+          "status": "Executing",
+          "source": "SolarQuarter, 30-Jul-26",
+          "date": "2026-07-30",
+          "pts": 2.1
+        },
+        {
+          "name": "New US production lines starting (tariff hedge)",
+          "sign": "+",
+          "I": 3,
+          "C": 0.7,
+          "W": 0.7,
+          "P": 1,
+          "status": "Approved",
+          "source": "Mercom India, Jul-26",
+          "date": "2026-07-30",
+          "pts": 1.47
+        }
+      ],
+      "researchCY": 67,
+      "researchTG": 67
+    },
+    "Premier Energies": {
+      "lifecycle": "Scaling",
+      "earnCycle": 70,
+      "earnNote": "PAT +53% on revenue +34% — rising mid-range",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [
+        {
+          "name": "Order book Rs15,000 Cr (2x FY26 revenue)",
+          "sign": "+",
+          "I": 3,
+          "C": 0.7,
+          "W": 1,
+          "P": 1,
+          "status": "Executing",
+          "source": "Sahi, Aug-26",
+          "date": "2026-08-07",
+          "pts": 2.1
+        },
+        {
+          "name": "Wafer/ingot + cell capacity expansion, margin guidance held",
+          "sign": "+",
+          "I": 3,
+          "C": 0.7,
+          "W": 0.7,
+          "P": 1,
+          "status": "Approved",
+          "source": "Sahi / Choice, Aug-26",
+          "date": "2026-08-07",
+          "pts": 1.47
+        },
+        {
+          "name": "US cell plant (production in 24-30 months)",
+          "sign": "+",
+          "I": 3,
+          "C": 0.4,
+          "W": 0.4,
+          "P": 1,
+          "status": "Announced",
+          "source": "Sahi, Aug-26",
+          "date": "2026-08-07",
+          "pts": 0.48
+        }
+      ],
+      "secTrigI": 2,
+      "researchCY": 74,
+      "researchTG": 75
+    },
+    "Shakti Pumps": {
+      "lifecycle": "Scaling",
+      "earnCycle": 50,
+      "earnNote": "margin trend not verified — flat",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [
+        {
+          "name": "Rs155 Cr order (~25% of a quarter's revenue)",
+          "sign": "+",
+          "I": 2,
+          "C": 1,
+          "W": 1,
+          "P": 1,
+          "status": "Executing",
+          "source": "Sahi, 2026",
+          "date": "2026-07-27",
+          "pts": 2
+        }
+      ],
+      "researchCY": 71,
+      "researchTG": 54
+    },
+    "Lupin": {
+      "lifecycle": "Mature",
+      "earnCycle": 40,
+      "earnNote": "EBITDA +50% YoY — at/near 5-yr high",
+      "valCycle": 55,
+      "valNote": "25x FY28E (PL) — in band (est.)",
+      "triggers": [
+        {
+          "name": "gTolvaptan, gMirabegron, gSpiriva (~50% of EPS) face competition from Q2 FY27/FY28",
+          "sign": "-",
+          "I": 5,
+          "C": 0.7,
+          "W": 1,
+          "P": 1,
+          "status": "Approved",
+          "source": "PL Research, 10-Aug-26",
+          "date": "2026-08-10",
+          "pts": 3.5
+        },
+        {
+          "name": "505(b)(2)/biosimilar pipeline, 25% EBITDA target",
+          "sign": "+",
+          "I": 3,
+          "C": 0.4,
+          "W": 0.7,
+          "P": 1,
+          "status": "Announced",
+          "source": "PL Research / Sahi, Aug-26",
+          "date": "2026-08-10",
           "pts": 0.84
         }
-      ]
+      ],
+      "researchCY": 43,
+      "researchTG": 29
+    },
+    "Laurus Labs": {
+      "lifecycle": "Re-inventing",
+      "earnCycle": 40,
+      "earnNote": "EBITDA 31.8% (+7 ppt) — at/near 5-yr high",
+      "valCycle": 30,
+      "valNote": "+92% in 1 yr, above all SMAs — above band (est.)",
+      "triggers": [
+        {
+          "name": "CDMO to 50% of revenue by FY30; capex on schedule",
+          "sign": "+",
+          "I": 5,
+          "C": 0.7,
+          "W": 0.4,
+          "P": 0.4,
+          "status": "Executing",
+          "source": "Sahi / Swastika, Jul-26",
+          "date": "2026-07-24",
+          "pts": 0.56
+        },
+        {
+          "name": "In-licensing of two antibody-drug conjugates",
+          "sign": "+",
+          "I": 3,
+          "C": 0.4,
+          "W": 0.4,
+          "P": 0.4,
+          "status": "Announced",
+          "source": "Swastika, Jul-26",
+          "date": "2026-07-27",
+          "pts": 0.19
+        }
+      ],
+      "sectorBlend": [
+        {
+          "phase": "P4",
+          "w": 0.5,
+          "why": "generics/ARV ~50%"
+        },
+        {
+          "phase": "S2",
+          "w": 0.5,
+          "why": "CDMO ~50%"
+        }
+      ],
+      "researchCY": 53,
+      "researchTG": 56
+    },
+    "Sun Pharma": {
+      "lifecycle": "Mature",
+      "earnCycle": 40,
+      "earnNote": "gross margin 80.5% — at/near high",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [
+        {
+          "name": "US 100% Section 232 tariff on patented drugs (specialty exposure; generics exempt)",
+          "sign": "-",
+          "I": 3,
+          "C": 0.7,
+          "W": 1,
+          "P": 1,
+          "status": "Approved",
+          "source": "India Briefing (White House factsheet 2-Apr-26)",
+          "date": "2026-04-02",
+          "pts": 2.1
+        }
+      ],
+      "researchCY": 43,
+      "researchTG": 33
+    },
+    "Shilpa Medicare": {
+      "lifecycle": "Re-inventing",
+      "earnCycle": 50,
+      "earnNote": "EBITDA +42% on revenue +43% — margin flat",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [
+        {
+          "name": "Europe partnership deal cleared by board",
+          "sign": "+",
+          "I": 2,
+          "C": 0.7,
+          "W": 0.7,
+          "P": 1,
+          "status": "Approved",
+          "source": "Multibagg, Aug-26",
+          "date": "2026-08-08",
+          "pts": 0.98
+        },
+        {
+          "name": "ADC biosimilar human trials to start in FY27",
+          "sign": "+",
+          "I": 4,
+          "C": 0.4,
+          "W": 0.4,
+          "P": 1,
+          "status": "Announced",
+          "source": "Sahi, Aug-26",
+          "date": "2026-08-08",
+          "pts": 0.64
+        }
+      ],
+      "researchCY": 48,
+      "researchTG": 63
+    },
+    "Neuland Laboratories": {
+      "lifecycle": "Scaling",
+      "earnCycle": 85,
+      "earnNote": "PAT ~10x from depressed FY26 base — rising from bottom third",
+      "valCycle": 30,
+      "valNote": "large re-rating — above band (est.)",
+      "triggers": [
+        {
+          "name": "Commercial CMS execution + peptide facility nearing commissioning",
+          "sign": "+",
+          "I": 3,
+          "C": 0.7,
+          "W": 1,
+          "P": 0.7,
+          "status": "Executing",
+          "source": "Multibagg / Q1 FY27 call transcript, Aug-26",
+          "date": "2026-08-12",
+          "pts": 1.47
+        }
+      ],
+      "researchCY": 73,
+      "researchTG": 62
+    },
+    "PFC": {
+      "lifecycle": "Mature",
+      "earnCycle": 25,
+      "earnNote": "NII -4.45% on spread compression — falling",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [
+        {
+          "name": "~10% FY27 loan-growth guidance looks stretched after flat Q1",
+          "sign": "-",
+          "I": 3,
+          "C": 0.7,
+          "W": 1,
+          "P": 1,
+          "status": "Watch",
+          "source": "Cofacto PFC Q1 FY27",
+          "date": "2026-08-12",
+          "pts": 2.1
+        }
+      ],
+      "researchCY": 40,
+      "researchTG": 22
+    },
+    "REC": {
+      "lifecycle": "Mature",
+      "earnCycle": 25,
+      "earnNote": "revenue -3%, profit -6% — falling",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [],
+      "tgReviewed": true,
+      "researchCY": 40,
+      "researchTG": 39
+    },
+    "GE Vernova T&D India": {
+      "lifecycle": "Scaling",
+      "earnCycle": 25,
+      "earnNote": "EBITDA 25.1% vs 27.1% — falling from high",
+      "valCycle": 30,
+      "valNote": "premium multiple — above band (est.)",
+      "triggers": [
+        {
+          "name": "FY27 base order inflow Rs7,000-8,000 Cr reaffirmed (Q1 only Rs1,140 Cr)",
+          "sign": "+",
+          "I": 3,
+          "C": 0.4,
+          "W": 1,
+          "P": 1,
+          "status": "Announced",
+          "source": "Cofacto GVT&D call, Aug-26",
+          "date": "2026-08-08",
+          "pts": 1.2
+        },
+        {
+          "name": "HVDC developer award decision (Aug/Sep-26)",
+          "sign": "+",
+          "I": 4,
+          "C": 0.4,
+          "W": 1,
+          "P": 1,
+          "status": "Watch",
+          "source": "Cofacto GVT&D call, Aug-26",
+          "date": "2026-08-08",
+          "pts": 1.6
+        },
+        {
+          "name": "Rs1,000 Cr capex for export capacity",
+          "sign": "+",
+          "I": 2,
+          "C": 0.7,
+          "W": 0.7,
+          "P": 1,
+          "status": "Approved",
+          "source": "Cofacto GVT&D call, Aug-26",
+          "date": "2026-08-08",
+          "pts": 0.98
+        }
+      ],
+      "researchCY": 40,
+      "researchTG": 80
+    },
+    "ABB India": {
+      "lifecycle": "Mature",
+      "earnCycle": 25,
+      "earnNote": "record orders but margin falling",
+      "valCycle": 55,
+      "valNote": "derated from peak — in band (est.)",
+      "triggers": [
+        {
+          "name": "Record orders (+50%) convert over 2-8 quarters",
+          "sign": "+",
+          "I": 3,
+          "C": 1,
+          "W": 0.7,
+          "P": 1,
+          "status": "Executing",
+          "source": "ABB India Q2 CY26 release, Aug-26",
+          "date": "2026-08-07",
+          "pts": 2.1
+        },
+        {
+          "name": "Rs90 special dividend",
+          "sign": "+",
+          "I": 1,
+          "C": 1,
+          "W": 1,
+          "P": 1,
+          "status": "Approved",
+          "source": "Angel One, Aug-26",
+          "date": "2026-08-07",
+          "pts": 1
+        }
+      ],
+      "researchCY": 40,
+      "researchTG": 75
+    },
+    "Hitachi Energy": {
+      "lifecycle": "Scaling",
+      "earnCycle": 70,
+      "earnNote": "EBITDA 16.0% rising — mid-range",
+      "valCycle": 30,
+      "valNote": "very high P/E history — above band (est.)",
+      "triggers": [
+        {
+          "name": "Data-centre-led orders (largest segment), exports 33.6%",
+          "sign": "+",
+          "I": 3,
+          "C": 1,
+          "W": 0.7,
+          "P": 0.7,
+          "status": "Executing",
+          "source": "Hitachi Energy India release, Aug-26",
+          "date": "2026-08-05",
+          "pts": 1.47
+        },
+        {
+          "name": "First BESS order 165 MW / 330 MWh",
+          "sign": "+",
+          "I": 2,
+          "C": 1,
+          "W": 0.7,
+          "P": 1,
+          "status": "Approved",
+          "source": "Hitachi Energy India release, Aug-26",
+          "date": "2026-08-05",
+          "pts": 1.4
+        },
+        {
+          "name": "20th factory (Karjan, Vadodara) under construction",
+          "sign": "+",
+          "I": 3,
+          "C": 0.7,
+          "W": 0.4,
+          "P": 1,
+          "status": "Approved",
+          "source": "Hitachi Energy India release, Aug-26",
+          "date": "2026-08-05",
+          "pts": 0.84
+        }
+      ],
+      "researchCY": 48,
+      "researchTG": 80
+    },
+    "BHEL": {
+      "lifecycle": "Re-inventing",
+      "earnCycle": 85,
+      "earnNote": "margin up 835 bps from a loss — rising from bottom third",
+      "valCycle": 30,
+      "valNote": "PL 'Reduce' on valuation — above band (est.)",
+      "triggers": [
+        {
+          "name": "~Rs1.6 lakh Cr order book; execution ramp-up",
+          "sign": "+",
+          "I": 4,
+          "C": 0.7,
+          "W": 1,
+          "P": 1,
+          "status": "Executing",
+          "source": "Sahi Jul-26; PL Research Q1 FY27",
+          "date": "2026-07-16",
+          "pts": 2.8
+        },
+        {
+          "name": "Growing share of non-thermal strategic businesses",
+          "sign": "+",
+          "I": 2,
+          "C": 0.4,
+          "W": 0.7,
+          "P": 1,
+          "status": "Announced",
+          "source": "T&D India, Jul-26",
+          "date": "2026-07-20",
+          "pts": 0.56
+        }
+      ],
+      "researchCY": 49,
+      "researchTG": 77
+    },
+    "Dixon Technologies": {
+      "lifecycle": "Scaling",
+      "earnCycle": 50,
+      "earnNote": "margins flat (thin EMS margin)",
+      "valCycle": 55,
+      "valNote": "stock has de-rated — in band (est.)",
+      "triggers": [
+        {
+          "name": "India smartphone shipments -3% YoY (6-yr low); flat-volume FY27 guide",
+          "sign": "-",
+          "I": 3,
+          "C": 1,
+          "W": 1,
+          "P": 1,
+          "status": "Executing",
+          "source": "Sahi, 17-Jul-26",
+          "date": "2026-07-17",
+          "pts": 3
+        },
+        {
+          "name": "Camera-module capacity to triple; IT hardware ramp",
+          "sign": "+",
+          "I": 3,
+          "C": 0.7,
+          "W": 0.7,
+          "P": 1,
+          "status": "Approved",
+          "source": "Cofacto Dixon call, Jul-26",
+          "date": "2026-07-31",
+          "pts": 1.47
+        },
+        {
+          "name": "FY27 guidance 32-33 mn phones, revenue +12-15%",
+          "sign": "+",
+          "I": 2,
+          "C": 0.4,
+          "W": 1,
+          "P": 1,
+          "status": "Announced",
+          "source": "Sahi, Jul-26",
+          "date": "2026-07-31",
+          "pts": 0.8
+        }
+      ],
+      "researchCY": 58,
+      "researchTG": 44
+    },
+    "Netweb Technologies": {
+      "lifecycle": "Scaling",
+      "earnCycle": 70,
+      "earnNote": "margins beat — rising mid-range",
+      "valCycle": 55,
+      "valNote": "QIP at Rs4,790 — in band (est.)",
+      "triggers": [
+        {
+          "name": "AI-systems order momentum",
+          "sign": "+",
+          "I": 3,
+          "C": 1,
+          "W": 1,
+          "P": 0.7,
+          "status": "Executing",
+          "source": "MNCL Q1 update, Jul-26",
+          "date": "2026-07-24",
+          "pts": 2.1
+        },
+        {
+          "name": "Rs1,200 Cr QIP (equity dilution)",
+          "sign": "-",
+          "I": 2,
+          "C": 1,
+          "W": 1,
+          "P": 1,
+          "status": "Executing",
+          "source": "Sahi, 2026",
+          "date": "2026-08-20",
+          "pts": 2
+        }
+      ],
+      "researchCY": 62,
+      "researchTG": 51
+    },
+    "Syrma SGS Technology": {
+      "lifecycle": "Scaling",
+      "earnCycle": 70,
+      "earnNote": "EBITDA 11.0% vs 10.7% — rising mid-range",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [
+        {
+          "name": "Rs25 Cr JV expansion with Kaga; auto electronics growth",
+          "sign": "+",
+          "I": 2,
+          "C": 0.7,
+          "W": 0.7,
+          "P": 1,
+          "status": "Approved",
+          "source": "Sahi / Autocar Pro, Jul-26",
+          "date": "2026-07-29",
+          "pts": 0.98
+        }
+      ],
+      "researchCY": 62,
+      "researchTG": 58
+    },
+    "SRF Limited": {
+      "lifecycle": "Mature",
+      "earnCycle": 40,
+      "earnNote": "best-ever quarter — at/near high",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [
+        {
+          "name": "Management flags normalisation of chemicals (refrigerant) earnings",
+          "sign": "-",
+          "I": 3,
+          "C": 0.7,
+          "W": 1,
+          "P": 1,
+          "status": "Announced",
+          "source": "Multibagg SRF Q1, Jul-26",
+          "date": "2026-07-22",
+          "pts": 2.1
+        }
+      ],
+      "researchCY": 60,
+      "researchTG": 33
+    },
+    "Acutaas Chemicals": {
+      "lifecycle": "Re-inventing",
+      "earnCycle": 40,
+      "earnNote": "after a 42% margin Q4, Q1 dipped — near high, softening",
+      "valCycle": 55,
+      "valNote": "PL upgraded to Buy after dip — in band (est.)",
+      "triggers": [
+        {
+          "name": "FY27 revenue +25% guidance; Rs1,000 Cr CDMO revenue goal",
+          "sign": "+",
+          "I": 4,
+          "C": 0.4,
+          "W": 0.7,
+          "P": 1,
+          "status": "Announced",
+          "source": "Sahi, Jul-26",
+          "date": "2026-07-28",
+          "pts": 1.12
+        }
+      ],
+      "sectorBlend": [
+        {
+          "phase": "P3",
+          "w": 0.6,
+          "why": "pharma intermediates ~60%"
+        },
+        {
+          "phase": "S2",
+          "w": 0.4,
+          "why": "CDMO ~40%"
+        }
+      ],
+      "researchCY": 65,
+      "researchTG": 59
+    },
+    "Niva Bupa Health Insurance": {
+      "lifecycle": "Scaling",
+      "earnCycle": 70,
+      "earnNote": "PAT +93% — rising",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [
+        {
+          "name": "GST exemption on health cover + retail share gains (>11%)",
+          "sign": "+",
+          "I": 3,
+          "C": 1,
+          "W": 0.7,
+          "P": 1,
+          "status": "Executing",
+          "source": "Angel One Q1 FY27",
+          "date": "2026-08-05",
+          "pts": 2.1
+        }
+      ],
+      "researchCY": 69,
+      "researchTG": 67
+    },
+    "BSE": {
+      "lifecycle": "Scaling",
+      "earnCycle": 40,
+      "earnNote": "record profit — at/near high",
+      "valCycle": 30,
+      "valNote": "multi-fold re-rating — above band (est.)",
+      "triggers": [],
+      "tgReviewed": true,
+      "researchCY": 43,
+      "researchTG": 50
+    },
+    "MCX": {
+      "lifecycle": "Scaling",
+      "earnCycle": 40,
+      "earnNote": "off a record quarter — near high",
+      "valCycle": 30,
+      "valNote": "above band (est.)",
+      "triggers": [],
+      "tgReviewed": true,
+      "researchCY": 43,
+      "researchTG": 50
+    },
+    "RVNL": {
+      "lifecycle": "Mature",
+      "earnCycle": 85,
+      "earnNote": "margin rising from bottom third",
+      "valCycle": 30,
+      "valNote": "PL 'Sell, valuation full' — above band",
+      "triggers": [
+        {
+          "name": "Order inflow ~4x; FY27 order target Rs25,000 Cr",
+          "sign": "+",
+          "I": 3,
+          "C": 0.4,
+          "W": 1,
+          "P": 1,
+          "status": "Announced",
+          "source": "FilingReader 18-Aug-26; Cofacto RVNL Q1",
+          "date": "2026-08-18",
+          "pts": 1.2
+        }
+      ],
+      "researchCY": 58,
+      "researchTG": 60
+    },
+    "Max Healthcare": {
+      "lifecycle": "Scaling",
+      "earnCycle": 25,
+      "earnNote": "new-bed dilution — margin falling",
+      "valCycle": 30,
+      "valNote": "premium P/E — above band (est.)",
+      "triggers": [
+        {
+          "name": "New beds + acquisitions (e.g. Kalinga hospital)",
+          "sign": "+",
+          "I": 3,
+          "C": 0.7,
+          "W": 0.7,
+          "P": 1,
+          "status": "Executing",
+          "source": "Kotak Neo / Multibagg, Aug-26",
+          "date": "2026-08-13",
+          "pts": 1.47
+        }
+      ],
+      "researchCY": 40,
+      "researchTG": 62
+    },
+    "Bank of Maharashtra": {
+      "lifecycle": "Mature",
+      "earnCycle": 40,
+      "earnNote": "RoA/RoE best among PSBs — at/near high",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [],
+      "tgReviewed": true,
+      "researchCY": 43,
+      "researchTG": 50
+    },
+    "Muthoot Finance": {
+      "lifecycle": "Mature",
+      "earnCycle": 25,
+      "earnNote": "NIM falling sharply",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [
+        {
+          "name": "AUM growth tied to gold price; tonnage falling (209 -> 197 t)",
+          "sign": "-",
+          "I": 3,
+          "C": 0.4,
+          "W": 0.7,
+          "P": 1,
+          "status": "Watch",
+          "source": "INDmoney, 3-Aug-26",
+          "date": "2026-08-03",
+          "pts": 0.84
+        }
+      ],
+      "researchCY": 40,
+      "researchTG": 43
+    },
+    "360 One WAM": {
+      "lifecycle": "Scaling",
+      "earnCycle": 50,
+      "earnNote": "cost-to-income flat — margin flat",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [
+        {
+          "name": "12-15% ARR net flows; 100-150 bps cost-to-income cut",
+          "sign": "+",
+          "I": 2,
+          "C": 0.4,
+          "W": 0.7,
+          "P": 1,
+          "status": "Announced",
+          "source": "Sahi, Jul-26",
+          "date": "2026-07-16",
+          "pts": 0.56
+        }
+      ],
+      "researchCY": 48,
+      "researchTG": 38
+    },
+    "IHCL": {
+      "lifecycle": "Mature",
+      "earnCycle": 40,
+      "earnNote": "record ARR-led margins — near high",
+      "valCycle": 55,
+      "valNote": "in band (est.)",
+      "triggers": [],
+      "tgReviewed": true,
+      "researchCY": 60,
+      "researchTG": 46
     }
   }
 }
