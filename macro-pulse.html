@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v23 (Six-lens Conviction · Quarter fallback)</title>
+<title>CB Finance26™ — Macro Pulse · v24 (Auto-discover results · Quarter fallback)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -1289,11 +1289,13 @@ tr:last-child td{border-bottom:none;}
   </div>
   <div class="card" style="margin-bottom:14px;">
     <div class="sec">📊 Ground Reality — link your published sector research</div>
-    <div style="font-size:10.5px;color:#3a3f5c;line-height:1.65;margin-bottom:9px;">Pull actual <span id="grQtrLabel">Q1 FY27</span> numbers from your sector dashboards so every macro signal is cross-checked against real results. <strong>Hosted:</strong> click Fetch — reads sector-index.json from this app's folder; each dashboard is looked for here first, then in the second repo (share-analysis). <strong>Only the latest quarter's results are used</strong> — older quarters are shown as stale and ignored. <strong>Testing locally:</strong> use Load files from computer.</div>
+    <div style="font-size:10.5px;color:#3a3f5c;line-height:1.65;margin-bottom:9px;">Pull actual <span id="grQtrLabel">Q1 FY27</span> numbers from your sector dashboards so every macro signal is cross-checked against real results. <strong>Hosted:</strong> runs by itself when the app opens (if data is over 6 hours old), or click Fetch. It reads sector-index.json <strong>and scans your GitHub repo(s) for any new results dashboard</strong> (file name with Q2FY27, Q3FY27 …) — new files are picked up automatically, no need to edit sector-index.json. <strong>Each company uses its newest published quarter</strong>; if the latest quarter is not out yet, the previous one (up to Q4 of the previous year) is used and footnoted. <strong>Testing locally:</strong> use Load files from computer.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
       <input id="grBaseUrl" type="text" placeholder="Base URL (blank = same folder as this app)" style="flex:1;min-width:220px;padding:8px 11px;border:1px solid var(--border-hi);border-radius:8px;background:#f8f9fc;color:var(--text);font-size:11px;font-family:inherit;">
       <input id="grAltBase" type="text" value="https://share-analysis.cauverybusiness.in" placeholder="Second repo (e.g. ../share-analysis or full https URL)" title="Files not found in the main folder are fetched from here" style="flex:1;min-width:200px;padding:8px 11px;border:1px solid var(--border-hi);border-radius:8px;background:#f8f9fc;color:var(--text);font-size:11px;font-family:inherit;">
+      <input id="grRepos" type="text" value="Elangocauvery/CB_Finance26, Elangocauvery/ShareAnalysis" placeholder="GitHub repo(s) to auto-scan, e.g. owner/cb-finance-26, owner/share-analysis (blank = detect from this page)" title="New dashboards in these repositories are found automatically — no need to edit sector-index.json" style="flex:1 1 100%;min-width:220px;padding:8px 11px;border:1px solid var(--border-hi);border-radius:8px;background:#f8f9fc;color:var(--text);font-size:11px;font-family:inherit;">
       <button onclick="grFetchAll()" style="padding:8px 16px;border-radius:8px;border:none;background:#ff7c00;color:#fff;font-size:11px;font-weight:800;cursor:pointer;">🔄 Fetch from GitHub</button>
+      <button id="grDlIndex" onclick="grDownloadIndex()" style="display:none;padding:8px 14px;border-radius:8px;border:1px solid var(--border-hi);background:#fff;color:#3a3f5c;font-size:11px;font-weight:700;cursor:pointer;" title="Optional — a tidy copy of sector-index.json including the auto-found files">⬇ Updated sector-index.json</button>
       <label style="padding:8px 16px;border-radius:8px;border:1px solid var(--border-hi);background:#fff;color:#3a3f5c;font-size:11px;font-weight:700;cursor:pointer;">📁 Load files from computer<input type="file" accept=".html,.htm" multiple style="display:none;" onchange="grPickFiles(this.files)"></label>
     </div>
     <div id="grStatus" style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6;"></div>
@@ -3376,6 +3378,7 @@ function initApp(){
   updateFIISignal();
   try{const u=localStorage.getItem(GR_URL_KEY);if(u!=null){const el=document.getElementById('grBaseUrl');if(el)el.value=u;}}catch(e){}
   try{const a=localStorage.getItem(GR_ALT_KEY);if(a!=null){const el=document.getElementById('grAltBase');if(el)el.value=a;}}catch(e){}
+  try{const g=localStorage.getItem(GR_REPO_KEY);if(g){const el=document.getElementById('grRepos');if(el)el.value=g;}}catch(e){}
   const grc=grLoadCache();
   if(grc){const st=document.getElementById('grStatus');if(st)st.innerHTML='💾 Cached: '+grc.files.filter(f=>f.agg).length+' file(s) · last loaded '+new Date(grc.ts).toLocaleString()+' — click Fetch to refresh';}
 }
@@ -3853,6 +3856,98 @@ function showSave(){
 const GR_KEY='cbf26_sector_actuals_v1';
 const GR_URL_KEY='cbf26_gr_baseurl_v1';
 const GR_ALT_KEY='cbf26_gr_altbase_v1';
+var GR_REPO_KEY='cbf26_gr_repos_v2';
+// ── v24: AUTO-DISCOVERY of new results dashboards ──────────────────────────
+// Lists every .html file in your GitHub repositories (one GitHub API call per repo),
+// picks up any results dashboard whose name carries a quarter tag (Q2FY27, Q1_FY27 …)
+// that is NOT yet in sector-index.json, and works out its sector by itself:
+//   ① same "family" as an indexed file (Q1FY27_Analysis_X → Q2FY27_Analysis_X inherits sectors)
+//   ② otherwise each company in the file is matched to its sector in Company Ranker
+//   ③ otherwise the file-name keyword map.
+// So publishing a new quarter's dashboard needs NO edit to sector-index.json.
+var GR_STOP=['analysis','dashboard','results','result','sector','sectors','intelligence','cb','research','companies','company','the','and','update','updated','final','new','india','html','htm','fy','q'];
+function grStem(f){ return String(f).split('/').pop().toLowerCase().replace(/\.html?$/,'').replace(/q[\s_-]*[1-4][\s_-]*fy[\s_-]*\d{2}/g,' ').replace(/\bv\d+\b/g,' ').replace(/\d+/g,' ').split(/[^a-z]+/).filter(w=>w&&w.length>1&&GR_STOP.indexOf(w)<0); }
+function grFamily(file, indexEntries){
+  const a=grStem(file); if(!a.length) return null;
+  let best=null, bs=0;
+  indexEntries.forEach(e=>{
+    const b=grStem(e.file); if(!b.length) return;
+    const inter=a.filter(w=>b.indexOf(w)>=0).length; if(!inter) return;
+    const uni=new Set(a.concat(b)).size, j=inter/uni;
+    if(j>bs){ bs=j; best=e; }
+  });
+  return bs>=0.5?best:null;
+}
+function grNormName(x){ return String(x||'').toLowerCase().replace(/\b(ltd|limited|india|industries|the)\b/g,'').replace(/[^a-z0-9]+/g,''); }
+function grAutoSectors(parsed){
+  const list=(typeof CR_DATA!=='undefined'&&Array.isArray(CR_DATA))?CR_DATA:[];
+  const split={}, secs=[];
+  (parsed.cos||[]).forEach(c=>{
+    const t=grNormName(c.name); if(t.length<3) return;
+    let hit=list.find(d=>grNormName(d.name)===t);
+    if(!hit) hit=list.find(d=>{ const n=grNormName(d.name); const sh=n.length<t.length?n:t, lg=n.length<t.length?t:n; return sh.length>=4&&lg.indexOf(sh)===0; });
+    if(hit&&hit.sector){ split[c.name]=hit.sector; if(secs.indexOf(hit.sector)<0) secs.push(hit.sector); }
+  });
+  return {sectors:secs, split:secs.length>1?split:null};
+}
+function grRepoFromUrl(u){
+  try{ const x=new URL(u, location.href); const h=x.hostname;
+    if(/\.github\.io$/i.test(h)){ const o=h.split('.')[0]; const seg=x.pathname.split('/').filter(Boolean)[0]; return o+'/'+((seg&&!/\.html?$/i.test(seg))?seg:h); }
+  }catch(e){}
+  return null;
+}
+function grRepoList(){
+  const v=(document.getElementById('grRepos')?.value||'').trim();
+  const list=v?v.split(/[\s,]+/).map(x=>x.replace(/^https?:\/\/github\.com\//i,'').replace(/\.git$/,'').replace(/\/+$/,'')).filter(x=>/^[\w.-]+\/[\w.-]+$/.test(x)):[];
+  [location.href,(document.getElementById('grBaseUrl')?.value||''),(document.getElementById('grAltBase')?.value||'')].forEach(u=>{ if(!u) return; const k=grRepoFromUrl(u); if(k&&list.indexOf(k)<0) list.push(k); });
+  return list;
+}
+async function grDiscover(indexEntries, log){
+  const repos=grRepoList(), found=[], notes=[];
+  if(!repos.length){ notes.push('🔎 Auto-discovery off — type your GitHub repo (owner/repo) in the box above once.'); return {found,notes}; }
+  const have=new Set(indexEntries.map(e=>grBaseName(e.file).toLowerCase()));
+  const excl=/macro-?pulse|^index\.html?$|cbconviction|top25|think|template|backup|copy/i;
+  for(const rp of repos){
+    try{
+      log('🔎 Scanning '+rp+' for new results dashboards …');
+      const r=await fetch('https://api.github.com/repos/'+rp+'/git/trees/HEAD?recursive=1',{cache:'no-store'});
+      if(!r.ok){ notes.push('🔎 '+rp+' — could not list files (HTTP '+r.status+(r.status===403?', GitHub hourly limit — try again later':r.status===404?', check the repo name':'')+')'); continue; }
+      const j=await r.json(); let n=0;
+      (j.tree||[]).forEach(t=>{
+        if(t.type!=='blob'||!/\.html?$/i.test(t.path)) return;
+        const bn=t.path.split('/').pop();
+        if(excl.test(bn)||have.has(bn.toLowerCase())||!grQtrKey(bn)) return;
+        have.add(bn.toLowerCase());
+        found.push({file:'https://raw.githubusercontent.com/'+rp+'/HEAD/'+t.path.split('/').map(encodeURIComponent).join('/'), name:bn, repo:rp, q:grQtrKey(bn)});
+        n++;
+      });
+      notes.push('🔎 '+rp+' scanned — '+n+' dashboard(s) not in sector-index.json'+(j.truncated?' (listing truncated)':''));
+    }catch(e){ notes.push('🔎 '+rp+' — scan failed ('+e.message+')'); }
+  }
+  // only recent quarters matter: newest found − CB_QTR_MAX_LAG
+  let newest=null; indexEntries.concat(found).forEach(e=>{ const q=grQtrKey(grBaseName(e.file||e.name)); if(q&&(!newest||q.key>newest.key)) newest=q; });
+  const keep=found.filter(f=>!newest||(newest.key-f.q.key)<=CB_QTR_MAX_LAG);
+  const entries=keep.map(f=>{
+    const fam=grFamily(f.name, indexEntries);
+    if(fam) return {file:f.file, sectors:fam.sectors||grKw(fam.file), split:fam.split||null, tokens:fam.tokens||null, exclude:fam.exclude||null, companies:fam.companies||null, auto:'family', fam:grBaseName(fam.file), name:f.name};
+    return {file:f.file, sectors:[], split:null, tokens:null, exclude:null, companies:null, auto:'companies', name:f.name};
+  });
+  return {found:entries, notes};
+}
+var GR_LAST_INDEX=null, GR_LAST_DISC=[];
+window.addEventListener('load',function(){
+  try{
+    if(!/^https?:$/.test(location.protocol)) return;
+    const c=grLoadCache(); if(c&&c.ts&&(Date.now()-c.ts)<6*3600*1000) return;
+    setTimeout(function(){ try{ grFetchAll(); }catch(e){} }, 2500);
+  }catch(e){}
+});
+function grDownloadIndex(){
+  const base=(GR_LAST_INDEX||[]).slice();
+  GR_LAST_DISC.forEach(e=>{ if(!e.sectors||!e.sectors.length) return; const o={file:e.name,sectors:e.sectors}; if(e.split) o.split=e.split; if(e.tokens) o.tokens=e.tokens; if(e.companies) o.companies=e.companies; if(e.exclude) o.exclude=e.exclude; base.push(o); });
+  const txt='[\n'+base.map(x=>'  '+JSON.stringify(x)).join(',\n')+'\n]\n';
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'})); a.download='sector-index.json'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
+}
 // filename keyword → Macro Pulse sector name(s)
 const GR_FILE_MAP=[
  {kw:'pharma',sectors:['Pharma']},
@@ -4345,7 +4440,7 @@ async function grFetchAll(){
   const st=document.getElementById('grStatus');
   const base=(document.getElementById('grBaseUrl')?.value||'').trim().replace(/\/+$/,'');
   const alt=(document.getElementById('grAltBase')?.value||'').trim().replace(/\/+$/,'');
-  try{localStorage.setItem(GR_URL_KEY,base);localStorage.setItem(GR_ALT_KEY,alt);}catch(e){}
+  try{localStorage.setItem(GR_URL_KEY,base);localStorage.setItem(GR_ALT_KEY,alt);localStorage.setItem(GR_REPO_KEY,(document.getElementById('grRepos')?.value||'').trim());}catch(e){}
   const isAbs=p=>/^https?:\/\//i.test(p);
   const join=(b,p)=>isAbs(p)?p:(b?b+'/'+p:p);
   const log=m=>{ if(st) st.innerHTML=m; };
@@ -4371,15 +4466,24 @@ async function grFetchAll(){
     return;
   }
   const entries=(Array.isArray(index)?index:[]).map(grMapFile);
+  GR_LAST_INDEX=Array.isArray(index)?index:[];
+  // v24: find new quarter dashboards in the repo(s) that are not listed in sector-index.json
+  let disc={found:[],notes:[]};
+  try{ disc=await grDiscover(entries, log); }catch(e){ disc.notes.push('🔎 Auto-discovery skipped ('+e.message+')'); }
+  GR_LAST_DISC=disc.found;
   const out={ts:Date.now(),files:[]};
-  for(const en of entries){
-    log('Fetching '+grBaseName(en.file)+' …');
+  let autoUsed=0, autoSkip=[];
+  for(const en of entries.concat(disc.found)){
+    log('Fetching '+(en.name||grBaseName(en.file))+' …');
     try{
       const got=await getText(en.file);
-      const parsed=grParseHTML(got.text,en.file,{tokens:en.tokens,companies:en.companies});
-      if(parsed) grEmit(en,parsed).forEach(e=>{ e.from=got.from; out.files.push(e); });
+      const parsed=grParseHTML(got.text,en.name||en.file,{tokens:en.tokens,companies:en.companies});
+      if(parsed&&en.auto==='companies'){ const a=grAutoSectors(parsed); en.sectors=a.sectors.length?a.sectors:grKw(en.name); en.split=a.split; }
+      if(en.auto&&(!parsed||!en.sectors||!en.sectors.length)){ autoSkip.push(en.name+(parsed?' (no company matched Company Ranker)':' (no results table)')); continue; }
+      if(parsed) grEmit(en,parsed).forEach(e=>{ e.from=got.from; if(en.auto){ e.file=en.name; e.auto=en.auto; e.fam=en.fam; } out.files.push(e); });
       else out.files.push({file:en.file,sectors:en.sectors,err:'no parseable table found'});
-    }catch(e){ out.files.push({file:en.file,sectors:en.sectors,err:e.message}); }
+      if(parsed&&en.auto) autoUsed++;
+    }catch(e){ if(en.auto) autoSkip.push(en.name+' ('+e.message+')'); else out.files.push({file:en.file,sectors:en.sectors,err:e.message}); }
   }
   grSaveCache(out);
   // v21: published Cycle & Trigger inputs (optional file next to sector-index.json)
@@ -4392,7 +4496,7 @@ async function grFetchAll(){
     tcLine='<br>🔄⚡ '+CV_TC_FILE+' loaded — '+Object.keys(j.sectors||{}).length+' sector phase(s), '+nt+' trigger(s)'+(j.updated?' · updated '+j.updated:'');
   }catch(e){ tcLine='<br><span style="color:#9aa0b8;">🔄⚡ '+CV_TC_FILE+' not found — Cycle uses auto sector phases; Trigger lens uses dashboard/local entries only.</span>'; }
   const latest=grLatestQtr(out);
-  const srcTag={main:'',alt:' · share-analysis',url:' · full URL'};
+  const srcTag={main:'',alt:' · share-analysis',url:''};
   const lines=out.files.map(f=>{
     if(!f.agg) return '❌ '+grBaseName(f.file)+' — '+f.err+(String(f.err).includes('404')?' (not found in main folder or second repo — check exact spelling/case)':String(f.err).includes('parseable')?' (reachable but no readable table — send this file to Claude to adapt the parser)':'');
     const q=grFileQtr(f);
@@ -4400,13 +4504,14 @@ async function grFetchAll(){
     // v23: an older file is still USED when it is the newest available for its sector (fallback)
     const newer=q&&out.files.some(g=>g!==f&&g.agg&&(g.sectors||[]).some(s=>(f.sectors||[]).includes(s))&&(grFileQtr(g)||{key:-1}).key>q.key);
     const isFb=!isCur&&q&&latest&&!newer&&(latest.key-q.key)<=CB_QTR_MAX_LAG;
-    return (isCur?'✅ ':isFb?'📅 ':'⏸ ')+grBaseName(f.file)+' ['+(q?q.label:'period?')+(srcTag[f.from]||'')+'] — '+f.agg.n+' cos → '+f.sectors.join(', ')+(isCur?'':isFb?' <span style="color:#b35c00;">(used as fallback — '+grPretty(latest.label)+' not yet published for this sector)</span>':' <span style="color:#9aa0b8;">(superseded — comparison only)</span>');
+    return (isCur?'✅ ':isFb?'📅 ':'⏸ ')+grBaseName(f.file)+(f.auto?' <span style="color:#1d6fa5;font-weight:700;">· auto-found'+(f.fam?' (like '+f.fam+')':' (sector from its companies)')+'</span>':'')+' ['+(q?q.label:'period?')+(srcTag[f.from]||'')+'] — '+f.agg.n+' cos → '+f.sectors.join(', ')+(isCur?'':isFb?' <span style="color:#b35c00;">(used as fallback — '+grPretty(latest.label)+' not yet published for this sector)</span>':' <span style="color:#9aa0b8;">(superseded — comparison only)</span>');
   });
   const ok=out.files.filter(f=>f.agg);
   const cur=ok.filter(f=>{const q=grFileQtr(f);return latest&&q&&q.key===latest.key;}).length;
   const fbN=ok.filter(f=>{const q=grFileQtr(f); if(!q||!latest||q.key===latest.key||(latest.key-q.key)>CB_QTR_MAX_LAG) return false; return !ok.some(g=>g!==f&&(g.sectors||[]).some(s=>(f.sectors||[]).includes(s))&&(grFileQtr(g)||{key:-1}).key>q.key);}).length;
   const fromAlt=ok.filter(f=>f.from==='alt').length;
-  log('<strong>Current quarter: '+(latest?grPretty(latest.label):'not detected')+'</strong> · '+cur+' current record(s) used · '+fbN+' older record(s) used as fallback (sector has no newer file) · '+(ok.length-cur-fbN)+' superseded · '+fromAlt+' loaded from second repo · '+out.files.filter(f=>f.err).length+' failed · '+new Date(out.ts).toLocaleString()+tcLine+'<br>'+lines.join('<br>'));
+  log('<strong>Current quarter: '+(latest?grPretty(latest.label):'not detected')+'</strong> · '+cur+' current record(s) used · '+fbN+' older record(s) used as fallback (sector has no newer file) · '+(ok.length-cur-fbN)+' superseded · '+autoUsed+' auto-found (not in sector-index.json) · '+fromAlt+' loaded from second repo · '+out.files.filter(f=>f.err).length+' failed · '+new Date(out.ts).toLocaleString()+tcLine+'<br>'+disc.notes.join('<br>')+(autoSkip.length?'<br><span style="color:#9aa0b8;">⏭ Auto-found but skipped (not a results dashboard / no match): '+autoSkip.slice(0,12).join(', ')+(autoSkip.length>12?' …':'')+'</span>':'')+'<br>'+lines.join('<br>'));
+  const dl=document.getElementById('grDlIndex'); if(dl) dl.style.display=autoUsed?'inline-block':'none';
   renderSectorImpact();
   if(typeof cvRender==='function'&&document.getElementById('page-cv')?.classList.contains('active')) cvRender();
 }
