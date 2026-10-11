@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v24 (Auto-discover results · Quarter fallback)</title>
+<title>CB Finance26™ — Macro Pulse · v25 (Auto-discover results · Quarter fallback)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -1293,7 +1293,7 @@ tr:last-child td{border-bottom:none;}
     <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
       <input id="grBaseUrl" type="text" placeholder="Base URL (blank = same folder as this app)" style="flex:1;min-width:220px;padding:8px 11px;border:1px solid var(--border-hi);border-radius:8px;background:#f8f9fc;color:var(--text);font-size:11px;font-family:inherit;">
       <input id="grAltBase" type="text" value="https://share-analysis.cauverybusiness.in" placeholder="Second repo (e.g. ../share-analysis or full https URL)" title="Files not found in the main folder are fetched from here" style="flex:1;min-width:200px;padding:8px 11px;border:1px solid var(--border-hi);border-radius:8px;background:#f8f9fc;color:var(--text);font-size:11px;font-family:inherit;">
-      <input id="grRepos" type="text" value="Elangocauvery/CB_Finance26, Elangocauvery/ShareAnalysis" placeholder="GitHub repo(s) to auto-scan, e.g. owner/cb-finance-26, owner/share-analysis (blank = detect from this page)" title="New dashboards in these repositories are found automatically — no need to edit sector-index.json" style="flex:1 1 100%;min-width:220px;padding:8px 11px;border:1px solid var(--border-hi);border-radius:8px;background:#f8f9fc;color:var(--text);font-size:11px;font-family:inherit;">
+      <input id="grRepos" type="text" placeholder="Extra GitHub repo(s) to scan, owner/repo (optional — this app's repo and the second-repo site are detected automatically)" title="New dashboards in these repositories are found automatically — no need to edit sector-index.json" style="flex:1 1 100%;min-width:220px;padding:8px 11px;border:1px solid var(--border-hi);border-radius:8px;background:#f8f9fc;color:var(--text);font-size:11px;font-family:inherit;">
       <button onclick="grFetchAll()" style="padding:8px 16px;border-radius:8px;border:none;background:#ff7c00;color:#fff;font-size:11px;font-weight:800;cursor:pointer;">🔄 Fetch from GitHub</button>
       <button id="grDlIndex" onclick="grDownloadIndex()" style="display:none;padding:8px 14px;border-radius:8px;border:1px solid var(--border-hi);background:#fff;color:#3a3f5c;font-size:11px;font-weight:700;cursor:pointer;" title="Optional — a tidy copy of sector-index.json including the auto-found files">⬇ Updated sector-index.json</button>
       <label style="padding:8px 16px;border-radius:8px;border:1px solid var(--border-hi);background:#fff;color:#3a3f5c;font-size:11px;font-weight:700;cursor:pointer;">📁 Load files from computer<input type="file" accept=".html,.htm" multiple style="display:none;" onchange="grPickFiles(this.files)"></label>
@@ -3879,8 +3879,8 @@ function grFamily(file, indexEntries){
   return bs>=0.5?best:null;
 }
 function grNormName(x){ return String(x||'').toLowerCase().replace(/\b(ltd|limited|india|industries|the)\b/g,'').replace(/[^a-z0-9]+/g,''); }
-function grAutoSectors(parsed){
-  const list=(typeof CR_DATA!=='undefined'&&Array.isArray(CR_DATA))?CR_DATA:[];
+function grAutoSectors(parsed, fname){
+  const list=((typeof CR_DATA!=='undefined'&&Array.isArray(CR_DATA))?CR_DATA:[]).filter(d=>d&&d.name);
   const split={}, secs=[];
   (parsed.cos||[]).forEach(c=>{
     const t=grNormName(c.name); if(t.length<3) return;
@@ -3888,6 +3888,14 @@ function grAutoSectors(parsed){
     if(!hit) hit=list.find(d=>{ const n=grNormName(d.name); const sh=n.length<t.length?n:t, lg=n.length<t.length?t:n; return sh.length>=4&&lg.indexOf(sh)===0; });
     if(hit&&hit.sector){ split[c.name]=hit.sector; if(secs.indexOf(hit.sector)<0) secs.push(hit.sector); }
   });
+  // single-company dashboard whose table label is a section heading: take the company from the file name
+  if(!secs.length&&fname&&(parsed.cos||[]).length===1){
+    const w=grStem(fname).filter(x=>x.length>=3), tries=[w.join(''), w.slice(0,2).join(''), w[0]||''].filter(x=>x.length>=4);
+    for(const t of tries){
+      const hits=list.filter(d=>grNormName(d.name).indexOf(t)===0);
+      if(hits.length===1){ parsed.cos[0].name=hits[0].name; secs.push(hits[0].sector); break; }
+    }
+  }
   return {sectors:secs, split:secs.length>1?split:null};
 }
 function grRepoFromUrl(u){
@@ -3899,18 +3907,33 @@ function grRepoFromUrl(u){
 function grRepoList(){
   const v=(document.getElementById('grRepos')?.value||'').trim();
   const list=v?v.split(/[\s,]+/).map(x=>x.replace(/^https?:\/\/github\.com\//i,'').replace(/\.git$/,'').replace(/\/+$/,'')).filter(x=>/^[\w.-]+\/[\w.-]+$/.test(x)):[];
-  [location.href,(document.getElementById('grBaseUrl')?.value||''),(document.getElementById('grAltBase')?.value||'')].forEach(u=>{ if(!u) return; const k=grRepoFromUrl(u); if(k&&list.indexOf(k)<0) list.push(k); });
-  return list;
+  let owner=null;
+  [location.href,(document.getElementById('grBaseUrl')?.value||''),(document.getElementById('grAltBase')?.value||'')].forEach(u=>{ if(!u) return; const k=grRepoFromUrl(u); if(k){ list.push(k); if(!owner) owner=k.split('/')[0]; } });
+  if(!owner&&list.length) owner=list[0].split('/')[0];
+  // second repo on a custom domain (e.g. share-analysis.example.in): same owner, repo named after the
+  // sub-domain — try "share-analysis" and "shareanalysis" (GitHub matches names case-insensitively)
+  try{ const alt=(document.getElementById('grAltBase')?.value||'').trim();
+    if(owner&&/^https?:\/\//i.test(alt)&&!/\.github\.io$/i.test(new URL(alt).hostname)){
+      const sub=new URL(alt).hostname.split('.')[0];
+      list.push({alts:[owner+'/'+sub, owner+'/'+sub.replace(/[-_]/g,'')]});
+    } }catch(e){}
+  const seen={}; return list.filter(x=>{ const l=(typeof x==='string'?x:x.alts.join('|')).toLowerCase(); if(seen[l]) return false; seen[l]=1; return true; });
 }
 async function grDiscover(indexEntries, log){
   const repos=grRepoList(), found=[], notes=[];
   if(!repos.length){ notes.push('🔎 Auto-discovery off — type your GitHub repo (owner/repo) in the box above once.'); return {found,notes}; }
   const have=new Set(indexEntries.map(e=>grBaseName(e.file).toLowerCase()));
   const excl=/macro-?pulse|^index\.html?$|cbconviction|top25|think|template|backup|copy/i;
-  for(const rp of repos){
+  const done={};
+  for(const item of repos){
+    let rp=typeof item==='string'?item:null, r=null;
     try{
-      log('🔎 Scanning '+rp+' for new results dashboards …');
-      const r=await fetch('https://api.github.com/repos/'+rp+'/git/trees/HEAD?recursive=1',{cache:'no-store'});
+      if(rp){ if(done[rp.toLowerCase()]) continue; log('🔎 Scanning '+rp+' for new results dashboards …'); r=await fetch('https://api.github.com/repos/'+rp+'/git/trees/HEAD?recursive=1',{cache:'no-store'}); }
+      else {
+        for(const cand of item.alts){ if(done[cand.toLowerCase()]) { r=null; rp=null; break; } log('🔎 Looking for second repo '+cand+' …'); const t=await fetch('https://api.github.com/repos/'+cand+'/git/trees/HEAD?recursive=1',{cache:'no-store'}); if(t.ok){ r=t; rp=cand; break; } if(t.status===403){ r=t; rp=cand; break; } }
+        if(!r){ if(item.alts.some(c=>done[c.toLowerCase()])) continue; notes.push('🔎 Second repo not found as '+item.alts.join(' / ')+' — type it in the box above (owner/repo)'); continue; }
+      }
+      done[rp.toLowerCase()]=1;
       if(!r.ok){ notes.push('🔎 '+rp+' — could not list files (HTTP '+r.status+(r.status===403?', GitHub hourly limit — try again later':r.status===404?', check the repo name':'')+')'); continue; }
       const j=await r.json(); let n=0;
       (j.tree||[]).forEach(t=>{
@@ -4399,6 +4422,12 @@ function grParseHTML(htmlText,fname,opts){
       }
     }
   }
+  // Priority 6 (v24): house-style `var CO = {...}` data object — used when nothing else
+  // parsed, or when the generic metric-table scan mislabelled a single-company file
+  if(!cos.length||fmt==='metric-tables'){
+    let coCos=null; try{ coCos=grFromCO(doc, htmlText); }catch(e){ coCos=null; }
+    if(coCos&&coCos.length){ cos=coCos; fmt='var-CO'; }
+  }
   if(!cos.length) return null;
   // dedupe by name, treating "Vardhman" and "Vardhman Textiles" as the same company
   const kept=[]; const keptVals=[];
@@ -4416,6 +4445,54 @@ function grParseHTML(htmlText,fname,opts){
   // period detection
   const pm=htmlText.match(/Q[1-4]\s*FY\s*\d{2}/i);
   return {fmt,period:pm?pm[0].replace(/\s+/g,' '):'',cos};
+}
+function grNum(v){ if(typeof v==='number') return isFinite(v)?v:null; if(typeof v==='string'){ const x=parseFloat(v.replace(/[,₹%+\s]/g,'')); return isFinite(x)?x:null; } return null; }
+function grSymToName(sym){
+  try{ if(typeof MI_NAME_TO_SYMBOL==='undefined'||!sym) return null; const u=String(sym).toUpperCase();
+    for(const k in MI_NAME_TO_SYMBOL){ if(String(MI_NAME_TO_SYMBOL[k]).toUpperCase()===u) return k; } }catch(e){}
+  return null;
+}
+function grFromCO(doc, htmlText){
+  const scripts=[...doc.querySelectorAll('script')].map(x=>x.textContent).join('\n');
+  const m=/\b(?:var|let|const)\s+CO\s*=\s*\{/.exec(scripts); if(!m) return null;
+  const j=m.index+m[0].length-1; let d=0,k=j,q=null;
+  for(;k<scripts.length;k++){ const ch=scripts[k];
+    if(q){ if(ch==='\\'){k++;continue;} if(ch===q) q=null; continue; }
+    if(ch==='"'||ch==="'"||ch==='`'){ q=ch; continue; }
+    if(ch==='{') d++; else if(ch==='}'){ d--; if(d===0) break; } }
+  let CO; try{ CO=(new Function('return '+scripts.slice(j,k+1)))(); }catch(e){ return null; }
+  if(!CO||typeof CO!=='object') return null;
+  const qm=String(htmlText).match(/Q([1-4])[\s_-]*FY[\s_-]*\d{2}/i); const qk=qm?'q'+qm[1]:null;
+  // single-company file: CO itself is the company (company/name at top level)
+  const pool=(CO.cos&&typeof CO.cos==='object')?CO.cos:((typeof CO.company==='string'||typeof CO.name==='string')?{main:CO}:CO);
+  const out=[];
+  Object.keys(pool).forEach(key=>{
+    const o=pool[key]; if(!o||typeof o!=='object'||Array.isArray(o)||key==='meta') return;
+    const tick=(o.ticker&&typeof o.ticker==='object')?(o.ticker.nse||o.ticker.bse):(o.ticker||o.nse||o.symbol||null);
+    let name=o.name||o.plain||o.company||o.full||grSymToName(tick)||grSymToName(key)||(tick?String(tick):null);
+    if(!name) return;
+    let rev=null,py=null,eb=null,ebm=null,pat=null,yoy=null;
+    let qb=(qk&&o[qk]&&typeof o[qk]==='object'&&!Array.isArray(o[qk]))?o[qk]:null;
+    const hasRev=v=>v&&typeof v==='object'&&!Array.isArray(v)&&(v.rev!=null||v.revenue!=null||v.revenueFromOps_cr!=null||v.totalIncome_cr!=null);
+    if(!qb||!hasRev(qb)) qb=['q','qtr','latest','cur','q1','q2','q3','q4','consolidated','consol','standalone'].map(x=>o[x]).find(hasRev)||null;
+    if(qb){ rev=grNum(qb.rev??qb.revenue??qb.revenueFromOps_cr??qb.totalIncome_cr??qb.sales??qb.income);
+      py=grNum(qb.revPY??qb.revPy??qb.rev_py??qb.prevRev??qb.revLY);
+      eb=grNum(qb.ebitda); ebm=grNum(qb.opm??qb.ebitdaM??qb.ebitdaMargin??qb.ebitda_margin);
+      pat=grNum(qb.pat??qb.netProfit??qb.adj_pat??qb.pat_total??qb.patConsolidated_cr);
+      yoy=grNum(qb.revYoY??qb.revGr??((qb.yoy&&typeof qb.yoy==='object')?qb.yoy.revenue:qb.yoy)); }
+    if(rev==null&&Array.isArray(o.res)){
+      const row=re=>o.res.find(r=>Array.isArray(r)&&re.test(String(r[0])));
+      const rr=row(/^(total income|revenue|net sales|income from operations|revenue from operations|total revenue)/i)||row(/net interest income|\bnii\b/i);
+      if(rr){ rev=grNum(rr[1]); py=grNum(rr[2]); const c=String(rr[3]||'').match(/(-?[\d.]+)\s*%/); if(c) yoy=parseFloat(c[1]); }
+      const er=row(/ebitda|ppop|pre-provision|operating profit/i); if(er) eb=grNum(er[1]);
+      const pr=row(/^pat|net profit|profit after tax/i); if(pr) pat=grNum(pr[1]);
+    }
+    if(rev==null||!(rev>0)) return;
+    if(yoy==null&&py>0) yoy=+((rev/py-1)*100).toFixed(1);
+    if(ebm==null&&eb!=null) ebm=+(eb/rev*100).toFixed(1);
+    out.push({name:String(name),rev,revYoY:yoy,ebitda:ebm,pat:pat||0,greens:0,reds:0,ambers:0});
+  });
+  return out;
 }
 function grAggregate(parsed){
   const cos=parsed.cos;
@@ -4478,7 +4555,8 @@ async function grFetchAll(){
     try{
       const got=await getText(en.file);
       const parsed=grParseHTML(got.text,en.name||en.file,{tokens:en.tokens,companies:en.companies});
-      if(parsed&&en.auto==='companies'){ const a=grAutoSectors(parsed); en.sectors=a.sectors.length?a.sectors:grKw(en.name); en.split=a.split; }
+      if(parsed&&en.auto==='companies'){ const a=grAutoSectors(parsed, en.name); en.sectors=a.sectors.length?a.sectors:grKw(en.name); en.split=a.split; }
+      if(en.auto&&parsed){ const cs=parsed.cos||[]; const good=cs.filter(c=>c.revYoY!=null||c.ebitda!=null).length; if(!cs.length||good<cs.length/2){ autoSkip.push(en.name+' (no YoY growth or margin — not a results print)'); continue; } }
       if(en.auto&&(!parsed||!en.sectors||!en.sectors.length)){ autoSkip.push(en.name+(parsed?' (no company matched Company Ranker)':' (no results table)')); continue; }
       if(parsed) grEmit(en,parsed).forEach(e=>{ e.from=got.from; if(en.auto){ e.file=en.name; e.auto=en.auto; e.fam=en.fam; } out.files.push(e); });
       else out.files.push({file:en.file,sectors:en.sectors,err:'no parseable table found'});
