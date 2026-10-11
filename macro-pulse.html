@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v25 (Auto-discover results · Quarter fallback)</title>
+<title>CB Finance26™ — Macro Pulse · v26 (Company Ranker on six-lens Conviction)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -1362,7 +1362,7 @@ tr:last-child td{border-bottom:none;}
     <div class="hdr-text">
       <div class="eyebrow">CB Research · EIL Research · Q4 FY26</div>
       <div class="hdr-title">India <span>Company Ranker</span></div>
-      <div class="hdr-sub">Ranked by CB Score (0–100) · 9 parameters incl. Seasonality · Edit any score · Add your own picks · Mobile ready</div>
+      <div class="hdr-sub">Ranked by <b>six-lens CB Conviction</b> (Earnings · Fundamental · Macro · Market · Cycle · Trigger) — tap "CB Score" to see the old fundamentals-only order · Mobile ready</div>
     </div>
   </div>
 </div>
@@ -1402,7 +1402,8 @@ tr:last-child td{border-bottom:none;}
     <div class="ctrl-sep"></div>
     <div class="pill-group">
       <span class="pill-lbl">Sort:</span>
-      <button class="fbtn on" id="sort-cb-btn" onclick="setSort('cb',this)">CB Score ↓</button>
+      <button class="fbtn on" id="sort-conv-btn" onclick="setSort('conv',this)" title="Six-lens CB Conviction: Earnings · Fundamental · Macro · Market · Cycle · Trigger">🎯 Conviction ↓</button>
+      <button class="fbtn" id="sort-cb-btn" onclick="setSort('cb',this)" title="Fundamentals-only CB Score (the old ranking)">CB Score ↓</button>
       <button class="fbtn" id="sort-mcap-btn" onclick="setSort('mcap',this)">Mkt Cap ↓</button>
       <button class="fbtn" id="sort-name-btn" onclick="setSort('name',this)">Name A–Z</button>
     </div>
@@ -1725,7 +1726,7 @@ tr:last-child td{border-bottom:none;}
     <table style="width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:12px;">
       <thead><tr style="border-bottom:2px solid #e6e2da;"><th style="text-align:left;padding:6px 10px;text-align:left;color:#5a6270;font-weight:700;">Lens</th><th style="padding:6px 10px;text-align:left;color:#5a6270;font-weight:700;">Standard</th><th style="padding:6px 10px;text-align:left;color:#5a6270;font-weight:700;">Price</th><th style="padding:6px 10px;text-align:left;color:#5a6270;font-weight:700;">What it measures</th><th style="padding:6px 10px;text-align:left;color:#5a6270;font-weight:700;">Source</th></tr></thead>
       <tbody>
-        <tr style="border-bottom:1px solid #e6e2da;"><td style="padding:6px 10px;font-weight:700;">E — Earnings</td><td style="padding:6px 10px;">25%</td><td style="padding:6px 10px;">30%</td><td style="padding:6px 10px;">Real, actual results this quarter</td><td style="padding:6px 10px;color:#5a6270;">Ground Reality Bridge — your published dashboards</td></tr>
+        <tr style="border-bottom:1px solid #e6e2da;"><td style="padding:6px 10px;font-weight:700;">E — Earnings</td><td style="padding:6px 10px;">25%</td><td style="padding:6px 10px;">30%</td><td style="padding:6px 10px;">Real, actual results — the newest quarter each company has published (falls back to the previous quarter, up to Q4 of the previous year, and says so on the card)</td><td style="padding:6px 10px;color:#5a6270;">Ground Reality Bridge — your published dashboards</td></tr>
         <tr style="border-bottom:1px solid #e6e2da;"><td style="padding:6px 10px;font-weight:700;">F — Fundamental</td><td style="padding:6px 10px;">20%</td><td style="padding:6px 10px;">10%</td><td style="padding:6px 10px;">CB Score — business quality</td><td style="padding:6px 10px;color:#5a6270;">Company Ranker parameters</td></tr>
         <tr style="border-bottom:1px solid #e6e2da;"><td style="padding:6px 10px;font-weight:700;">M — Macro</td><td style="padding:6px 10px;">15%</td><td style="padding:6px 10px;">15%</td><td style="padding:6px 10px;">How today's macro favours this sub-sector</td><td style="padding:6px 10px;color:#5a6270;">Sector Impact rules</td></tr>
         <tr style="border-bottom:1px solid #e6e2da;"><td style="padding:6px 10px;font-weight:700;">T — Market</td><td style="padding:6px 10px;">15%</td><td style="padding:6px 10px;">20%</td><td style="padding:6px 10px;">Live trading signals</td><td style="padding:6px 10px;color:#5a6270;">NSE Market Intel — delivery, deals, PE, price</td></tr>
@@ -1734,10 +1735,11 @@ tr:last-child td{border-bottom:none;}
       </tbody>
     </table>
     <ul style="font-size:12px;color:#5a6270;line-height:1.7;margin:0 0 0 18px;">
-      <li>Missing lenses are skipped and the rest re-weighted.</li>
-      <li>Ranked list needs <b style="color:#1c1f26;">3 of the 4 core lenses</b> (E/F/M/T); Cycle and Trigger add to it but don't decide eligibility.</li>
-      <li>Agreement: most lenses positive → +5; most negative → −5.</li>
-      <li>Gates: Stage 4 price decline → max 55 · serious negative trigger → max 50 · cyclical P/E trap → −5.</li>
+      <li><b style="color:#1c1f26;">Score = weighted average of the lenses a company has.</b> A lens with no data is left out and its weight is shared among the rest — e.g. with all six lenses Earnings counts 25%; without Trigger, Earnings counts 25 ÷ 85 ≈ 29%.</li>
+      <li><b style="color:#1c1f26;">Who gets ranked:</b> Earnings, Fundamental, Macro and Market can be measured for every company, so a company is ranked once it has <b style="color:#1c1f26;">at least 3 of these 4</b>. Cycle and Trigger need researched inputs (only the companies in cb-triggers-cycle.json have them so far) — when present they count fully in the score and can lift, cut or cap it, but a company is not shut out just because they have not been researched yet. The 🔢 "x/6 lenses" tag on each card shows how many lenses its score rests on.</li>
+      <li><b style="color:#1c1f26;">Top 25:</b> ranked companies with Conviction ≥ 55, no red flag and no cap applied · at most 3 per sector and 12 per group.</li>
+      <li><b style="color:#1c1f26;">Agreement bonus:</b> when 5 or 6 lenses are available and at least 4 of them score 60+ → +5; at least 4 score 42 or below → −5 (with fewer lenses, 3 are enough).</li>
+      <li><b style="color:#1c1f26;">Gates (applied last):</b> price in Stage 4 decline → capped at 55 · serious negative trigger (Impact ≥4, Certainty ≥0.7) → capped at 50 · cyclical P/E trap → −5.</li>
     </ul>
   </div>
 
@@ -4590,6 +4592,7 @@ async function grFetchAll(){
   const fromAlt=ok.filter(f=>f.from==='alt').length;
   log('<strong>Current quarter: '+(latest?grPretty(latest.label):'not detected')+'</strong> · '+cur+' current record(s) used · '+fbN+' older record(s) used as fallback (sector has no newer file) · '+(ok.length-cur-fbN)+' superseded · '+autoUsed+' auto-found (not in sector-index.json) · '+fromAlt+' loaded from second repo · '+out.files.filter(f=>f.err).length+' failed · '+new Date(out.ts).toLocaleString()+tcLine+'<br>'+disc.notes.join('<br>')+(autoSkip.length?'<br><span style="color:#9aa0b8;">⏭ Auto-found but skipped (not a results dashboard / no match): '+autoSkip.slice(0,12).join(', ')+(autoSkip.length>12?' …':'')+'</span>':'')+'<br>'+lines.join('<br>'));
   const dl=document.getElementById('grDlIndex'); if(dl) dl.style.display=autoUsed?'inline-block':'none';
+  try{ CR_CONV=null; if(typeof render==='function') render(); }catch(e){}
   renderSectorImpact();
   if(typeof cvRender==='function'&&document.getElementById('page-cv')?.classList.contains('active')) cvRender();
 }
@@ -7913,7 +7916,7 @@ function fmtMcap(cr){
 
 
 // ── State
-let sortKey='cb', sortDir=-1;
+let sortKey='conv', sortDir=-1;
 let filterScoreVal='all', filterGrpVal='all', searchVal='', sectorFilter='all', qtrFilter='all';
 
 // ══════════════════════════════════════════════════════════
@@ -7981,13 +7984,13 @@ function buildCard(d, rank){
     return `<div class="card" id="card-${d.id}">
       <div class="card-head">
         <div class="card-rank">
-          ${medalEl(rank,cbLive)}
+          ${medalEl(rank,sortKey==='conv'&&CR_CONV&&CR_CONV[d.name]&&CR_CONV[d.name].avail>=3?CR_CONV[d.name].conv:cbLive)}
           <span class="mcap-badge" title="NSE Mkt Cap Rank #${d.mcap_rank||'—'}">
             ${fmtMcap(d.mcap)} &nbsp;MC:${d.mcap_rank||'—'}
           </span>
         </div>
         <div class="card-info">
-          <div class="card-name">${d.name}${sym?` <span style="font-size:10.5px;color:#6b7498;font-weight:600;">(${sym})</span>`:''}</div>
+          <div class="card-name">${d.name}${sym?` <span style="font-size:10.5px;color:#6b7498;font-weight:600;">(${sym})</span>`:''}</div>${crConvChip(d)}
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:5px;font-size:10.5px;color:#3a3f5c;">
             <span>Revenue (Qtr): <strong>${d.revQtr||'—'}</strong></span>
             <span>EBITDA (Qtr): <strong>${d.ebitdaQtr||'—'}</strong></span>
@@ -7999,6 +8002,7 @@ function buildCard(d, rank){
             <div class="${cbCls}" id="cbwrap-${d.id}">
               <div class="cb-num" id="cbnum-${d.id}">${cbLive}</div>
               <div class="cb-bar-wrap"><div class="cb-bar" id="cbbar-${d.id}" style="width:${cbLive}%;background:${cbBarCol(cbLive)};"></div></div>
+              <div style="font-size:8.5px;color:#6b7498;font-weight:700;text-align:center;margin-top:2px;letter-spacing:.3px;">CB SCORE</div>
             </div>
           </div>
         </div>
@@ -8049,7 +8053,7 @@ function buildCard(d, rank){
         </span>
       </div>
       <div class="card-info">
-        <div class="card-name">${d.name}${qStar}</div>
+        <div class="card-name">${d.name}${qStar}</div>${crConvChip(d)}
         <div class="card-tags">
           <span class="tag tag-sec">${d.sector}</span>
           <span class="tag tag-model"${d.paramModel?` title="Scored on the Disruptor/Pre-Profit Growth rubric, not the standard ${d.sector} rubric — see param labels below"`:''}>${model} model${d.paramModel?' 🚀':''}</span>
@@ -8152,10 +8156,36 @@ function getVisible(){
   });
 }
 
+// v26: six-lens Conviction for the Company Ranker (same engine as the Conviction page)
+var CR_CONV=null, CR_CONV_TS=0;
+function crConvMap(){
+  if(CR_CONV&&Date.now()-CR_CONV_TS<4000) return CR_CONV;
+  const m={};
+  try{ if(typeof cvCompute==='function') cvCompute().forEach(x=>{ m[x.d.name]=x; }); }catch(e){ console.warn('crConvMap',e); }
+  CR_CONV=m; CR_CONV_TS=Date.now(); return m;
+}
+function crConvChip(d){
+  const x=(CR_CONV||{})[d.name]; if(!x) return '';
+  const L=x.L, ch=(k,lb)=>L[k]?`<span style="padding:1px 6px;border-radius:6px;background:${L[k].score>=60?'#e6f4ef':L[k].score<=42?'#fce8e8':'#fff8ee'};color:${L[k].score>=60?'#006b30':L[k].score<=42?'#b71c1c':'#b35c00'};font-weight:700;">${lb} ${L[k].score}</span>`:`<span style="padding:1px 6px;border-radius:6px;background:#f1f3f9;color:#9aa0b8;">${lb} —</span>`;
+  const ok=x.avail>=3, c=!ok?'#9aa0b8':x.conv>=75?'#006b30':x.conv>=55?'#b35c00':'#b71c1c';
+  return `<div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-top:6px;font-size:9.5px;">
+    <span style="padding:2px 8px;border-radius:7px;background:#fff3e0;border:1px solid ${c}55;color:${c};font-weight:800;">🎯 Conviction ${ok?x.conv:'— (needs 3 of E/F/M/T)'}</span>
+    ${ch('E','E')}${ch('F','F')}${ch('M','M')}${ch('T','T')}${ch('CY','🔄 CY')}${ch('TG','⚡ TG')}
+    ${(x.gates||[]).length?`<span style="color:#b71c1c;font-weight:700;">${x.gates[0]}</span>`:''}
+    ${x.basisLag>0?`<span style="color:#b35c00;">📅 ${x.basisQ.replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2')} results</span>`:''}</div>`;
+}
 function render(){
   refreshLiveAdjustments();
   const vis=getVisible();
+  const cm=crConvMap();
   vis.sort((a,b)=>{
+    if(sortKey==='conv'){
+      const xa=cm[a.name], xb=cm[b.name];
+      const ra=xa&&xa.avail>=3?1:0, rb=xb&&xb.avail>=3?1:0;
+      if(ra!==rb) return rb-ra;                                    // ranked companies first
+      if(ra&&rb&&xa.conv!==xb.conv) return sortDir*(xa.conv-xb.conv);
+      return sortDir*((a.cbLive!==undefined?a.cbLive:a.cb)-(b.cbLive!==undefined?b.cbLive:b.cb));
+    }
     let av=a[sortKey],bv=b[sortKey];
     if(sortKey==='cb'){ av=(a.cbLive!==undefined?a.cbLive:a.cb); bv=(b.cbLive!==undefined?b.cbLive:b.cb); }
     if(typeof av==='string')return sortDir*(av.localeCompare(bv));
@@ -8238,7 +8268,7 @@ function applyFilters(){
 function setSort(key,btn){
   sortKey = key;
   sortDir = key==='name' ? 1 : -1;
-  document.querySelectorAll('#sort-cb-btn,#sort-mcap-btn,#sort-name-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#sort-conv-btn,#sort-cb-btn,#sort-mcap-btn,#sort-name-btn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
   render();
 }
@@ -10278,7 +10308,7 @@ function openTop25(){
       `<td class="num">${lens(x.L.CY)}</td><td class="num">${lens(x.L.TG)}</td><td class="num"><b>${x.conv}</b></td>`+
       `<td style="font-size:10.5px;white-space:normal;">${(x.gates||[]).join('<br>')||(x.agreeTxt||'')}</td></tr>`;
   });
-  if(!sel.length) rows += `<tr><td colspan="11" style="text-align:center;padding:18px;">No company has 3 of the 4 core lenses yet — fetch dashboards (Sector Impact) and NSE data first.</td></tr>`;
+  if(!sel.length) rows += `<tr><td colspan="11" style="text-align:center;padding:18px;">No company has 3 of the 4 always-available lenses (Earnings, Fundamental, Macro, Market) yet — fetch dashboards (Sector Impact) and NSE data first.</td></tr>`;
   document.getElementById('top25-table').innerHTML = rows;
   const withCY=conv.filter(x=>x.L.CY).length, withTG=conv.filter(x=>x.L.TG).length;
   const capped = Object.entries(capNotes).map(([k,v])=>`${k} (${v})`).join(', ');
@@ -10681,8 +10711,14 @@ function cvTCNormalise(m){
   return o;
 }
 // effective model = local edits if any, else the published file
-function cvTCModel(){ return cvTCNormalise(cvTCRead(CV_TC_LOCAL_KEY)||cvTCRead(CV_TC_PUB_KEY)||null); }
-function cvTCHasLocal(){ return !!cvTCRead(CV_TC_LOCAL_KEY); }
+function cvTCModel(){
+  // v26: a local (edited-in-browser) copy is used only if it is at least as new as the published file —
+  // otherwise an old local copy silently hid every newly published cycle phase and trigger
+  var loc=cvTCRead(CV_TC_LOCAL_KEY), pub=cvTCRead(CV_TC_PUB_KEY);
+  if(loc&&pub&&String(loc.updated||'')<String(pub.updated||'')) loc=null;
+  return cvTCNormalise(loc||pub||null);
+}
+function cvTCHasLocal(){ var loc=cvTCRead(CV_TC_LOCAL_KEY), pub=cvTCRead(CV_TC_PUB_KEY); return !!loc&&!(pub&&String(loc.updated||'')<String(pub.updated||'')); }
 function cvTCSaveLocal(m){ try{ m.updated=new Date().toISOString().slice(0,10); localStorage.setItem(CV_TC_LOCAL_KEY, JSON.stringify(m)); }catch(e){} }
 function cvTCFindKey(obj, name){
   if(!obj||!name) return null;
@@ -10995,7 +11031,7 @@ function cvCard(x){
   }).join('');
   var divHtml=x.div?'<div style="margin-top:7px;padding:7px 10px;border-radius:8px;background:'+x.div.bg+';border:1px solid '+x.div.c+'30;font-size:10.5px;font-weight:700;color:'+x.div.c+';line-height:1.55;">'+x.div.e+' '+x.div.t+'</div>':'';
   var agreeHtml=x.agreeTxt?'<div style="margin-top:6px;font-size:10px;font-weight:700;color:'+(x.agree>0?'#006b30':'#b71c1c')+';">'+x.agreeTxt+'</div>':'';
-  var covHtml=x.availAll<6?'<span style="font-size:9px;font-weight:700;background:#fff3e0;color:#b35c00;padding:2px 8px;border-radius:7px;margin-left:6px;">'+x.availAll+'/6 lenses</span>':'';
+  var covHtml=x.availAll<6?'<span style="font-size:9px;font-weight:700;background:#fff3e0;color:#b35c00;padding:2px 8px;border-radius:7px;margin-left:6px;">🔢 '+x.availAll+'/6 lenses</span>':'';
   return '<div class="card" style="border-top:4px solid '+v.c+'55;">'+
     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">'+
       (medal?'<span style="font-size:16px;">'+medal+'</span>':'')+
@@ -11318,7 +11354,7 @@ function cvRender(){
     else msgs.push('🕐 QoQ earnings momentum activates once previous-quarter prints are available.');
     st.innerHTML=msgs.join('<br>');
   }
-  grid.innerHTML=tierA.map(cvCard).join('')||'<div style="font-size:12px;color:#5a6080;">No companies with 3 of the 4 core lenses (E/F/M/T) in this group yet.</div>';
+  grid.innerHTML=tierA.map(cvCard).join('')||'<div style="font-size:12px;color:#5a6080;">No companies with 3 of the 4 always-available lenses (Earnings, Fundamental, Macro, Market) in this group yet.</div>';
   var tb=document.getElementById('cv-grid-b'), tt=document.getElementById('cv-tierb-title');
   if(tt) tt.style.display=tierB.length?'block':'none';
   if(tb) tb.innerHTML=tierB.map(cvCard).join('');
