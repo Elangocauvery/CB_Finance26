@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v21 (Cycle &amp; Trigger lenses)</title>
+<title>CB Finance26™ — Macro Pulse · v23 (Six-lens Conviction · Quarter fallback)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -1465,12 +1465,12 @@ tr:last-child td{border-bottom:none;}
 <div class="v5-modal" id="top25-modal">
   <div class="v5-modal-box">
     <div class="v5-modal-head">
-      <b>🏆 Top 25 — Long-Term Shortlist Builder</b>
+      <b>🏆 Top 25 — Six-Lens Conviction Shortlist</b>
       <button class="fbtn" onclick="closeModal('top25-modal')">Close ✕</button>
     </div>
     <div class="v5-modal-note" id="top25-note"></div>
     <div class="v5-table-wrap"><table class="v5-table" id="top25-table"></table></div>
-    <div class="v5-modal-foot">Screening output from CB Research parameters — <b>not a buy/sell recommendation</b>. Built on fundamentals + macro overlay only; the daily NSE live nudge is deliberately EXCLUDED from long-term selection. Constraints: max 3/sector · max 7/group · size mix ≈15L/7M/3S · red-flagged &amp; CB&lt;55 excluded.</div>
+    <div class="v5-modal-foot">Screening output from CB Research parameters — <b>not a buy/sell recommendation</b>. Built on the six-lens CB Conviction (Earnings, Fundamental, Macro, Market, Cycle, Trigger) with all gates applied. Constraints: max 3/sector · max 12/group · red-flagged, gate-breached &amp; Conviction&lt;55 excluded.</div>
   </div>
 </div>
 
@@ -1507,7 +1507,7 @@ tr:last-child td{border-bottom:none;}
 
 <!-- DISCLAIMER -->
 <div class="disc">
-  <div class="disc-box">⚠️ <strong>CB Research Disclaimer:</strong> CB Scores are qualitative composite ratings (1–5 scale, 9 parameters including Seasonality) based on Q4 FY26 reported results and analyst assessment. Seasonality parameter reflects quarter-specific demand drivers — not a buy signal. 33 sector-specific models — each company rated on 8 metrics tailored to its industry (e.g. Banking uses NIM, NPA, CASA, PCR; Pharma uses USFDA status, US growth, ANDA pipeline; Auto 2W uses volume, EV mix, premiumisation). Weights: Param1 18% · Param2 16% · Param3 13% · Param4 11% · Param5 13% · Param6 10% · Param7 6% · Param8 6% · Seasonality 7%. For CB Research members only. Not SEBI-registered advice. · Elango Industries Limited (BSE: 513452) · EIL Research</div>
+  <div class="disc-box">⚠️ <strong>CB Research Disclaimer:</strong> CB Scores are qualitative composite ratings (1–5 scale, 9 parameters including Seasonality) based on Q4 FY26 reported results and analyst assessment. Seasonality parameter reflects quarter-specific demand drivers — not a buy signal. 33 sector-specific models — each company rated on 8 metrics tailored to its industry (e.g. Banking uses NIM, NPA, CASA, PCR; Pharma uses USFDA status, US growth, ANDA pipeline; Auto 2W uses volume, EV mix, premiumisation). Weights: Param1 18% · Param2 16% · Param3 13% · Param4 11% · Param5 13% · Param6 10% · Param7 6% · Param8 6% · Seasonality 7%. For CB Research members only. Not SEBI-registered advice. · EIL (BSE: 513452) · EIL Research</div>
 </div>
 
 </div><!-- /pane-0 -->
@@ -1614,7 +1614,7 @@ tr:last-child td{border-bottom:none;}
 <!-- HEADER -->
 <div class="hdr">
   <div class="hdr-inner">
-    <div class="hdr-eyebrow">CB Research · EIL Research · Q4 FY26 · Elango Industries Limited</div>
+    <div class="hdr-eyebrow">CB Research · EIL Research · Q4 FY26 · EIL</div>
     <div class="hdr-title">India Sector <span>Performance Ranker</span></div>
     <div class="hdr-sub">39 Sectors · 63+ Dashboards · Q4 FY26 Results · Synced 09-Jul-2026 with standalone Sector Ranker · CB Score Composite Ranking · Not Investment Advice</div>
     <div class="hdr-chips">
@@ -1701,7 +1701,7 @@ tr:last-child td{border-bottom:none;}
   </div>
 </div>
 
-<div class="footer">CB Research · EIL Research · Elango Industries Limited (BSE: 513452) · Q4 FY26 Sector Ranker · For members only · Not SEBI-registered advice</div>
+<div class="footer">CB Research · EIL Research · EIL (BSE: 513452) · Q4 FY26 Sector Ranker · For members only · Not SEBI-registered advice</div>
 </div>
 <div class="footer">CB Finance26™ · Sector Ranker · Not Financial Advice</div>
 </div>
@@ -1747,7 +1747,7 @@ tr:last-child td{border-bottom:none;}
   <div id="cv-tierb-title" style="display:none;margin:22px 0 10px;font-size:12px;font-weight:800;color:#b35c00;text-transform:uppercase;letter-spacing:0.6px;">⚠️ Insufficient coverage — fewer than 3 of the 4 core lenses (E/F/M/T) have data (ranking not comparable)</div>
   <div id="cv-grid-b" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;"></div>
 
-  <div class="footer">CB Research · EIL Research · Elango Industries Limited (BSE: 513452) · CB Conviction Engine · For members only · Research ranking, not SEBI-registered investment advice — no buy/sell recommendation is made or implied.</div>
+  <div class="footer">CB Research · EIL Research · EIL (BSE: 513452) · CB Conviction Engine · For members only · Research ranking, not SEBI-registered investment advice — no buy/sell recommendation is made or implied.</div>
 </div>
 
 <!-- ═══ DEBT & GOLD/METALS (ported) ═══ -->
@@ -3207,16 +3207,16 @@ function showPage(id,tab){
 const MACRO_INDICATORS=[
   {name:"RBI Interest Rates",icon:"🏦",
    tooltip:"When RBI cuts rates, loans get cheaper, companies invest more, stock markets rise. India is in a cut cycle — 50+ bps expected in FY26. Small-cap, real estate and banking benefit most from rate cuts.",
-   options:[{label:"Aggressive Cutting (>100 bps cut cycle)",score:3,cls:"pos"},{label:"Cutting (25–100 bps cuts expected)",score:2,cls:"pos"},{label:"Stable / Pause",score:0,cls:"neu"},{label:"Hiking (25–100 bps hikes expected)",score:-2,cls:"neg"},{label:"Aggressive Hiking (>100 bps hike cycle)",score:-3,cls:"neg"}],default:1},
+   options:[{label:"Aggressive Cutting (>100 bps cut cycle)",score:3,cls:"pos"},{label:"Cutting (25–100 bps cuts expected)",score:2,cls:"pos"},{label:"Stable / Pause",score:0,cls:"neu"},{label:"Hiking (25–100 bps hikes expected)",score:-2,cls:"neg"},{label:"Aggressive Hiking (>100 bps hike cycle)",score:-3,cls:"neg"}],default:3},
   {name:"Inflation (CPI)",icon:"🌡",
    tooltip:"High inflation forces RBI to hike rates. Below 4% = ideal. Above 6% = RBI forced to act. Food inflation hits rural consumption hard — FMCG, 2W, agri-NBFCs all impacted. A 10% monsoon deficit adds 1.5–2% to food inflation.",
-   options:[{label:"Very Low — Below 2% (deflationary risk)",score:1,cls:"pos"},{label:"Comfortable — 2–4% (ideal range)",score:2,cls:"pos"},{label:"Moderate — 4–5% (within RBI tolerance)",score:0,cls:"neu"},{label:"Elevated — 5–6.5% (RBI watching)",score:-1,cls:"neg"},{label:"High — Above 6.5% (RBI forced to act)",score:-2,cls:"neg"}],default:2},
+   options:[{label:"Very Low — Below 2% (deflationary risk)",score:1,cls:"pos"},{label:"Comfortable — 2–4% (ideal range)",score:2,cls:"pos"},{label:"Moderate — 4–5% (within RBI tolerance)",score:0,cls:"neu"},{label:"Elevated — 5–6.5% (RBI watching)",score:-1,cls:"neg"},{label:"High — Above 6.5% (RBI forced to act)",score:-2,cls:"neg"}],default:3},
   {name:"Crude Oil (Brent $/bbl)",icon:"🛢",
    tooltip:"India imports 85% of crude. Every $10 rise adds ~0.5% to inflation and widens CAD. Hurts INR, aviation, paints, tyres, chemicals. Low crude = windfall — lower inflation, better CAD, room for RBI rate cuts.",
-   options:[{label:"Very Low — Below $60 (windfall for India)",score:2,cls:"pos"},{label:"Low — $60–75 (comfortable — current zone)",score:1,cls:"pos"},{label:"Moderate — $75–85 (manageable)",score:0,cls:"neu"},{label:"High — $85–100 (pressure building)",score:-1,cls:"neg"},{label:"Very High — Above $100 (crisis level)",score:-2,cls:"neg"}],default:1},
+   options:[{label:"Very Low — Below $60 (windfall for India)",score:2,cls:"pos"},{label:"Low — $60–75 (comfortable — current zone)",score:1,cls:"pos"},{label:"Moderate — $75–85 (manageable)",score:0,cls:"neu"},{label:"High — $85–100 (pressure building)",score:-1,cls:"neg"},{label:"Very High — Above $100 (crisis level)",score:-2,cls:"neg"}],default:4},
   {name:"RBI Liquidity (Money Supply)",icon:"💧",
    tooltip:"Surplus liquidity = banks have excess cash → rates fall → credit grows → markets get boost. Deficit = tight money → higher short rates → slowdown risk. RBI controls via OMOs, CRR cuts, repo rate. Surplus + rate cuts = double tailwind.",
-   options:[{label:"Very Surplus — Large OMO purchases, SLR cuts",score:3,cls:"pos"},{label:"Surplus — Comfortable banking liquidity",score:2,cls:"pos"},{label:"Neutral — Balanced, no stress",score:0,cls:"neu"},{label:"Deficit — Banks borrowing from RBI",score:-1,cls:"neg"},{label:"Severe Deficit — Tight money, credit crunch risk",score:-2,cls:"neg"}],default:1},
+   options:[{label:"Very Surplus — Large OMO purchases, SLR cuts",score:3,cls:"pos"},{label:"Surplus — Comfortable banking liquidity",score:2,cls:"pos"},{label:"Neutral — Balanced, no stress",score:0,cls:"neu"},{label:"Deficit — Banks borrowing from RBI",score:-1,cls:"neg"},{label:"Severe Deficit — Tight money, credit crunch risk",score:-2,cls:"neg"}],default:2},
   {name:"Government Capex / Spending",icon:"🏗",
    tooltip:"Govt capex on roads, rail, defence, power directly benefits capital goods, cement, steel, infra. FY26 budget: ₹11L Cr capex. Front-loading is the key signal. Q1 capex data tells you if govt is on track.",
    options:[{label:"Surge — Front-loaded, budget beats target",score:3,cls:"pos"},{label:"Strong — On-track, beats last year",score:2,cls:"pos"},{label:"Moderate — In-line with budget",score:1,cls:"neu"},{label:"Slowing — Below target, fiscal constraint",score:-1,cls:"neg"},{label:"Austerity — Sharp cuts; fiscal crisis mode",score:-2,cls:"neg"}],default:1},
@@ -3225,25 +3225,25 @@ const MACRO_INDICATORS=[
    options:[{label:"Strong — INR below 84/USD",score:2,cls:"pos"},{label:"Stable — INR 84–88/USD",score:1,cls:"pos"},{label:"Mild Weakness — INR 88–92/USD",score:0,cls:"neu"},{label:"Depreciating — INR 92–96/USD (current zone)",score:-1,cls:"neg"},{label:"Sharp Fall — INR above 96/USD (RBI defence zone)",score:-2,cls:"neg"}],default:3},
   {name:"Global Risk / US Economy",icon:"🌐",
    tooltip:"FII flows heavily influenced by US Fed policy and global risk. Risk-off events pull FII money out of EMs. India better insulated than most EMs but a global crisis still hurts via FII outflows and INR depreciation.",
-   options:[{label:"Risk-On — US soft landing, FII buying EMs",score:2,cls:"pos"},{label:"Stable — No major global stress",score:1,cls:"pos"},{label:"Cautious — Mixed global signals",score:-1,cls:"neu"},{label:"Risk-Off — FII selling, USD strengthening",score:-2,cls:"neg"},{label:"Crisis — Recession / War / Banking collapse",score:-3,cls:"neg"}],default:1},
+   options:[{label:"Risk-On — US soft landing, FII buying EMs",score:2,cls:"pos"},{label:"Stable — No major global stress",score:1,cls:"pos"},{label:"Cautious — Mixed global signals",score:-1,cls:"neu"},{label:"Risk-Off — FII selling, USD strengthening",score:-2,cls:"neg"},{label:"Crisis — Recession / War / Banking collapse",score:-3,cls:"neg"}],default:3},
   {name:"Corporate Earnings Momentum",icon:"📊",
    tooltip:"Nifty EPS growth is the single biggest long-term driver. Earnings upgrades drive rallies; downgrades drive corrections. When 60%+ of Nifty companies beat estimates for 2+ quarters = genuine upgrade cycle. Current FY26E Nifty EPS ~₹1,080.",
-   options:[{label:"Acceleration — Earnings upgrades across sectors",score:2,cls:"pos"},{label:"Growth — EPS growing 15%+ YoY",score:1,cls:"pos"},{label:"Stable — EPS growing 8–15% YoY",score:0,cls:"neu"},{label:"Slowing — EPS growth below 8%",score:-1,cls:"neg"},{label:"Contraction — Earnings downgrades / miss",score:-2,cls:"neg"}],default:1},
+   options:[{label:"Acceleration — Earnings upgrades across sectors",score:2,cls:"pos"},{label:"Growth — EPS growing 15%+ YoY",score:1,cls:"pos"},{label:"Stable — EPS growing 8–15% YoY",score:0,cls:"neu"},{label:"Slowing — EPS growth below 8%",score:-1,cls:"neg"},{label:"Contraction — Earnings downgrades / miss",score:-2,cls:"neg"}],default:2},
   {name:"Market Valuations (Nifty PE)",icon:"📐",
    tooltip:"Nifty PE above 25x = expensive. Below 18x = cheap. Above 28x = euphoric danger zone. Note: from April 2021 NSE switched to consolidated earnings — current 20–22x is not directly comparable to pre-2021 data. Long-term average on consolidated basis ~22–23x.",
-   options:[{label:"Very Cheap — Nifty PE below 16x (rare opportunity)",score:3,cls:"pos"},{label:"Reasonable — PE 16–20x (fair value)",score:1,cls:"pos"},{label:"Fair — PE 20–23x (neutral — current zone)",score:0,cls:"neu"},{label:"Expensive — PE 23–28x (caution)",score:-1,cls:"neg"},{label:"Euphoric — PE above 28x (high risk)",score:-2,cls:"neg"}],default:2},
+   options:[{label:"Very Cheap — Nifty PE below 16x (rare opportunity)",score:3,cls:"pos"},{label:"Reasonable — PE 16–20x (fair value)",score:1,cls:"pos"},{label:"Fair — PE 20–23x (neutral — current zone)",score:0,cls:"neu"},{label:"Expensive — PE 23–28x (caution)",score:-1,cls:"neg"},{label:"Euphoric — PE above 28x (high risk)",score:-2,cls:"neg"}],default:1},
   {name:"FII / FPI Flow Trend",icon:"🌍",
    tooltip:"FIIs hold ~14.2% of NSE mkt cap (↓ from 21% in 2021). Despite lower holding, FII flows still set daily price direction. Sustained FII outflow = headwind even with strong domestic flows. IT and banking see maximum FII impact.",
-   options:[{label:"Heavy Inflow — FII net >₹15,000Cr/month (rising)",score:2,cls:"pos"},{label:"Inflow — FII net positive (holding stable)",score:1,cls:"pos"},{label:"Neutral — FII flows balanced (DII absorbing)",score:0,cls:"neu"},{label:"Outflow — FII net sellers (holding declining)",score:-1,cls:"neg"},{label:"Heavy Outflow — FII dumping >₹15,000Cr/month",score:-2,cls:"neg"}],default:2},
+   options:[{label:"Heavy Inflow — FII net >₹15,000Cr/month (rising)",score:2,cls:"pos"},{label:"Inflow — FII net positive (holding stable)",score:1,cls:"pos"},{label:"Neutral — FII flows balanced (DII absorbing)",score:0,cls:"neu"},{label:"Outflow — FII net sellers (holding declining)",score:-1,cls:"neg"},{label:"Heavy Outflow — FII dumping >₹15,000Cr/month",score:-2,cls:"neg"}],default:4},
   {name:"SIP / Domestic Retail Flows",icon:"🏠",
    tooltip:"SIP flows at ₹26,000Cr+/month (2025) = India's single most important market floor. 8Cr+ active SIP accounts. Even during FII exits, strong SIP flows absorb supply. Rising SIP stoppage rate = retail fear signal. AMC sector directly benefits.",
    options:[{label:"Surge — SIP >₹25,000Cr/month, accelerating",score:3,cls:"pos"},{label:"Strong — SIP ₹20,000–25,000Cr/month, stable",score:2,cls:"pos"},{label:"Healthy — SIP ₹15,000–20,000Cr/month, growing",score:1,cls:"pos"},{label:"Slowing — SIP growth stagnant, stoppage rising",score:-1,cls:"neg"},{label:"Weak — SIP cancellations rising, retail fear",score:-2,cls:"neg"}],default:1},
   {name:"DII (Domestic Institutions) Activity",icon:"🏛",
    tooltip:"DIIs (MFs, LIC, Banks) hold ~18% of Nifty vs FII 14.2%. When FIIs sell, DIIs absorb — fundamental change in India market structure since 2021. Strong DII inflows = market resilience. DANGER only when BOTH FII + DII sell together (extremely rare).",
-   options:[{label:"Aggressive Deployment — DIIs net >₹20,000Cr/month",score:3,cls:"pos"},{label:"Strong — DIIs net positive, absorbing FII sales",score:2,cls:"pos"},{label:"Moderate — DIIs buying selectively",score:1,cls:"pos"},{label:"Cautious — DIIs slowing deployment, cash building",score:-1,cls:"neg"},{label:"Selling — DIIs also net sellers (extreme rare signal)",score:-3,cls:"neg"}],default:1},
+   options:[{label:"Aggressive Deployment — DIIs net >₹20,000Cr/month",score:3,cls:"pos"},{label:"Strong — DIIs net positive, absorbing FII sales",score:2,cls:"pos"},{label:"Moderate — DIIs buying selectively",score:1,cls:"pos"},{label:"Cautious — DIIs slowing deployment, cash building",score:-1,cls:"neg"},{label:"Selling — DIIs also net sellers (extreme rare signal)",score:-3,cls:"neg"}],default:0},
   {name:"Monsoon (June–September)",icon:"🌧",
    tooltip:"India's most unique macro variable. 60% of agriculture depends on it. Below-normal → food inflation rises → rural income falls → FMCG, NBFC, 2W shrink → RBI cannot cut rates aggressively. 10% deficit = +1.5–2% food inflation.",
-   options:[{label:"Excess — >110% LPA (flooding risk in some regions)",score:-1,cls:"neg"},{label:"Above Normal — 105–110% LPA (ideal for agriculture)",score:2,cls:"pos"},{label:"Normal — 96–105% LPA (comfortable)",score:1,cls:"pos"},{label:"Below Normal — 90–96% LPA (food inflation risk)",score:-1,cls:"neg"},{label:"Deficient — Below 90% LPA (drought, rural stress)",score:-3,cls:"neg"}],default:3}
+   options:[{label:"Excess — >110% LPA (flooding risk in some regions)",score:-1,cls:"neg"},{label:"Above Normal — 105–110% LPA (ideal for agriculture)",score:2,cls:"pos"},{label:"Normal — 96–105% LPA (comfortable)",score:1,cls:"pos"},{label:"Below Normal — 90–96% LPA (food inflation risk)",score:-1,cls:"neg"},{label:"Deficient — Below 90% LPA (drought, rural stress)",score:-3,cls:"neg"}],default:4}
 ];
 
 const ALLOC_MATRIX=[
@@ -3284,7 +3284,7 @@ let sel=MACRO_INDICATORS.map(i=>i.default);
 let allocChart=null, flowChart=null;
 
 // ── STORAGE ───────────────────────────────────────────────────────────────
-const SK='cbf26_macro_v1';
+const SK='cbf26_macro_v2_oct26'; // v22: new key so the Oct-2026 defaults load once; re-save after reviewing
 function saveSel(){ try{localStorage.setItem(SK,JSON.stringify({sel,ts:Date.now()}));}catch(e){} }
 function loadSel(){
   try{
@@ -3992,6 +3992,12 @@ function grKw(fname){
 // kept for QoQ comparison only and never drive signals.
 function grQtrKey(s){ const m=/Q[\s_-]*([1-4])[\s_-]*FY[\s_-]*(\d{2})/i.exec(String(s||'')); return m?{q:+m[1],fy:+m[2],key:(+m[2])*4+(+m[1]),label:'Q'+m[1]+'FY'+m[2]}:null; }
 function grFileQtr(f){ if(!f) return null; const b=String(f.file||'').split('/').pop(); return grQtrKey(b)||grQtrKey(f.agg&&f.agg.period)||grQtrKey(f.period)||null; }
+// v23: QUARTER FALLBACK — if a company/sector has not yet published the newest quarter,
+// its most recent earlier quarter is used (up to CB_QTR_MAX_LAG quarters back, e.g.
+// Q2FY27 → Q1FY27 → Q4FY26) and every screen footnotes which quarter it is based on.
+var CB_QTR_MAX_LAG = 2;
+function grPrevLabel(q){ var m=/^Q([1-4])FY(\d{2})$/.exec(q||''); if(!m) return null; var n=+m[1], y=+m[2]; return n>1?'Q'+(n-1)+'FY'+(y<10?'0':'')+y:'Q4FY'+((y-1)<10?'0':'')+(y-1); }
+function grQtrPretty(q){ return String(q||'').replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2'); }
 function grLatestQtr(cache){ cache=cache||grLoadCache(); if(!cache||!cache.files) return null; let best=null; cache.files.forEach(f=>{ if(!f.agg&&!(f.cos&&f.cos.length)) return; const q=grFileQtr(f); if(q&&(!best||q.key>best.key)) best=q; }); return best; }
 function grPretty(label){ return String(label||'').replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2'); }
 function grBaseName(f){ return String(f||'').split('/').pop(); }
@@ -4391,12 +4397,16 @@ async function grFetchAll(){
     if(!f.agg) return '❌ '+grBaseName(f.file)+' — '+f.err+(String(f.err).includes('404')?' (not found in main folder or second repo — check exact spelling/case)':String(f.err).includes('parseable')?' (reachable but no readable table — send this file to Claude to adapt the parser)':'');
     const q=grFileQtr(f);
     const isCur=latest&&q&&q.key===latest.key;
-    return (isCur?'✅ ':'⏸ ')+grBaseName(f.file)+' ['+(q?q.label:'period?')+(srcTag[f.from]||'')+'] — '+f.agg.n+' cos → '+f.sectors.join(', ')+(isCur?'':' <span style="color:#9aa0b8;">(stale — ignored)</span>');
+    // v23: an older file is still USED when it is the newest available for its sector (fallback)
+    const newer=q&&out.files.some(g=>g!==f&&g.agg&&(g.sectors||[]).some(s=>(f.sectors||[]).includes(s))&&(grFileQtr(g)||{key:-1}).key>q.key);
+    const isFb=!isCur&&q&&latest&&!newer&&(latest.key-q.key)<=CB_QTR_MAX_LAG;
+    return (isCur?'✅ ':isFb?'📅 ':'⏸ ')+grBaseName(f.file)+' ['+(q?q.label:'period?')+(srcTag[f.from]||'')+'] — '+f.agg.n+' cos → '+f.sectors.join(', ')+(isCur?'':isFb?' <span style="color:#b35c00;">(used as fallback — '+grPretty(latest.label)+' not yet published for this sector)</span>':' <span style="color:#9aa0b8;">(superseded — comparison only)</span>');
   });
   const ok=out.files.filter(f=>f.agg);
   const cur=ok.filter(f=>{const q=grFileQtr(f);return latest&&q&&q.key===latest.key;}).length;
+  const fbN=ok.filter(f=>{const q=grFileQtr(f); if(!q||!latest||q.key===latest.key||(latest.key-q.key)>CB_QTR_MAX_LAG) return false; return !ok.some(g=>g!==f&&(g.sectors||[]).some(s=>(f.sectors||[]).includes(s))&&(grFileQtr(g)||{key:-1}).key>q.key);}).length;
   const fromAlt=ok.filter(f=>f.from==='alt').length;
-  log('<strong>Current quarter: '+(latest?grPretty(latest.label):'not detected')+'</strong> · '+cur+' current record(s) used · '+(ok.length-cur)+' older record(s) ignored · '+fromAlt+' loaded from second repo · '+out.files.filter(f=>f.err).length+' failed · '+new Date(out.ts).toLocaleString()+tcLine+'<br>'+lines.join('<br>'));
+  log('<strong>Current quarter: '+(latest?grPretty(latest.label):'not detected')+'</strong> · '+cur+' current record(s) used · '+fbN+' older record(s) used as fallback (sector has no newer file) · '+(ok.length-cur-fbN)+' superseded · '+fromAlt+' loaded from second repo · '+out.files.filter(f=>f.err).length+' failed · '+new Date(out.ts).toLocaleString()+tcLine+'<br>'+lines.join('<br>'));
   renderSectorImpact();
   if(typeof cvRender==='function'&&document.getElementById('page-cv')?.classList.contains('active')) cvRender();
 }
@@ -4431,9 +4441,15 @@ function grForSector(name){
   const hits=cache.files.filter(f=>f.agg&&f.sectors.includes(name));
   if(!hits.length) return null;
   const latest=grLatestQtr(cache);
-  const cur=hits.filter(f=>{const q=grFileQtr(f);return latest&&q&&q.key===latest.key;});
+  // v23: newest quarter available FOR THIS SECTOR (falls back to an earlier quarter if the
+  // latest quarter's file for this sector is not yet published)
+  let used=null;
+  hits.forEach(f=>{const q=grFileQtr(f); if(q&&(!used||q.key>used.key)) used=q;});
+  if(used&&latest&&(latest.key-used.key)>CB_QTR_MAX_LAG) used=null;
+  const cur=used?hits.filter(f=>{const q=grFileQtr(f);return q&&q.key===used.key;}):[];
   const stale=hits.filter(f=>cur.indexOf(f)<0);
-  return {cur,stale,latest};
+  const fallback=!!(used&&latest&&used.key<latest.key);
+  return {cur,stale,latest,used,fallback};
 }
 // combined verdict: macro pts × results tone
 function grCombined(macroPts,tone){
@@ -4451,10 +4467,12 @@ function grCombined(macroPts,tone){
 function grSection(sectorName,macroPts){
   const r=grForSector(sectorName);
   if(!r) return `<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#f8f9fc;border:1px dashed var(--border);font-size:9.5px;color:var(--muted);">📂 No CB Research file yet for this sector — macro view only. Publish a sector dashboard and add it to sector-index.json.</div>`;
-  const curLbl=r.latest?grPretty(r.latest.label):'latest quarter';
+  const curLbl=r.used?grPretty(r.used.label):(r.latest?grPretty(r.latest.label):'latest quarter');
+  const latLbl=r.latest?grPretty(r.latest.label):'latest quarter';
   const oldQs=[...new Set(r.stale.map(f=>{const q=grFileQtr(f);return q?grPretty(q.label):'undated';}))].join(', ');
-  if(!r.cur.length) return `<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#f8f9fc;border:1px dashed var(--border);font-size:9.5px;color:var(--muted);">⏸ No ${curLbl} results file yet for this sector. Older print (${oldQs}) is stale and not used — macro view only.</div>`;
-  const staleNote=r.stale.length?`<div style="margin-top:5px;font-size:9px;color:#9aa0b8;">⏸ ${r.stale.length} older file(s) (${oldQs}) ignored — superseded by ${curLbl}.</div>`:'';
+  if(!r.cur.length) return `<div style="margin-top:8px;padding:7px 10px;border-radius:8px;background:#f8f9fc;border:1px dashed var(--border);font-size:9.5px;color:var(--muted);">⏸ No results file within the last ${CB_QTR_MAX_LAG+1} quarters for this sector (older print: ${oldQs}) — macro view only.</div>`;
+  const staleNote=(r.fallback?`<div style="margin-top:5px;font-size:9.5px;font-weight:700;color:#b35c00;">📅 Based on ${curLbl} results — ${latLbl} results for this sector not yet published; switches automatically when they are.</div>`:`<div style="margin-top:5px;font-size:9px;color:#5a6080;">📅 Based on ${curLbl} results.</div>`)+
+    (r.stale.length?`<div style="margin-top:3px;font-size:9px;color:#9aa0b8;">⏸ ${r.stale.length} older file(s) (${oldQs}) kept for comparison only — superseded by ${curLbl}.</div>`:'');
   return r.cur.map(h=>{
     const a=h.agg;
     const cv=grCombined(macroPts,a.tone);
@@ -5025,7 +5043,7 @@ const load=k=>{try{return JSON.parse(localStorage.getItem('cbr_'+k)||'[]')}catch
 // the ranking for everyone, but the breakdown (PE/Delivery/Bulk-Block data,
 // "Fund. X +Y" sub-labels, nudge reasoning) is only rendered when admin mode
 // is unlocked. No visible button is shown to members — unlock is via a
-// keyboard shortcut only Elango knows: Ctrl+Alt+Shift+C.
+// keyboard shortcut only the owner knows: Ctrl+Alt+Shift+C.
 // NOTE: this is a deterrent, not real security — anyone reading the page
 // source can find ADMIN_PASS_HASH and brute-force/guess against it offline,
 // the same limitation as the existing access-code gate. Don't rely on this
@@ -10053,47 +10071,44 @@ function sizeBucket(d){
   return r<=100 ? 'L' : r<=250 ? 'M' : 'S';
 }
 function openTop25(){
-  const N=25, SEC_CAP=3, GRP_CAP=7;
-  const SIZE_TGT={L:15,M:7,S:3};
-  const pool = CR_DATA.filter(d=>!d.flag && d.cb>=55).slice().sort((a,b)=>b.cb-a.cb || (a.mcap_rank||999)-(b.mcap_rank||999));
+  // v22: Top 25 is built on the six-lens CB Conviction (E·F·M·T·CY·TG), not on the
+  // fundamentals-only CB Score. Eligibility: ≥3 of 4 core lenses, Conviction ≥55,
+  // no red flag, no gate breach. Caps: max 3 per sector, max 12 per group.
+  const N=25, SEC_CAP=3, GRP_CAP=12; // v22: 'Manufacturing' bundles defence, pharma, T&D, EMS, chemicals — a 7 cap starved the list
+  const conv = (typeof cvCompute==='function') ? cvCompute() : [];
   const flagged = CR_DATA.filter(d=>d.flag).length;
-  const sel=[], secCnt={}, grpCnt={}, sizeCnt={L:0,M:0,S:0}, capNotes={};
-  for(const d of pool){
+  const pool = conv.filter(x=>x.avail>=3 && !x.d.flag && x.conv>=55 && !(x.gates||[]).some(g=>/capped/i.test(g)));
+  const sel=[], secCnt={}, grpCnt={}, capNotes={};
+  for(const x of pool){
     if(sel.length>=N) break;
-    const sb=sizeBucket(d);
+    const d=x.d;
     if((secCnt[d.sector]||0)>=SEC_CAP){ capNotes[d.sector]='sector cap'; continue; }
     if((grpCnt[d.group]||0)>=GRP_CAP){ capNotes[d.group]='group cap'; continue; }
-    if(sizeCnt[sb]>=SIZE_TGT[sb]) continue;
-    sel.push(d); secCnt[d.sector]=(secCnt[d.sector]||0)+1; grpCnt[d.group]=(grpCnt[d.group]||0)+1; sizeCnt[sb]++;
+    sel.push(x); secCnt[d.sector]=(secCnt[d.sector]||0)+1; grpCnt[d.group]=(grpCnt[d.group]||0)+1;
   }
-  if(sel.length<N){
-    for(const d of pool){
-      if(sel.length>=N) break;
-      if(sel.includes(d)) continue;
-      if((secCnt[d.sector]||0)>=SEC_CAP) continue;
-      if((grpCnt[d.group]||0)>=GRP_CAP) continue;
-      sel.push(d); secCnt[d.sector]=(secCnt[d.sector]||0)+1; grpCnt[d.group]=(grpCnt[d.group]||0)+1; sizeCnt[sizeBucket(d)]++;
-    }
-  }
-  const tot = sel.reduce((s,d)=>s+d.cb,0)||1;
-  let rows = `<tr><th>#</th><th>Company</th><th>Sector</th><th>Group</th><th>Size</th><th>CB</th><th>Data \u2713</th><th>Sugg. Wt %</th></tr>`;
-  sel.forEach((d,i)=>{
-    const c=coverage(d), sb=sizeBucket(d);
-    rows += `<tr><td class="num">${i+1}</td><td><b>${d.name}</b></td><td>${d.sector}</td><td>${d.group}</td>`+
-      `<td><span class="size-tag size-${sb}">${sb==='L'?'Large':sb==='M'?'Mid':'Small'}</span></td>`+
-      `<td class="num"><b>${d.cb}</b></td>`+
-      `<td class="num" title="${c.v} of ${c.n} params verified">${c.pct}%</td>`+
-      `<td class="num">${(d.cb/tot*100).toFixed(1)}</td></tr>`;
+  const lens=(L)=>L?L.score:'—';
+  let rows = `<tr><th>#</th><th>Company</th><th>Sector</th><th>E</th><th>F</th><th>M</th><th>T</th><th>CY</th><th>TG</th><th>Conviction</th><th>Gates / flags</th></tr>`;
+  sel.forEach((x,i)=>{
+    const sb=sizeBucket(x.d);
+    rows += `<tr><td class="num">${i+1}</td><td><b>${x.d.name}</b> <span class="size-tag size-${sb}">${sb==='L'?'Large':sb==='M'?'Mid':'Small'}</span></td><td>${x.d.sector}</td>`+
+      `<td class="num">${lens(x.L.E)}${x.basisQ?`<div style="font-size:9px;font-weight:700;color:${x.basisLag>0?'#b35c00':'#5a6080'};">${x.basisQ.replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2')}${x.basisLag>0?'*':''}</div>`:''}</td><td class="num">${lens(x.L.F)}</td><td class="num">${lens(x.L.M)}</td><td class="num">${lens(x.L.T)}</td>`+
+      `<td class="num">${lens(x.L.CY)}</td><td class="num">${lens(x.L.TG)}</td><td class="num"><b>${x.conv}</b></td>`+
+      `<td style="font-size:10.5px;white-space:normal;">${(x.gates||[]).join('<br>')||(x.agreeTxt||'')}</td></tr>`;
   });
+  if(!sel.length) rows += `<tr><td colspan="11" style="text-align:center;padding:18px;">No company has 3 of the 4 core lenses yet — fetch dashboards (Sector Impact) and NSE data first.</td></tr>`;
   document.getElementById('top25-table').innerHTML = rows;
-  const avgCov = Math.round(sel.reduce((s,d)=>s+coverage(d).pct,0)/(sel.length||1));
+  const withCY=conv.filter(x=>x.L.CY).length, withTG=conv.filter(x=>x.L.TG).length;
   const capped = Object.entries(capNotes).map(([k,v])=>`${k} (${v})`).join(', ');
   document.getElementById('top25-note').innerHTML =
-    `Mode: <b>${MODE==='LT'?'\U0001f3db Long-Term (season weight 0)':'\u26a1 Tactical (season 7%, quarter ahead: '+NEXT_QTR+')'}</b> \u00b7 `+
-    `Universe: ${CR_DATA.length} companies \u00b7 Eligible after red-flag &amp; CB\u226555 gate: ${pool.length} (${flagged} flagged out) \u00b7 `+
-    `Selected: ${sel.length} \u00b7 Size mix L/M/S: ${sizeCnt.L}/${sizeCnt.M}/${sizeCnt.S} \u00b7 `+
-    `Avg data coverage: <b>${avgCov}%</b>${avgCov<50?' \u26a0 <b>low \u2014 most scores are still estimated seeds; verify before relying on this list</b>':''}`+
-    (capped?`<br>Caps binding on: ${capped}`:'');
+    `Ranked by <b>six-lens CB Conviction</b> (E25 · F20 · M15 · T15 · CY10 · TG15, renormalised over available lenses) · `+
+    `Universe: ${conv.length} companies · Eligible (≥3 core lenses, Conviction ≥55, no red flag): ${pool.length} (${flagged} red-flagged) · `+
+    `Cycle lens on ${withCY} · Trigger lens on ${withTG} · Selected: ${sel.length}`+
+    (capped?`<br>Caps binding on: ${capped}`:'')+
+    (()=>{ const bq={}; sel.forEach(x=>{ const k=x.basisQ||'none'; bq[k]=(bq[k]||0)+1; });
+      const cq=(typeof CV_CURRENT_QTR!=='undefined')?CV_CURRENT_QTR:'';
+      const pq=q=>q==='none'?'no results print':q.replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2');
+      return `<br>📅 <b>Results basis:</b> `+Object.entries(bq).map(([q,n])=>`${n} on ${pq(q)}${q!==cq&&q!=='none'?' (fallback)':''}`).join(' · ')+
+        `. The quarter under each E score shows which results it uses; <b>*</b> = ${pq(cq)} not yet published for that company, so its previous quarter (up to Q4 of the previous year) is used. Re-ranks automatically as new results are published.`; })();
   document.getElementById('top25-modal').classList.add('show');
 }
 
@@ -10184,6 +10199,43 @@ function cvPrevFiles(all){
 function cvLoadSnap(q){
   try{ return JSON.parse(localStorage.getItem(CV_SNAP_PREFIX+q)||'null'); }catch(e){ return null; }
 }
+// ── v23: per-company / per-sector quarter fallback ──
+function cvQtrChain(){
+  var c=[CV_CURRENT_QTR], q=CV_CURRENT_QTR, n=(typeof CB_QTR_MAX_LAG!=='undefined')?CB_QTR_MAX_LAG:2;
+  for(var i=0;i<n;i++){ q=cvPrevQtr(q); if(!q) break; c.push(q); }
+  return c;
+}
+function cvFilesForQtr(all, q){
+  if(!q) return [];
+  var f=(all||[]).filter(function(x){var k=grFileQtr(x);return k&&k.label===q;});
+  if(!f.length){ var snap=cvLoadSnap(q); if(snap&&snap.files) f=snap.files.filter(function(x){var k=grFileQtr(x);return k&&k.label===q;}); }
+  return f;
+}
+// newest print for THIS company: current quarter, else previous, else the one before
+function cvResolvePrint(d, all){
+  var chain=cvQtrChain();
+  for(var i=0;i<chain.length;i++){
+    var files=cvFilesForQtr(all, chain[i]); if(!files.length) continue;
+    var hit=cvFindCo(d, files);
+    if(hit) return {hit:hit, q:chain[i], lag:i, files:files, prevFiles:cvFilesForQtr(all, cvPrevQtr(chain[i]))};
+  }
+  return null;
+}
+// newest quarter that has a print FOR THIS SECTOR
+function cvSectorQtrFiles(sector, all){
+  var chain=cvQtrChain();
+  for(var i=0;i<chain.length;i++){
+    var files=cvFilesForQtr(all, chain[i]);
+    if(files.some(function(f){return (f.sectors||[]).indexOf(sector)>=0;}))
+      return {cur:files, prev:cvFilesForQtr(all, cvPrevQtr(chain[i])), q:chain[i], lag:i};
+  }
+  return null;
+}
+function cvBasisTxt(q, lag){
+  if(!q) return '';
+  var p=String(q).replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2'), c=String(CV_CURRENT_QTR).replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2');
+  return lag>0 ? 'Based on '+p+' results ('+c+' not yet published)' : 'Based on '+p+' results';
+}
 
 // ── LAYER E: this company's own earnings print ──────────────────────────
 function cvFindCo(d, files){
@@ -10225,10 +10277,9 @@ function cvSectorAvgYoY(sector, files){
 function cvEarnings(d){
   var cache = grLoadCache();
   var all = cache && cache.files ? cache.files.filter(function(f){return f.cos&&f.cos.length;}) : [];
-  // v20: only the current quarter's prints count — older quarters are stale
-  var files = all.filter(function(f){var q=grFileQtr(f);return q&&q.label===CV_CURRENT_QTR;});
-  if(!files.length) return null;
-  var hit = cvFindCo(d, files); if(!hit) return null;
+  // v23: newest quarter available for THIS company (falls back Q2→Q1→Q4 of previous FY)
+  var rs = cvResolvePrint(d, all); if(!rs) return null;
+  var files = rs.files, hit = rs.hit;
   var c = hit.c, parts=[], score=50;
   // (1) own-print tone: this company's greens vs reds
   var tot = (c.g||0)+(c.r||0)+(c.a||0);
@@ -10250,7 +10301,7 @@ function cvEarnings(d){
   if(c.e!=null) parts.push('EBITDA '+c.e+'%');
   // (3) QoQ momentum vs previous-quarter snapshot (accrues from next quarter on)
   // previous quarter used ONLY as a comparison base for QoQ momentum
-  var prevFiles = cvPrevFiles(all);
+  var prevFiles = rs.prevFiles;
   if(prevFiles.length){
     var ph = cvFindCo(d, prevFiles);
     if(ph&&ph.c){
@@ -10266,7 +10317,7 @@ function cvEarnings(d){
       }
     }
   }
-  return {score:Math.round(Math.max(0,Math.min(100,score))), parts:parts, src:hit.file};
+  return {score:Math.round(Math.max(0,Math.min(100,score))), parts:parts, src:hit.file, q:rs.q, lag:rs.lag, basis:cvBasisTxt(rs.q, rs.lag)};
 }
 
 // ── LAYER M: sector macro points propagated to the stock ────────────────
@@ -10467,11 +10518,10 @@ function cvTrigNeg(t){ return t.sign==='-'||t.sign==='−'||t.sign==='neg'||t.si
 function cvCoPrints(d){
   var cache=grLoadCache();
   var all=cache&&cache.files?cache.files.filter(function(f){return f.cos&&f.cos.length;}):[];
-  var cur=all.filter(function(f){var q=grFileQtr(f);return q&&q.label===CV_CURRENT_QTR;});
-  var hit=cur.length?cvFindCo(d,cur):null;
-  var prevFiles=cvPrevFiles(all);
-  var ph=prevFiles.length?cvFindCo(d,prevFiles):null;
-  return {cur:hit?hit.c:null, prev:ph?ph.c:null, curFiles:cur, prevFiles:prevFiles};
+  // v23: company's own newest quarter (fallback aware)
+  var rs=cvResolvePrint(d, all);
+  var ph=rs&&rs.prevFiles.length?cvFindCo(d,rs.prevFiles):null;
+  return {cur:rs?rs.hit.c:null, prev:ph?ph.c:null, curFiles:rs?rs.files:[], prevFiles:rs?rs.prevFiles:[], q:rs?rs.q:null, lag:rs?rs.lag:null};
 }
 
 // ── SECTOR CYCLE ──
@@ -10499,6 +10549,9 @@ function cvSectorCycle(sector, curFiles, prevFiles){
   if(!CV_CYCLE_CACHE) CV_CYCLE_CACHE={};
   if(CV_CYCLE_CACHE[sector]!==undefined) return CV_CYCLE_CACHE[sector];
   var m=cvTCModel(), out=null;
+  // v23: sector auto-phase uses the newest quarter available for this sector
+  try{ var gc=grLoadCache(); var sf=cvSectorQtrFiles(sector, gc&&gc.files?gc.files.filter(function(f){return f.cos&&f.cos.length;}):[]);
+       if(sf){ curFiles=sf.cur; prevFiles=sf.prev; } }catch(e){ sf=null; }
   var k=cvTCFindKey(m.sectors, sector), s=k?m.sectors[k]:null;
   if(s&&s.phase&&CV_PHASES[s.phase]){
     out={phase:s.phase, score:CV_PHASES[s.phase].score, src:cvTCHasLocal()?'manual':'published', why:s.note||'', date:s.date||''};
@@ -10511,7 +10564,7 @@ function cvSectorCycle(sector, curFiles, prevFiles){
       } return false;
     });
   }
-  if(!out) out=cvSectorAutoPhase(sector, curFiles, prevFiles);
+  if(!out){ out=cvSectorAutoPhase(sector, curFiles, prevFiles); if(out&&sf) out.why+=' · '+cvBasisTxt(sf.q, sf.lag); }
   CV_CYCLE_CACHE[sector]=out;
   return out;
 }
@@ -10553,6 +10606,12 @@ function cvCycle(d, sym, pr){
   // explicit CY from a company dashboard / JSON wins
   var explicit = co.cy!=null&&co.cy!=='' ? +co.cy : (dash.cy!=null?+dash.cy:null);
   var sec=cvSectorCycle(d.sector, pr.curFiles, pr.prevFiles);
+  // v22: company straddles two cycle types → blend sector phases by revenue share (SKILL step 1)
+  if(Array.isArray(co.sectorBlend)&&co.sectorBlend.length){
+    var bs=0, bw=0, dom=null, txt=[];
+    co.sectorBlend.forEach(function(b){ if(!b||!CV_PHASES[b.phase]) return; var w=+b.w||0; bs+=CV_PHASES[b.phase].score*w; bw+=w; if(!dom||w>dom.w) dom={phase:b.phase,w:w}; txt.push(b.phase+'×'+w+(b.why?' ('+b.why+')':'')); });
+    if(bw>0) sec={phase:dom.phase, score:Math.round(bs/bw), src:'blend', why:txt.join(' + ')};
+  }
   var stage=cvStockStage(sym);
   var peTrap=!!(co.peTrap||dash.peTrap);
   if(explicit!=null&&!isNaN(explicit)){
@@ -10564,17 +10623,23 @@ function cvCycle(d, sym, pr){
   var sub=[];
   var lc=co.lifecycle||dash.lifecycle;
   if(lc&&CV_LIFECYCLE[lc]!=null){ sub.push(CV_LIFECYCLE[lc]); parts.push('Business lifecycle: '+lc); }
-  if(pr.cur&&pr.prev&&pr.cur.e!=null&&pr.prev.e!=null){
+  if(co.earnCycle!=null&&co.earnCycle!==''){
+    sub.push(+co.earnCycle); parts.push('Earnings cycle '+co.earnCycle+(co.earnNote?': '+co.earnNote:' (research file)'));
+  } else if(pr.cur&&pr.prev&&pr.cur.e!=null&&pr.prev.e!=null){
     var dE=pr.cur.e-pr.prev.e;
     var es=dE>0.5?70:dE<-0.5?25:50;
     sub.push(es); parts.push('Earnings cycle: margin '+(dE>=0?'+':'')+dE.toFixed(1)+'pp QoQ ('+(es===70?'rising':es===25?'falling':'flat')+')');
+  }
+  if(co.valCycle!=null&&co.valCycle!==''){
+    var vc=+co.valCycle; if(peTrap) vc=Math.min(vc,30);
+    sub.push(vc); parts.push('Valuation cycle '+vc+(co.valNote?': '+co.valNote:' (research file)'));
   }
   if(stage){ sub.push(stage.score); }
   var stockScore=sub.length?sub.reduce(function(a,b){return a+b;},0)/sub.length:null;
   if(!sec&&stockScore==null) return null;
   var score=(sec&&stockScore!=null)?(sec.score+stockScore)/2:(sec?sec.score:stockScore);
   if(peTrap) parts.push('⚠️ Cyclical P/E trap — cheap P/E on peak margins (−5 on Conviction)');
-  var secTxt=sec?('Sector '+CV_PHASES[sec.phase].label+' ('+({manual:'your setting',published:'published',dashboard:'dashboard',auto:'auto from prints','auto-low':'auto, low confidence'}[sec.src]||sec.src)+')'):'Sector phase: no prints yet';
+  var secTxt=sec?('Sector '+CV_PHASES[sec.phase].label+' ('+({manual:'your setting',published:'published',dashboard:'dashboard',auto:'auto from prints','auto-low':'auto, low confidence',blend:'blended '+sec.score+': '+(sec.why||'')}[sec.src]||sec.src)+')'):'Sector phase: no prints yet';
   parts.unshift(secTxt);
   if(stage) parts.splice(1,0,'Stock '+stage.detail);
   return {score:Math.round(Math.max(0,Math.min(100,score))), parts:parts, sec:sec, stage:stage, peTrap:peTrap};
@@ -10586,7 +10651,13 @@ function cvTriggerList(d, pr){
   var ck=cvTCFindKey(m.companies,d.name);
   ((ck&&m.companies[ck].triggers)||[]).forEach(function(t){ list.push(Object.assign({scope:'company'},t)); });
   var sk=cvTCFindKey(m.sectorTriggers,d.sector);
-  ((sk&&m.sectorTriggers[sk])||[]).forEach(function(t){ list.push(Object.assign({scope:'sector'},t)); });
+  var coRec=ck?m.companies[ck]:{};
+  ((sk&&m.sectorTriggers[sk])||[]).forEach(function(t){
+    var o=Object.assign({scope:'sector'},t);
+    // v22: scale a sector trigger to this company's exposure (e.g. cell-integrated maker less hit by module glut)
+    if(coRec&&coRec.secTrigI!=null&&cvTrigNeg(t)) o.I=+coRec.secTrigI;
+    list.push(o);
+  });
   // triggers published inside the company's own dashboard (cb-data)
   pr=pr||cvCoPrints(d);
   var have={}; list.forEach(function(t){ have[cvNorm(t.name)]=1; });
@@ -10596,7 +10667,12 @@ function cvTriggerList(d, pr){
 }
 function cvTrigger(d, pr){
   var list=cvTriggerList(d, pr);
-  if(!list.length) return null;               // no triggers logged → lens off (weights renormalise)
+  if(!list.length){
+    // v22 (SKILL 4b): researched with no sourced trigger → neutral 50; never researched → lens off
+    var mm=cvTCModel(), kk=cvTCFindKey(mm.companies,d.name);
+    if(kk&&mm.companies[kk].tgReviewed) return {score:50, parts:['Reviewed — no sourced trigger found; Trigger lens neutral at 50'], pos:[], neg:[], serious:[], n:0};
+    return null;                               // no triggers logged → lens off (weights renormalise)
+  }
   var pos=list.filter(function(t){return !t.neg;}).sort(function(a,b){return b.pts-a.pts;});
   var neg=list.filter(function(t){return t.neg;}).sort(function(a,b){return b.pts-a.pts;});
   var top=pos.slice(0,3);
@@ -10698,7 +10774,8 @@ function cvCompute(weights){
     if(L.CY&&L.CY.stage&&L.CY.stage.stage4&&conv>55){ conv=55; gates.push('📉 Price in Stage 4 decline — Conviction capped at 55'); }
     if(L.TG&&L.TG.serious.length&&conv>50){ conv=50; gates.push('⛔ Serious negative trigger ('+L.TG.serious[0].name+') — Conviction capped at 50'); }
     conv=Math.round(Math.max(0,Math.min(100,conv)));
-    out.push({d:d, sym:sym, L:L, avail:avail, availAll:availAll, conv:conv, agree:agree, agreeTxt:agreeTxt, gates:gates, div:cvDivergence(L)});
+    var basisQ=(L.E&&L.E.q)||pr.q||null, basisLag=L.E?L.E.lag:pr.lag;
+    out.push({basisQ:basisQ, basisLag:basisLag, basis:basisQ?cvBasisTxt(basisQ,basisLag):'No results print loaded', d:d, sym:sym, L:L, avail:avail, availAll:availAll, conv:conv, agree:agree, agreeTxt:agreeTxt, gates:gates, div:cvDivergence(L)});
   });
   out.sort(function(a,b){return b.conv-a.conv;});
   var rank=1;
@@ -10751,7 +10828,8 @@ function cvCard(x){
       cvLayerChip('E','📊 Earnings',x.L.E)+cvLayerChip('F','🏢 Fundamental',x.L.F)+
       cvLayerChip('M','🧭 Macro',x.L.M)+cvLayerChip('T','📡 Market',x.L.T)+
       cvLayerChip('CY','🔄 Cycle',x.L.CY)+cvLayerChip('TG','⚡ Trigger',x.L.TG)+
-    '</div>'+reasons+divHtml+agreeHtml+'</div>';
+    '</div>'+reasons+divHtml+agreeHtml+
+    '<div style="margin-top:7px;font-size:9.5px;font-weight:700;color:'+(x.basisLag>0?'#b35c00':'#5a6080')+';">📅 '+x.basis+'</div></div>';
 }
 // ── CB SCORE HISTORY SNAPSHOT (feeds the backtest — see server.py /api/cb_history) ──
 // Exports the 4 fused lenses (Earnings/Fundamental/Macro/Market) + blended
@@ -11050,7 +11128,9 @@ function cvRender(){
     if(!withT) msgs.push('📡 No NSE market data — open <strong>NSE Market Intel</strong> → Load Latest Data (needs the v18 fetcher for price fields).');
     var gc=grLoadCache(); var allF=gc&&gc.files?gc.files.filter(function(f){return f.cos&&f.cos.length;}):[];
     var staleN=allF.filter(function(f){var q=grFileQtr(f);return !q||q.label!==CV_CURRENT_QTR;}).length;
-    msgs.push('🗓 Earnings lens uses <strong>'+CV_CURRENT_QTR.replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2')+'</strong> prints only'+(staleN?' — '+staleN+' older-quarter record(s) ignored':'')+'. Switches automatically when the next quarter\'s files are published.');
+    var bq={}; all.forEach(function(x){ if(x.basisQ) bq[x.basisQ]=(bq[x.basisQ]||0)+1; });
+    var bTxt=cvQtrChain().filter(function(q){return bq[q];}).map(function(q,i){return '<strong>'+bq[q]+'</strong> on '+q.replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2')+(q!==CV_CURRENT_QTR?' (fallback)':'');}).join(' · ');
+    msgs.push('🗓 Latest quarter detected: <strong>'+CV_CURRENT_QTR.replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2')+'</strong>. Companies that have not yet published it use their previous quarter (up to '+(typeof CB_QTR_MAX_LAG!=='undefined'?CB_QTR_MAX_LAG:2)+' quarters back) — each card shows its basis.'+(bTxt?'<br>📅 Results basis: '+bTxt:''));
     if(cvPrevFiles(allF).length) msgs.push('📈 '+cvPrevQtr(CV_CURRENT_QTR)+' prints found — used only as the comparison base for QoQ momentum.');
     else msgs.push('🕐 QoQ earnings momentum activates once previous-quarter prints are available.');
     st.innerHTML=msgs.join('<br>');
