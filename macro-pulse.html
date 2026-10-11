@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v26 (Company Ranker on six-lens Conviction)</title>
+<title>CB Finance26™ — Macro Pulse · v27 (Auto NSE fetch each morning)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -6105,6 +6105,22 @@ function miRecordKey(r,storeKey){
   if(storeKey==='fii'||storeKey==='fo') return r.date||'';
   return [r.date||'', r.sym||'', r.idx||'', r.type||'', r.co||''].join('|');
 }
+// v27: browser storage is limited (~5 MB shared by every page on the same site). When it is full,
+// trim the oldest rows of that data set instead of failing the whole load.
+function miRowDay(r){ const d=String((r&&(r.date||r.d))||''); let m=d.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m) return m[1]+m[2]+m[3];
+  m=d.match(/^(\d{1,2})[-\/ ](\d{1,2}|[A-Za-z]{3})[-\/ ](\d{4})/); if(m){ const M={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12}; const mo=isNaN(+m[2])?M[m[2].toLowerCase()]:+m[2]; return m[3]+String(mo).padStart(2,'0')+String(m[1]).padStart(2,'0'); } return ''; }
+function miSafeSave(k,arr){
+  try{ save(k,arr); return 0; }catch(e){
+    if(!/quota|exceed/i.test(String(e&&e.name)+' '+String(e&&e.message))) throw e;
+    for(const days of [365,180,90,45,20]){
+      const cut=new Date(Date.now()-days*864e5).toISOString().slice(0,10).replace(/-/g,'');
+      const kept=arr.filter(r=>{ const d=miRowDay(r); return !d||d>=cut; });
+      try{ save(k,kept); return arr.length-kept.length; }catch(e2){}
+    }
+    throw new Error('browser storage is full while saving "'+k+'" — clear old site data or use a different browser profile');
+  }
+}
+var MI_TRIMMED=0;
 function miMergeIntoLocalStorage(serverData){
   let added=0, updated=0;
   for(const k of Object.keys(serverData)){
@@ -6117,32 +6133,43 @@ function miMergeIntoLocalStorage(serverData){
       if(byKey.has(key)) updated++; else added++;
       byKey.set(key,r);   // fresh data always wins — replaces stale/blank rows for the same key
     }
-    save(k,Array.from(byKey.values()));
+    MI_TRIMMED+=miSafeSave(k,Array.from(byKey.values()));
   }
   return {added,updated};
 }
 async function miLoadFromServerCore(){
-  const r=await fetch(MI_SERVER+'/api/data',{signal:AbortSignal.timeout(30000)});
-  if(!r.ok)throw new Error('HTTP '+r.status);
-  const j=await r.json();
+  const r=await fetch(MI_SERVER+'/api/data',{signal:AbortSignal.timeout(120000)});
+  if(!r.ok){ const er=new Error('server answered HTTP '+r.status); er.httpStatus=r.status; throw er; }
+  let j; try{ j=await r.json(); }catch(e){ throw new Error('server sent data that could not be read ('+e.message+')'); }
+  MI_TRIMMED=0;
   const {added,updated}=miMergeIntoLocalStorage(j.data||{});
   const purged=(typeof miPurgeUntracked==='function')?miPurgeUntracked():0;
   miSetServerStatus(true,j.last_fetch||'');
-  miRender(miActiveTab);
-  if(typeof miAutoLinkIndicators==='function'){miAutoLinkIndicators();renderAllIndicators();updateAll();}
-  if(typeof render==='function')render();
-  if(typeof renderAll==='function')renderAll();
-  return {added,updated,purged};
+  try{ localStorage.setItem('cbf26_mi_last_load',new Date().toISOString()); }catch(e){}
+  const refresh=f=>{ try{ f(); }catch(e){ console.warn('MI refresh',e); } };
+  refresh(()=>miRender(miActiveTab));
+  refresh(()=>{ if(typeof miAutoLinkIndicators==='function'){miAutoLinkIndicators();renderAllIndicators();updateAll();} });
+  refresh(()=>{ if(typeof CR_CONV!=='undefined') CR_CONV=null; if(typeof render==='function')render(); });
+  refresh(()=>{ if(typeof renderAll==='function')renderAll(); });
+  return {added,updated,purged,trimmed:MI_TRIMMED};
+}
+function miExplainError(e){
+  const msg=String((e&&e.message)||e||'');
+  if(e&&(e.name==='TimeoutError'||e.name==='AbortError')) return {offline:false,text:'Server is busy (no answer in 2 minutes) — it may still be fetching from NSE. Try "Load Latest Data" again in a minute.'};
+  if(e&&e.name==='TypeError'&&/fetch|network|load failed/i.test(msg)) return {offline:true,text:'Cannot reach the NSE server on this computer. Start it (double-click start_cb_nse.bat) — and in Chrome allow 🔒 → Site settings → Local network access.'};
+  return {offline:false,text:'Load failed: '+msg};
 }
 async function miLoadFromServer(){
   const btn=event.target;const origText=btn.textContent;
   btn.classList.add('loading');btn.textContent='Loading...';
   try{
-    const {added,updated,purged}=await miLoadFromServerCore();
-    miShowToast(`✓ ${added} new, ${updated} updated`+(purged?`, ${purged} untracked removed`:''));
+    const {added,updated,purged,trimmed}=await miLoadFromServerCore();
+    miShowToast(`✓ ${added} new, ${updated} updated`+(purged?`, ${purged} untracked removed`:'')+(trimmed?`, ${trimmed} very old rows trimmed (storage full)`:''));
   }catch(e){
-    miShowToast('Server not reachable. Run: python server.py',true);
-    miSetServerStatus(false,'');
+    console.error('Load Latest Data failed:',e);
+    const x=miExplainError(e);
+    miShowToast(x.text,true);
+    if(x.offline) miSetServerStatus(false,'');
   }finally{btn.classList.remove('loading');btn.textContent=origText;}
 }
 async function miTriggerFetch(){
@@ -6151,7 +6178,7 @@ async function miTriggerFetch(){
   MI_FETCHING=true; miSetServerStatus(true,'');
   try{
     const r=await fetch(MI_SERVER+'/api/fetch',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(15000)});
-    if(!r.ok) throw new Error('HTTP '+r.status);
+    if(!r.ok){ MI_FETCHING=false; miSetServerStatus(true,''); miShowToast('Server is running but refused the fetch request (HTTP '+r.status+') — send server.py to update it.',true); return; }
   }catch(e){
     // A timeout usually means the server is busy; only a refused connection means it is really off.
     if(e && e.name!=='TimeoutError' && e.name!=='AbortError'){
@@ -6164,9 +6191,9 @@ async function miTriggerFetch(){
   const finish=async(note)=>{
     MI_FETCHING=false;
     try{
-      const {added,updated,purged}=await miLoadFromServerCore();
-      miShowToast(`✓ Loaded: ${added} new, ${updated} updated`+(purged?`, ${purged} untracked removed`:'')+(note||''));
-    }catch(e){ miShowToast('Load failed — click "Load Latest Data" to retry.',true); }
+      const {added,updated,purged,trimmed}=await miLoadFromServerCore();
+      miShowToast(`✓ Loaded: ${added} new, ${updated} updated`+(purged?`, ${purged} untracked removed`:'')+(trimmed?`, ${trimmed} very old rows trimmed (storage full)`:'')+(note||''));
+    }catch(e){ console.error(e); miShowToast(miExplainError(e).text,true); }
   };
   const poll=async()=>{
     const secs=(Date.now()-t0)/1000;
@@ -6231,9 +6258,27 @@ function miAutoLinkIndicators(){
 // hidden, and showPage('mi') itself redirects non-admins). The server-poll loop
 // only runs once an admin has actually unlocked the session, so regular member
 // sessions never attempt the localhost fetch at all.
+var MI_POLL_STARTED=false;
 function miStartAdminPolling(){
   if(typeof isAdminMode!=='function' || !isAdminMode()) return;
+  if(MI_POLL_STARTED) return; MI_POLL_STARTED=true;
   if(typeof miCheckServer==='function'){ miCheckServer(); setInterval(()=>{ if(isAdminMode()) miCheckServer(); }, 30000); }
+  setTimeout(miAutoDaily, 2500);
+}
+// v27: every time the app opens — load whatever the NSE server already has; and once a day
+// (first open of the day, IST) also ask the server to fetch fresh data from NSE.
+async function miAutoDaily(){
+  try{
+    const today=new Date(Date.now()+5.5*3600e3).toISOString().slice(0,10);
+    const st=await miServerStatus(8000);
+    if(!st){ miShowToast('NSE server not running on this computer — double-click start_cb_nse.bat (or add it to Startup) and reopen.',true); return; }
+    try{ await miLoadFromServerCore(); }catch(e){ console.warn('auto load',e); }
+    let done=null; try{ done=localStorage.getItem('cbf26_mi_auto_day'); }catch(e){}
+    if(done===today||st.running===true) return;
+    try{ localStorage.setItem('cbf26_mi_auto_day',today); }catch(e){}
+    miShowToast('🌅 Fetching today\'s data from NSE automatically…');
+    miTriggerFetch();
+  }catch(e){ console.warn('miAutoDaily',e); }
 }
 miStartAdminPolling();
 
