@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v28 (Sector Ranker on six lenses)</title>
+<title>CB Finance26™ — Macro Pulse · v29 (Points table for every lens)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -1750,6 +1750,7 @@ tr:last-child td{border-bottom:none;}
   <div id="cv-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px;"></div>
   <div id="cv-filters" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;"></div>
   <div id="cv-status" style="font-size:11px;color:#5a6080;margin-bottom:12px;line-height:1.7;"></div>
+  <div style="margin:-4px 0 12px;"><button onclick="cvOpenPointsTable()" style="padding:7px 14px;border-radius:8px;border:1px solid #ff7c00;background:#fff3e0;color:#b35c00;font-weight:800;font-size:12px;cursor:pointer;">📋 Points table — all companies, all lenses</button> <span style="font-size:11px;color:#5a6080;">Each card also has "🧮 Show working".</span></div>
   <div id="cv-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;"></div>
   <div id="cv-tierb-title" style="display:none;margin:22px 0 10px;font-size:12px;font-weight:800;color:#b35c00;text-transform:uppercase;letter-spacing:0.6px;">⚠️ Insufficient coverage — fewer than 3 of the 4 core lenses (E/F/M/T) have data (ranking not comparable)</div>
   <div id="cv-grid-b" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;"></div>
@@ -10492,6 +10493,8 @@ var CV_FILTER = 'All';
 var CV_MACRO_CACHE = null;                       // sector -> {pts,hits} per render
 
 function cvNorm(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,''); }
+// v29: records each sub-item's points as the lens is built (score change since the last item)
+function cvTracker(start){ var t={w:[], last:start}; t.add=function(label,score){ t.w.push([label, Math.round((score-t.last)*10)/10]); t.last=score; }; return t; }
 
 // ── quarter snapshotting (earnings momentum builds automatically from now on) ──
 function cvPrevQtr(q){
@@ -10598,7 +10601,7 @@ function cvEarnings(d){
   // v23: newest quarter available for THIS company (falls back Q2→Q1→Q4 of previous FY)
   var rs = cvResolvePrint(d, all); if(!rs) return null;
   var files = rs.files, hit = rs.hit;
-  var c = hit.c, parts=[], score=50;
+  var c = hit.c, parts=[], score=50; var _t=cvTracker(50); var _push=parts.push.bind(parts); parts.push=function(x){ _t.add(x,score); return _push(x); };
   // (1) own-print tone: this company's greens vs reds
   var tot = (c.g||0)+(c.r||0)+(c.a||0);
   if(tot>0){
@@ -10635,7 +10638,7 @@ function cvEarnings(d){
       }
     }
   }
-  return {score:Math.round(Math.max(0,Math.min(100,score))), parts:parts, src:hit.file, q:rs.q, lag:rs.lag, basis:cvBasisTxt(rs.q, rs.lag)};
+  var _raw=score; return {score:Math.round(Math.max(0,Math.min(100,score))), parts:parts, src:hit.file, q:rs.q, lag:rs.lag, basis:cvBasisTxt(rs.q, rs.lag), work:{base:50, items:_t.w, raw:Math.round(_raw*10)/10}};
 }
 
 // ── LAYER M: sector macro points propagated to the stock ────────────────
@@ -10670,7 +10673,7 @@ function cvNiftyAt(dateStr, mdHist){
 }
 function cvMarket(sym){
   if(!sym) return null;
-  var parts=[], score=50, any=false;
+  var parts=[], score=50, any=false; var _t=cvTracker(50); var _push=parts.push.bind(parts); parts.push=function(x){ _t.add(x,score); return _push(x); };
 
   // price series (needs the v18 fetcher's cp field)
   var rows=load('delivery').filter(function(r){return (r.sym||'').toUpperCase()===sym;})
@@ -10772,7 +10775,7 @@ function cvMarket(sym){
   }
 
   if(!any) return null;
-  return {score:Math.round(Math.max(0,Math.min(100,score))), parts:parts};
+  return {score:Math.round(Math.max(0,Math.min(100,score))), parts:parts, work:{base:50, items:_t.w, raw:Math.round(score*10)/10}};
 }
 
 // ════════════════════════════════════════════════════════════════════════
@@ -10944,21 +10947,21 @@ function cvCycle(d, sym, pr){
     return {score:Math.round(Math.max(0,Math.min(100,explicit))), parts:parts, sec:sec, stage:stage, peTrap:peTrap};
   }
   // stock sub-items
-  var sub=[];
+  var sub=[], subL=[];
   var lc=co.lifecycle||dash.lifecycle;
-  if(lc&&CV_LIFECYCLE[lc]!=null){ sub.push(CV_LIFECYCLE[lc]); parts.push('Business lifecycle: '+lc); }
+  if(lc&&CV_LIFECYCLE[lc]!=null){ sub.push(CV_LIFECYCLE[lc]); subL.push('Lifecycle: '+lc); parts.push('Business lifecycle: '+lc); }
   if(co.earnCycle!=null&&co.earnCycle!==''){
-    sub.push(+co.earnCycle); parts.push('Earnings cycle '+co.earnCycle+(co.earnNote?': '+co.earnNote:' (research file)'));
+    sub.push(+co.earnCycle); subL.push('Earnings cycle'+(co.earnNote?' — '+co.earnNote:'')); parts.push('Earnings cycle '+co.earnCycle+(co.earnNote?': '+co.earnNote:' (research file)'));
   } else if(pr.cur&&pr.prev&&pr.cur.e!=null&&pr.prev.e!=null){
     var dE=pr.cur.e-pr.prev.e;
     var es=dE>0.5?70:dE<-0.5?25:50;
-    sub.push(es); parts.push('Earnings cycle: margin '+(dE>=0?'+':'')+dE.toFixed(1)+'pp QoQ ('+(es===70?'rising':es===25?'falling':'flat')+')');
+    sub.push(es); subL.push('Earnings cycle (margin '+(dE>=0?'+':'')+dE.toFixed(1)+'pp QoQ)'); parts.push('Earnings cycle: margin '+(dE>=0?'+':'')+dE.toFixed(1)+'pp QoQ ('+(es===70?'rising':es===25?'falling':'flat')+')');
   }
   if(co.valCycle!=null&&co.valCycle!==''){
     var vc=+co.valCycle; if(peTrap) vc=Math.min(vc,30);
-    sub.push(vc); parts.push('Valuation cycle '+vc+(co.valNote?': '+co.valNote:' (research file)'));
+    sub.push(vc); subL.push('Valuation cycle'+(co.valNote?' — '+co.valNote:'')); parts.push('Valuation cycle '+vc+(co.valNote?': '+co.valNote:' (research file)'));
   }
-  if(stage){ sub.push(stage.score); }
+  if(stage){ sub.push(stage.score); subL.push('Price stage: '+stage.stage); }
   var stockScore=sub.length?sub.reduce(function(a,b){return a+b;},0)/sub.length:null;
   if(!sec&&stockScore==null) return null;
   var score=(sec&&stockScore!=null)?(sec.score+stockScore)/2:(sec?sec.score:stockScore);
@@ -10966,7 +10969,8 @@ function cvCycle(d, sym, pr){
   var secTxt=sec?('Sector '+CV_PHASES[sec.phase].label+' ('+({manual:'your setting',published:'published',dashboard:'dashboard',auto:'auto from prints','auto-low':'auto, low confidence',blend:'blended '+sec.score+': '+(sec.why||'')}[sec.src]||sec.src)+')'):'Sector phase: no prints yet';
   parts.unshift(secTxt);
   if(stage) parts.splice(1,0,'Stock '+stage.detail);
-  return {score:Math.round(Math.max(0,Math.min(100,score))), parts:parts, sec:sec, stage:stage, peTrap:peTrap};
+  return {score:Math.round(Math.max(0,Math.min(100,score))), parts:parts, sec:sec, stage:stage, peTrap:peTrap,
+    work:{cy:true, sec:sec?{label:CV_PHASES[sec.phase].label+(sec.src==='blend'?' (blended)':''), score:sec.score}:null, sub:sub.map(function(v,i){return [subL[i]||'item', v];}), stock:stockScore!=null?Math.round(stockScore*10)/10:null}};
 }
 
 // ── LAYER TG ──
@@ -11007,7 +11011,8 @@ function cvTrigger(d, pr){
   var parts=serious.map(function(t){return '⛔ '+fmt(t);})
     .concat(top.map(fmt))
     .concat(neg.filter(function(t){return serious.indexOf(t)<0;}).map(fmt));
-  return {score:score, parts:parts, pos:pos, neg:neg, serious:serious, n:list.length};
+  return {score:score, parts:parts, pos:pos, neg:neg, serious:serious, n:list.length,
+    work:{tg:true, top:top.map(function(t){return [t.name+(t.scope==='sector'?' (sector)':''), t.I, t.C, t.W, (t.P===undefined||t.P===''||t.P===null)?1:t.P, t.pts];}), neg:neg.map(function(t){return [t.name+(t.scope==='sector'?' (sector)':''), t.I, t.C, t.W, (t.P===undefined||t.P===''||t.P===null)?1:t.P, t.pts];}), unused:pos.slice(3).map(function(t){return [t.name, t.pts];}), sp:Math.round(sp*100)/100, sn:Math.round(sn*100)/100}};
 }
 
 // ── FUSION ────────────────────────────────────────────────────────────────
@@ -11073,7 +11078,7 @@ function cvCompute(weights){
       M: null, T: cvMarket(sym)
     };
     var mm=cvSectorMacro(d.sector);
-    if(mm) L.M={score:mm.score, pts:mm.pts, parts:mm.hits.slice(0,2).map(function(h){return (h.p>0?'+':'')+h.p+' '+h.r;})};
+    if(mm) L.M={score:mm.score, pts:mm.pts, parts:mm.hits.slice(0,2).map(function(h){return (h.p>0?'+':'')+h.p+' '+h.r;}), work:{base:50, items:mm.hits.map(function(h){return [h.r.split(' — ')[0], h.p*10];}), raw:50+mm.pts*10, note:'each rule point × 10'}};
     // v21: Cycle + Trigger lenses
     var pr=cvCoPrints(d);
     try{ L.CY=cvCycle(d, sym, pr); }catch(e){ L.CY=null; }
@@ -11099,7 +11104,7 @@ function cvCompute(weights){
     if(L.TG&&L.TG.serious.length&&conv>50){ conv=50; gates.push('⛔ Serious negative trigger ('+L.TG.serious[0].name+') — Conviction capped at 50'); }
     conv=Math.round(Math.max(0,Math.min(100,conv)));
     var basisQ=(L.E&&L.E.q)||pr.q||null, basisLag=L.E?L.E.lag:pr.lag;
-    out.push({basisQ:basisQ, basisLag:basisLag, basis:basisQ?cvBasisTxt(basisQ,basisLag):'No results print loaded', d:d, sym:sym, L:L, avail:avail, availAll:availAll, conv:conv, agree:agree, agreeTxt:agreeTxt, gates:gates, div:cvDivergence(L)});
+    out.push({wSum:wSum, base:Math.round(base*10)/10, W:W, pos:pos, neg:neg, posNeed:posNeed, basisQ:basisQ, basisLag:basisLag, basis:basisQ?cvBasisTxt(basisQ,basisLag):'No results print loaded', d:d, sym:sym, L:L, avail:avail, availAll:availAll, conv:conv, agree:agree, agreeTxt:agreeTxt, gates:gates, div:cvDivergence(L)});
   });
   out.sort(function(a,b){return b.conv-a.conv;});
   var rank=1;
@@ -11107,6 +11112,79 @@ function cvCompute(weights){
   return out;
 }
 
+// ── v29: WORKING — exactly how each lens score and the final Conviction were built ──
+var CV_LENS_NAME={E:'Earnings',F:'Fundamental',M:'Macro',T:'Market',CY:'Cycle',TG:'Trigger'};
+var CV_LENS_COL={E:'#2563eb',F:'#7c3aed',M:'#0891b2',T:'#db2777',CY:'#16a34a',TG:'#ea580c'};
+function cvF1(v){ return (v>0?'+':'')+(Math.round(v*10)/10); }
+function cvWorkingHtml(x){
+  var td='padding:3px 6px;border-bottom:1px solid #f0ece4;vertical-align:top;', tdn=td+'text-align:right;font-family:Consolas,monospace;white-space:nowrap;';
+  var h='<div style="font-size:10.5px;color:#3a3f5c;">';
+  ['E','F','M','T','CY','TG'].forEach(function(k){
+    var L=x.L[k], c=CV_LENS_COL[k];
+    h+='<div style="margin-top:8px;border-left:3px solid '+c+';padding-left:7px;"><b style="color:'+c+';">'+k+' — '+CV_LENS_NAME[k]+'</b> ';
+    if(!L){ h+='<span style="color:#9aa0b8;">not available — left out, weight shared by the others</span></div>'; return; }
+    h+='<b>= '+L.score+'</b><table style="width:100%;border-collapse:collapse;margin-top:3px;">';
+    var w=L.work;
+    if(k==='F'){ h+='<tr><td style="'+td+'">'+L.parts[0]+'</td><td style="'+tdn+'">'+L.score+'</td></tr>'; }
+    else if(w&&w.cy){
+      h+='<tr><td style="'+td+'">Sector: '+(w.sec?w.sec.label:'—')+'</td><td style="'+tdn+'">'+(w.sec?w.sec.score:'—')+'</td></tr>';
+      w.sub.forEach(function(r){ h+='<tr><td style="'+td+'padding-left:16px;">Stock · '+r[0]+'</td><td style="'+tdn+'">'+Math.round(r[1])+'</td></tr>'; });
+      h+='<tr><td style="'+td+'color:#5a6080;">Stock average</td><td style="'+tdn+'">'+(w.stock!=null?w.stock:'—')+'</td></tr>';
+      h+='<tr><td style="'+td+'font-weight:700;">CY = '+(w.sec&&w.stock!=null?'(sector '+w.sec.score+' + stock '+w.stock+') ÷ 2':'the one part available')+'</td><td style="'+tdn+'font-weight:700;">'+L.score+'</td></tr>';
+    }
+    else if(w&&w.tg){
+      h+='<tr style="color:#5a6080;"><td style="'+td+'">Trigger (I × C × W × P)</td><td style="'+tdn+'">pts</td></tr>';
+      w.top.forEach(function(r){ h+='<tr><td style="'+td+'">＋ '+r[0]+' <span style="color:#9aa0b8;">('+r[1]+'×'+r[2]+'×'+r[3]+'×'+r[4]+')</span></td><td style="'+tdn+'color:#006b30;">+'+r[5].toFixed(2)+'</td></tr>'; });
+      w.neg.forEach(function(r){ h+='<tr><td style="'+td+'">− '+r[0]+' <span style="color:#9aa0b8;">('+r[1]+'×'+r[2]+'×'+r[3]+'×'+r[4]+')</span></td><td style="'+tdn+'color:#b71c1c;">−'+r[5].toFixed(2)+'</td></tr>'; });
+      if(w.unused.length) h+='<tr><td style="'+td+'color:#9aa0b8;" colspan="2">not counted (only best 3 positives count): '+w.unused.map(function(r){return r[0]+' '+r[1].toFixed(2);}).join(', ')+'</td></tr>';
+      h+='<tr><td style="'+td+'font-weight:700;">TG = 50 + 8×'+w.sp+' − 8×'+w.sn+'</td><td style="'+tdn+'font-weight:700;">'+L.score+'</td></tr>';
+    }
+    else if(w){
+      h+='<tr><td style="'+td+'color:#5a6080;">Start (neutral)</td><td style="'+tdn+'">'+w.base+'</td></tr>';
+      w.items.forEach(function(r){ h+='<tr><td style="'+td+'">'+r[0]+'</td><td style="'+tdn+'color:'+(r[1]>0?'#006b30':r[1]<0?'#b71c1c':'#9aa0b8')+';">'+(r[1]===0?'0':cvF1(r[1]))+'</td></tr>'; });
+      var capped=(w.raw>100||w.raw<0);
+      h+='<tr><td style="'+td+'font-weight:700;">Total'+(w.note?' ('+w.note+')':'')+(capped?' → kept within 0–100':'')+'</td><td style="'+tdn+'font-weight:700;">'+(capped?w.raw+' → ':'')+L.score+'</td></tr>';
+    }
+    else { (L.parts||[]).forEach(function(p){ h+='<tr><td style="'+td+'" colspan="2">'+p+'</td></tr>'; }); }
+    h+='</table></div>';
+  });
+  // fusion
+  var ks=['E','F','M','T','CY','TG'].filter(function(k){return x.L[k];});
+  h+='<div style="margin-top:10px;border-left:3px solid #ff7c00;padding-left:7px;"><b style="color:#b35c00;">Fusion</b><table style="width:100%;border-collapse:collapse;margin-top:3px;">';
+  h+='<tr style="color:#5a6080;"><td style="'+td+'">Lens</td><td style="'+tdn+'">score</td><td style="'+tdn+'">weight</td><td style="'+tdn+'">share</td><td style="'+tdn+'">adds</td></tr>';
+  ks.forEach(function(k){ var wt=x.W[k], sh=wt/x.wSum; h+='<tr><td style="'+td+'">'+k+'</td><td style="'+tdn+'">'+x.L[k].score+'</td><td style="'+tdn+'">'+Math.round(wt*100)+'%</td><td style="'+tdn+'">'+Math.round(sh*100)+'%</td><td style="'+tdn+'">'+(x.L[k].score*sh).toFixed(1)+'</td></tr>'; });
+  h+='<tr><td style="'+td+'font-weight:700;" colspan="4">Weighted average (weights present '+Math.round(x.wSum*100)+'% → rescaled to 100%)</td><td style="'+tdn+'font-weight:700;">'+x.base+'</td></tr>';
+  h+='<tr><td style="'+td+'" colspan="4">Agreement: '+x.pos+' lens(es) ≥60, '+x.neg+' ≤42, need '+x.posNeed+'</td><td style="'+tdn+'">'+(x.agree>0?'+5':x.agree<0?'−5':'0')+'</td></tr>';
+  (x.gates||[]).forEach(function(g){ h+='<tr><td style="'+td+'color:#b71c1c;" colspan="5">'+g+'</td></tr>'; });
+  h+='<tr><td style="'+td+'font-weight:800;" colspan="4">Conviction</td><td style="'+tdn+'font-weight:800;color:#b35c00;">'+x.conv+'</td></tr></table></div></div>';
+  return h;
+}
+function cvPointsTable(){
+  var all=cvCompute(), ranked=all.filter(function(x){return x.avail>=3;});
+  var th='padding:5px 6px;border-bottom:2px solid #e6e2da;text-align:right;font-size:10.5px;color:#5a6270;position:sticky;top:0;background:#fff;';
+  var td='padding:4px 6px;border-bottom:1px solid #f0ece4;text-align:right;font-family:Consolas,monospace;font-size:11px;';
+  var h='<table style="border-collapse:collapse;width:100%;"><tr><th style="'+th+'">#</th><th style="'+th+'text-align:left;">Company</th>';
+  ['E','F','M','T','CY','TG'].forEach(function(k){ h+='<th style="'+th+'color:'+CV_LENS_COL[k]+';">'+k+'</th><th style="'+th+'">'+k+' adds</th>'; });
+  h+='<th style="'+th+'">Avg</th><th style="'+th+'">Agree</th><th style="'+th+'">Gate</th><th style="'+th+'">Conviction</th></tr>';
+  ranked.forEach(function(x,i){
+    h+='<tr><td style="'+td+'">'+(i+1)+'</td><td style="'+td+'text-align:left;font-family:inherit;">'+x.d.name+'</td>';
+    ['E','F','M','T','CY','TG'].forEach(function(k){ var L=x.L[k]; h+='<td style="'+td+'">'+(L?L.score:'—')+'</td><td style="'+td+'color:#5a6080;">'+(L?(L.score*x.W[k]/x.wSum).toFixed(1):'—')+'</td>'; });
+    h+='<td style="'+td+'">'+x.base+'</td><td style="'+td+'">'+(x.agree>0?'+5':x.agree<0?'−5':'0')+'</td><td style="'+td+'color:#b71c1c;">'+((x.gates||[]).length?(x.gates[0].match(/capped at \d+|−5/)||['yes'])[0]:'')+'</td><td style="'+td+'font-weight:800;">'+x.conv+'</td></tr>';
+  });
+  return {html:h+'</table>', ranked:ranked};
+}
+function cvOpenPointsTable(){
+  var r=cvPointsTable(), m=document.getElementById('cv-pt-modal');
+  if(!m){ m=document.createElement('div'); m.id='cv-pt-modal'; m.style.cssText='position:fixed;inset:0;background:rgba(20,24,40,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:14px;'; document.body.appendChild(m); m.onclick=function(e){ if(e.target===m) m.remove(); }; }
+  m.innerHTML='<div style="background:#fff;border-radius:12px;max-width:1300px;width:100%;max-height:90vh;display:flex;flex-direction:column;"><div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #e6e2da;"><b style="flex:1;">📋 Points table — every ranked company, every lens ("adds" = lens score × its share of the weights present)</b><button onclick="cvDownloadPoints()" style="padding:6px 12px;border-radius:8px;border:1px solid #ff7c00;background:#fff3e0;font-weight:700;cursor:pointer;">⬇ CSV</button><button onclick="document.getElementById(\'cv-pt-modal\').remove()" style="padding:6px 12px;border-radius:8px;border:1px solid #d6d9e6;background:#fff;cursor:pointer;">Close</button></div><div style="overflow:auto;padding:0 10px 10px;">'+r.html+'</div></div>';
+}
+function cvDownloadPoints(){
+  var r=cvPointsTable(), rows=[['Rank','Company','Sector','E','F','M','T','CY','TG','E adds','F adds','M adds','T adds','CY adds','TG adds','Weights present %','Weighted avg','Agreement','Gate','Conviction','Results basis']];
+  r.ranked.forEach(function(x,i){ var ks=['E','F','M','T','CY','TG'];
+    rows.push([i+1,x.d.name,x.d.sector].concat(ks.map(function(k){return x.L[k]?x.L[k].score:'';})).concat(ks.map(function(k){return x.L[k]?(x.L[k].score*x.W[k]/x.wSum).toFixed(1):'';})).concat([Math.round(x.wSum*100),x.base,x.agree,(x.gates||[]).join(' | '),x.conv,x.basis||''])); });
+  var csv=rows.map(function(r){return r.map(function(v){v=String(v==null?'':v); return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}).join(',');}).join('\n');
+  var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv'})); a.download='Conviction_points_table_'+new Date().toISOString().slice(0,10)+'.csv'; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},400);
+}
 // ── RENDER ────────────────────────────────────────────────────────────────
 function cvLayerChip(k,label,L){
   if(!L) return '<span style="font-size:9px;font-weight:700;background:#f1f3f9;color:#9aa0b8;padding:3px 8px;border-radius:7px;">'+label+' —</span>';
@@ -11153,7 +11231,8 @@ function cvCard(x){
       cvLayerChip('M','🧭 Macro',x.L.M)+cvLayerChip('T','📡 Market',x.L.T)+
       cvLayerChip('CY','🔄 Cycle',x.L.CY)+cvLayerChip('TG','⚡ Trigger',x.L.TG)+
     '</div>'+reasons+divHtml+agreeHtml+
-    '<div style="margin-top:7px;font-size:9.5px;font-weight:700;color:'+(x.basisLag>0?'#b35c00':'#5a6080')+';">📅 '+x.basis+'</div></div>';
+    '<div style="margin-top:7px;font-size:9.5px;font-weight:700;color:'+(x.basisLag>0?'#b35c00':'#5a6080')+';">📅 '+x.basis+'</div>'+
+    '<details style="margin-top:8px;border-top:1px dashed #e6e2da;padding-top:6px;"><summary style="cursor:pointer;font-size:11px;font-weight:800;color:#b35c00;">🧮 Show working — points for every lens</summary>'+cvWorkingHtml(x)+'</details></div>';
 }
 // ── CB SCORE HISTORY SNAPSHOT (feeds the backtest — see server.py /api/cb_history) ──
 // Exports the 4 fused lenses (Earnings/Fundamental/Macro/Market) + blended
