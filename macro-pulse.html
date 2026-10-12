@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v27 (Auto NSE fetch each morning)</title>
+<title>CB Finance26™ — Macro Pulse · v28 (Sector Ranker on six lenses)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -1619,9 +1619,9 @@ tr:last-child td{border-bottom:none;}
   <div class="hdr-inner">
     <div class="hdr-eyebrow">CB Research · EIL Research · Q4 FY26 · EIL</div>
     <div class="hdr-title">India Sector <span>Performance Ranker</span></div>
-    <div class="hdr-sub">39 Sectors · 63+ Dashboards · Q4 FY26 Results · Synced 09-Jul-2026 with standalone Sector Ranker · CB Score Composite Ranking · Not Investment Advice</div>
+    <div class="hdr-sub">Ranked by <b>six lenses</b> — each lens averaged over the sector's ranked companies (Earnings · Fundamental · Macro · Market · Cycle · Trigger), with the sector's own macro rules, cycle phase and triggers · tap "CB Score (old)" for the Q4 FY26 order · Not Investment Advice</div>
     <div class="hdr-chips">
-      <span class="chip g">🏆 #1 Hotels (87)</span>
+      <span class="chip g" id="sr-top-chip">🏆 #1 Hotels (87)</span>
       <span class="chip g">💊 Pharma — Lupin +89% PAT</span>
       <span class="chip g">⚡ Power — NTPC/PFC/REC</span>
       <span class="chip a">🛡️ Defence — revised down (HAL engine crisis)</span>
@@ -1651,6 +1651,9 @@ tr:last-child td{border-bottom:none;}
 <div style="background:#fff;border-bottom:1px solid var(--slate-m);padding:12px 0 10px;">
 <div class="controls">
   <div class="ctrl-row">
+    <span class="ctrl-lbl">Rank by:</span>
+    <button class="rbtn on" id="sr-by-six" onclick="srSetBy('six')" style="padding:5px 12px;border-radius:14px;border:1px solid #ff7c00;background:#fff3e0;color:#b35c00;font-weight:800;font-size:11.5px;cursor:pointer;">🎯 Six-lens</button>
+    <button class="rbtn" id="sr-by-old" onclick="srSetBy('old')" style="padding:5px 12px;border-radius:14px;border:1px solid #d6d9e6;background:#fff;color:#5a6080;font-weight:700;font-size:11.5px;cursor:pointer;margin-right:12px;">CB Score (old)</button>
     <span class="ctrl-lbl">Filter:</span>
     <button class="fbtn on" onclick="filter('all',this)">All 33</button>
     <button class="fbtn" onclick="filter('top10',this)">Top 10</button>
@@ -4593,6 +4596,7 @@ async function grFetchAll(){
   log('<strong>Current quarter: '+(latest?grPretty(latest.label):'not detected')+'</strong> · '+cur+' current record(s) used · '+fbN+' older record(s) used as fallback (sector has no newer file) · '+(ok.length-cur-fbN)+' superseded · '+autoUsed+' auto-found (not in sector-index.json) · '+fromAlt+' loaded from second repo · '+out.files.filter(f=>f.err).length+' failed · '+new Date(out.ts).toLocaleString()+tcLine+'<br>'+disc.notes.join('<br>')+(autoSkip.length?'<br><span style="color:#9aa0b8;">⏭ Auto-found but skipped (not a results dashboard / no match): '+autoSkip.slice(0,12).join(', ')+(autoSkip.length>12?' …':'')+'</span>':'')+'<br>'+lines.join('<br>'));
   const dl=document.getElementById('grDlIndex'); if(dl) dl.style.display=autoUsed?'inline-block':'none';
   try{ CR_CONV=null; if(typeof render==='function') render(); }catch(e){}
+  try{ if(typeof recomputeSectorLiveRanks==='function'){ recomputeSectorLiveRanks(); renderAll(); } }catch(e){}
   renderSectorImpact();
   if(typeof cvRender==='function'&&document.getElementById('page-cv')?.classList.contains('active')) cvRender();
 }
@@ -6150,7 +6154,7 @@ async function miLoadFromServerCore(){
   refresh(()=>miRender(miActiveTab));
   refresh(()=>{ if(typeof miAutoLinkIndicators==='function'){miAutoLinkIndicators();renderAllIndicators();updateAll();} });
   refresh(()=>{ if(typeof CR_CONV!=='undefined') CR_CONV=null; if(typeof render==='function')render(); });
-  refresh(()=>{ if(typeof renderAll==='function')renderAll(); });
+  refresh(()=>{ if(typeof recomputeSectorLiveRanks==='function') recomputeSectorLiveRanks(); if(typeof renderAll==='function')renderAll(); });
   return {added,updated,purged,trimmed:MI_TRIMMED};
 }
 function miExplainError(e){
@@ -9067,6 +9071,50 @@ const SR_DATA=SECTORS.filter(s=>{ if(seen.has(s.name))return false; seen.add(s.n
 // today, capped tighter at ±2 since this is already an aggregate of many
 // fundamentals. Re-ranks sectors on the live-adjusted score; s.cb (the
 // fundamentals composite) is never overwritten — only s.cbLive is derived.
+// ── v28: SIX-LENS SECTOR SCORE ─────────────────────────────────────────────
+// Each lens for a sector = average of that lens across its ranked member companies
+// (same engine as Conviction), with sector-level fallbacks:
+//   M  = the sector's own macro rules (Sector Impact)          CY = member average, else the sector phase
+//   TG = member average, else the sector's own triggers         F  = member average, else the old sector CB Score
+// Then the same weights as company Conviction (E25 F20 M15 T15 CY10 TG15), re-weighted over lenses present.
+var SR_BY='six';
+function srNorm(x){ return String(x||'').toLowerCase().replace(/\b(ltd|limited|the)\b/g,'').replace(/[^a-z0-9]+/g,''); }
+function srMembers(s){
+  if(typeof cvCompute==='function'&&typeof CR_CONV!=='undefined'&&CR_CONV&&!Object.keys(CR_CONV).length) CR_CONV=null;
+  const cm=(typeof crConvMap==='function')?crConvMap():{};
+  const byNorm={}; Object.keys(cm).forEach(n=>{ byNorm[srNorm(n)]=cm[n]; });
+  const out={};
+  (s.companies||[]).forEach(nm=>{
+    const t=srNorm(nm); let x=cm[nm]||byNorm[t];
+    if(!x&&t.length>=4){ const k=Object.keys(byNorm).find(k=>k.indexOf(t)===0||t.indexOf(k)===0&&k.length>=4); if(k) x=byNorm[k]; }
+    if(x) out[x.d.name]=x;
+  });
+  Object.keys(cm).forEach(n=>{ const x=cm[n], sec=String(x.d.sector||'');
+    if(sec===s.name||sec.indexOf(s.name+' (')===0) out[n]=x; });
+  return Object.values(out);
+}
+function srSixLens(s){
+  const mem=srMembers(s), ranked=mem.filter(x=>x.avail>=3);
+  const L={}, src={};
+  const avg=k=>{ const v=ranked.filter(x=>x.L[k]).map(x=>x.L[k].score); return v.length?{v:Math.round(v.reduce((a,b)=>a+b,0)/v.length),n:v.length}:null; };
+  ['E','F','M','T','CY','TG'].forEach(k=>{ const a=avg(k); if(a){ L[k]=a.v; src[k]=a.n+' cos'; } });
+  try{ const m=(typeof cvSectorMacro==='function')?cvSectorMacro(s.name):null; if(m){ L.M=m.score; src.M='sector rules ('+(m.pts>0?'+':'')+m.pts+')'; } }catch(e){}
+  if(L.CY==null){ try{ const c=(typeof cvSectorCycle==='function')?cvSectorCycle(s.name,[],[]):null; if(c){ L.CY=c.score; src.CY='sector phase '+c.phase; } }catch(e){} }
+  if(L.TG==null){ try{ const m=cvTCModel(), k=cvTCFindKey(m.sectorTriggers,s.name), tr=(k&&m.sectorTriggers[k])||[];
+      if(tr.length){ let sp=0,sn=0; tr.forEach(t=>{ const p=cvTrigPts(t); if(cvTrigNeg(t)) sn+=p; else sp+=p; }); L.TG=Math.round(Math.max(0,Math.min(100,50+8*sp-8*sn))); src.TG='sector triggers'; } }catch(e){} }
+  if(L.F==null&&s.cb!=null){ L.F=s.cb; src.F='old sector CB Score'; }
+  const W=(typeof CV_W!=='undefined')?CV_W:{E:.25,F:.2,M:.15,T:.15,CY:.1,TG:.15};
+  let ws=0,tot=0; Object.keys(W).forEach(k=>{ if(L[k]!=null){ ws+=W[k]; tot+=L[k]*W[k]; } });
+  const score=ws?Math.round(tot/ws):null;
+  const strong=ranked.filter(x=>x.conv>=63).length, capped=ranked.filter(x=>(x.gates||[]).some(g=>/capped/.test(g))).length;
+  const best=ranked.slice().sort((a,b)=>b.conv-a.conv).slice(0,3).map(x=>x.d.name+' '+x.conv);
+  return {score, L, src, n:ranked.length, strong, capped, best};
+}
+function srSetBy(m){ SR_BY=m;
+  const a=document.getElementById('sr-by-six'), b=document.getElementById('sr-by-old');
+  [[a,m==='six'],[b,m==='old']].forEach(([el,on])=>{ if(!el) return; el.style.background=on?'#fff3e0':'#fff'; el.style.borderColor=on?'#ff7c00':'#d6d9e6'; el.style.color=on?'#b35c00':'#5a6080'; });
+  recomputeSectorLiveRanks(); if(typeof renderAll==='function') renderAll(); }
+function srScore(s){ return (SR_BY==='six'&&s.six&&s.six.score!=null)?s.six.score:((s.cbLive!==undefined)?s.cbLive:s.cb); }
 function recomputeSectorLiveRanks(){
   let sectorsWithData=0, sectorsNudged=0;
   SR_DATA.forEach(s=>{
@@ -9083,8 +9131,11 @@ function recomputeSectorLiveRanks(){
     if(s.liveAdj!==0) sectorsNudged++;
     s.cbLive = Math.max(0,Math.min(100, Math.round(s.cb + s.liveAdj)));
   });
-  SR_DATA.sort((a,b)=>b.cbLive-a.cbLive);
+  // v28: six-lens score per sector
+  SR_DATA.forEach(s=>{ try{ s.six=srSixLens(s); }catch(e){ s.six=null; } });
+  SR_DATA.sort((a,b)=>(srScore(b)-srScore(a))||(b.cbLive-a.cbLive));
   SR_DATA.forEach((s,i)=>s.rank=i+1);
+  try{ const tc=document.getElementById('sr-top-chip'); if(tc&&SR_DATA[0]) tc.textContent='🏆 #1 '+SR_DATA[0].name+' ('+srScore(SR_DATA[0])+(SR_BY==='six'?' six-lens':'')+')'; }catch(e){}
   const banner=document.getElementById('sr-admin-banner');
   if(banner && isAdminMode()){
     const diag = sectorsWithData===0
@@ -9116,8 +9167,16 @@ function stars(n){
   for(let i=1;i<=5;i++)h+=`<div class="star${i<=n?' on':''}"></div>`;
   return h;
 }
+function srChips(s){
+  const x=s.six; if(!x) return '';
+  const col={E:'#2563eb',F:'#7c3aed',M:'#0891b2',T:'#db2777',CY:'#16a34a',TG:'#ea580c'};
+  const ch=k=>x.L[k]!=null?`<span title="${k}: ${x.src[k]||''}" style="padding:1px 6px;border-radius:6px;background:${x.L[k]>=60?'#e6f4ef':x.L[k]<=42?'#fce8e8':'#fff8ee'};color:${x.L[k]>=60?'#006b30':x.L[k]<=42?'#b71c1c':'#b35c00'};font-weight:700;border-left:3px solid ${col[k]};">${k} ${x.L[k]}</span>`:`<span style="padding:1px 6px;border-radius:6px;background:#f1f3f9;color:#9aa0b8;">${k} —</span>`;
+  return `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;font-size:9.5px;font-weight:600;">${['E','F','M','T','CY','TG'].map(ch).join('')}
+    <span style="color:#5a6080;">· ${x.n} ranked cos${x.n?` · ${x.strong} at 63+`:''}${x.capped?` · <b style="color:#b71c1c;">${x.capped} capped</b>`:''}</span></div>
+    ${x.best.length?`<div style="font-size:9.5px;color:#5a6080;margin-top:3px;">Leaders: ${x.best.join(' · ')}</div>`:''}`;
+}
 function renderCard(s){
-  const cbLive = (s.cbLive!==undefined) ? s.cbLive : s.cb;
+  const cbLive = srScore(s);
   const rc=rankClass(s.rank,s.sent);
   const cls=[
     'sec-card',
@@ -9136,18 +9195,19 @@ function renderCard(s){
   <div class="sec-name">
     <span class="sec-title">${s.name}</span>
     ${admin?`<span class="sec-grp">${groupEmoji(s.group)} ${s.group}</span>`:''}
+    ${srChips(s)}
   </div>
   <div class="met">${admin?`<span class="val ${revClass}">${s.rev}</span><span class="tag">Rev YoY</span>`:''}</div>
   <div class="met">${admin?`<span class="val">${s.ebitda}</span><span class="tag">EBITDA%</span>`:''}</div>
   <div class="met">${admin?`<span class="val ${patClass}">${s.pat}</span><span class="tag">PAT</span>`:''}</div>
   <div class="met">${admin?`<span class="val">${'★'.repeat(s.detail.stars)}${'☆'.repeat(5-s.detail.stars)}</span><span class="tag">Outlook</span>`:''}</div>
   <div class="heat-wrap">
-    <div class="heat-bar"><div class="heat-fill" style="width:${cbLive}%;background:${heatColor(cbLive)};"></div></div>
-    <div class="heat-lbl">${cbLive}/100${(admin&&s.liveAdj)?` <small style="color:${s.liveAdj>0?'#059669':'#e11d48'};">(Fund. ${s.cb} ${s.liveAdj>0?'+':''}${s.liveAdj})</small>`:''}</div>
+    <div class="heat-bar"><div class="heat-fill" style="width:${cbLive}%;background:${SR_BY==='six'?heatColor(cbLive>=65?80:cbLive>=55?70:50):heatColor(cbLive)};"></div></div>
+    <div class="heat-lbl">${cbLive}/100${SR_BY==='six'?` <small style="color:#5a6080;">(old CB ${s.cbLive!==undefined?s.cbLive:s.cb})</small>`:((admin&&s.liveAdj)?` <small style="color:${s.liveAdj>0?'#059669':'#e11d48'};">(Fund. ${s.cb} ${s.liveAdj>0?'+':''}${s.liveAdj})</small>`:'')}</div>
   </div>
-  <div class="cb-score ${cbLive>=75?'s-hi':cbLive>=60?'s-mid':'s-lo'}">
+  <div class="cb-score ${SR_BY==='six'?(cbLive>=65?'s-hi':cbLive>=55?'s-mid':'s-lo'):(cbLive>=75?'s-hi':cbLive>=60?'s-mid':'s-lo')}">
     <span class="sc">${cbLive}</span>
-    <span class="sl">CB Score</span>
+    <span class="sl">${SR_BY==='six'?'Six-lens':'CB Score'}</span>
   </div>
   ${miSectorLiveBadge(s)}
 </div>
