@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v33 (Market Data form auto-filled with latest dated values)</title>
+<title>CB Finance26™ — Macro Pulse · v34 (Simple ranking list · Market Data auto-fill)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -1440,7 +1440,7 @@ tr:last-child td{border-bottom:none;}
     </div>
     <div class="ctrl-sep"></div>
     <button class="add-btn" style="background:#1e2a4a;" onclick="toggleMacroPanel()">🌍 Macro Overlay</button>
-    <button class="add-btn" style="background:#059669;" onclick="openTop25()">🏆 Top 25</button>
+    <button class="add-btn" style="background:#059669;" onclick="openTop25()">🏆 Top 25</button> <button class="add-btn" style="background:#ff7c00;" onclick="cvOpenSimple()">📋 Simple list</button>
     <button class="add-btn" style="background:#64748b;" onclick="openExport()">⬇ Export</button>
     <div class="ctrl-sep"></div>
     <button class="add-btn" onclick="addCompany()">+ Add Company</button>
@@ -1750,7 +1750,7 @@ tr:last-child td{border-bottom:none;}
   <div id="cv-summary" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px;"></div>
   <div id="cv-filters" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;"></div>
   <div id="cv-status" style="font-size:11px;color:#5a6080;margin-bottom:12px;line-height:1.7;"></div>
-  <div style="margin:-4px 0 12px;"><button onclick="cvOpenPointsTable()" style="padding:7px 14px;border-radius:8px;border:1px solid #ff7c00;background:#fff3e0;color:#b35c00;font-weight:800;font-size:12px;cursor:pointer;">📋 Points table — all companies, all lenses</button> <span style="font-size:11px;color:#5a6080;">Each card also has "🧮 Show working".</span></div>
+  <div style="margin:-4px 0 12px;"><button onclick="cvOpenSimple()" style="padding:9px 16px;border-radius:8px;border:none;background:#ff7c00;color:#fff;font-weight:800;font-size:13px;cursor:pointer;margin-right:6px;">📋 Simple list — how each company is ranked</button><button onclick="cvOpenPointsTable()" style="padding:7px 14px;border-radius:8px;border:1px solid #ff7c00;background:#fff3e0;color:#b35c00;font-weight:800;font-size:12px;cursor:pointer;">📋 Points table — all companies, all lenses</button> <span style="font-size:11px;color:#5a6080;">Each card also has "🧮 Show working".</span></div>
   <div id="cv-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;"></div>
   <div id="cv-tierb-title" style="display:none;margin:22px 0 10px;font-size:12px;font-weight:800;color:#b35c00;text-transform:uppercase;letter-spacing:0.6px;">⚠️ Insufficient coverage — fewer than 3 of the 4 core lenses (E/F/M/T) have data (ranking not comparable)</div>
   <div id="cv-grid-b" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;"></div>
@@ -11313,6 +11313,128 @@ function cvPointsTable(){
   });
   return {html:h+'</table>', ranked:ranked};
 }
+// ── CB Simple Ranking List — shared renderer (used by the standalone report and by Macro Pulse) ──
+var SL_K=['E','F','M','T','CY','TG'];
+var SL_NAME={E:'Earnings',F:'Fundamental',M:'Macro',T:'Market',CY:'Cycle',TG:'Trigger'};
+var SL_W={E:25,F:20,M:15,T:15,CY:10,TG:15};
+var SL_COL={E:'#2563eb',F:'#7c3aed',M:'#0891b2',T:'#db2777',CY:'#16a34a',TG:'#ea580c'};
+var SL_ASK={E:'Were the latest quarterly results strong?',F:'Is the business itself good (CB Score)?',M:'Does today’s economy help this sector?',T:'Is the share price / NSE activity supportive?',CY:'Is the sector and stock early or late in its cycle?',TG:'Is there fresh news that can move it?'};
+function slEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function slTone(s){ return s==null?{c:'#9aa0b8',bg:'#f3f4f8',t:'—'}:s>=60?{c:'#006b30',bg:'#e3f4ea',t:'Good'}:s<=42?{c:'#b71c1c',bg:'#fde8e8',t:'Weak'}:{c:'#9a5a00',bg:'#fff4e0',t:'Average'}; }
+function slShort(t){ t=String(t||''); var i=t.indexOf(' — '); if(i>20) t=t.slice(0,i); return t.length>150?t.slice(0,147)+'…':t; }
+function slCell(L){ var s=L?L.s:null, o=slTone(s); return '<td class="sl-sc" style="color:'+o.c+';background:'+o.bg+';">'+(s==null?'—':s)+'</td>'; }
+function slRowsFor(data,mode,q){
+  var rows=data.rows, by={}; rows.forEach(function(r){by[r.n]=r;});
+  var list=mode==='top'?data.top.map(function(n){return by[n];}).filter(Boolean):rows.slice();
+  if(q){ q=q.toLowerCase(); list=list.filter(function(r){return (r.n+' '+r.s).toLowerCase().indexOf(q)>=0;}); }
+  return list;
+}
+function slDetail(r){
+  var h='<div class="sl-det"><div class="sl-det-h">How <b>'+slEsc(r.n)+'</b> got <b>'+r.c+'</b></div><table class="sl-dt"><tr><th>Parameter</th><th>Weight</th><th>Score</th><th>Why (plain words)</th></tr>';
+  SL_K.forEach(function(k){ var L=r.L[k], o=slTone(L?L.s:null), why;
+    if(!L) why='<span style="color:#9aa0b8;">Not available — left out; its weight is shared by the others</span>';
+    else if(k==='TG'&&L.miss) why='No trigger researched yet — counted as neutral 50';
+    else if(k==='TG'&&!(L.pos.length||L.neg.length)) why=slEsc(slShort((L.p||[]).join(' · ')))||'No live trigger';
+    else if(k==='TG') why=L.pos.map(function(t){return '🟢 '+slEsc(t.n);}).concat(L.neg.map(function(t){return '🔴 '+slEsc(t.n);})).join('<br>');
+    else why=(L.p||[]).map(function(x){return slEsc(slShort(x));}).join('<br>');
+    h+='<tr><td><span class="sl-dot" style="background:'+SL_COL[k]+'"></span><b>'+SL_NAME[k]+'</b><div class="sl-ask">'+SL_ASK[k]+'</div></td><td class="sl-c">'+SL_W[k]+'%</td><td class="sl-c" style="color:'+o.c+';font-weight:800;">'+(L?L.s:'—')+'<div style="font-size:9.5px;font-weight:700;">'+o.t+'</div></td><td>'+why+'</td></tr>';
+  });
+  h+='</table>';
+  // the sum, step by step
+  var pres=SL_K.filter(function(k){return r.L[k];}), wsum=pres.reduce(function(a,k){return a+SL_W[k];},0);
+  h+='<div class="sl-steps"><div class="sl-step"><span>1</span> Weighted average of the '+pres.length+' scores = <b>'+r.base+'</b>'+(wsum<100?' <i>(weights of available parameters scaled up to 100%)</i>':'')+'</div>';
+  h+='<div class="sl-step"><span>2</span> Agreement: '+(r.agree>0?'most parameters are Good → <b>+5</b>':r.agree<0?'most parameters are Weak → <b>−5</b>':'no clear agreement → <b>0</b>')+'</div>';
+  h+='<div class="sl-step"><span>3</span> Safety caps: '+(r.gates&&r.gates.length?r.gates.map(slEsc).join('; '):'none applied')+'</div>';
+  h+='<div class="sl-step sl-fin"><span>=</span> Final CB Conviction <b>'+r.c+'</b> · '+slEsc(r.basis||'')+'</div></div>';
+  // trigger sources (separate column)
+  var tg=r.L.TG, ts=tg?(tg.pos||[]).map(function(t){t.sg='+';return t;}).concat((tg.neg||[]).map(function(t){t.sg='−';return t;})):[];
+  if(ts.length){ h+='<div class="sl-det-h" style="margin-top:10px;">Triggers used</div><table class="sl-dt"><tr><th></th><th>Trigger</th><th>Date</th><th>Source</th></tr>';
+    ts.forEach(function(t){ h+='<tr><td class="sl-c" style="font-weight:900;color:'+(t.sg==='+'?'#006b30':'#b71c1c')+'">'+t.sg+'</td><td>'+slEsc(t.n)+'</td><td style="white-space:nowrap;">'+slEsc(t.d||'')+'</td><td>'+(t.url?'<a href="'+slEsc(t.url)+'" target="_blank" rel="noopener">'+slEsc(t.src||'link')+'</a>':slEsc(t.src||''))+'</td></tr>'; });
+    h+='</table>'; }
+  return h+'</div>';
+}
+function slRender(data,el,state){
+  state=state||{mode:'top',q:''};
+  var list=slRowsFor(data,state.mode,state.q);
+  var h='<div class="sl-bar"><button class="sl-tab'+(state.mode==='top'?' on':'')+'" data-m="top">🏆 Top 25</button><button class="sl-tab'+(state.mode==='all'?' on':'')+'" data-m="all">All '+data.rows.length+' companies</button><input class="sl-q" placeholder="Search company or sector…" value="'+slEsc(state.q)+'"></div>';
+  h+='<div class="sl-hint">Tap any company to see exactly how its score was arrived at. Green = Good (60+), amber = Average, red = Weak (42 or less).</div>';
+  h+='<div class="sl-wrap"><table class="sl-t"><thead><tr><th>#</th><th style="text-align:left;">Company</th>'+SL_K.map(function(k){return '<th title="'+SL_ASK[k]+'"><span style="color:'+SL_COL[k]+'">'+SL_NAME[k]+'</span><div class="sl-w">'+SL_W[k]+'%</div></th>';}).join('')+'<th>Average</th><th>Bonus / cap</th><th>Final</th></tr></thead><tbody>';
+  list.forEach(function(r,i){ var adj=(r.agree?(r.agree>0?'+5':'−5'):'')+(r.gates&&r.gates.length?(r.agree?' · ':'')+'cap':'');
+    h+='<tr class="sl-r" data-n="'+slEsc(r.n)+'"><td class="sl-c sl-rk">'+(state.mode==='top'?(i+1):r.r)+(state.mode==='top'?'<div class="sl-w">overall '+r.r+'</div>':'')+'</td><td><b>'+slEsc(r.n)+'</b><div class="sl-sec">'+slEsc(r.s)+'</div></td>'+SL_K.map(function(k){return slCell(r.L[k]);}).join('')+'<td class="sl-c">'+Math.round(r.base)+'</td><td class="sl-c" style="font-weight:700;color:'+(r.gates&&r.gates.length?'#b71c1c':r.agree>0?'#006b30':r.agree<0?'#b71c1c':'#9aa0b8')+'">'+(adj||'—')+'</td><td class="sl-c sl-fn">'+r.c+'</td></tr>';
+    if(state.open===r.n) h+='<tr><td colspan="11" style="padding:0;">'+slDetail(r)+'</td></tr>';
+  });
+  if(!list.length) h+='<tr><td colspan="11" style="text-align:center;padding:16px;color:#9aa0b8;">No company matches.</td></tr>';
+  h+='</tbody></table></div>';
+  el.innerHTML=h;
+  el.querySelectorAll('.sl-tab').forEach(function(b){ b.onclick=function(){ state.mode=b.getAttribute('data-m'); state.open=null; slRender(data,el,state); }; });
+  var q=el.querySelector('.sl-q'); q.oninput=function(){ state.q=q.value; slRender(data,el,state); var q2=el.querySelector('.sl-q'); q2.focus(); q2.setSelectionRange(q2.value.length,q2.value.length); };
+  el.querySelectorAll('.sl-r').forEach(function(tr){ tr.onclick=function(){ var n=tr.getAttribute('data-n'); state.open=state.open===n?null:n; slRender(data,el,state); }; });
+}
+var SL_CSS='.sl-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 6px}.sl-tab{padding:7px 14px;border-radius:20px;border:1px solid #e0dccf;background:#fff;font-weight:700;font-size:12.5px;cursor:pointer;color:#3a3f5c}.sl-tab.on{background:#ff7c00;border-color:#ff7c00;color:#fff}.sl-q{flex:1;min-width:180px;padding:8px 12px;border-radius:20px;border:1px solid #e0dccf;font-size:12.5px}.sl-hint{font-size:11.5px;color:#5a6080;margin:2px 0 8px}.sl-wrap{overflow-x:auto;border:1px solid #ece8de;border-radius:10px}.sl-t{border-collapse:collapse;width:100%;min-width:860px;font-size:12.5px}.sl-t th{background:#faf8f3;padding:8px 6px;font-size:11px;text-align:center;border-bottom:1px solid #ece8de;position:sticky;top:0}.sl-t td{padding:7px 6px;border-bottom:1px solid #f3f0e8}.sl-r{cursor:pointer}.sl-r:hover{background:#fffaf2}.sl-sc{text-align:center;font-weight:800;border-radius:0}.sl-c{text-align:center}.sl-rk{font-weight:900;color:#3a3f5c}.sl-fn{font-weight:900;font-size:15px;color:#b35c00}.sl-w{font-size:9.5px;color:#9aa0b8;font-weight:600}.sl-sec{font-size:10.5px;color:#8a90a8}.sl-det{background:#fffcf6;border-left:4px solid #ff7c00;padding:12px 14px}.sl-det-h{font-size:13px;margin-bottom:6px;color:#3a3f5c}.sl-dt{border-collapse:collapse;width:100%;font-size:12px;background:#fff}.sl-dt th{background:#f6f3ec;padding:6px;font-size:11px;text-align:left}.sl-dt td{padding:6px;border-bottom:1px solid #f0ece4;vertical-align:top}.sl-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.sl-ask{font-size:10.5px;color:#8a90a8}.sl-steps{margin-top:10px;display:grid;gap:5px}.sl-step{font-size:12px;background:#fff;border:1px solid #f0ece4;border-radius:8px;padding:6px 10px}.sl-step span{display:inline-block;width:20px;height:20px;border-radius:50%;background:#ff7c00;color:#fff;text-align:center;font-weight:800;line-height:20px;margin-right:6px;font-size:11px}.sl-fin{border-color:#ff7c00;background:#fff3e0;font-size:13px}';
+
+// ── v34: SIMPLE LIST — every company, six parameters, how the final score is arrived at ──
+function cvSimpleData(){
+  var conv=(typeof cvCompute==='function')?cvCompute():[];
+  var ranked=conv.filter(function(x){return x.avail>=3;});
+  var rows=ranked.map(function(x){
+    var L={}; SL_K.forEach(function(k){ var l=x.L[k]; L[k]=l?{s:l.score,p:(l.parts||[]).slice(0,3),miss:!!l.missing,
+      pos:(l.pos||[]).map(function(t){return {n:t.name,src:t.source,url:t.url,d:t.date};}),
+      neg:(l.neg||[]).map(function(t){return {n:t.name,src:t.source,url:t.url,d:t.date};})}:null; });
+    return {r:x.rank,n:x.d.name,s:x.d.sector,c:x.conv,base:x.base,agree:x.agree,gates:x.gates||[],basis:x.basis,L:L};
+  });
+  // same Top 25 rule as the 🏆 Top 25 button
+  var pool=ranked.filter(function(x){return !x.d.flag&&x.conv>=55&&!(x.gates||[]).some(function(g){return /capped/i.test(g);});});
+  var top=[], sc={}, gc={};
+  for(var i=0;i<pool.length&&top.length<25;i++){ var d=pool[i].d; if((sc[d.sector]||0)>=3||(gc[d.group]||0)>=12) continue; top.push(d.name); sc[d.sector]=(sc[d.sector]||0)+1; gc[d.group]=(gc[d.group]||0)+1; }
+  var withT=rows.filter(function(r){return r.L.T;}).length;
+  return {rows:rows, top:top, asOf:new Date(Date.now()+5.5*3600e3).toISOString().slice(0,16).replace('T',' ')+' IST', withT:withT};
+}
+function cvSimpleFlowSvg(){
+  var bx='', y=8;
+  SL_K.forEach(function(k,i){ var yy=8+i*40; bx+='<rect x="6" y="'+yy+'" width="200" height="32" rx="8" fill="#fff" stroke="'+SL_COL[k]+'" stroke-width="2"/><text x="16" y="'+(yy+21)+'" font-size="13" font-weight="700" fill="'+SL_COL[k]+'">'+SL_NAME[k]+'</text><text x="196" y="'+(yy+21)+'" font-size="13" font-weight="800" text-anchor="end" fill="#3a3f5c">'+SL_W[k]+'%</text><path d="M206 '+(yy+16)+' C 250 '+(yy+16)+', 250 128, 280 128" fill="none" stroke="#d9d4c7" stroke-width="1.5"/>'; });
+  var st=[['Weighted average','of the six scores'],['± 5 agreement','+5 if most are Good, −5 if most are Weak'],['Safety caps','Stage-4 price fall → max 55 · serious bad news → max 50'],['Final CB Conviction','0 – 100 · used for ranking']];
+  st.forEach(function(s,i){ var x=284+i*168; bx+='<rect x="'+x+'" y="98" width="150" height="62" rx="10" fill="'+(i===3?'#ff7c00':'#fff8ee')+'" stroke="#ff7c00" stroke-width="1.5"/><text x="'+(x+75)+'" y="122" font-size="13" font-weight="800" text-anchor="middle" fill="'+(i===3?'#fff':'#9a4a00')+'">'+s[0]+'</text>'+
+    '<foreignObject x="'+(x+4)+'" y="127" width="142" height="32"><div xmlns="http://www.w3.org/1999/xhtml" style="font-size:9.5px;line-height:1.2;text-align:center;color:'+(i===3?'#fff':'#5a6080')+'">'+s[1]+'</div></foreignObject>'+(i<3?'<path d="M'+(x+152)+' 129 L'+(x+166)+' 129" stroke="#ff7c00" stroke-width="2" marker-end="url(#sla)"/>':''); });
+  return '<svg viewBox="0 0 960 252" style="width:100%;min-width:760px;height:auto;" role="img" aria-label="Six parameters combine into the final score"><defs><marker id="sla" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8z" fill="#ff7c00"/></marker></defs>'+bx+'</svg>';
+}
+function cvOpenSimple(){
+  var data=cvSimpleData(), m=document.getElementById('cv-sl-modal');
+  if(!m){ m=document.createElement('div'); m.id='cv-sl-modal'; m.style.cssText='position:fixed;inset:0;background:rgba(20,24,40,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px;'; document.body.appendChild(m); m.onclick=function(e){ if(e.target===m) m.remove(); }; }
+  if(!document.getElementById('sl-css')){ var st=document.createElement('style'); st.id='sl-css'; st.textContent=SL_CSS; document.head.appendChild(st); }
+  m.innerHTML='<div style="background:#fff;border-radius:12px;max-width:1250px;width:100%;max-height:92vh;display:flex;flex-direction:column;"><div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #ece8de;flex-wrap:wrap;"><b style="flex:1;font-size:15px;">📋 Simple ranking list — how every company\u2019s score is arrived at</b><button onclick="cvSaveSimpleReport()" style="padding:6px 12px;border-radius:8px;border:1px solid #ff7c00;background:#fff3e0;color:#9a4a00;font-weight:700;cursor:pointer;">⬇ Save as report</button><button onclick="document.getElementById(\'cv-sl-modal\').remove()" style="padding:6px 12px;border-radius:8px;border:1px solid #d6d9e6;background:#fff;cursor:pointer;">Close</button></div><div style="overflow:auto;padding:10px 16px 16px;"><div style="overflow-x:auto;">'+cvSimpleFlowSvg()+'</div>'+(data.withT?'':'<div style="font-size:11.5px;color:#9a4a00;background:#fff4e0;border-radius:8px;padding:6px 10px;margin:6px 0;">Market column is blank — no NSE data in this browser yet. Press Fetch in NSE Market Intel; its 15% is shared by the other five until then.</div>')+'<div id="cv-sl-body"></div></div></div>';
+  slRender(data, document.getElementById('cv-sl-body'), {mode:'top',q:''});
+}
+function cvSaveSimpleReport(){
+  var data=cvSimpleData();
+  var fn=[slEsc,slTone,slShort,slCell,slRowsFor,slDetail,slRender,cvSimpleFlowSvg].map(function(f){return f.toString();}).join('\n');
+  var vars='var SL_K='+JSON.stringify(SL_K)+',SL_NAME='+JSON.stringify(SL_NAME)+',SL_W='+JSON.stringify(SL_W)+',SL_COL='+JSON.stringify(SL_COL)+',SL_ASK='+JSON.stringify(SL_ASK)+';';
+  var html=cvSimpleReportHtml(data, vars+'\n'+fn);
+  var dt=new Date(Date.now()+5.5*3600e3), mo=dt.getUTCMonth()+1, yr=dt.getUTCFullYear(); var qn=mo>=7&&mo<=9?1:mo>=10?2:mo<=3?3:4; var fy=(qn===3||qn===4)?yr:yr+1; var q='Q'+qn+'FY'+String(fy).slice(2);
+  var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html'})); a.download=String(q).replace(/\s/g,'')+'_Analysis_CBConviction_SimpleList_'+data.asOf.slice(0,10)+'.html'; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+}
+function cvSimpleReportHtml(data, code){
+  var S='scr'+'ipt', css=SL_CSS+'body{margin:0;background:#fff;color:#1a1e2e;font-family:"Segoe UI",system-ui,Roboto,Arial,sans-serif;font-size:13.5px}.wrap{max-width:1250px;margin:0 auto;padding:0 16px 90px}header{padding:18px 0 10px;border-bottom:1px solid #ece8de;background:linear-gradient(180deg,#fffaf3,#fff);margin-bottom:10px}h1{font-size:21px;margin:0 0 4px}h1 b{color:#ff7c00}.sub{color:#5a6080;font-size:12px}h2{font-size:16px;margin:16px 0 6px}.note{font-size:12px;color:#5a6080;background:#faf8f3;border-radius:8px;padding:8px 12px;margin:8px 0}'+
+    '#cb{position:fixed;right:16px;bottom:16px;width:50px;height:50px;border-radius:50%;background:#ff7c00;color:#fff;font-weight:900;font-size:17px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 4px 14px rgba(255,124,0,.45);cursor:pointer;z-index:50}#disc{display:none;position:fixed;right:16px;bottom:74px;max-width:330px;background:#fff;border:1px solid #e6e8f0;border-radius:12px;padding:12px;font-size:12px;box-shadow:0 10px 30px rgba(0,0,0,.12);z-index:51}#disc.on{display:block}#asb{position:fixed;right:76px;bottom:22px;background:#1a1e2e;color:#fff;border:none;border-radius:20px;padding:9px 13px;font-weight:800;cursor:pointer;z-index:50}#as{display:none;position:fixed;right:16px;bottom:78px;width:min(370px,calc(100vw - 32px));background:#fff;border:1px solid #e6e8f0;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.15);z-index:52}#as.on{display:block}#as .hd{padding:10px 12px;font-weight:800;border-bottom:1px solid #eee}#ab{max-height:260px;overflow:auto;padding:10px 12px;font-size:12.5px}#ab .m{background:#f6f7fb;border-radius:10px;padding:7px 10px;margin-bottom:6px}#ab .q{background:#fff3e0;text-align:right}#as .ft{display:flex;gap:6px;padding:8px 10px;border-top:1px solid #eee}#ai{flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:18px}.mic{border:none;background:#ff7c00;color:#fff;border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer}';
+  var h='<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CB Conviction Simple List</title><style>'+css+'</style></head><body><div class="wrap"><header><h1>CB Conviction — <b>Simple Ranking List</b></h1><div class="sub">Every company, six parameters, and how the final score is arrived at · prepared '+data.asOf+'</div></header>'+
+    '<h2>How the final score is made</h2><div style="overflow-x:auto;">'+cvSimpleFlowSvg()+'</div>'+
+    '<div class="note">Each parameter is scored 0–100. <b>Good</b> = 60 or more, <b>Weak</b> = 42 or less. A parameter with no data is left out and its weight is shared by the others. Top 25 picks the highest finals with 55+, no safety cap, and at most 3 per sector.</div>'+
+    (data.withT?'':'<div class="note" style="background:#fff4e0;color:#9a4a00;">Market column is blank in this list — it needs the daily NSE data from the app. Its 15% is shared by the other five.</div>')+
+    '<h2>The list</h2><div id="sl"></div>'+
+    '<div class="note">Not investment advice. No buy, sell or hold recommendation. CB Research is not SEBI-registered.</div></div>'+
+    '<div id="cb" onclick="document.getElementById(\'disc\').classList.toggle(\'on\')">CB</div><div id="disc"><b>CB Research (Cauvery Business)</b><br>Scores are a rules-based ranking of reported results, macro, cycle and news triggers, for education only. Not investment advice or a recommendation to buy, sell or hold. Not a SEBI-registered research analyst. Verify with company filings.</div>'+
+    '<button id="asb" onclick="document.getElementById(\'as\').classList.toggle(\'on\')">🎙 CB Assist</button><div id="as"><div class="hd">🎙 Ask about any company</div><div id="ab"><div class="m">Ask by voice or type, e.g. “Torrent Power”, “why is BHEL ranked”, “top five”.</div></div><div class="ft"><input id="ai" placeholder="Company or question…" onkeydown="if(event.key===\'Enter\')ask(this.value)"><button class="mic" onclick="lis()">🎤</button></div></div>'+
+    '<'+S+'>'+code+'\nvar DATA='+JSON.stringify(data).replace(/</g,'\\u003c')+';\nslRender(DATA,document.getElementById("sl"),{mode:"top",q:""});\n'+
+    'function ans(q){q=String(q||"").toLowerCase();var by=DATA.rows;if(/top|best|first/.test(q)&&!by.some(function(r){return q.indexOf(r.n.toLowerCase())>=0;})){return "Top five: "+DATA.top.slice(0,5).map(function(n,i){var r=by.filter(function(x){return x.n===n;})[0];return (i+1)+". "+n+" with "+r.c;}).join(", ")+".";}'+
+    'var best=null,bs=0;by.forEach(function(r){var nm=r.n.toLowerCase(),s=0;if(q.indexOf(nm)>=0)s=100;else{nm.split(/[^a-z0-9]+/).forEach(function(w){if(w.length>=3&&q.indexOf(w)>=0)s+=w.length;});}if(s>bs){bs=s;best=r;}});'+
+    'if(!best||bs<4)return "I could not match a company. Try a name from the list, for example Torrent Power or BHEL.";var r=best,t=DATA.top.indexOf(r.n);'+
+    'var parts=SL_K.filter(function(k){return r.L[k];}).map(function(k){return SL_NAME[k]+" "+r.L[k].s;}).join(", ");var tg=r.L.TG&&r.L.TG.pos&&r.L.TG.pos.length?" Main trigger: "+r.L.TG.pos[0].n+".":"";var ng=r.L.TG&&r.L.TG.neg&&r.L.TG.neg.length?" Risk: "+r.L.TG.neg[0].n+".":"";'+
+    'return r.n+" is ranked "+r.r+" overall"+(t>=0?", number "+(t+1)+" in the Top 25":"")+". Final score "+r.c+". "+parts+"."+(r.agree>0?" Plus 5 because most parameters agree.":r.agree<0?" Minus 5 because most parameters are weak.":"")+(r.gates.length?" "+r.gates[0].replace(/[^\\w\\s.,()\\-]/g,"")+".":"")+tg+ng;}'+
+    'function ask(q){if(!q)return;var a=ans(q),ab=document.getElementById("ab");ab.insertAdjacentHTML("beforeend","<div class=\\"m q\\">"+slEsc(q)+"</div><div class=\\"m\\">"+slEsc(a)+"</div>");ab.scrollTop=1e6;document.getElementById("ai").value="";try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(a);u.lang="en-IN";speechSynthesis.speak(u);}catch(e){}}'+
+    'function lis(){var R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R){alert("Voice input needs Chrome or Edge.");return;}var r=new R();r.lang="en-IN";r.onresult=function(e){ask(e.results[0][0].transcript);};r.start();}'+
+    '</'+S+'></body></html>';
+  return h;
+}
+
 function cvOpenPointsTable(){
   var r=cvPointsTable(), m=document.getElementById('cv-pt-modal');
   if(!m){ m=document.createElement('div'); m.id='cv-pt-modal'; m.style.cssText='position:fixed;inset:0;background:rgba(20,24,40,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:14px;'; document.body.appendChild(m); m.onclick=function(e){ if(e.target===m) m.remove(); }; }
