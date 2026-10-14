@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v31 (Latest-quarter fundamentals · full auto market data)</title>
+<title>CB Finance26™ — Macro Pulse · v32 (Researched triggers · neutral Trigger for un-researched)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -10482,7 +10482,7 @@ function openTop25(){
   });
   if(!sel.length) rows += `<tr><td colspan="11" style="text-align:center;padding:18px;">No company has 3 of the 4 always-available lenses (Earnings, Fundamental, Macro, Market) yet — fetch dashboards (Sector Impact) and NSE data first.</td></tr>`;
   document.getElementById('top25-table').innerHTML = rows;
-  const withCY=conv.filter(x=>x.L.CY).length, withTG=conv.filter(x=>x.L.TG).length;
+  const withCY=conv.filter(x=>x.L.CY).length, withTG=conv.filter(x=>x.L.TG&&!x.L.TG.missing).length;
   const capped = Object.entries(capNotes).map(([k,v])=>`${k} (${v})`).join(', ');
   document.getElementById('top25-note').innerHTML =
     `Ranked by <b>six-lens CB Conviction</b> (E25 · F20 · M15 · T15 · CY10 · TG15, renormalised over available lenses) · `+
@@ -10710,6 +10710,8 @@ function cvEarnings(d){
 
 // v31: share of the Fundamental lens that comes from the latest results (0 = Q4 FY26 score only)
 var CV_F_REFRESH_W = 0.5;
+// v32: missing Trigger lens counts as neutral 50 (true) or is left out and re-weighted (false)
+var CV_TG_MISSING_NEUTRAL = true;
 function cvFRefresh(d){
   try{
     var cache=grLoadCache(); var all=cache&&cache.files?cache.files.filter(function(f){return f.cos&&f.cos.length;}):[];
@@ -11181,6 +11183,10 @@ function cvCompute(weights){
     var pr=cvCoPrints(d);
     try{ L.CY=cvCycle(d, sym, pr); }catch(e){ L.CY=null; }
     try{ L.TG=cvTrigger(d, pr); }catch(e){ L.TG=null; }
+    // v32: a company nobody has researched for triggers is scored NEUTRAL (50), not left out —
+    // leaving it out handed its 15% to the other (usually higher) lenses, so un-researched names
+    // out-ranked researched ones with ordinary catalysts. Set CV_TG_MISSING_NEUTRAL=false to revert.
+    if(!L.TG&&CV_TG_MISSING_NEUTRAL) L.TG={score:50, parts:['No trigger research yet — counted as neutral 50'], pos:[], neg:[], serious:[], n:0, missing:true, work:{tg:true, top:[], neg:[], unused:[], sp:0, sn:0}};
     // weighted fusion over available layers, weights renormalised
     var wSum=0, tot=0, avail=0, availAll=0;
     ['E','F','M','T','CY','TG'].forEach(function(k){
@@ -11532,7 +11538,7 @@ function cvTCRender(all){
       '<td style="'+td+'color:#5a6270;font-size:10.5px;">'+cvEsc(t.source||'')+(t.date?' · '+cvEsc(t.date):'')+'</td>'+
       (isAdmin?'<td style="'+td+'"><button onclick="cvTCDel('+i+')" style="border:none;background:#fce8e8;color:#b71c1c;border-radius:6px;padding:2px 7px;cursor:pointer;font-weight:800;">✕</button></td>':'')+'</tr>';
   }).join('');
-  var nCY=(all||[]).filter(function(x){return x.L.CY;}).length, nTG=(all||[]).filter(function(x){return x.L.TG;}).length;
+  var nCY=(all||[]).filter(function(x){return x.L.CY;}).length, nTG=(all||[]).filter(function(x){return x.L.TG&&!x.L.TG.missing;}).length;
   var inp='font-size:11.5px;padding:5px 7px;border:1px solid #e6e2da;border-radius:7px;background:#fff;color:#1c1f26;';
   var lbl='font-size:10px;font-weight:800;color:#5a6270;text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:2px;';
   var form = !isAdmin ? '' :
@@ -11619,7 +11625,7 @@ function cvRender(){
     ['All-lens confirmed', confirmed, '#006b30'],
     ['With earnings print', withE+' / '+all.length, '#b35c00'],
     ['With market data', withT+' / '+all.length, '#b35c00'],
-    ['With cycle / trigger', all.filter(function(x){return x.L.CY;}).length+' / '+all.filter(function(x){return x.L.TG;}).length, '#b35c00']
+    ['With cycle / trigger', all.filter(function(x){return x.L.CY;}).length+' / '+all.filter(function(x){return x.L.TG&&!x.L.TG.missing;}).length, '#b35c00']
   ].map(function(s){
     return '<div class="card" style="padding:12px 14px;"><div style="font-size:9.5px;color:#5a6080;text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:4px;">'+s[0]+'</div><div style="font-family:\'IBM Plex Mono\',monospace;font-size:19px;font-weight:700;color:'+s[2]+';">'+s[1]+'</div></div>';
   }).join('');
