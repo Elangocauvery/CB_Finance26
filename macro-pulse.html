@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v32 (Researched triggers · neutral Trigger for un-researched)</title>
+<title>CB Finance26™ — Macro Pulse · v33 (Market Data form auto-filled with latest dated values)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -975,31 +975,31 @@ tr:last-child td{border-bottom:none;}
       <div class="entry-grid">
         <div class="entry-item">
           <label>Entry Date</label>
-          <input type="date" id="md-date" value="2026-06-25">
+          <input type="date" id="md-date">
         </div>
         <div class="entry-item">
           <label>Nifty 50 Level</label>
-          <input type="number" id="md-nifty" placeholder="e.g. 24500" step="1" value="24056.00">
+          <input type="number" id="md-nifty" placeholder="e.g. 24500" step="1">
           <div class="sig" id="sig-nifty"></div>
         </div>
         <div class="entry-item">
           <label>Nifty % Change</label>
-          <input type="number" id="md-nifty-chg" placeholder="e.g. +0.85" step="0.01" value="0.14">
+          <input type="number" id="md-nifty-chg" placeholder="e.g. +0.85" step="0.01">
           <div class="sig" id="sig-nifty-chg"></div>
         </div>
         <div class="entry-item">
           <label>Nifty PE Ratio</label>
-          <input type="number" id="md-pe" placeholder="e.g. 21.5" step="0.01" value="20.77">
+          <input type="number" id="md-pe" placeholder="e.g. 21.5" step="0.01">
           <div class="sig" id="sig-pe"></div>
         </div>
         <div class="entry-item">
           <label>Nifty PB Ratio</label>
-          <input type="number" id="md-pb" placeholder="e.g. 3.8" step="0.01" value="3.17">
+          <input type="number" id="md-pb" placeholder="e.g. 3.8" step="0.01">
           <div class="sig" id="sig-pb"></div>
         </div>
         <div class="entry-item">
           <label>Dividend Yield %</label>
-          <input type="number" id="md-divy" placeholder="e.g. 1.2" step="0.01" value="1.20">
+          <input type="number" id="md-divy" placeholder="e.g. 1.2" step="0.01">
         </div>
       </div>
     </div>
@@ -1032,12 +1032,12 @@ tr:last-child td{border-bottom:none;}
       <div class="entry-grid">
         <div class="entry-item">
           <label>Brent Crude ($/bbl)</label>
-          <input type="number" id="md-crude" placeholder="e.g. 78.5" step="0.1" value="69.5">
+          <input type="number" id="md-crude" placeholder="e.g. 78.5" step="0.1">
           <div class="sig" id="sig-crude"></div>
         </div>
         <div class="entry-item">
           <label>INR / USD</label>
-          <input type="number" id="md-inr" placeholder="e.g. 84.2" step="0.01" value="94.30">
+          <input type="number" id="md-inr" placeholder="e.g. 84.2" step="0.01">
           <div class="sig" id="sig-inr"></div>
         </div>
         <div class="entry-item">
@@ -3348,6 +3348,11 @@ function mdAutoFromNSE(inr){
     const prev=hist.slice().reverse().find(h=>h.nifty);
     const e=i>=0?hist[i]:{date:date};
     if(pe&&pe.pe>0) e.pe=+pe.pe;
+    // v33: P/B, dividend yield and breadth were never copied before — form kept June values
+    if(pe&&num(pe.pb)) e.pb=num(pe.pb); else if(vx&&num(vx.pb)) e.pb=num(vx.pb);
+    if(pe&&num(pe.dy)) e.divY=num(pe.dy); else if(vx&&num(vx.dy)) e.divY=num(vx.dy);
+    if(!(pe&&pe.pe>0)&&vx&&num(vx.pe)) e.pe=num(vx.pe);
+    if(vx&&num(vx.adv)&&num(vx.dec)){ e.adv=num(vx.adv); e.dec=num(vx.dec); }
     if(fo){ if(fo.vix) e.vix=+fo.vix; if(fo.pcr) e.pcr=+fo.pcr; if(fo.bnpcr) e.bnpcr=+fo.bnpcr; }
     if(n50&&n50.t!==''&&!isNaN(+n50.t)) e.niftyChg=+n50.t;
     // v31: Nifty level from the fetcher's VIX/market step (or F&O spot, or Nifty 50 index level)
@@ -3370,8 +3375,33 @@ async function mdAutoRefresh(){
   let inr=null;
   try{ const r=await fetch('https://open.er-api.com/v6/latest/USD',{cache:'no-store',signal:AbortSignal.timeout(8000)}); if(r.ok){ const j=await r.json(); if(j&&j.rates&&j.rates.INR) inr=Math.round(j.rates.INR*100)/100; } }catch(e){}
   const ok=mdAutoFromNSE(inr);
+  try{ mdFillForm(); }catch(e){}
   if(ok){ try{ if(typeof renderMarketSnapshot==='function') renderMarketSnapshot(); if(typeof updateSignalPanel==='function') updateSignalPanel(); if(typeof renderMDHistory==='function') renderMDHistory(); }catch(e){} }
   return ok;
+}
+// v33: Market Data form shows the newest value of every field (with its date) instead of fixed numbers
+const MD_FORM_FIELDS=[['md-nifty','nifty',2],['md-nifty-chg','niftyChg',2],['md-pe','pe',2],['md-pb','pb',2],['md-divy','divY',2],['md-adv','adv',0],['md-dec','dec',0],['md-crude','crude',1],['md-inr','inr',2],['md-cpi','cpi',2],['md-repo','repo',2]];
+const MD_STALE_DAYS={nifty:5,niftyChg:5,pe:7,pb:7,divY:7,adv:5,dec:5,crude:10,inr:10,cpi:45,repo:75};
+function mdIstToday(){ return new Date(Date.now()+5.5*3600e3).toISOString().slice(0,10); }
+function mdFillForm(){
+  try{
+    const hist=getMDHistory(); const today=mdIstToday();
+    const dt=document.getElementById('md-date'); if(dt) dt.value=today;
+    MD_FORM_FIELDS.forEach(([id,k,dp])=>{
+      const el=document.getElementById(id); if(!el) return;
+      let v=null,d=null; for(let i=hist.length-1;i>=0;i--){ const x=hist[i][k]; if(x!=null&&x!==''&&!isNaN(+x)){ v=+x; d=hist[i].date; break; } }
+      let tag=document.getElementById(id+'-asof');
+      if(!tag){ tag=document.createElement('div'); tag.id=id+'-asof'; tag.style.cssText='font-size:9.5px;margin-top:3px;font-weight:600;'; el.insertAdjacentElement('afterend',tag); }
+      if(v==null){ el.value=''; el.dataset.autoVal=''; el.dataset.autoDate=''; tag.textContent='not fetched — enter manually'; tag.style.color='#9aa0b8'; return; }
+      el.value=dp===0?String(Math.round(v)):v.toFixed(dp);
+      el.dataset.autoVal=el.value; el.dataset.autoDate=d;
+      const age=Math.round((Date.parse(today)-Date.parse(d))/864e5);
+      const lim=MD_STALE_DAYS[k]||7;
+      const dd=new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+      if(age>lim){ tag.textContent='⚠ old — as of '+dd+' ('+age+' days). Enter today\'s value'; tag.style.color='#b71c1c'; }
+      else { tag.textContent='as of '+dd+(age<=1?' ✓':''); tag.style.color=age<=1?'#006b30':'#6b7498'; }
+    });
+  }catch(e){ console.warn('mdFillForm',e); }
 }
 function saveMDHistory(arr){ try{localStorage.setItem(MD_KEY,JSON.stringify(arr.slice(-90)));}catch(e){} }
 // Latest India VIX / PCR reading from NSE Market Intel's F&O tab ('cbr_fo' storage) —
@@ -3415,7 +3445,7 @@ function initApp(){
   }catch(e){}
   if(typeof miAutoLinkIndicators==='function')miAutoLinkIndicators();
   // Set default dates
-  const today=new Date().toISOString().split('T')[0];
+  const today=new Date(Date.now()+5.5*3600e3).toISOString().slice(0,10);
   ['md-date','fd-date'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=today; });
   initChart();
   renderAllIndicators();
@@ -3423,6 +3453,7 @@ function initApp(){
   renderRiskCards();
   updateAll();
   renderMDHistory();
+  mdFillForm();
   updateSignalPanel();
   renderFDHistory();
   renderFlowChart();
@@ -3635,12 +3666,15 @@ function saveMarketData(){
     repo: parseFloat(document.getElementById('md-repo')?.value)||null,
   };
   if(!entry.nifty&&!entry.pe&&!entry.vix){alert('Please enter at least one data point (or add today\'s VIX/PCR in NSE Market Intel first).');return;}
+  // v33: a value carried over from an older day (not edited) is not re-stamped with today's date
+  MD_FORM_FIELDS.forEach(([id,k])=>{ const el=document.getElementById(id); if(el&&el.dataset.autoDate&&el.dataset.autoDate!==entry.date&&el.value===el.dataset.autoVal) entry[k]=null; });
   const hist=getMDHistory();
   const existing=hist.findIndex(h=>h.date===entry.date);
-  if(existing>=0) hist[existing]=entry; else hist.push(entry);
+  if(existing>=0){ const m=Object.assign({},hist[existing]); Object.keys(entry).forEach(k=>{ if(entry[k]!=null) m[k]=entry[k]; }); hist[existing]=m; } else hist.push(entry);
   hist.sort((a,b)=>a.date.localeCompare(b.date));
   saveMDHistory(hist);
   renderMDHistory();
+  mdFillForm();
   updateSignalPanel();
   renderMarketSnapshot();
   showSave();
@@ -8522,6 +8556,7 @@ function seedVerifiedMacroHistory(){
   // Refresh every view that reads from history, so it's visible immediately on open —
   // no button click needed.
   if(typeof renderMDHistory==='function') renderMDHistory();
+  if(typeof mdFillForm==='function') mdFillForm();
   if(typeof renderFDHistory==='function') renderFDHistory();
   if(typeof updateFIIKPIs==='function') updateFIIKPIs();
   if(typeof renderMarketSnapshot==='function') renderMarketSnapshot();
