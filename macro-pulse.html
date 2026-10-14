@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v34 (Simple ranking list · Market Data auto-fill)</title>
+<title>CB Finance26™ — Macro Pulse · v34 (Simple ranking list with share-price change · Market Data auto-fill)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -6196,7 +6196,7 @@ function miRecordKey(r,storeKey){
   // carried a stray field — so both survived instead of the fresh one
   // replacing the stale one. That's what produced the blank "Neutral/NSE"
   // rows alternating with real Trendlyne rows in the FII/DII table.
-  if(storeKey==='fii'||storeKey==='fo'||storeKey==='vix'||storeKey==='macro') return r.date||'';
+  if(storeKey==='fii'||storeKey==='fo'||storeKey==='vix'||storeKey==='macro'||storeKey==='px') return r.date||'';
   return [r.date||'', r.sym||'', r.idx||'', r.type||'', r.co||''].join('|');
 }
 // v27: browser storage is limited (~5 MB shared by every page on the same site). When it is full,
@@ -11345,6 +11345,7 @@ function slDetail(r){
   h+='<div class="sl-steps"><div class="sl-step"><span>1</span> Weighted average of the '+pres.length+' scores = <b>'+r.base+'</b>'+(wsum<100?' <i>(weights of available parameters scaled up to 100%)</i>':'')+'</div>';
   h+='<div class="sl-step"><span>2</span> Agreement: '+(r.agree>0?'most parameters are Good → <b>+5</b>':r.agree<0?'most parameters are Weak → <b>−5</b>':'no clear agreement → <b>0</b>')+'</div>';
   h+='<div class="sl-step"><span>3</span> Safety caps: '+(r.gates&&r.gates.length?r.gates.map(slEsc).join('; '):'none applied')+'</div>';
+  if(r.px) h+='<div class="sl-step" style="background:#f8faff;">📈 Share price: close ₹'+Number(r.px.c).toLocaleString('en-IN')+' on '+r.px.d+' · 1 week '+(r.px.w1==null?'—':r.px.w1+'%')+' · 2 weeks '+(r.px.w2==null?'—':r.px.w2+'%')+' · 1 month '+(r.px.m1==null?'—':r.px.m1+'%')+'</div>';
   h+='<div class="sl-step sl-fin"><span>=</span> Final CB Conviction <b>'+r.c+'</b> · '+slEsc(r.basis||'')+'</div></div>';
   // trigger sources (separate column)
   var tg=r.L.TG, ts=tg?(tg.pos||[]).map(function(t){t.sg='+';return t;}).concat((tg.neg||[]).map(function(t){t.sg='−';return t;})):[];
@@ -11353,41 +11354,66 @@ function slDetail(r){
     h+='</table>'; }
   return h+'</div>';
 }
+function slPct(v){ if(v==null) return '<td class="sl-c sl-px" style="color:#c0c4d4;" title="Builds up as daily prices are fetched">—</td>'; var c=v>0?'#006b30':v<0?'#b71c1c':'#5a6080'; return '<td class="sl-c sl-px" style="color:'+c+';font-weight:700;">'+(v>0?'+':'')+v.toFixed(1)+'%</td>'; }
+function slPxCells(p){ if(!p) return '<td class="sl-c sl-px" style="color:#c0c4d4;">—</td>'+slPct(null)+slPct(null)+slPct(null);
+  var dd=new Date(p.d+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
+  return '<td class="sl-c sl-px"><b>'+Number(p.c).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})+'</b><div class="sl-w">'+dd+'</div></td>'+slPct(p.w1)+slPct(p.w2)+slPct(p.m1); }
 function slRender(data,el,state){
   state=state||{mode:'top',q:''};
   var list=slRowsFor(data,state.mode,state.q);
   var h='<div class="sl-bar"><button class="sl-tab'+(state.mode==='top'?' on':'')+'" data-m="top">🏆 Top 25</button><button class="sl-tab'+(state.mode==='all'?' on':'')+'" data-m="all">All '+data.rows.length+' companies</button><input class="sl-q" placeholder="Search company or sector…" value="'+slEsc(state.q)+'"></div>';
   h+='<div class="sl-hint">Tap any company to see exactly how its score was arrived at. Green = Good (60+), amber = Average, red = Weak (42 or less).</div>';
-  h+='<div class="sl-wrap"><table class="sl-t"><thead><tr><th>#</th><th style="text-align:left;">Company</th>'+SL_K.map(function(k){return '<th title="'+SL_ASK[k]+'"><span style="color:'+SL_COL[k]+'">'+SL_NAME[k]+'</span><div class="sl-w">'+SL_W[k]+'%</div></th>';}).join('')+'<th>Average</th><th>Bonus / cap</th><th>Final</th></tr></thead><tbody>';
+  h+='<div class="sl-wrap"><table class="sl-t"><thead><tr><th>#</th><th style="text-align:left;">Company</th>'+SL_K.map(function(k){return '<th title="'+SL_ASK[k]+'"><span style="color:'+SL_COL[k]+'">'+SL_NAME[k]+'</span><div class="sl-w">'+SL_W[k]+'%</div></th>';}).join('')+'<th>Average</th><th>Bonus / cap</th><th>Final</th><th class="sl-pxh">Close ₹</th><th class="sl-pxh">1 Week</th><th class="sl-pxh">2 Weeks</th><th class="sl-pxh">1 Month</th></tr></thead><tbody>';
   list.forEach(function(r,i){ var adj=(r.agree?(r.agree>0?'+5':'−5'):'')+(r.gates&&r.gates.length?(r.agree?' · ':'')+'cap':'');
-    h+='<tr class="sl-r" data-n="'+slEsc(r.n)+'"><td class="sl-c sl-rk">'+(state.mode==='top'?(i+1):r.r)+(state.mode==='top'?'<div class="sl-w">overall '+r.r+'</div>':'')+'</td><td><b>'+slEsc(r.n)+'</b><div class="sl-sec">'+slEsc(r.s)+'</div></td>'+SL_K.map(function(k){return slCell(r.L[k]);}).join('')+'<td class="sl-c">'+Math.round(r.base)+'</td><td class="sl-c" style="font-weight:700;color:'+(r.gates&&r.gates.length?'#b71c1c':r.agree>0?'#006b30':r.agree<0?'#b71c1c':'#9aa0b8')+'">'+(adj||'—')+'</td><td class="sl-c sl-fn">'+r.c+'</td></tr>';
-    if(state.open===r.n) h+='<tr><td colspan="11" style="padding:0;">'+slDetail(r)+'</td></tr>';
+    h+='<tr class="sl-r" data-n="'+slEsc(r.n)+'"><td class="sl-c sl-rk">'+(state.mode==='top'?(i+1):r.r)+(state.mode==='top'?'<div class="sl-w">overall '+r.r+'</div>':'')+'</td><td><b>'+slEsc(r.n)+'</b><div class="sl-sec">'+slEsc(r.s)+'</div></td>'+SL_K.map(function(k){return slCell(r.L[k]);}).join('')+'<td class="sl-c">'+Math.round(r.base)+'</td><td class="sl-c" style="font-weight:700;color:'+(r.gates&&r.gates.length?'#b71c1c':r.agree>0?'#006b30':r.agree<0?'#b71c1c':'#9aa0b8')+'">'+(adj||'—')+'</td><td class="sl-c sl-fn">'+r.c+'</td>'+slPxCells(r.px)+'</tr>';
+    if(state.open===r.n) h+='<tr><td colspan="15" style="padding:0;">'+slDetail(r)+'</td></tr>';
   });
-  if(!list.length) h+='<tr><td colspan="11" style="text-align:center;padding:16px;color:#9aa0b8;">No company matches.</td></tr>';
+  if(!list.length) h+='<tr><td colspan="15" style="text-align:center;padding:16px;color:#9aa0b8;">No company matches.</td></tr>';
   h+='</tbody></table></div>';
   el.innerHTML=h;
   el.querySelectorAll('.sl-tab').forEach(function(b){ b.onclick=function(){ state.mode=b.getAttribute('data-m'); state.open=null; slRender(data,el,state); }; });
   var q=el.querySelector('.sl-q'); q.oninput=function(){ state.q=q.value; slRender(data,el,state); var q2=el.querySelector('.sl-q'); q2.focus(); q2.setSelectionRange(q2.value.length,q2.value.length); };
   el.querySelectorAll('.sl-r').forEach(function(tr){ tr.onclick=function(){ var n=tr.getAttribute('data-n'); state.open=state.open===n?null:n; slRender(data,el,state); }; });
 }
-var SL_CSS='.sl-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 6px}.sl-tab{padding:7px 14px;border-radius:20px;border:1px solid #e0dccf;background:#fff;font-weight:700;font-size:12.5px;cursor:pointer;color:#3a3f5c}.sl-tab.on{background:#ff7c00;border-color:#ff7c00;color:#fff}.sl-q{flex:1;min-width:180px;padding:8px 12px;border-radius:20px;border:1px solid #e0dccf;font-size:12.5px}.sl-hint{font-size:11.5px;color:#5a6080;margin:2px 0 8px}.sl-wrap{overflow-x:auto;border:1px solid #ece8de;border-radius:10px}.sl-t{border-collapse:collapse;width:100%;min-width:860px;font-size:12.5px}.sl-t th{background:#faf8f3;padding:8px 6px;font-size:11px;text-align:center;border-bottom:1px solid #ece8de;position:sticky;top:0}.sl-t td{padding:7px 6px;border-bottom:1px solid #f3f0e8}.sl-r{cursor:pointer}.sl-r:hover{background:#fffaf2}.sl-sc{text-align:center;font-weight:800;border-radius:0}.sl-c{text-align:center}.sl-rk{font-weight:900;color:#3a3f5c}.sl-fn{font-weight:900;font-size:15px;color:#b35c00}.sl-w{font-size:9.5px;color:#9aa0b8;font-weight:600}.sl-sec{font-size:10.5px;color:#8a90a8}.sl-det{background:#fffcf6;border-left:4px solid #ff7c00;padding:12px 14px}.sl-det-h{font-size:13px;margin-bottom:6px;color:#3a3f5c}.sl-dt{border-collapse:collapse;width:100%;font-size:12px;background:#fff}.sl-dt th{background:#f6f3ec;padding:6px;font-size:11px;text-align:left}.sl-dt td{padding:6px;border-bottom:1px solid #f0ece4;vertical-align:top}.sl-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.sl-ask{font-size:10.5px;color:#8a90a8}.sl-steps{margin-top:10px;display:grid;gap:5px}.sl-step{font-size:12px;background:#fff;border:1px solid #f0ece4;border-radius:8px;padding:6px 10px}.sl-step span{display:inline-block;width:20px;height:20px;border-radius:50%;background:#ff7c00;color:#fff;text-align:center;font-weight:800;line-height:20px;margin-right:6px;font-size:11px}.sl-fin{border-color:#ff7c00;background:#fff3e0;font-size:13px}';
+var SL_CSS='.sl-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:4px 0 6px}.sl-tab{padding:7px 14px;border-radius:20px;border:1px solid #e0dccf;background:#fff;font-weight:700;font-size:12.5px;cursor:pointer;color:#3a3f5c}.sl-tab.on{background:#ff7c00;border-color:#ff7c00;color:#fff}.sl-q{flex:1;min-width:180px;padding:8px 12px;border-radius:20px;border:1px solid #e0dccf;font-size:12.5px}.sl-hint{font-size:11.5px;color:#5a6080;margin:2px 0 8px}.sl-wrap{overflow-x:auto;border:1px solid #ece8de;border-radius:10px}.sl-t{border-collapse:collapse;width:100%;min-width:1120px;font-size:12.5px}.sl-t th{background:#faf8f3;padding:8px 6px;font-size:11px;text-align:center;border-bottom:1px solid #ece8de;position:sticky;top:0}.sl-t td{padding:7px 6px;border-bottom:1px solid #f3f0e8}.sl-r{cursor:pointer}.sl-r:hover{background:#fffaf2}.sl-sc{text-align:center;font-weight:800;border-radius:0}.sl-c{text-align:center}.sl-rk{font-weight:900;color:#3a3f5c}.sl-fn{font-weight:900;font-size:15px;color:#b35c00}.sl-w{font-size:9.5px;color:#9aa0b8;font-weight:600}.sl-sec{font-size:10.5px;color:#8a90a8}.sl-det{background:#fffcf6;border-left:4px solid #ff7c00;padding:12px 14px}.sl-det-h{font-size:13px;margin-bottom:6px;color:#3a3f5c}.sl-dt{border-collapse:collapse;width:100%;font-size:12px;background:#fff}.sl-dt th{background:#f6f3ec;padding:6px;font-size:11px;text-align:left}.sl-dt td{padding:6px;border-bottom:1px solid #f0ece4;vertical-align:top}.sl-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}.sl-ask{font-size:10.5px;color:#8a90a8}.sl-steps{margin-top:10px;display:grid;gap:5px}.sl-step{font-size:12px;background:#fff;border:1px solid #f0ece4;border-radius:8px;padding:6px 10px}.sl-step span{display:inline-block;width:20px;height:20px;border-radius:50%;background:#ff7c00;color:#fff;text-align:center;font-weight:800;line-height:20px;margin-right:6px;font-size:11px}.sl-fin{border-color:#ff7c00;background:#fff3e0;font-size:13px}.sl-px{background:#f8faff;white-space:nowrap}.sl-pxh{background:#eef3ff!important;color:#1e3a8a}';
 
+// ── v34: closing-price history of tracked companies (fetcher step 10 'px' + older delivery rows) ──
+function cvPxHistory(){
+  var H={};
+  try{ JSON.parse(localStorage.getItem('cbr_px')||'[]').forEach(function(r){ if(r&&r.date&&r.p){ H[r.date]=Object.assign(H[r.date]||{}, r.p); } }); }catch(e){}
+  try{ JSON.parse(localStorage.getItem('cbr_delivery')||'[]').forEach(function(r){ var v=parseFloat(r&&r.cp); if(r&&r.date&&r.sym&&v>0){ var d=H[r.date]||(H[r.date]={}); if(!d[r.sym]) d[r.sym]=v; } }); }catch(e){}
+  return {H:H, dates:Object.keys(H).sort()};
+}
+function cvPxFor(sym, P){
+  if(!sym||!P||!P.dates.length) return null; sym=String(sym).toUpperCase();
+  var i=P.dates.length-1; while(i>=0&&!(P.H[P.dates[i]][sym]>0)) i--; if(i<0) return null;
+  var d=P.dates[i], c=P.H[d][sym], t0=Date.parse(d), out={c:c,d:d};
+  [['w1',7],['w2',14],['m1',30]].forEach(function(o){
+    var lim=t0-o[1]*864e5, lo=lim-6*864e5, v=null;
+    for(var j=i-1;j>=0;j--){ var tj=Date.parse(P.dates[j]); if(tj>lim) continue; if(tj<lo) break; var x=P.H[P.dates[j]][sym]; if(x>0){ v=x; break; } }
+    out[o[0]]=v?Math.round((c/v-1)*1000)/10:null;
+  });
+  return out;
+}
 // ── v34: SIMPLE LIST — every company, six parameters, how the final score is arrived at ──
 function cvSimpleData(){
   var conv=(typeof cvCompute==='function')?cvCompute():[];
   var ranked=conv.filter(function(x){return x.avail>=3;});
+  var P=cvPxHistory();
   var rows=ranked.map(function(x){
     var L={}; SL_K.forEach(function(k){ var l=x.L[k]; L[k]=l?{s:l.score,p:(l.parts||[]).slice(0,3),miss:!!l.missing,
       pos:(l.pos||[]).map(function(t){return {n:t.name,src:t.source,url:t.url,d:t.date};}),
       neg:(l.neg||[]).map(function(t){return {n:t.name,src:t.source,url:t.url,d:t.date};})}:null; });
-    return {r:x.rank,n:x.d.name,s:x.d.sector,c:x.conv,base:x.base,agree:x.agree,gates:x.gates||[],basis:x.basis,L:L};
+    var sy=x.sym||(typeof MI_NAME_TO_SYMBOL!=='undefined'?MI_NAME_TO_SYMBOL[x.d.name]:null);
+    return {r:x.rank,n:x.d.name,s:x.d.sector,c:x.conv,base:x.base,agree:x.agree,gates:x.gates||[],basis:x.basis,L:L,px:cvPxFor(sy,P)};
   });
   // same Top 25 rule as the 🏆 Top 25 button
   var pool=ranked.filter(function(x){return !x.d.flag&&x.conv>=55&&!(x.gates||[]).some(function(g){return /capped/i.test(g);});});
   var top=[], sc={}, gc={};
   for(var i=0;i<pool.length&&top.length<25;i++){ var d=pool[i].d; if((sc[d.sector]||0)>=3||(gc[d.group]||0)>=12) continue; top.push(d.name); sc[d.sector]=(sc[d.sector]||0)+1; gc[d.group]=(gc[d.group]||0)+1; }
   var withT=rows.filter(function(r){return r.L.T;}).length;
-  return {rows:rows, top:top, asOf:new Date(Date.now()+5.5*3600e3).toISOString().slice(0,16).replace('T',' ')+' IST', withT:withT};
+  var withPx=rows.filter(function(r){return r.px;}).length;
+  return {withPx:withPx, pxDays:P.dates.length, rows:rows, top:top, asOf:new Date(Date.now()+5.5*3600e3).toISOString().slice(0,16).replace('T',' ')+' IST', withT:withT};
 }
 function cvSimpleFlowSvg(){
   var bx='', y=8;
@@ -11401,12 +11427,12 @@ function cvOpenSimple(){
   var data=cvSimpleData(), m=document.getElementById('cv-sl-modal');
   if(!m){ m=document.createElement('div'); m.id='cv-sl-modal'; m.style.cssText='position:fixed;inset:0;background:rgba(20,24,40,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px;'; document.body.appendChild(m); m.onclick=function(e){ if(e.target===m) m.remove(); }; }
   if(!document.getElementById('sl-css')){ var st=document.createElement('style'); st.id='sl-css'; st.textContent=SL_CSS; document.head.appendChild(st); }
-  m.innerHTML='<div style="background:#fff;border-radius:12px;max-width:1250px;width:100%;max-height:92vh;display:flex;flex-direction:column;"><div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #ece8de;flex-wrap:wrap;"><b style="flex:1;font-size:15px;">📋 Simple ranking list — how every company\u2019s score is arrived at</b><button onclick="cvSaveSimpleReport()" style="padding:6px 12px;border-radius:8px;border:1px solid #ff7c00;background:#fff3e0;color:#9a4a00;font-weight:700;cursor:pointer;">⬇ Save as report</button><button onclick="document.getElementById(\'cv-sl-modal\').remove()" style="padding:6px 12px;border-radius:8px;border:1px solid #d6d9e6;background:#fff;cursor:pointer;">Close</button></div><div style="overflow:auto;padding:10px 16px 16px;"><div style="overflow-x:auto;">'+cvSimpleFlowSvg()+'</div>'+(data.withT?'':'<div style="font-size:11.5px;color:#9a4a00;background:#fff4e0;border-radius:8px;padding:6px 10px;margin:6px 0;">Market column is blank — no NSE data in this browser yet. Press Fetch in NSE Market Intel; its 15% is shared by the other five until then.</div>')+'<div id="cv-sl-body"></div></div></div>';
+  m.innerHTML='<div style="background:#fff;border-radius:12px;max-width:1250px;width:100%;max-height:92vh;display:flex;flex-direction:column;"><div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #ece8de;flex-wrap:wrap;"><b style="flex:1;font-size:15px;">📋 Simple ranking list — how every company\u2019s score is arrived at</b><button onclick="cvSaveSimpleReport()" style="padding:6px 12px;border-radius:8px;border:1px solid #ff7c00;background:#fff3e0;color:#9a4a00;font-weight:700;cursor:pointer;">⬇ Save as report</button><button onclick="document.getElementById(\'cv-sl-modal\').remove()" style="padding:6px 12px;border-radius:8px;border:1px solid #d6d9e6;background:#fff;cursor:pointer;">Close</button></div><div style="overflow:auto;padding:10px 16px 16px;"><div style="overflow-x:auto;">'+cvSimpleFlowSvg()+'</div>'+(data.withT?'':'<div style="font-size:11.5px;color:#9a4a00;background:#fff4e0;border-radius:8px;padding:6px 10px;margin:6px 0;">Market column is blank — no NSE data in this browser yet. Press Fetch in NSE Market Intel; its 15% is shared by the other five until then.</div>')+(data.withPx?'':'<div style="font-size:11.5px;color:#1e3a8a;background:#eef3ff;border-radius:8px;padding:6px 10px;margin:6px 0;">Price columns fill after the next NSE fetch with the new fetcher.py. The first fetch also back-fills prices from 1 week, 2 weeks, 1 month and 3 months ago.</div>')+'<div id="cv-sl-body"></div></div></div>';
   slRender(data, document.getElementById('cv-sl-body'), {mode:'top',q:''});
 }
 function cvSaveSimpleReport(){
   var data=cvSimpleData();
-  var fn=[slEsc,slTone,slShort,slCell,slRowsFor,slDetail,slRender,cvSimpleFlowSvg].map(function(f){return f.toString();}).join('\n');
+  var fn=[slEsc,slTone,slShort,slCell,slRowsFor,slDetail,slPct,slPxCells,slRender,cvSimpleFlowSvg].map(function(f){return f.toString();}).join('\n');
   var vars='var SL_K='+JSON.stringify(SL_K)+',SL_NAME='+JSON.stringify(SL_NAME)+',SL_W='+JSON.stringify(SL_W)+',SL_COL='+JSON.stringify(SL_COL)+',SL_ASK='+JSON.stringify(SL_ASK)+';';
   var html=cvSimpleReportHtml(data, vars+'\n'+fn);
   var dt=new Date(Date.now()+5.5*3600e3), mo=dt.getUTCMonth()+1, yr=dt.getUTCFullYear(); var qn=mo>=7&&mo<=9?1:mo>=10?2:mo<=3?3:4; var fy=(qn===3||qn===4)?yr:yr+1; var q='Q'+qn+'FY'+String(fy).slice(2);
@@ -11428,7 +11454,7 @@ function cvSimpleReportHtml(data, code){
     'var best=null,bs=0;by.forEach(function(r){var nm=r.n.toLowerCase(),s=0;if(q.indexOf(nm)>=0)s=100;else{nm.split(/[^a-z0-9]+/).forEach(function(w){if(w.length>=3&&q.indexOf(w)>=0)s+=w.length;});}if(s>bs){bs=s;best=r;}});'+
     'if(!best||bs<4)return "I could not match a company. Try a name from the list, for example Torrent Power or BHEL.";var r=best,t=DATA.top.indexOf(r.n);'+
     'var parts=SL_K.filter(function(k){return r.L[k];}).map(function(k){return SL_NAME[k]+" "+r.L[k].s;}).join(", ");var tg=r.L.TG&&r.L.TG.pos&&r.L.TG.pos.length?" Main trigger: "+r.L.TG.pos[0].n+".":"";var ng=r.L.TG&&r.L.TG.neg&&r.L.TG.neg.length?" Risk: "+r.L.TG.neg[0].n+".":"";'+
-    'return r.n+" is ranked "+r.r+" overall"+(t>=0?", number "+(t+1)+" in the Top 25":"")+". Final score "+r.c+". "+parts+"."+(r.agree>0?" Plus 5 because most parameters agree.":r.agree<0?" Minus 5 because most parameters are weak.":"")+(r.gates.length?" "+r.gates[0].replace(/[^\\w\\s.,()\\-]/g,"")+".":"")+tg+ng;}'+
+    'var pxs=r.px?" Share price "+r.px.c+" rupees"+(r.px.w1!=null?", "+(r.px.w1>=0?"up ":"down ")+Math.abs(r.px.w1)+" percent in a week":"")+(r.px.m1!=null?", "+(r.px.m1>=0?"up ":"down ")+Math.abs(r.px.m1)+" percent in a month":"")+".":"";return r.n+" is ranked "+r.r+" overall"+(t>=0?", number "+(t+1)+" in the Top 25":"")+". Final score "+r.c+". "+parts+"."+(r.agree>0?" Plus 5 because most parameters agree.":r.agree<0?" Minus 5 because most parameters are weak.":"")+(r.gates.length?" "+r.gates[0].replace(/[^\\w\\s.,()\\-]/g,"")+".":"")+tg+ng+pxs;}'+
     'function ask(q){if(!q)return;var a=ans(q),ab=document.getElementById("ab");ab.insertAdjacentHTML("beforeend","<div class=\\"m q\\">"+slEsc(q)+"</div><div class=\\"m\\">"+slEsc(a)+"</div>");ab.scrollTop=1e6;document.getElementById("ai").value="";try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(a);u.lang="en-IN";speechSynthesis.speak(u);}catch(e){}}'+
     'function lis(){var R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R){alert("Voice input needs Chrome or Edge.");return;}var r=new R();r.lang="en-IN";r.onresult=function(e){ask(e.results[0][0].transcript);};r.start();}'+
     '</'+S+'></body></html>';
