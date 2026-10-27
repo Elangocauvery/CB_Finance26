@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v35 (CDMO fix: sub-sector peers · CDMO tailwind scored · name matching)</title>
+<title>CB Finance26™ — Macro Pulse · v36 (Sector Ranker on Q1/Q2 FY27 results · reads Q2 FY27 dashboards)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -1622,10 +1622,9 @@ tr:last-child td{border-bottom:none;}
     <div class="hdr-sub">Ranked by <b>six lenses</b> — each lens averaged over the sector's ranked companies (Earnings · Fundamental · Macro · Market · Cycle · Trigger), with the sector's own macro rules, cycle phase and triggers · tap "CB Score (old)" for the Q4 FY26 order · Not Investment Advice</div>
     <div class="hdr-chips">
       <span class="chip g" id="sr-top-chip">🏆 #1 Hotels (87)</span>
-      <span class="chip g">💊 Pharma — Lupin +89% PAT</span>
-      <span class="chip g">⚡ Power — NTPC/PFC/REC</span>
-      <span class="chip a">🛡️ Defence — revised down (HAL engine crisis)</span>
-      <span class="chip r">💻 IT under pressure</span>
+      <span class="chip g" id="sr-chip-fast"></span>
+      <span class="chip a" id="sr-chip-slow"></span>
+      <span class="chip r" id="sr-chip-last"></span>
     </div>
   </div>
 </div>
@@ -1633,17 +1632,19 @@ tr:last-child td{border-bottom:none;}
 <!-- SUMMARY -->
 <div class="summary">
   <div class="summary-inner">
-    <div class="sum-stat"><span class="sum-val">33</span><span class="sum-lbl">Sectors Ranked</span></div>
+    <div class="sum-stat"><span class="sum-val" id="sr-n">—</span><span class="sum-lbl">Sectors Ranked</span></div>
     <div class="sum-div"></div>
-    <div class="sum-stat"><span class="sum-val g">17</span><span class="sum-lbl">Green Sectors</span></div>
+    <div class="sum-stat"><span class="sum-val g" id="sr-g">—</span><span class="sum-lbl">Green Sectors</span></div>
     <div class="sum-div"></div>
-    <div class="sum-stat"><span class="sum-val a">14</span><span class="sum-lbl">Mixed / Neutral</span></div>
+    <div class="sum-stat"><span class="sum-val a" id="sr-m">—</span><span class="sum-lbl">Mixed / Neutral</span></div>
     <div class="sum-div"></div>
-    <div class="sum-stat"><span class="sum-val r">2</span><span class="sum-lbl">Red / Weak</span></div>
+    <div class="sum-stat"><span class="sum-val r" id="sr-r">—</span><span class="sum-lbl">Red / Weak</span></div>
+    <div class="sum-div"></div>
+    <div class="sum-stat"><span class="sum-val" id="sr-fy27">—</span><span class="sum-lbl">On FY27 results</span></div>
     <div class="sum-div"></div>
     <div class="sum-stat"><span class="sum-val qtr-live">Q1 FY27</span><span class="sum-lbl">Latest results</span></div>
     <div class="sum-div"></div>
-    <div class="sum-stat"><span class="sum-val">May 2026</span><span class="sum-lbl">Data As Of</span></div>
+    <div class="sum-stat"><span class="sum-val" id="sr-asof">—</span><span class="sum-lbl">Data As Of</span></div>
   </div>
 </div>
 
@@ -1655,7 +1656,7 @@ tr:last-child td{border-bottom:none;}
     <button class="rbtn on" id="sr-by-six" onclick="srSetBy('six')" style="padding:5px 12px;border-radius:14px;border:1px solid #ff7c00;background:#fff3e0;color:#b35c00;font-weight:800;font-size:11.5px;cursor:pointer;">🎯 Six-lens</button>
     <button class="rbtn" id="sr-by-old" onclick="srSetBy('old')" style="padding:5px 12px;border-radius:14px;border:1px solid #d6d9e6;background:#fff;color:#5a6080;font-weight:700;font-size:11.5px;cursor:pointer;margin-right:12px;">CB Score (old)</button>
     <span class="ctrl-lbl">Filter:</span>
-    <button class="fbtn on" onclick="filter('all',this)">All 33</button>
+    <button class="fbtn on" onclick="filter('all',this)">All</button>
     <button class="fbtn" onclick="filter('top10',this)">Top 10</button>
     <button class="fbtn" onclick="filter('green',this)">Green ✅</button>
     <button class="fbtn" onclick="filter('mixed',this)">Mixed ⚡</button>
@@ -1681,7 +1682,7 @@ tr:last-child td{border-bottom:none;}
     <div>Sector</div>
     <div class="lh-r">Rev Growth</div>
     <div class="lh-r">EBITDA Margin</div>
-    <div class="lh-r">PAT Trend</div>
+    <div class="lh-r">Results tone</div>
     <div class="lh-r">Outlook</div>
     <div>CB Heat Bar</div>
     <div class="lh-r">CB Score</div>
@@ -4182,14 +4183,14 @@ function grEmit(en,parsed){
   if(en.exclude&&en.exclude.length){
     parsed={fmt:parsed.fmt,period:parsed.period,cos:parsed.cos.filter(c=>!en.exclude.some(x=>c.name.toLowerCase().includes(x.toLowerCase())))};
   }
-  if(!en.split) return [{file:en.file,sectors:en.sectors,agg:grAggregate(parsed),cos:cvSlimCos(parsed.cos),sc:parsed.sc}];
+  if(!en.split) return [{file:en.file,sectors:en.sectors,agg:grAggregate(parsed),cos:cvSlimCos(parsed.cos),sc:parsed.sc,dq:parsed.dq}];
   const bySec={};
   parsed.cos.forEach(c=>{
     const sec=Object.keys(en.split).find(k=>c.name.toLowerCase().includes(k.toLowerCase())||k.toLowerCase().includes(c.name.toLowerCase()));
     const s=sec?en.split[sec]:null; if(!s) return;
     (bySec[s]=bySec[s]||[]).push(c);
   });
-  const out=Object.keys(bySec).map(s=>({file:en.file,sectors:[s],agg:grAggregate({fmt:parsed.fmt,period:parsed.period,cos:bySec[s]}),cos:cvSlimCos(bySec[s])}));
+  const out=Object.keys(bySec).map(s=>({file:en.file,sectors:[s],agg:grAggregate({fmt:parsed.fmt,period:parsed.period,cos:bySec[s]}),cos:cvSlimCos(bySec[s]),dq:parsed.dq}));
   return out.length?out:[{file:en.file,sectors:en.sectors,agg:grAggregate(parsed),cos:cvSlimCos(parsed.cos)}];
 }
 function grKw(fname){
@@ -4201,7 +4202,7 @@ function grKw(fname){
 // Only the newest quarter found in the loaded files counts. Older prints are
 // kept for QoQ comparison only and never drive signals.
 function grQtrKey(s){ const m=/Q[\s_-]*([1-4])[\s_-]*FY[\s_-]*(\d{2})/i.exec(String(s||'')); return m?{q:+m[1],fy:+m[2],key:(+m[2])*4+(+m[1]),label:'Q'+m[1]+'FY'+m[2]}:null; }
-function grFileQtr(f){ if(!f) return null; const b=String(f.file||'').split('/').pop(); return grQtrKey(b)||grQtrKey(f.agg&&f.agg.period)||grQtrKey(f.period)||null; }
+function grFileQtr(f){ if(!f) return null; if(f.dq) return grQtrKey(f.dq); const b=String(f.file||'').split('/').pop(); return grQtrKey(b)||grQtrKey(f.agg&&f.agg.period)||grQtrKey(f.period)||null; }
 // v23: QUARTER FALLBACK — if a company/sector has not yet published the newest quarter,
 // its most recent earlier quarter is used (up to CB_QTR_MAX_LAG quarters back, e.g.
 // Q2FY27 → Q1FY27 → Q4FY26) and every screen footnotes which quarter it is based on.
@@ -4520,6 +4521,15 @@ function grParseHTML(htmlText,fname,opts){
     let coCos=null; try{ coCos=grFromCO(doc, htmlText); }catch(e){ coCos=null; }
     if(coCos&&coCos.length){ cos=coCos; fmt='var-CO'; }
   }
+  // v36: dashboards whose numbers sit in a JS data object (Q2 FY27 house style) — used when
+  // nothing above produced usable results (no YoY growth and no margin for most companies)
+  var dqLabel=null;
+  if(fmt!=='cb-data'&&fmt!=='data-attrs'){
+    var dpc=null; try{ dpc=grDeepCO(doc, htmlText); }catch(e){ dpc=null; }
+    var yN=function(a){ return (a||[]).filter(function(c){return c.revYoY!=null;}).length; };
+    var weak=!cos.length||cos.filter(function(c){return c.revYoY!=null||c.ebitda!=null;}).length<cos.length/2;
+    if(dpc&&dpc.length&&(weak||(yN(dpc)>=yN(cos)&&yN(dpc)>0&&/transposed|metric-tables|var-CO/.test(fmt)))){ cos=dpc.slice(); dqLabel=dpc.dq||null; fmt='deep-object'; }
+  }
   if(!cos.length) return null;
   // dedupe by name, treating "Vardhman" and "Vardhman Textiles" as the same company
   const kept=[]; const keptVals=[];
@@ -4536,13 +4546,150 @@ function grParseHTML(htmlText,fname,opts){
   });
   // period detection
   const pm=htmlText.match(/Q[1-4]\s*FY\s*\d{2}/i);
-  return {fmt,period:pm?pm[0].replace(/\s+/g,' '):'',cos};
+  return {fmt,period:dqLabel||(pm?pm[0].replace(/\s+/g,' '):''),cos,dq:dqLabel||undefined};
 }
 function grNum(v){ if(typeof v==='number') return isFinite(v)?v:null; if(typeof v==='string'){ const x=parseFloat(v.replace(/[,₹%+\s]/g,'')); return isFinite(x)?x:null; } return null; }
 function grSymToName(sym){
   try{ if(typeof MI_NAME_TO_SYMBOL==='undefined'||!sym) return null; const u=String(sym).toUpperCase();
     for(const k in MI_NAME_TO_SYMBOL){ if(String(MI_NAME_TO_SYMBOL[k]).toUpperCase()===u) return k; } }catch(e){}
   return null;
+}
+// v36: generic reader for house-style dashboards whose numbers live in a JS data object
+// (var CO / QTR / MULTI ... = {...}) with a quarter-label array and matching number series.
+function grDeepCO(doc, htmlText){
+  var src=[].slice.call(doc.querySelectorAll('script')).map(function(x){return x.textContent;}).join('\n');
+  var re=/\b(?:var|let|const)\s+([A-Za-z_$][\w$]*)\s*=\s*([\[{])/g, m, objs=[];
+  while((m=re.exec(src))&&objs.length<200){
+    var j=m.index+m[0].length-1, d=0, k=j, q=null;
+    for(;k<src.length&&k-j<600000;k++){ var ch=src[k];
+      if(q){ if(ch==='\\'){k++;continue;} if(ch===q) q=null; continue; }
+      if(ch==='"'||ch==="'"||ch==='`'){ q=ch; continue; }
+      if(ch==='{'||ch==='[') d++; else if(ch==='}'||ch===']'){ d--; if(d===0) break; } }
+    if(d!==0) continue;
+    var lit=src.slice(j,k+1); if(lit.length<40) continue;
+    try{ var o=(new Function('return '+lit))(); if(o&&typeof o==='object') objs.push({n:m[1],o:o,pos:m.index}); }catch(e){}
+    re.lastIndex=k+1;
+  }
+  if(!objs.length) return null;
+  var QRE=/Q\s*([1-4])\s*[-_ ]?\s*FY\s*'?(\d{2})/i;
+  var MQ={jun:1,sep:2,dec:3,mar:4};
+  function qk(s){ s=String(s||''); var x=QRE.exec(s); if(x) return (+x[2])*4+(+x[1]);
+    var y=/^\s*(jun|sep|dec|mar)[a-z]*[\s'\-]*(\d{2})\s*$/i.exec(s); if(!y) return null;
+    var q=MQ[y[1].toLowerCase()], yy=+y[2], fy=q===4?yy:yy+1; return fy*4+q; }
+  function lab(a){ if(!Array.isArray(a)||a.length<2) return null;
+    var out=a.map(function(v){ return qk(Array.isArray(v)?v[0]:v); });
+    return out.filter(function(v){return v!=null;}).length>=Math.max(2,a.length-1)?out:null; }
+  function numArr(a,n){ return Array.isArray(a)&&a.length===n&&a.some(function(v){return typeof v==='number';})&&a.every(function(v){return v==null||typeof v==='number';}); }
+  var REV=['rev','revenue','revINR','inr','revInr','consRev','revCons','totalRev','revOps','revenueOps','sales','netSales','totalInc','totalIncome','ti','income','nii','revStandalone','saRev'];
+  var EBM=['ebitdaM','ebitdaMargin','ebm','margin','consMargin','opm','ebitM','ebitdaPct','opMargin'];
+  var EB=['ebitda','adjEbitda','consEbitda','ebitdaConsol','repEbitda','pbidt','ppop','ebit','opProfit'];
+  var PAT=['pat','consPat','patConsol','patAdj','patRep','netProfit','np','ni','patStandalone'];
+  function pick(o,keys,n){ for(var i=0;i<keys.length;i++){ if(numArr(o[keys[i]],n)) return o[keys[i]]; } return null; }
+  function nameOf(node,key,root){
+    var nm=node.name||node.short||node.plain||node.company||node.co||null;
+    if(!nm&&typeof grSymToName==='function') nm=grSymToName(node.nse||node.ticker||node.symbol||key);
+    return nm||(root&&(root.name||root.short))||null;
+  }
+  var found={};
+  function addCo(nm,rec){ if(!nm||!rec||!(rec.rev>0)) return; var k=String(nm).toLowerCase();
+    var sc=(rec.revYoY!=null?2:0)+(rec.ebitda!=null?1:0); if(!found[k]||found[k]._s<sc){ rec._s=sc; rec.name=String(nm); found[k]=rec; } }
+  function fromTable(labels, t, nm){
+    var n=labels.length, R=pick(t,REV,n); if(!R) return;
+    var cur=-1, best=-1; labels.forEach(function(v,i){ if(v!=null&&v>best&&R[i]!=null){ best=v; cur=i; } }); if(cur<0) return;
+    var yi=labels.indexOf(best-4), rev=+R[cur], yoy=(yi>=0&&R[yi]>0)?+((rev/R[yi]-1)*100).toFixed(1):null;
+    var M=pick(t,EBM,n), E=pick(t,EB,n), P=pick(t,PAT,n), em=null;
+    if(M&&M[cur]!=null) em=+M[cur]; else if(E&&E[cur]!=null&&rev) em=+(E[cur]/rev*100).toFixed(1);
+    addCo(nm,{rev:rev,revYoY:yoy,ebitda:em,pat:P&&P[cur]!=null?+P[cur]:0,greens:0,reds:0,ambers:0,q:best});
+  }
+  function scanNode(node,key,root,depth){
+    if(!node||typeof node!=='object'||Array.isArray(node)||depth>3) return;
+    var nm=nameOf(node,key,root);
+    var lk=['q','labels','periods','quarters','qtr','qs','cols','period'];
+    // labels on this node -> series on this node; labels inside a child -> series in that child
+    for(var i=0;i<lk.length;i++){ var L=lab(node[lk[i]]); if(L) fromTable(L,node,nm); }
+    for(var i2=0;i2<lk.length;i2++){ var L2=lab(node[lk[i2]]); if(!L2) continue;
+      Object.keys(node).forEach(function(k){ var c=node[k]; if(c&&typeof c==='object'&&!Array.isArray(c)&&!/usd|\$/i.test(k)) fromTable(L2,c,nm); }); }
+    if(node.m&&typeof node.m==='object'){ var Rm=null,km=null; ['nii','rev','totalInc','income'].some(function(k){ var a=node.m[k]; if(Array.isArray(a)&&a.length===2&&a[0]>0&&a[1]>0){ Rm=a; km=k; return true; } return false; });
+      if(Rm) addCo(nm,{rev:+Rm[1],revYoY:+((Rm[1]/Rm[0]-1)*100).toFixed(1),ebitda:null,pat:Array.isArray(node.m.pat)?+node.m.pat[1]||0:0,greens:0,reds:0,ambers:0}); }
+    Object.keys(node).forEach(function(k){ var c=node[k]; if(!c||typeof c!=='object'||Array.isArray(c)) return;
+      for(var i=0;i<lk.length;i++){ var L=lab(c[lk[i]]); if(L){ fromTable(L,c,nm); if(c.periods&&lab(c.periods)) fromTable(lab(c.periods),c,nm); } }
+      // [current, year-ago, yoy%] triples, e.g. pl:{totalInc:[2449,1939,26.3]}
+      var R=null; for(var r=0;r<REV.length;r++){ var a=c[REV[r]]; if(Array.isArray(a)&&a.length===3&&a[0]>0&&a[1]>0&&a[2]!=null&&Math.abs((a[0]/a[1]-1)*100-a[2])<2){ R=a; break; } }
+      if(R){ var Pt=null; PAT.some(function(p){ if(Array.isArray(c[p])&&c[p].length===3){ Pt=c[p]; return true; } return false; });
+        addCo(nm,{rev:+R[0],revYoY:+R[2],ebitda:null,pat:Pt?+Pt[0]:0,greens:0,reds:0,ambers:0}); }
+    });
+    // scalar style: revINR + inrYoY + ebitM
+    var rv=null, yy=null; ['revINR','rev','revenue','totalIncome'].some(function(k){ if(typeof node[k]==='number'){ rv=node[k]; return true; } return false; });
+    ['inrYoY','revYoY','revGr','yoy'].some(function(k){ if(typeof node[k]==='number'){ yy=node[k]; return true; } return false; });
+    if(rv>0&&yy!=null){ var em2=null; ['ebitdaM','ebitM','opm','margin','ebitdaMargin'].some(function(k){ if(typeof node[k]==='number'){ em2=node[k]; return true; } return false; });
+      addCo(nm,{rev:rv,revYoY:yy,ebitda:em2,pat:typeof node.pat==='number'?node.pat:0,greens:0,reds:0,ambers:0}); }
+    Object.keys(node).forEach(function(k){ var c=node[k]; if(c&&typeof c==='object'&&!Array.isArray(c)&&(c.name||c.short||c.nse||c.ticker||depth===0)) scanNode(c,k,root,depth+1); });
+  }
+  objs.forEach(function(x){ scanNode(x.o,x.n,x.o,0); });
+  if(!Object.keys(found).length) grChartScan(src, objs, qk, lab, addCo, doc);
+  if(!Object.keys(found).length){ // quarter-per-row table: Quarter | Revenue | Net profit ...
+    var ttl=((doc.querySelector('title')||{}).textContent||'').split(/\s+[—|–-]\s+/)[0].replace(/\b(Q[1-4]\s*FY\s*\d{2}|FY\s*\d{2}|results?|analysis|dashboard)\b/gi,'').replace(/\s+/g,' ').trim();
+    [].slice.call(doc.querySelectorAll('table')).some(function(tb){
+      var rows=[].slice.call(tb.querySelectorAll('tr')); if(rows.length<3) return false;
+      var hd=[].slice.call(rows[0].cells).map(function(c){return c.textContent.toLowerCase();});
+      var iR=hd.findIndex(function(h){return /revenue|total income|sales|net interest income|\bnii\b/.test(h)&&!/%|yoy|growth/.test(h);});
+      if(iR<1) return false;
+      var iE=hd.findIndex(function(h){return /ebitda/.test(h)&&/%|margin/.test(h);}), iP=hd.findIndex(function(h){return /net profit|\bpat\b/.test(h)&&!/%|yoy/.test(h);});
+      var L=[],R=[],E=[],P=[]; var num=function(c){ if(!c) return null; var v=parseFloat(String(c.textContent).replace(/[₹,~%*+\s]/g,'')); return isNaN(v)?null:v; };
+      rows.slice(1).forEach(function(tr){ var k=qk(tr.cells[0]&&tr.cells[0].textContent); if(k==null) return; L.push(k); R.push(num(tr.cells[iR])); E.push(iE>0?num(tr.cells[iE]):null); P.push(iP>0?num(tr.cells[iP]):null); });
+      if(L.length<2) return false;
+      var cur=-1,best=-1; L.forEach(function(v,i){ if(v>best&&R[i]!=null){best=v;cur=i;} }); if(cur<0) return false;
+      var yi=L.indexOf(best-4); addCo(ttl||'?',{rev:R[cur],revYoY:(yi>=0&&R[yi]>0)?+((R[cur]/R[yi]-1)*100).toFixed(1):null,ebitda:E[cur],pat:P[cur]||0,greens:0,reds:0,ambers:0,q:best});
+      return true;
+    });
+  }
+  var out=Object.keys(found).map(function(k){ var r=found[k]; delete r._s; return r; });
+  var mq=Math.max.apply(null,out.map(function(r){return r.q||0;}));
+  if(mq>0) out=out.filter(function(r){ return !r.q||r.q===mq; });
+  if(out.length&&mq>0){ var qq=((mq-1)%4)+1, fy=(mq-qq)/4; out.dq='Q'+qq+'FY'+(fy<10?'0':'')+fy; }
+  return out.length?out:null;
+}
+
+// v36: numbers drawn as charts — labels:QTR (quarters) + datasets/series {label:"Revenue", data:[...]}
+function grChartScan(src, objs, qk, lab, addCo, doc){
+  var LV=objs.filter(function(x){ return Array.isArray(x.o)&&lab(x.o); });
+  function lv(name,pos){ var b=null; LV.forEach(function(x){ if(x.n===name&&x.pos<pos&&(!b||x.pos>b.pos)) b=x; }); if(!b) LV.forEach(function(x){ if(x.n===name&&!b) b=x; }); return b?lab(b.o):null; }
+  var title=((doc.querySelector('title')||{}).textContent||'').split(/\s+[—|–-]\s+/)[0].replace(/\b(Q[1-4]\s*FY\s*\d{2}|FY\s*\d{2}|results?|analysis|dashboard)\b/gi,'').replace(/\s+/g,' ').trim();
+  var list=(typeof CR_DATA!=='undefined'&&Array.isArray(CR_DATA))?CR_DATA:[];
+  var nrm=function(x){ return String(x||'').toLowerCase().replace(/\b(ltd|limited|india|the)\b/g,'').replace(/[^a-z0-9]+/g,''); };
+  var re=/labels\s*:\s*([A-Za-z_$][\w$]*|\[[^\]]{0,400}\])/g, m, per={};
+  while((m=re.exec(src))){
+    var L=null; if(/^\[/.test(m[1])){ try{ L=lab((new Function('return '+m[1]))()); }catch(e){} } else L=lv(m[1],m.index);
+    if(!L) continue;
+    var before=src.slice(Math.max(0,m.index-160),m.index), idm=/["']([A-Za-z][\w-]{1,40})["'][^"']*$/.exec(before), cid=idm?idm[1]:'';
+    var seg=src.slice(m.index, m.index+1500), nx=seg.indexOf('labels',8); if(nx>0) seg=seg.slice(0,nx);
+    var dre=/(?:label|name)\s*:\s*(?:[A-Za-z]\(\s*)*(?:[A-Za-z]\(\s*)?["']([^"']{1,60})["'][\s\S]{0,220}?(?:data|vals)\s*:\s*\[([^\[\]]{0,300})\]/g, d;
+    var co=null;  // multi-company page: chart id ("cIdbiFin") or enclosing function ("drawIdbi") names the company
+    var fnm=/function\s+([A-Za-z_$][\w$]*)\s*\([^)]*\)\s*\{(?![\s\S]*function\s+[A-Za-z_$][\w$]*\s*\()[\s\S]*$/.exec(src.slice(Math.max(0,m.index-4000),m.index));
+    [cid, fnm?fnm[1]:''].some(function(raw){
+      var tok=String(raw).replace(/^(draw|render|build|init|make|chart|ch|c)(?=[A-Z0-9_]|[a-z]{3})/,'').toLowerCase().replace(/(rev|fin|pat|nii|trend|bar|line|chart|charts|q|qtr|perf|results?)+$/,'');
+      if(tok.length<3) return false;
+      var hit=list.filter(function(r){ return nrm(r.name).indexOf(tok)===0; }); if(hit.length===1){ co=hit[0].name; return true; } return false; });
+    while((d=dre.exec(seg))){
+      var nm=d[1], vals; try{ vals=(new Function('return ['+d[2]+']'))(); }catch(e){ continue; }
+      if(vals.length!==L.length||!vals.every(function(v){return v==null||typeof v==='number';})) continue;
+      var t=nm.toLowerCase(), kind=null;
+      if(/%|margin|growth|yoy|share|mix/.test(t)){ if(/ebitda|operating|opm|ebit\b/.test(t)&&!/gross/.test(t)) kind='em'; }
+      else if(/revenue|sales|total income|net interest income|^nii\b|income from op/.test(t)) kind='rev';
+      else if(/^ebitda|operating profit|^ppop/.test(t)) kind='eb';
+      else if(/net profit|^pat\b|profit after tax/.test(t)) kind='pat';
+      if(!kind) continue;
+      var who=co||title||'?'; var r=per[who]||(per[who]={});
+      if(!r[kind]) r[kind]={L:L,v:vals};
+    }
+  }
+  Object.keys(per).forEach(function(who){ var r=per[who]; if(!r.rev) return;
+    var L=r.rev.L, V=r.rev.v, cur=-1, best=-1; L.forEach(function(q,i){ if(q!=null&&q>best&&V[i]!=null){ best=q; cur=i; } }); if(cur<0) return;
+    var yi=L.indexOf(best-4), rev=+V[cur], yoy=(yi>=0&&V[yi]>0)?+((rev/V[yi]-1)*100).toFixed(1):null, em=null;
+    if(r.em&&r.em.L.indexOf(best)>=0) em=r.em.v[r.em.L.indexOf(best)]; else if(r.eb&&r.eb.L.indexOf(best)>=0&&rev) em=+(r.eb.v[r.eb.L.indexOf(best)]/rev*100).toFixed(1);
+    var pat=r.pat&&r.pat.L.indexOf(best)>=0?r.pat.v[r.pat.L.indexOf(best)]:0;
+    addCo(who,{rev:rev,revYoY:yoy,ebitda:em,pat:pat||0,greens:0,reds:0,ambers:0,q:best});
+  });
 }
 function grFromCO(doc, htmlText){
   const scripts=[...doc.querySelectorAll('script')].map(x=>x.textContent).join('\n');
@@ -9234,9 +9381,22 @@ function recomputeSectorLiveRanks(){
   });
   // v28: six-lens score per sector
   SR_DATA.forEach(s=>{ try{ s.six=srSixLens(s); }catch(e){ s.six=null; } });
+  // v36: green / mixed / weak from the current score, not the Q4 FY26 label
+  SR_DATA.forEach(s=>{ if(s.sent0===undefined) s.sent0=s.sent; const v=(s.six&&s.six.score!=null)?s.six.score:null; s.sent=v==null?s.sent0:(v>=63?'green':v>=50?'mixed':'red'); });
   SR_DATA.sort((a,b)=>(srScore(b)-srScore(a))||(b.cbLive-a.cbLive));
   SR_DATA.forEach((s,i)=>s.rank=i+1);
   try{ const tc=document.getElementById('sr-top-chip'); if(tc&&SR_DATA[0]) tc.textContent='🏆 #1 '+SR_DATA[0].name+' ('+srScore(SR_DATA[0])+(SR_BY==='six'?' six-lens':'')+')'; }catch(e){}
+  try{ // v36 live summary + growth chips
+    const set=(id,t)=>{ const el=document.getElementById(id); if(el) el.textContent=t; };
+    set('sr-n',SR_DATA.length); set('sr-g',SR_DATA.filter(s=>s.sent==='green').length); set('sr-m',SR_DATA.filter(s=>s.sent==='mixed').length); set('sr-r',SR_DATA.filter(s=>s.sent==='red').length);
+    const L=SR_DATA.map(s=>({s,L:srLatest(s)})).filter(x=>x.L);
+    set('sr-fy27',L.length+' / '+SR_DATA.length);
+    const c=grLoadCache(); set('sr-asof', c&&c.ts?new Date(c.ts).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):(SR_BAKED?new Date(SR_BAKED.built).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+' (saved)':'—'));
+    const g=L.filter(x=>x.L.y!=null&&x.L.n>=3).sort((a,b)=>b.L.y-a.L.y);
+    if(g.length){ set('sr-chip-fast','🚀 Fastest growth: '+g[0].s.name+' '+(g[0].L.y>0?'+':'')+g[0].L.y+'% ('+srQ(g[0].L.newest)+')');
+                  set('sr-chip-slow','🐢 Slowest growth: '+g[g.length-1].s.name+' '+(g[g.length-1].L.y>0?'+':'')+g[g.length-1].L.y+'%'); }
+    const last=SR_DATA[SR_DATA.length-1]; if(last) set('sr-chip-last','🔻 Lowest rank: '+last.name+' ('+srScore(last)+')');
+  }catch(e){ console.warn('sr summary',e); }
   const banner=document.getElementById('sr-admin-banner');
   if(banner && isAdminMode()){
     const diag = sectorsWithData===0
@@ -9249,6 +9409,64 @@ function recomputeSectorLiveRanks(){
 SR_DATA.sort((a,b)=>b.cb-a.cb);
 SR_DATA.forEach((s,i)=>{s.rank=i+1; s.cbLive=s.cb; s.liveAdj=0;});
 recomputeSectorLiveRanks();
+
+// ── v36: SECTOR RANKER on the latest results ───────────────────────────────
+// Each company uses its own newest quarter (Q2 FY27 where published, else Q1 FY27, up to
+// CB_QTR_MAX_LAG back). Sub-sectors roll up into their parent ("Banking (PSU)" → "Banking").
+var SR_ALIAS={
+  'Power Financiers':['Power Financiers (PFC/REC/IREDA)'],
+  'Power (Gencos/Transmission)':['Power (Gencos)','Power (Transmission)','Power (Integrated/Distribution)'],
+  'NBFC (Lending)':['NBFC (Gold Loan)','NBFC (Vehicle Finance)','NBFC (Diversified/Unsecured)','NBFC'],
+  'Exchanges / Depositories':['Exchanges'],
+  'Battery':['Battery / Energy Storage'],
+  'Ports/Maritime':['Ports/Maritime Infra'],
+  'PVC Pipes':['Pipes/PVC'],
+  'Speciality Chemicals':['Chemicals (Specialty/Performance)','Chemicals / Specialty','Chemicals (Commodity/Bulk)','Chemicals (Agrochemicals)'],
+  'Insurance':['Insurance (Life)','Insurance (General/Health)']
+};
+// snapshot of the published dashboards (2026-10-27); replaced by live data after Fetch
+var SR_BAKED = {"built":"2026-10-27","sectors":{"Defence":{"cos":[{"n":"ideaForge","q":"Q1FY27","v":69,"y":437,"e":6.3},{"n":"BDL","q":"Q1FY27","v":572,"y":130.8,"e":14.52},{"n":"MTAR Technologies","q":"Q1FY27","v":361,"y":130.4,"e":23.6},{"n":"Apollo Micro Systems","q":"Q1FY27","v":251,"y":88.1,"e":21.4},{"n":"Solar Industries","q":"Q1FY27","v":3688,"y":71.2,"e":28.1},{"n":"Unimech Aerospace","q":"Q1FY27","v":108,"y":71,"e":36.5},{"n":"GRSE","q":"Q1FY27","v":1815,"y":38.5,"e":null},{"n":"Paras Defence","q":"Q1FY27","v":128,"y":37.2,"e":24.9},{"n":"BEML","q":"Q1FY27","v":820,"y":29.2,"e":0.4},{"n":"BEL","q":"Q1FY27","v":5533,"y":25.3,"e":25.83},{"n":"Azad Engineering","q":"Q1FY27","v":172.6,"y":19.5,"e":37.6},{"n":"Data Patterns","q":"Q1FY27","v":116,"y":16.8,"e":27.14},{"n":"HAL","q":"Q1FY27","v":5515,"y":14.4,"e":27.7},{"n":"Mazagon Dock","q":"Q1FY27","v":2943,"y":12.1,"e":15.18},{"n":"Zen Technologies","q":"Q1FY27","v":142,"y":-10.5,"e":40.9},{"n":"Astra Microwave","q":"Q1FY27","v":177,"y":-11.5,"e":19.7},{"n":"DCX Systems","q":"Q1FY27","v":103,"y":-53.6,"e":-5.41}],"n":17,"y":29.2,"e":24.3,"basis":{"Q1FY27":17},"newest":"Q1FY27","tone":"strong"},"Hotels":{"cos":[{"n":"Chalet Hotels","q":"Q1FY27","v":512,"y":42.7,"e":46.6},{"n":"The Leela","q":"Q1FY27","v":352,"y":28,"e":41},{"n":"ITC Hotels","q":"Q2FY27","v":1054.14,"y":25.6,"e":32},{"n":"IHCL","q":"Q1FY27","v":2339,"y":14.6,"e":31.1},{"n":"Lemon Tree","q":"Q1FY27","v":346.8,"y":9.3,"e":43.4}],"n":5,"y":25.6,"e":41,"basis":{"Q1FY27":4,"Q2FY27":1},"newest":"Q2FY27","tone":"strong"},"Power (Gencos/Transmission)":{"cos":[{"n":"AESL","q":"Q1FY27","v":9711,"y":42.4,"e":null},{"n":"Adani Power","q":"Q1FY27","v":18902,"y":34,"e":null},{"n":"AGEL","q":"Q1FY27","v":4431,"y":29.2,"e":null},{"n":"NTPC (Consol.)","q":"Q1FY27","v":50741,"y":7.8,"e":null},{"n":"NTPC (Standalone)","q":"Q1FY27","v":43832,"y":3,"e":null}],"n":5,"y":29.2,"e":null,"basis":{"Q1FY27":5},"newest":"Q1FY27","tone":"strong"},"Capital Goods":{"cos":[{"n":"Hitachi Energy","q":"Q1FY27","v":2494,"y":68.6,"e":null},{"n":"Siemens India","q":"Q1FY27","v":2486,"y":39.3,"e":null},{"n":"GE Vernova T&D India","q":"Q1FY27","v":1836,"y":38.1,"e":null},{"n":"ABB India","q":"Q1FY27","v":3559,"y":21,"e":null},{"n":"Larsen & Toubro","q":"Q1FY27","v":67942,"y":6.7,"e":9}],"n":5,"y":38.1,"e":9,"basis":{"Q1FY27":5},"newest":"Q1FY27","tone":"strong"},"Exchanges / Depositories":{"cos":[{"n":"BSE","q":"Q1FY27","v":1708,"y":63.6,"e":null},{"n":"NSE IPO","q":"Q1FY27","v":5252,"y":-2.4,"e":79},{"n":"MCX","q":"Q1FY27","v":2305,"y":null,"e":null},{"n":"CDSL","q":"Q1FY27","v":1145,"y":null,"e":null},{"n":"NSDL","q":"Q1FY27","v":1530,"y":null,"e":null},{"n":"CAMS","q":"Q1FY27","v":1516,"y":null,"e":null},{"n":"KFin Technologies","q":"Q1FY27","v":1301,"y":null,"e":null},{"n":"NSE vs BSE Which Exchange Is Better IPO-Day Deep Dive","q":"Q1FY27","v":16601,"y":null,"e":67}],"n":8,"y":30.6,"e":73,"basis":{"Q1FY27":8},"newest":"Q1FY27","tone":"strong"},"Cables & Wires":{"cos":[{"n":"Polycab","q":"Q2FY27","v":9899,"y":52.8,"e":14.4},{"n":"Apar Industries","q":"Q1FY27","v":6591,"y":29.1,"e":null}],"n":2,"y":41,"e":14.4,"basis":{"Q2FY27":1,"Q1FY27":1},"newest":"Q2FY27","tone":"strong"},"Solar / Renewables":{"cos":[{"n":"Fujiyama Power (UTL)","q":"Q1FY27","v":1345.7,"y":125.3,"e":null},{"n":"Waaree Energies","q":"Q1FY27","v":7932,"y":79.2,"e":18.15},{"n":"ACME Solar Holdings","q":"Q1FY27","v":954,"y":63,"e":87.1},{"n":"NTPC Green Energy","q":"Q1FY27","v":1106.86,"y":62.72,"e":89.3},{"n":"Waaree Renewable (WRTL)","q":"Q1FY27","v":924.25,"y":53.2,"e":18.8},{"n":"Emmvee Solar · Manufacturing","q":"Q1FY27","v":1555.5,"y":51.3,"e":35.24},{"n":"Emmvee Photovoltaic","q":"Q1FY27","v":1555.5,"y":51.3,"e":35.2},{"n":"Vikram Solar ★NEW","q":"Q1FY27","v":1563,"y":38,"e":8},{"n":"Premier Energies","q":"Q1FY27","v":2508,"y":34.1,"e":30.3},{"n":"CleanMax Enviro Energy","q":"Q1FY27","v":557,"y":25,"e":67},{"n":"Suzlon Energy","q":"Q1FY27","v":3819,"y":22.5,"e":15.6},{"n":"Adani Green","q":"Q1FY27","v":4431,"y":16.6,"e":94},{"n":"Sterling & Wilson Renewable Energy","q":"Q1FY27","v":1590,"y":-9.8,"e":4.9},{"n":"KPI Green Energy","q":"Q1FY27","v":250,"y":null,"e":28}],"n":14,"y":51.3,"e":30.3,"basis":{"Q1FY27":14},"newest":"Q1FY27","tone":"strong"},"Railways":{"cos":[{"n":"Titagarh Rail","q":"Q1FY27","v":765.1,"y":12.6,"e":null}],"n":1,"y":12.6,"e":null,"basis":{"Q1FY27":1},"newest":"Q1FY27","tone":"strong"},"EMS":{"cos":[{"n":"Netweb Technologies","q":"Q1FY27","v":819.7,"y":180,"e":14.7},{"n":"Syrma SGS Technology","q":"Q1FY27","v":1588.6,"y":67.1,"e":11},{"n":"Headline numbers","q":"Q1FY27","v":16076,"y":25,"e":2.97},{"n":"Group structure who does what","q":"Q1FY27","v":3888,"y":12.7,"e":8.7},{"n":"Amber Enterprises","q":"Q1FY27","v":3887.7,"y":null,"e":8.7}],"n":5,"y":46.1,"e":8.7,"basis":{"Q1FY27":5},"newest":"Q1FY27","tone":"strong"},"NBFC (Lending)":{"cos":[{"n":"Poonawalla Fincorp","q":"Q1FY27","v":2330.22,"y":77.4,"e":null},{"n":"Muthoot Finance","q":"Q1FY27","v":8672,"y":34.4,"e":null},{"n":"IIFL Finance","q":"Q1FY27","v":3921.88,"y":32.5,"e":null},{"n":"MAS Financial Services","q":"Q1FY27","v":516,"y":23.86,"e":null},{"n":"Cholamandalam","q":"Q1FY27","v":8957,"y":22,"e":null},{"n":"Bajaj Finance","q":"Q1FY27","v":23166,"y":19.6,"e":43.8},{"n":"Shriram Finance","q":"Q1FY27","v":13400,"y":16.2,"e":null},{"n":"Ashok Leyland Finance (HLF)","q":"Q1FY27","v":5724.81,"y":14.2,"e":null}],"n":8,"y":22.9,"e":43.8,"basis":{"Q1FY27":8},"newest":"Q1FY27","tone":"strong"},"Gold & Jewellery":{"cos":[{"n":"SGIL / SHANTIGOLD","q":"Q1FY27","v":716.4,"y":144.68,"e":null},{"n":"Sky Gold / SKYGOLD","q":"Q1FY27","v":2012.8,"y":77.9,"e":null},{"n":"Sky Gold","q":"Q1FY27","v":6295,"y":77,"e":null},{"n":"Thangamayil Jewellery","q":"Q1FY27","v":8514,"y":73,"e":null},{"n":"Thangamayil / THANGAMAYL","q":"Q1FY27","v":2666,"y":71,"e":null},{"n":"Senco / SENCO","q":"Q1FY27","v":3056,"y":67,"e":null},{"n":"Shringar / SHRINGARMS","q":"Q1FY27","v":548.5,"y":64.9,"e":null},{"n":"Shringar","q":"Q1FY27","v":2250.5,"y":57,"e":null},{"n":"Goldiam International & Titan Company","q":"Q1FY27","v":363.7,"y":54.3,"e":null},{"n":"Goldiam / GOLDIAM","q":"Q1FY27","v":363.7,"y":54,"e":null},{"n":"BlueStone / BLUESTONE","q":"Q1FY27","v":733,"y":48.85,"e":null},{"n":"Lalithaa 🆕 (pre-IPO)","q":"Q1FY27","v":25024,"y":48,"e":null},{"n":"Kalyan / KALYANKJIL","q":"Q1FY27","v":10589,"y":45.05,"e":null},{"n":"Kalyan Jewellers","q":"Q1FY27","v":35743,"y":43,"e":null},{"n":"PN Gadgil / PNGJL","q":"Q1FY27","v":2413,"y":40.73,"e":null},{"n":"Titan / TITAN","q":"Q1FY27","v":20787,"y":40.31,"e":null},{"n":"PN Gadgil","q":"Q1FY27","v":10739,"y":40,"e":null},{"n":"Titan Company","q":"Q1FY27","v":76078,"y":33,"e":null},{"n":"Senco Gold","q":"Q1FY27","v":8430,"y":33,"e":null},{"n":"PC Jeweller Cupid","q":"Q1FY27","v":877.04,"y":21,"e":27.5},{"n":"BlueStone","q":"Q1FY27","v":2600,"y":null,"e":null},{"n":"SGIL","q":"Q1FY27","v":2600,"y":null,"e":null},{"n":"Goldiam","q":"Q1FY27","v":1021,"y":null,"e":null}],"n":23,"y":51.4,"e":27.5,"basis":{"Q1FY27":23},"newest":"Q1FY27","tone":"strong"},"Pharma":{"cos":[{"n":"Neuland Laboratories","q":"Q1FY27","v":650.1,"y":116.3,"e":35.5},{"n":"Torrent Power","q":"Q1FY27","v":4921,"y":54.9,"e":null},{"n":"Laurus Labs","q":"Q1FY27","v":2035.5,"y":28.8,"e":31.8},{"n":"Divi's Laboratories","q":"Q1FY27","v":3080,"y":27.8,"e":40.75},{"n":"Sun Pharma","q":"Q1FY27","v":15299.88,"y":10.5,"e":null},{"n":"Dr Reddys","q":"Q2FY27","v":8671,"y":-1.5,"e":20.6},{"n":"Lupin","q":"Q1FY27","v":8277,"y":null,"e":30},{"n":"Sterlite Technologies Ltd","q":"Q1FY27","v":1910,"y":null,"e":20},{"n":"VA Tech Wabag Ltd..","q":"Q1FY27","v":887,"y":null,"e":null}],"n":9,"y":28.3,"e":30.9,"basis":{"Q2FY27":1,"Q1FY27":8},"newest":"Q2FY27","tone":"strong"},"Banking":{"cos":[{"n":"Bank of Baroda","q":"Q1FY27","v":12524,"y":71.8,"e":null},{"n":"RBL Bank","q":"Q2FY27","v":2131,"y":37.4,"e":null},{"n":"Tamilnad Mercantile Bank","q":"Q2FY27","v":807.17,"y":35.2,"e":null},{"n":"CUB","q":"Q1FY27","v":786,"y":31,"e":null},{"n":"Indian Overseas Bank","q":"Q2FY27","v":3866.98,"y":26.4,"e":null},{"n":"Ujjivan Small Finance Bank Ltd","q":"Q2FY27","v":2449,"y":26.3,"e":null},{"n":"TMB","q":"Q1FY27","v":704,"y":23.9,"e":null},{"n":"YES Bank","q":"Q2FY27","v":2822,"y":22.6,"e":null},{"n":"Bank of Maharashtra","q":"Q2FY27","v":3954,"y":21.7,"e":null},{"n":"IDFC First Bank","q":"Q2FY27","v":6184,"y":20.9,"e":null},{"n":"ICICI Bank","q":"Q2FY27","v":25339,"y":17.7,"e":null},{"n":"South Indian Bank","q":"Q1FY27","v":1025,"y":17.2,"e":null},{"n":"IDBI Bank","q":"Q1FY27","v":3851,"y":17.1,"e":null},{"n":"ICI Bank PVT","q":"Q1FY27","v":12.3,"y":15.9,"e":null},{"n":"Kotak Mahindra","q":"Q2FY27","v":8459,"y":15.7,"e":null},{"n":"Central Bank of India","q":"Q1FY27","v":3914,"y":13,"e":null},{"n":"Axis Bank","q":"Q2FY27","v":15371,"y":11.9,"e":null},{"n":"Indian Bank","q":"Q1FY27","v":7110,"y":11.3,"e":null},{"n":"SBI","q":"Q1FY27","v":46992,"y":10.2,"e":null},{"n":"HDFC Bank","q":"Q2FY27","v":34619,"y":9.7,"e":null},{"n":"Kotak Bank","q":"Q1FY27","v":7876,"y":8.1,"e":null},{"n":"Karnataka Bank","q":"Q1FY27","v":843,"y":7.9,"e":null},{"n":"SIB","q":"Q1FY27","v":915,"y":5.4,"e":null},{"n":"Canara Bank","q":"Q1FY27","v":10215,"y":2.2,"e":null},{"n":"Union Bank of India","q":"Q1FY27","v":9406,"y":-1.1,"e":null},{"n":"PNB","q":"Q1FY27","v":10380,"y":-3.5,"e":null},{"n":"IndusInd Bank","q":"Q1FY27","v":4371,"y":-17.3,"e":null},{"n":"Federal Bank","q":"Q1FY27","v":3173,"y":null,"e":null},{"n":"IOB","q":"Q1FY27","v":3688,"y":null,"e":null},{"n":"KVB","q":"Q1FY27","v":1423,"y":null,"e":null},{"n":"AU Small Finance Bank","q":"Q1FY27","v":2582,"y":null,"e":null},{"n":"Ujjivan Small Finance Bank","q":"Q1FY27","v":1093,"y":null,"e":null},{"n":"Equitas Small Finance Bank","q":"Q1FY27","v":981,"y":null,"e":null},{"n":"Suryoday Small Finance Bank","q":"Q1FY27","v":320,"y":null,"e":null},{"n":"Jana Small Finance Bank","q":"Q1FY27","v":736,"y":null,"e":null}],"n":35,"y":15.9,"e":null,"basis":{"Q2FY27":11,"Q1FY27":24},"newest":"Q2FY27","tone":"strong"},"FMCG":{"cos":[{"n":"ITC (Standalone)","q":"Q1FY27","v":26943,"y":28,"e":16.75},{"n":"Varun Beverages","q":"Q1FY27","v":8651,"y":15.1,"e":27.1},{"n":"HUL (Consolidated)","q":"Q1FY27","v":17149,"y":10.3,"e":23},{"n":"ITC (Consol., ex-excise)","q":"Q1FY27","v":19001,"y":-11.1,"e":27.3}],"n":4,"y":12.7,"e":25.1,"basis":{"Q1FY27":4},"newest":"Q1FY27","tone":"weak"},"Hospitals":{"cos":[{"n":"Narayana Hrudayalaya","q":"Q1FY27","v":2683.6,"y":78,"e":18.8},{"n":"Yatharth Hospitals","q":"Q1FY27","v":392.7,"y":51,"e":23.3},{"n":"KIMS Hospitals","q":"Q1FY27","v":1179.5,"y":35.3,"e":18.9},{"n":"Rainbow Children's","q":"Q1FY27","v":470,"y":33.2,"e":28.7},{"n":"Medanta (Global Health)","q":"Q1FY27","v":1304.1,"y":26.5,"e":23.8},{"n":"Apollo Hospitals","q":"Q1FY27","v":7043.5,"y":20.6,"e":15.5},{"n":"Fortis Healthcare","q":"Q1FY27","v":2545,"y":17.5,"e":22.3},{"n":"Jupiter Life Line","q":"Q1FY27","v":411,"y":16.4,"e":19.3},{"n":"Max Healthcare","q":"Q1FY27","v":2982,"y":16,"e":24.8},{"n":"Medanta","q":"Q1FY27","v":4410,"y":null,"e":24.2},{"n":"KIMS","q":"Q1FY27","v":3905,"y":null,"e":21.1},{"n":"Aster DM Healthcare","q":"Q1FY27","v":4643,"y":null,"e":20.4},{"n":"Manipal Hospitals (post-IPO)","q":"Q1FY27","v":10336,"y":null,"e":25.3}],"n":13,"y":26.5,"e":22.3,"basis":{"Q1FY27":13},"newest":"Q1FY27","tone":"strong"},"Telecom":{"cos":[{"n":"Tata Communications","q":"Q1FY27","v":6583,"y":29.4,"e":18.7},{"n":"Bharti Airtel","q":"Q1FY27","v":58539,"y":18.4,"e":57.4}],"n":2,"y":23.9,"e":38.1,"basis":{"Q1FY27":2},"newest":"Q1FY27","tone":"strong"},"Auto 2W":{"cos":[{"n":"Ather Energy","q":"Q2FY27","v":1464.2,"y":62.9,"e":4.9},{"n":"Net Profit Trend ( Cr)","q":"Q1FY27","v":17244,"y":37,"e":20.9},{"n":"TVS Motor","q":"Q1FY27","v":16295.5,"y":33.5,"e":null},{"n":"Royal Enfield Capacity Roadmap (Lakh UnitsYr)","q":"Q1FY27","v":16296,"y":null,"e":13.1}],"n":4,"y":37,"e":13.1,"basis":{"Q1FY27":3,"Q2FY27":1},"newest":"Q2FY27","tone":"strong"},"Auto 4W":{"cos":[{"n":"Tata Motors","q":"Q2FY27","v":25338,"y":37,"e":10.9},{"n":"Belrise Industries","q":"Q2FY27","v":35244,"y":16.7,"e":8.8},{"n":"Maruti Suzuki","q":"Q1FY27","v":52456,"y":null,"e":null},{"n":"Hyundai India","q":"Q1FY27","v":16335,"y":null,"e":null}],"n":4,"y":26.9,"e":9.9,"basis":{"Q2FY27":2,"Q1FY27":2},"newest":"Q2FY27","tone":"strong"},"Cement":{"cos":[{"n":"Shree Cement","q":"Q2FY27","v":5897,"y":23.9,"e":17.2},{"n":"UltraTech Cement","q":"Q2FY27","v":23295,"y":18.8,"e":16.4}],"n":2,"y":21.4,"e":16.8,"basis":{"Q2FY27":2},"newest":"Q2FY27","tone":"strong"},"Metals":{"cos":[{"n":"Hindustan Copper","q":"Q1FY27","v":936.5,"y":139,"e":null},{"n":"NALCO","q":"Q1FY27","v":5302,"y":39.3,"e":51.1},{"n":"Hindalco","q":"Q1FY27","v":84825,"y":32.1,"e":17.7},{"n":"JSW Steel","q":"Q2FY27","v":54486,"y":20.7,"e":18.2},{"n":"Tata Steel","q":"Q1FY27","v":60794,"y":14.3,"e":15.4},{"n":"Vedanta — Copper","q":"Q1FY27","v":8538,"y":null,"e":null}],"n":6,"y":32.1,"e":18,"basis":{"Q2FY27":1,"Q1FY27":5},"newest":"Q2FY27","tone":"strong"},"Oil & Gas":{"cos":[{"n":"ONGC","q":"Q1FY27","v":46460,"y":45.2,"e":null},{"n":"Oil & Natural Gas Corporation Ltd","q":"Q1FY27","v":204987,"y":null,"e":null}],"n":2,"y":45.2,"e":null,"basis":{"Q1FY27":2},"newest":"Q1FY27","tone":"strong"},"Sugar / Ethanol":{"cos":[{"n":"Balrampur Chini","q":"Q1FY27","v":5594,"y":15.8,"e":null}],"n":1,"y":15.8,"e":null,"basis":{"Q1FY27":1},"newest":"Q1FY27","tone":"strong"},"IT Services":{"cos":[{"n":"Coforge","q":"Q2FY27","v":6170.8,"y":53.6,"e":16},{"n":"Persistent","q":"Q1FY27","v":14748,"y":17.4,"e":15.6},{"n":"LTIMindtree","q":"Q1FY27","v":42308,"y":11.3,"e":15.4},{"n":"TCS","q":"Q2FY27","v":73188,"y":11.2,"e":24},{"n":"HCL Technologies","q":"Q1FY27","v":130144,"y":11.2,"e":17.2},{"n":"Tata Consultancy Services","q":"Q2FY27","v":73188,"y":11.2,"e":24},{"n":"Infosys","q":"Q2FY27","v":49244,"y":10.7,"e":21},{"n":"KPIT Tech","q":"Q1FY27","v":6455,"y":10.5,"e":14},{"n":"Tech Mahindra","q":"Q1FY27","v":56815,"y":7.2,"e":12.6},{"n":"Newgen","q":"Q1FY27","v":1574,"y":6,"e":24.9},{"n":"Wipro","q":"Q1FY27","v":92620,"y":4,"e":17.2}],"n":11,"y":11.2,"e":17.2,"basis":{"Q2FY27":4,"Q1FY27":7},"newest":"Q2FY27","tone":"strong"},"Brokers / Wealth":{"cos":[{"n":"Angel One","q":"Q1FY27","v":1459,"y":null,"e":null},{"n":"Groww (Billionbrains)","q":"Q1FY27","v":1505,"y":null,"e":null}],"n":2,"y":null,"e":null,"basis":{"Q1FY27":2},"newest":"Q1FY27","tone":"mixed"},"Dairy":{"cos":[{"n":"Milky Mist","q":"Q1FY27","v":3138,"y":33.6,"e":13.9},{"n":"Hatsun Agro Product","q":"Q1FY27","v":3090,"y":19.3,"e":11.34},{"n":"Dodla Dairy","q":"Q1FY27","v":1198,"y":19,"e":5.4},{"n":"Heritage Foods","q":"Q1FY27","v":1338,"y":17.7,"e":4.62},{"n":"Parag Milk Foods","q":"Q1FY27","v":945,"y":11,"e":7.2}],"n":5,"y":19,"e":7.2,"basis":{"Q1FY27":5},"newest":"Q1FY27","tone":"mixed"},"Battery":{"cos":[{"n":"Exide Industries","q":"Q1FY27","v":5305,"y":null,"e":12.4},{"n":"Amara Raja E&M","q":"Q1FY27","v":4041,"y":null,"e":9.6}],"n":2,"y":null,"e":11,"basis":{"Q1FY27":2},"newest":"Q1FY27","tone":"strong"},"Speciality Chemicals":{"cos":[{"n":"Acutaas Chemicals","q":"Q1FY27","v":329.7,"y":59.1,"e":null},{"n":"Himadri Speciality Chemical Ltd · Business & Investment ·","q":"Q1FY27","v":1431.88,"y":28,"e":21.9}],"n":2,"y":43.6,"e":21.9,"basis":{"Q1FY27":2},"newest":"Q1FY27","tone":"strong"},"Insurance":{"cos":[{"n":"HDFC Life","q":"Q1FY27","v":16728,"y":15.1,"e":null},{"n":"ICICI Pru Life","q":"Q1FY27","v":9749,"y":14.7,"e":null},{"n":"LIC","q":"Q1FY27","v":537604,"y":9.8,"e":null}],"n":3,"y":14.7,"e":null,"basis":{"Q1FY27":3},"newest":"Q1FY27","tone":"strong"}}};
+function srSecList(s){ return [s.name].concat(SR_ALIAS[s.name]||[]); }
+function srMatchSec(fs, list){ return (fs||[]).some(function(x){ return list.some(function(n){ return x===n||x.indexOf(n+' (')===0; }); }); }
+function srCoKey(n){
+  var t=String(n||'').toLowerCase().replace(/\b(ltd|limited|the|india)\b/g,'').replace(/[^a-z0-9]+/g,'');
+  var list=(typeof CR_DATA!=='undefined'&&Array.isArray(CR_DATA))?CR_DATA:[];
+  var hit=list.find(function(d){ if(!d||!d.name) return false; var k=String(d.name).toLowerCase().replace(/\b(ltd|limited|the|india)\b/g,'').replace(/[^a-z0-9]+/g,''); return k===t||(k.length>=5&&t.indexOf(k)===0)||(t.length>=5&&k.indexOf(t)===0); });
+  return hit?hit.name:String(n||'');
+}
+function srLatestFrom(cache, s){
+  if(!cache||!cache.files) return null;
+  var lat=grLatestQtr(cache); if(!lat) return null;
+  var lag=1; // Sector Ranker: only the newest two quarters (e.g. Q2 FY27, else Q1 FY27)
+  var by={};
+  cache.files.forEach(function(f){
+    if(!f.cos||!f.cos.length||!srMatchSec(f.sectors, srSecList(s))) return;
+    var q=grFileQtr(f); if(!q||lat.key-q.key>lag) return;
+    f.cos.forEach(function(c){ if(!(c.v>0)||!c.n||/^\W*$|^\?|cb research|rationale|summary|overview|metric|lens\b|sector|total|average|peer/i.test(c.n)) return; var k=srCoKey(c.n), o=by[k];
+      if(c.e!=null&&(c.e>100||c.e<-100)) c=Object.assign({},c,{e:null});
+      var sc=(c.y!=null?2:0)+(c.e!=null?1:0);
+      if(!o||q.key>o.qk||(q.key===o.qk&&sc>o.sc)) by[k]={n:k,q:q.label,qk:q.key,v:+c.v,y:c.y,e:c.e,g:c.g||0,r:c.r||0,a:c.a||0,sc:sc,file:grBaseName(f.file)}; });
+  });
+  var cos=Object.keys(by).map(function(k){return by[k];}); if(!cos.length) return null;
+  // median, so one odd print (a low-base +400%) cannot swing the sector
+  var avg=function(k){ var v=cos.filter(function(c){return c[k]!=null&&!isNaN(c[k]);}).map(function(c){return +c[k];}).sort(function(a,b){return a-b;}); if(!v.length) return null; var h=Math.floor(v.length/2); return Math.round((v.length%2?v[h]:(v[h-1]+v[h])/2)*10)/10; };
+  var basis={}; cos.forEach(function(c){ basis[c.q]=(basis[c.q]||0)+1; });
+  var newest=cos.reduce(function(a,c){return c.qk>a?c.qk:a;},0);
+  var g=0,r=0; cos.forEach(function(c){ g+=c.g; r+=c.r; });
+  var y=avg('y'), tone = (g+r)>4 ? ((g-r)/(g+r)>0.25?'strong':(g-r)/(g+r)<-0.1?'weak':'mixed') : (y==null?'mixed':y>=12?'strong':y<3?'weak':'mixed');
+  cos.sort(function(a,b){ return (b.y==null?-999:b.y)-(a.y==null?-999:a.y); });
+  return {cos:cos.map(function(c){ return {n:c.n,q:c.q,v:c.v,y:c.y,e:c.e}; }), n:cos.length, y:y, e:avg('e'), basis:basis,
+          newest:cos.filter(function(c){return c.qk===newest;})[0].q, tone:tone};
+}
+function srLatest(s){
+  var live=null; try{ live=srLatestFrom(grLoadCache(), s); }catch(e){}
+  if(live){ live.src='live'; return live; }
+  var b=SR_BAKED&&SR_BAKED.sectors&&SR_BAKED.sectors[s.name];
+  if(b){ var o=JSON.parse(JSON.stringify(b)); o.src='saved'; return o; }
+  return null;
+}
+function srQ(q){ return String(q||'').replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2'); }
+function srBasisTxt(L){ return Object.keys(L.basis).sort().reverse().map(function(q){ return srQ(q)+' ×'+L.basis[q]; }).join(' · '); }
 
 // ── Render ──
 let curFilter='all', curGrp='all', curLang='en';
@@ -9288,7 +9506,14 @@ function renderCard(s){
     `grp-${s.group.replace(/[^a-zA-Z]/g,'')}`
   ].filter(Boolean).join(' ');
   // v31: latest-quarter sector numbers from the published dashboards (fallback: Q4 FY26 authored)
-  try{ const g=grForSector(s.name); const a=g&&g.cur&&g.cur[0]&&g.cur[0].agg; if(a){ const q=g.used?g.used.label.replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2'):''; if(a.avgRevYoY!=null){ s.rev=(a.avgRevYoY>0?'+':'')+a.avgRevYoY+'% ('+q+')'; s.revN=a.avgRevYoY; } if(a.avgEbitda!=null) s.ebitda=a.avgEbitda+'% ('+q+')'; } }catch(e){}
+  // v36: latest results (Q2 FY27 where published, else Q1 FY27) — median across the sector's companies
+  if(!s.q4) s.q4={rev:s.rev,revN:s.revN,ebitda:s.ebitda,pat:s.pat};
+  let LT=null; try{ LT=srLatest(s); }catch(e){}
+  s.LT=LT;
+  if(LT){ s.rev=LT.y!=null?(LT.y>0?'+':'')+LT.y+'%':'—'; s.revN=LT.y!=null?LT.y:0; s.ebitda=LT.e!=null?LT.e+'%':'n/a';
+          s.pat=LT.tone==='strong'?'↑↑ Strong':LT.tone==='weak'?'↓ Weak':'↑ Mixed'; }
+  else { s.rev=s.q4.rev; s.revN=s.q4.revN; s.ebitda=s.q4.ebitda; s.pat=s.q4.pat; }
+  const qTag=LT?srQ(LT.newest):'Q4 FY26';
   const patClass=s.pat.includes('↑↑')?'pos':s.pat.includes('↓')?'neg':'';
   const revClass=s.revN>=15?'pos':s.revN>=8?'warn-c':'neg';
   const admin=isAdminMode();
@@ -9299,10 +9524,11 @@ function renderCard(s){
     <span class="sec-title">${s.name}</span>
     ${admin?`<span class="sec-grp">${groupEmoji(s.group)} ${s.group}</span>`:''}
     ${srChips(s)}
+    <div style="font-size:9.5px;font-weight:700;margin-top:3px;color:${LT?'#5a6080':'#b35c00'};">📅 ${LT?'Results basis: '+srBasisTxt(LT)+' · '+LT.n+' cos'+(LT.src==='saved'?' (saved snapshot — press Fetch for live)':''):'No Q1/Q2 FY27 results file yet — showing Q4 FY26'}</div>
   </div>
-  <div class="met">${admin?`<span class="val ${revClass}">${s.rev}</span><span class="tag">Rev YoY</span>`:''}</div>
-  <div class="met">${admin?`<span class="val">${s.ebitda}</span><span class="tag">EBITDA%</span>`:''}</div>
-  <div class="met">${admin?`<span class="val ${patClass}">${s.pat}</span><span class="tag">PAT</span>`:''}</div>
+  <div class="met">${admin?`<span class="val ${revClass}">${s.rev}</span><span class="tag">Rev YoY · ${qTag}</span>`:''}</div>
+  <div class="met">${admin?`<span class="val">${s.ebitda}</span><span class="tag">EBITDA% · ${qTag}</span>`:''}</div>
+  <div class="met">${admin?`<span class="val ${patClass}">${s.pat}</span><span class="tag">Results tone</span>`:''}</div>
   <div class="met">${admin?`<span class="val">${'★'.repeat(s.detail.stars)}${'☆'.repeat(5-s.detail.stars)}</span><span class="tag">Outlook</span>`:''}</div>
   <div class="heat-wrap">
     <div class="heat-bar"><div class="heat-fill" style="width:${cbLive}%;background:${SR_BY==='six'?heatColor(cbLive>=65?80:cbLive>=55?70:50):heatColor(cbLive)};"></div></div>
@@ -9318,20 +9544,20 @@ function renderCard(s){
 ${admin?`
   <div class="dp-grid">
     <div class="dp-block">
-      <div class="dp-block-title">📊 Q4 FY26 Numbers</div>
-      <div class="dp-row"><span class="dp-key">Revenue Growth</span><span class="dp-val ${revClass}">${s.rev} YoY</span></div>
-      <div class="dp-row"><span class="dp-key">EBITDA Margin</span><span class="dp-val">${s.ebitda}</span></div>
-      <div class="dp-row"><span class="dp-key">PAT Trend</span><span class="dp-val ${patClass}">${s.pat}</span></div>
-      <div style="font-size:11px;color:var(--ink-2);margin-top:6px;">${s.detail.revNote}</div>
+      <div class="dp-block-title">📊 ${LT?'Latest results — '+srBasisTxt(LT):'Q4 FY26 Numbers (no FY27 file yet)'}</div>
+      <div class="dp-row"><span class="dp-key">Revenue growth (median)</span><span class="dp-val ${revClass}">${s.rev} YoY</span></div>
+      <div class="dp-row"><span class="dp-key">EBITDA margin (median)</span><span class="dp-val">${s.ebitda}</span></div>
+      <div class="dp-row"><span class="dp-key">Results tone</span><span class="dp-val ${patClass}">${s.pat}</span></div>
+      ${LT?`<table style="width:100%;border-collapse:collapse;font-size:11px;margin-top:6px;"><tr style="color:#5a6080;"><td>Company</td><td style="text-align:right;">Qtr</td><td style="text-align:right;">Rev ₹Cr</td><td style="text-align:right;">YoY</td><td style="text-align:right;">EBITDA%</td></tr>${LT.cos.slice(0,14).map(c=>`<tr style="border-top:1px solid #eef1f8;"><td>${c.n}</td><td style="text-align:right;">${srQ(c.q)}</td><td style="text-align:right;">${Math.round(c.v).toLocaleString('en-IN')}</td><td style="text-align:right;color:${c.y==null?'#9aa0b8':c.y>=0?'#006b30':'#b71c1c'};">${c.y==null?'—':(c.y>0?'+':'')+c.y+'%'}</td><td style="text-align:right;">${c.e==null?'—':c.e+'%'}</td></tr>`).join('')}</table>`:`<div style="font-size:11px;color:var(--ink-2);margin-top:6px;">${s.detail.revNote}</div>`}
     </div>
     <div class="dp-block">
-      <div class="dp-block-title">🔍 Deep Metrics</div>
+      <div class="dp-block-title">🔍 Q4 FY26 notes (earlier round)</div>
       <div class="dp-row"><span class="dp-key">EBITDA Detail</span><span class="dp-val">${s.detail.ebitdaNote.substring(0,30)}…</span></div>
       <div class="dp-row"><span class="dp-key">PAT Detail</span><span class="dp-val">${s.detail.patNote.substring(0,30)}…</span></div>
       <div style="font-size:11px;color:var(--ink-2);margin-top:6px;">${s.detail.ebitdaNote}</div>
     </div>
     <div class="dp-block">
-      <div class="dp-block-title">🔭 FY27 Outlook</div>
+      <div class="dp-block-title">🔭 FY27 Outlook <span style="font-size:9px;font-weight:600;color:#9aa0b8;">(written after Q4 FY26)</span></div>
       <div class="dp-stars">${stars(s.detail.stars)}</div>
       <div class="dp-outlook">${s.detail.outNote}</div>
       <div style="font-size:11px;color:var(--red);margin-top:8px;"><strong>Risk:</strong> ${s.detail.risk}</div>
@@ -10610,7 +10836,7 @@ function cvSnapshotGR(){
     var cache = grLoadCache(); if(!cache||!cache.files||!cache.files.length) return;
     var key = CV_SNAP_PREFIX + CV_CURRENT_QTR;
     var slim = {ts:cache.ts, files:cache.files.filter(function(f){var q=grFileQtr(f);return f.cos&&f.cos.length&&q&&q.label===CV_CURRENT_QTR;})
-      .map(function(f){return {file:f.file, sectors:f.sectors, cos:f.cos, period:(grFileQtr(f)||{}).label||''};})};
+      .map(function(f){return {file:f.file, sectors:f.sectors, cos:f.cos, dq:f.dq, period:(grFileQtr(f)||{}).label||''};})};
     if(slim.files.length) localStorage.setItem(key, JSON.stringify(slim));
   }catch(e){}
 }
