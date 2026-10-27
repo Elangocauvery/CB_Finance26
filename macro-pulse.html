@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v34 (Simple ranking list with share-price change · Market Data auto-fill)</title>
+<title>CB Finance26™ — Macro Pulse · v35 (CDMO fix: sub-sector peers · CDMO tailwind scored · name matching)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -5217,7 +5217,7 @@ const SECTOR_IMPACT=[
  rules:[
   c=>c.sc('Global')>=1?{p:2,r:`Global sentiment steady-to-positive (${c.lab('Global')}) — CDMO order flow tracks global biopharma R&D and outsourcing spend more directly than domestic-formulation pharma does; this is the dominant driver, ahead of any domestic macro factor.`}:null,
   c=>c.inr>=92?{p:2,r:`Rupee at ${c.inrTxt} — CDMO revenue is almost entirely USD-billed against largely INR costs; depreciation is a near-direct margin transfer, more concentrated here than in blended domestic+export pharma names.`}:null,
-  c=>true?{p:0,r:`Structural watch, not tied to any single indicator: the China+1/Biosecure Act sourcing shift toward Indian CDMOs is the multi-year thesis here — same driver behind Laurus Labs' CDMO segment growing 67% YoY this quarter. This is a standing tailwind, not a cyclical one, so weight it independent of the quarter's macro readings.`}:null]},
+  c=>true?{p:1,r:`Structural tailwind (+1, always on), not tied to any single indicator: the China+1/Biosecure Act sourcing shift toward Indian CDMOs is the multi-year thesis here — same driver behind Laurus Labs' CDMO segment growing 67% YoY this quarter. This is a standing tailwind, not a cyclical one, so weight it independent of the quarter's macro readings.`}:null]},
 {name:"MedTech",group:"Pharma",icon:"🩺",links:["USD-INR★ (export bonus)","US Policy/USFDA","Healthcare Capex (Hospitals/Govt)"],
  metrics:["Revenue growth (domestic vs export)","EBITDA margin","USFDA/CE inspection outcomes","New product/device approvals","Capacity utilisation","Acquisition integration margin drag"],
  rules:[
@@ -7572,7 +7572,8 @@ const PARAMS = {
 };
 // Helper — get params for a sector
 function getParamsForSector(sector){
-  return PARAMS[sector] || PARAMS['Capital Goods']; // fallback
+  var par=String(sector||'').replace(/\s*\(.*\)\s*$/,'');
+  return PARAMS[sector] || PARAMS[par] || PARAMS['Capital Goods']; // fallback
 }
 // Helper — get params for a COMPANY. Checks d.paramModel first (an override
 // used for pre-profit/disruptor names that don't fit their sector's default
@@ -7781,11 +7782,11 @@ let CR_DATA=[
 {id:58,name:"Titan Company",sector:"Gold & Jewellery",group:"Consumption & Services",mcap:298000,mcap_rank:15,desc:"Premium valuation; brand moat",cb:74,alloc:"Rs.0",season:9,asOf:"2026-07-06",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,9],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:59,name:"Thangamayil Jewellery",sector:"Gold & Jewellery",group:"Consumption & Services",mcap:4800,mcap_rank:295,desc:"South India focus; fastest +32% rev",cb:72,alloc:"Rs.0",season:9,asOf:"2026-07-06",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,9],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:60,name:"Lupin",sector:"Pharma",group:"Manufacturing",mcap:88000,mcap_rank:48,desc:"PAT +89%; US +57%; turnaround",cb:92,alloc:"Rs.0",season:1,asOf:"2026-07-06",flag:"",scores:[5,5,5,4,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
-{id:61,name:"Laurus Labs",sector:"Pharma",group:"Manufacturing",mcap:18000,mcap_rank:130,desc:"PAT +148%; CDMO secular",cb:88,alloc:"Rs.0",season:1,asOf:"2026-07-06",flag:"",scores:[5,5,5,3,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:61,name:"Laurus Labs",sector:"Pharma (CDMO)",group:"Manufacturing",mcap:18000,mcap_rank:130,desc:"PAT +148%; CDMO secular",cb:88,alloc:"Rs.0",season:1,asOf:"2026-07-06",flag:"",scores:[5,5,5,3,5,5,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:62,name:"Sun Pharma",sector:"Pharma",group:"Manufacturing",mcap:428000,mcap_rank:10,desc:"Specialty + GLP-1 + branded",cb:84,alloc:"Rs.0",season:1,asOf:"2026-07-06",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:63,name:"Alkem Laboratories",sector:"Pharma",group:"Manufacturing",mcap:28000,mcap_rank:100,desc:"Domestic; chronic therapy strong",cb:80,alloc:"Rs.0",season:1,asOf:"2026-07-06",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:64,name:"Torrent Pharma",sector:"Pharma",group:"Manufacturing",mcap:88000,mcap_rank:49,desc:"28% EBITDA; branded domestic",cb:78,alloc:"Rs.0",season:1,asOf:"2026-07-06",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
-{id:65,name:"Divi's Laboratories",sector:"Pharma",group:"Manufacturing",mcap:108,desc:"API/CDMO recovery; slow growth",cb:74,alloc:"Rs.0",season:1,asOf:"2026-07-06",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:65,name:"Divi's Laboratories",sector:"Pharma (CDMO)",group:"Manufacturing",mcap:225000,mcap_rank:24,desc:"Custom synthesis/CDMO + generic APIs; Q1FY27 rev +28%, PAT +65.5% (re-seeded 27-Oct-2026 on Q1FY27 actuals; Q2FY27 not yet out)",cb:82,alloc:"Rs.0",season:1,asOf:"2026-10-27",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:66,name:"Cipla",sector:"Pharma",group:"Manufacturing",mcap:128000,mcap_rank:36,desc:"gRevlimid expiry hit; respiratory steady",cb:66,alloc:"Rs.0",season:4,asOf:"2026-07-06",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,4],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:67,name:"Dr Reddys",sector:"Pharma",group:"Manufacturing",mcap:88000,mcap_rank:45,desc:"Weakest large pharma; shelf-stock adj",cb:60,alloc:"Rs.0",season:1,asOf:"2026-07-06",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:68,name:"ICICI Bank",sector:"Banking (Private)",group:"Financials",mcap:908000,mcap_rank:4,desc:"Best large bank; ROA ~2.4%",cb:80,alloc:"Rs.0",season:1,asOf:"2026-07-06",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
@@ -10649,7 +10650,7 @@ function cvSectorQtrFiles(sector, all){
   var chain=cvQtrChain();
   for(var i=0;i<chain.length;i++){
     var files=cvFilesForQtr(all, chain[i]);
-    if(files.some(function(f){return (f.sectors||[]).indexOf(sector)>=0;}))
+    if(files.some(function(f){return cvSecIn(f.sectors, sector);}))
       return {cur:files, prev:cvFilesForQtr(all, cvPrevQtr(chain[i])), q:chain[i], lag:i};
   }
   return null;
@@ -10661,17 +10662,22 @@ function cvBasisTxt(q, lag){
 }
 
 // ── LAYER E: this company's own earnings print ──────────────────────────
+// v35: a sub-sector ("Pharma (CDMO)", "Banking (Private)") shares its parent's dashboards and peers
+function cvParentSec(s){ return String(s||'').replace(/\s*\(.*\)\s*$/,''); }
+function cvSecIn(list, sector){ list=list||[]; if(list.indexOf(sector)>=0) return true; var p=cvParentSec(sector); return p!==sector&&list.indexOf(p)>=0; }
+// v35: name core without "Labs/Laboratories/Ltd" so "Divi's Labs" = "Divi's Laboratories"
+function cvCoreName(s){ return cvNorm(String(s||'').toLowerCase().replace(/\b(laboratories|laboratory|labs|lab|limited|ltd|the)\b/g,' ')); }
 function cvFindCo(d, files){
   if(!files) return null;
   var target = cvNorm(d.name);
   var best=null, bestScore=-1;
   files.forEach(function(f){
     if(!f.cos) return;
-    var secMatch = (f.sectors||[]).indexOf(d.sector)>=0;
+    var secMatch = cvSecIn(f.sectors, d.sector);
     f.cos.forEach(function(c){
       var cn = cvNorm(c.n); if(!cn) return;
       var s=-1;
-      if(cn===target) s=3;
+      if(cn===target||(cvCoreName(c.n).length>=4&&cvCoreName(c.n)===cvCoreName(d.name))) s=3;
       else {
         // v21: no loose substring matches — "HAL" must not match "cHALet Hotels", "BEL" not "RR KaBEL"
         var sh=cn.length<=target.length?cn:target, lg=cn.length<=target.length?target:cn;
@@ -10692,7 +10698,7 @@ function cvFindCo(d, files){
 function cvSectorAvgYoY(sector, files){
   var vals=[];
   (files||[]).forEach(function(f){
-    if((f.sectors||[]).indexOf(sector)<0||!f.cos) return;
+    if(!cvSecIn(f.sectors, sector)||!f.cos) return;
     f.cos.forEach(function(c){ if(c.y!=null&&!isNaN(c.y)) vals.push(c.y); });
   });
   return vals.length ? vals.reduce(function(a,b){return a+b;},0)/vals.length : null;
@@ -10751,7 +10757,7 @@ function cvFRefresh(d){
   try{
     var cache=grLoadCache(); var all=cache&&cache.files?cache.files.filter(function(f){return f.cos&&f.cos.length;}):[];
     var rs=cvResolvePrint(d, all); if(!rs||rs.hit.c.e==null) return null;
-    var vals=[]; rs.files.forEach(function(f){ if((f.sectors||[]).indexOf(d.sector)<0||!f.cos) return; f.cos.forEach(function(c){ if(c.e!=null&&!isNaN(c.e)) vals.push(+c.e); }); });
+    var vals=[]; rs.files.forEach(function(f){ if(!cvSecIn(f.sectors, d.sector)||!f.cos) return; f.cos.forEach(function(c){ if(c.e!=null&&!isNaN(c.e)) vals.push(+c.e); }); });
     if(vals.length<2) return null;                      // need peers to compare against
     var avg=vals.reduce(function(a,b){return a+b;},0)/vals.length, e=+rs.hit.c.e;
     var q=Math.round(Math.max(0,Math.min(100,50+Math.max(-30,Math.min(30,(e-avg)*2)))));
@@ -11016,7 +11022,7 @@ function cvSectorCycle(sector, curFiles, prevFiles){
   if(!out){
     // a dashboard can carry "sectorCycle":{"phase":"P2"} in its cb-data block
     (curFiles||[]).some(function(f){
-      if(f.sc&&f.sc.phase&&CV_PHASES[f.sc.phase]&&(f.sectors||[]).indexOf(sector)>=0){
+      if(f.sc&&f.sc.phase&&CV_PHASES[f.sc.phase]&&cvSecIn(f.sectors, sector)){
         out={phase:f.sc.phase, score:CV_PHASES[f.sc.phase].score, src:'dashboard', why:f.sc.note||grBaseName(f.file)}; return true;
       } return false;
     });
