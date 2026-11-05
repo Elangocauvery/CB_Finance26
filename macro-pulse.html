@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v39 (Sector Ranker on Q1/Q2 FY27 results · reads Q2 FY27 dashboards)</title>
+<title>CB Finance26™ — Macro Pulse · v40 (Sector Ranker on Q1/Q2 FY27 results · reads Q2 FY27 dashboards)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -4201,7 +4201,7 @@ function grMapFile(entry){
 // of the sector average. {n:name, v:rev, y:revYoY, e:ebitda%, g/r/a: green/red/amber counts}
 function cvSlimCos(cos){
   return (cos||[]).map(c=>({n:c.name, v:+(c.rev||0), y:(c.revYoY!=null&&!isNaN(c.revYoY))?+c.revYoY:null,
-    e:(c.ebitda!=null&&!isNaN(c.ebitda))?+c.ebitda:null, g:c.greens||0, r:c.reds||0, a:c.ambers||0,
+    e:(c.ebitda!=null&&!isNaN(c.ebitda))?+c.ebitda:null, g:c.greens||0, r:c.reds||0, a:c.ambers||0, s:c.sym||undefined,
     tg:Array.isArray(c.triggers)?c.triggers:undefined, cy:(c.cycle&&typeof c.cycle==='object')?c.cycle:undefined}));
 }
 // v37: a multi-company file whose companies sit at different quarters (one company has
@@ -4651,9 +4651,13 @@ function grDeepCO(doc, htmlText){
     if(M&&M[cur]!=null) em=+M[cur]; else if(E&&E[cur]!=null&&rev) em=+(E[cur]/rev*100).toFixed(1);
     addCo(nm,{rev:rev,revYoY:yoy,ebitda:em,pat:P&&P[cur]!=null?+P[cur]:0,greens:0,reds:0,ambers:0,q:best});
   }
+  var symOf={};
   function scanNode(node,key,root,depth){
     if(!node||typeof node!=='object'||Array.isArray(node)||depth>3) return;
     var nm=nameOf(node,key,root);
+    // v40: remember the NSE ticker the dashboard gives for this company
+    var tk=node.nse||(node.ticker&&typeof node.ticker==='object'?node.ticker.nse:node.ticker)||node.symbol;
+    if(nm&&typeof tk==='string'&&/^[A-Z0-9&-]{2,20}$/.test(tk.trim())) symOf[String(nm).toLowerCase()]=tk.trim();
     var lk=['q','labels','periods','quarters','qtr','qs','cols','period'];
     // labels on this node -> series on this node; labels inside a child -> series in that child
     for(var i=0;i<lk.length;i++){ var L=lab(node[lk[i]]); if(L) fromTable(L,node,nm); }
@@ -4693,7 +4697,7 @@ function grDeepCO(doc, htmlText){
       return true;
     });
   }
-  var out=Object.keys(found).map(function(k){ var r=found[k]; delete r._s; return r; });
+  var out=Object.keys(found).map(function(k){ var r=found[k]; delete r._s; if(symOf[k]&&!r.sym) r.sym=symOf[k]; return r; });
   var mq=Math.max.apply(null,out.map(function(r){return r.q||0;}));
   // v37: companies whose data stops a quarter or two earlier are KEPT (tagged with their own quarter);
   // grEmit files them under that quarter so they are scored on their latest print, not dropped
@@ -4781,7 +4785,7 @@ function grFromCO(doc, htmlText){
     if(rev==null||!(rev>0)) return;
     if(yoy==null&&py>0) yoy=+((rev/py-1)*100).toFixed(1);
     if(ebm==null&&eb!=null) ebm=+(eb/rev*100).toFixed(1);
-    out.push({name:String(name),rev,revYoY:yoy,ebitda:ebm,pat:pat||0,greens:0,reds:0,ambers:0});
+    out.push({name:String(name),rev,revYoY:yoy,ebitda:ebm,pat:pat||0,greens:0,reds:0,ambers:0,sym:(typeof tick==='string'&&/^[A-Z0-9&-]{2,20}$/.test(tick))?tick:undefined});
   });
   return out;
 }
@@ -4904,7 +4908,7 @@ function grNewCos(){
       const k=grNormName(nm)||nm.toLowerCase(); if(seen[k]) { if(q.key>seen[k].qk){ seen[k].q=q.label; seen[k].qk=q.key; } return; }
       if(ig.indexOf(nm.toLowerCase())>=0) return;
       if(grCrHit(nm)) return;
-      seen[k]={n:nm,q:q.label,qk:q.key,file:grBaseName(f.file),sectors:(f.sectors||[]).slice(),y:c.y,e:c.e};
+      seen[k]={n:nm,q:q.label,qk:q.key,file:grBaseName(f.file),sectors:(f.sectors||[]).slice(),y:c.y,e:c.e,s:c.s||(MI_NAME_TO_SYMBOL[nm]||'')};
       out.push(seen[k]);
     });
   });
@@ -4921,6 +4925,7 @@ function grRenderNewCos(){
     const opts=c.sectors.concat(all.filter(s=>c.sectors.indexOf(s)<0));
     return '<tr style="border-bottom:1px solid #f0e2cc;"><td style="padding:5px 8px;font-weight:700;">'+esc(c.n)+'</td>'+
       '<td style="padding:5px 8px;"><select id="grNcSec'+i+'" style="font-size:10.5px;padding:2px 4px;border-radius:5px;border:1px solid #e6c9a0;background:#fffaf2;max-width:190px;">'+opts.map(s=>'<option>'+esc(s)+'</option>').join('')+'</select></td>'+
+      '<td style="padding:5px 8px;"><input id="grNcSym'+i+'" value="'+esc(c.s||'')+'" placeholder="NSE symbol" title="NSE symbol — puts the company on the tracked list for bulk/block deals, delivery and prices" style="width:96px;font-size:10.5px;padding:2px 5px;border-radius:5px;border:1px solid #e6c9a0;background:#fffaf2;text-transform:uppercase;"></td>'+
       '<td style="padding:5px 8px;white-space:nowrap;">'+esc(grPretty(c.q))+'</td>'+
       '<td style="padding:5px 8px;text-align:right;">'+(c.y!=null?(c.y>0?'+':'')+c.y+'%':'—')+'</td>'+
       '<td style="padding:5px 8px;text-align:right;">'+(c.e!=null?c.e+'%':'—')+'</td>'+
@@ -4933,9 +4938,9 @@ function grRenderNewCos(){
     '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">'+
     '<div style="font-size:11.5px;font-weight:800;color:#8a4b00;">🆕 New companies found — not in Company Ranker ('+list.length+')</div>'+
     '<button onclick="grAddAllNewCos()" style="padding:5px 12px;border-radius:7px;border:none;background:#ff7c00;color:#fff;font-size:10.5px;font-weight:800;cursor:pointer;">+ Add all</button></div>'+
-    '<div style="font-size:9.5px;color:#7a5a30;margin-bottom:7px;line-height:1.5;">These companies are in your results dashboards and already count in their sector averages, but get no individual score until added. Check the sector, then add. Added companies get a neutral starting score (CB 60) and are kept in this browser; use Export to make them permanent in the file.</div>'+
+    '<div style="font-size:9.5px;color:#7a5a30;margin-bottom:7px;line-height:1.5;">These companies are in your results dashboards and already count in their sector averages, but get no individual score until added. Check the sector and NSE symbol (the symbol puts it on the tracked list for bulk/block deals and prices), then add. Added companies get a neutral starting score (CB 60) and are kept in this browser; use Export to make them permanent in the file.</div>'+
     '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:10.5px;"><thead><tr style="background:#fde7c8;color:#6b3a00;text-align:left;">'+
-    '<th style="padding:5px 8px;">Company</th><th style="padding:5px 8px;">Sector</th><th style="padding:5px 8px;">Quarter</th><th style="padding:5px 8px;text-align:right;">Rev YoY</th><th style="padding:5px 8px;text-align:right;">EBITDA %</th><th style="padding:5px 8px;">Dashboard file</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+    '<th style="padding:5px 8px;">Company</th><th style="padding:5px 8px;">Sector</th><th style="padding:5px 8px;">NSE symbol</th><th style="padding:5px 8px;">Quarter</th><th style="padding:5px 8px;text-align:right;">Rev YoY</th><th style="padding:5px 8px;text-align:right;">EBITDA %</th><th style="padding:5px 8px;">Dashboard file</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
 }
 function grNewCoEntry(c, sector){
   const peer=(CR_DATA||[]).find(d=>d.sector===sector);
@@ -4947,18 +4952,21 @@ function grNewCoEntry(c, sector){
   return nd;
 }
 function grAddNewCos(idxs){
-  const list=window.GR_NEWCOS||[]; const saved=crAddedList(); let n=0;
+  const list=window.GR_NEWCOS||[]; const saved=crAddedList(); let n=0; const noSym=[], pendSym=[];
   idxs.forEach(i=>{ const c=list[i]; if(!c) return;
     const sel=document.getElementById('grNcSec'+i); const sector=(sel&&sel.value)||c.sectors[0]||'Other';
+    const si=document.getElementById('grNcSym'+i); const sym=String((si&&si.value)||c.s||'').toUpperCase().replace(/[^A-Z0-9&\-]/g,'');
     if(grCrHit(c.n)) return;
-    const nd=grNewCoEntry(c, sector); CR_DATA.push(nd); saved.push(nd); n++; });
+    const nd=grNewCoEntry(c, sector); if(sym) nd.nse=sym; CR_DATA.push(nd); saved.push(nd); n++;
+    if(sym) pendSym.push([c.n,sym]); else noSym.push(c.n); });
   try{ localStorage.setItem(CR_ADDED_KEY, JSON.stringify(saved)); }catch(e){}
+  pendSym.forEach(x=>miSetSymbol(x[0],x[1]));
   try{ CR_CONV=null; }catch(e){}
   try{ render(); }catch(e){}
   try{ if(typeof recomputeSectorLiveRanks==='function'){ recomputeSectorLiveRanks(); renderAll(); } }catch(e){}
   try{ if(typeof cvRender==='function'&&document.getElementById('page-cv')?.classList.contains('active')) cvRender(); }catch(e){}
   grRenderNewCos();
-  const st=document.getElementById('grStatus'); if(st&&n) st.insertAdjacentHTML('afterbegin','<div style="color:#006b30;font-weight:700;">✅ '+n+' company(ies) added to Company Ranker.</div>');
+  const st=document.getElementById('grStatus'); if(st&&n) st.insertAdjacentHTML('afterbegin','<div style="color:#006b30;font-weight:700;">✅ '+n+' company(ies) added to Company Ranker and to the tracked list for bulk/block deals.'+(noSym.length?' <span style="color:#b71c1c;">No NSE symbol for: '+noSym.join(', ')+' — set it in NSE Market Intel → Bulk/Block → Tracked list.</span>':'')+'</div>');
 }
 function grAddNewCo(i){ grAddNewCos([i]); }
 function grAddAllNewCos(){ const l=window.GR_NEWCOS||[]; if(!l.length) return; if(!confirm('Add all '+l.length+' companies to Company Ranker with a neutral starting score?')) return; grAddNewCos(l.map((_,i)=>i)); }
@@ -6029,6 +6037,30 @@ function miCleanupFiiDupes(){
   return {before,after,removed:before-after};
 }
 
+// v40: the tracked list shown on the Bulk/Block tab — grows automatically with Company Ranker
+function miTrackedBox(){
+  try{
+    miApplyExtraSyms();
+    const pay=miTrackedPayload();
+    const missing=(CR_DATA||[]).filter(d=>d&&d.name&&!MI_NAME_TO_SYMBOL[d.name]);
+    const esc=x=>String(x).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+    const ex=miSymExtra(), exN=Object.keys(ex).length;
+    let srv='';
+    try{ const t=localStorage.getItem('cbf26_tracked_srv'); if(t){ const o=JSON.parse(t); srv=' · NSE server '+(o.ok?'accepted the list ('+o.n+' symbols) on '+o.at:'has not confirmed the list yet'); } }catch(e){}
+    return '<div style="border:1px solid #f3c58a;background:#fff6ea;border-radius:10px;padding:9px 12px;margin-bottom:10px;font-size:11px;color:#5a4020;">'+
+      '<b>📋 Tracked list: '+pay.symbols.length+' companies</b> — only deals in these companies are kept. It updates automatically whenever a company is added to Company Ranker (with its NSE symbol), and the full list is sent to your NSE server with every fetch'+esc(srv)+'.'+
+      (exN?'<div style="margin-top:4px;color:#7a5a30;">Added after the built-in list: '+Object.keys(ex).map(n=>esc(n)+' ('+esc(ex[n])+')').join(', ')+'</div>':'')+
+      (missing.length?'<div style="margin-top:6px;color:#b71c1c;font-weight:700;">⚠ '+missing.length+' company(ies) in Company Ranker have no NSE symbol, so their deals are not tracked:</div>'+
+        missing.map((d,i)=>'<span style="display:inline-flex;gap:4px;align-items:center;margin:4px 8px 0 0;">'+esc(d.name)+' <input id="miSymIn'+i+'" data-n="'+esc(d.name)+'" placeholder="NSE symbol" style="width:92px;font-size:10.5px;padding:2px 5px;border-radius:5px;border:1px solid #e6c9a0;text-transform:uppercase;"></span>').join('')+
+        ' <button onclick="miSaveMissingSyms('+missing.length+')" style="margin-top:4px;padding:3px 10px;border-radius:6px;border:none;background:#ff7c00;color:#fff;font-size:10px;font-weight:800;cursor:pointer;">Save symbols</button>':'')+
+      '</div>';
+  }catch(e){ return ''; }
+}
+function miSaveMissingSyms(n){
+  let k=0; for(let i=0;i<n;i++){ const el=document.getElementById('miSymIn'+i); if(el&&el.value.trim()){ miSetSymbol(el.dataset.n, el.value); k++; } }
+  if(k){ try{ miShowToast('✓ '+k+' symbol(s) added to the tracked list — deals for them are kept from the next fetch'); }catch(e){} }
+  try{ miRender('bulk'); }catch(e){}
+}
 function miRenderBulk(){
   const data=load('bulk').sort((a,b)=>b.date.localeCompare(a.date));
   const dSel=getSel('bk-ds'),tSel=getSel('bk-ts'),bsSel=getSel('bk-bs-f');
@@ -6036,7 +6068,7 @@ function miRenderBulk(){
   if(dSel)rows=rows.filter(r=>r.date===dSel);
   if(tSel)rows=rows.filter(r=>r.type===tSel);
   if(bsSel)rows=rows.filter(r=>r.bs===bsSel);
-  document.getElementById('mi-p-bulk').innerHTML=`
+  document.getElementById('mi-p-bulk').innerHTML=miTrackedBox()+`
 <div class="note">Sources: <a href="https://trendlyne.com/portfolio/bulk-block-deals/" target="_blank">Trendlyne Bulk/Block</a> &nbsp;|&nbsp; <a href="https://www.nseindia.com/market-data/bulk-deals" target="_blank">NSE Bulk Deals</a> &nbsp;|&nbsp; <a href="https://www.nseindia.com/market-data/block-deals" target="_blank">NSE Block Deals</a> &nbsp;|&nbsp; <a href="https://www.bseindia.com/markets/equity/EQReports/bulk_deal.aspx" target="_blank">BSE Bulk Deals</a></div>
 <div class="fc">
   <div class="fc-title">Add deal entry</div>
@@ -6558,7 +6590,7 @@ async function miCheckServer(){
 // using the same symbol list the rest of the app already trusts.
 let MI_TRACKED_SYMS_CACHE=null;
 function miTrackedSymSet(){
-  if(!MI_TRACKED_SYMS_CACHE) MI_TRACKED_SYMS_CACHE=new Set(Object.values(MI_NAME_TO_SYMBOL).map(s=>String(s).toUpperCase()));
+  if(!MI_TRACKED_SYMS_CACHE){ if(typeof miApplyExtraSyms==='function') try{ miApplyExtraSyms(); }catch(e){} MI_TRACKED_SYMS_CACHE=new Set(Object.values(MI_NAME_TO_SYMBOL).map(s=>String(s).toUpperCase())); }
   return MI_TRACKED_SYMS_CACHE;
 }
 function miPurgeUntracked(){
@@ -6663,8 +6695,11 @@ async function miTriggerFetch(){
   const before=MI_LAST_FETCH;
   MI_FETCHING=true; miSetServerStatus(true,'');
   try{
-    const r=await fetch(MI_SERVER+'/api/fetch',{method:'POST',headers:{'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(15000)});
+    const r=await fetch(MI_SERVER+'/api/fetch',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify((typeof miTrackedPayload==='function')?miTrackedPayload():{}),signal:AbortSignal.timeout(15000)});
     if(!r.ok){ MI_FETCHING=false; miSetServerStatus(true,''); miShowToast('Server is running but refused the fetch request (HTTP '+r.status+') — send server.py to update it.',true); return; }
+    // v40: the server reports how many tracked symbols it now holds from Macro Pulse
+    try{ const j=await r.clone().json(); const sent=(typeof miTrackedPayload==='function')?miTrackedPayload().symbols.length:0;
+      localStorage.setItem('cbf26_tracked_srv', JSON.stringify(j&&j.tracked!=null?{ok:true,n:j.tracked,at:new Date(Date.now()+5.5*3600e3).toISOString().slice(0,16).replace('T',' ')+' IST',sent:sent}:{ok:false})); }catch(e){}
   }catch(e){
     // A timeout usually means the server is busy; only a refused connection means it is really off.
     if(e && e.name!=='TimeoutError' && e.name!=='AbortError'){
@@ -7109,7 +7144,40 @@ const MI_NAME_TO_SYMBOL={
   'Welspun Living':'WELSPUNLIV',
   'Wonderla Holidays':'WONDERLA',
   'YES Bank':'YESBANK',
+  // v40: companies in Company Ranker that had no NSE symbol (their deals/prices were being dropped)
+  'Kotak Mahindra Bank':'KOTAKBANK',
+  'Hitachi Energy India':'POWERINDIA',
+  'Neuland Laboratories':'NEULANDLAB',
+  'Axis Max Life':'MFSL',            // unlisted — tracks listed parent Max Financial Services
+  'Highways Infra Trust':'VERTIS',   // Highways Infrastructure Trust, renamed Vertis Infrastructure Trust
 };
+// v40: the tracked list grows with Company Ranker — every company added later carries its own
+// NSE symbol (d.nse) or one set in "Tracked list" (stored in this browser); both are merged in here,
+// so bulk/block deals, promoter filings, delivery and prices are kept for it from the next fetch.
+const MI_SYM_EXTRA_KEY='cbf26_sym_extra_v1';
+function miSymExtra(){ try{ return JSON.parse(localStorage.getItem(MI_SYM_EXTRA_KEY)||'{}')||{}; }catch(e){ return {}; } }
+function miApplyExtraSyms(){
+  try{
+    const ex=miSymExtra(); Object.keys(ex).forEach(n=>{ if(ex[n]) MI_NAME_TO_SYMBOL[n]=String(ex[n]).toUpperCase().trim(); });
+    if(typeof CR_DATA!=='undefined') CR_DATA.forEach(d=>{ if(d&&d.name&&d.nse&&!MI_NAME_TO_SYMBOL[d.name]) MI_NAME_TO_SYMBOL[d.name]=String(d.nse).toUpperCase().trim(); });
+    MI_TRACKED_SYMS_CACHE=null;
+  }catch(e){}
+}
+function miSetSymbol(name, sym){
+  sym=String(sym||'').toUpperCase().replace(/[^A-Z0-9&\-]/g,'');
+  const ex=miSymExtra(); if(sym) ex[name]=sym; else delete ex[name];
+  try{ localStorage.setItem(MI_SYM_EXTRA_KEY, JSON.stringify(ex)); }catch(e){}
+  if(sym) MI_NAME_TO_SYMBOL[name]=sym; else delete MI_NAME_TO_SYMBOL[name];
+  try{ const d=CR_DATA.find(x=>x&&x.name===name); if(d){ d.nse=sym||undefined;
+    const sv=crAddedList(); const i=sv.findIndex(x=>x&&x.name===name); if(i>=0){ sv[i].nse=sym||undefined; localStorage.setItem(CR_ADDED_KEY, JSON.stringify(sv)); } } }catch(e){}
+  MI_TRACKED_SYMS_CACHE=null;
+}
+// the full tracked list sent to the NSE server with every fetch request
+function miTrackedPayload(){
+  miApplyExtraSyms();
+  const names={}; Object.keys(MI_NAME_TO_SYMBOL).forEach(n=>{ const s=String(MI_NAME_TO_SYMBOL[n]).toUpperCase(); if(!names[s]) names[s]=n; });
+  return {symbols:Object.keys(names).sort(), names:names, source:'macro-pulse', at:new Date().toISOString()};
+}
 
 // ══ COMPANY RANKER (merged) ══
 // ══════════════════════════════════════════════════════════
@@ -8451,6 +8519,7 @@ function crLoadAdded(){
   });
 }
 try{ crLoadAdded(); }catch(e){}
+try{ miApplyExtraSyms(); }catch(e){}
 
 // Format market cap for display
 function fmtMcap(cr){
@@ -8655,7 +8724,7 @@ function updateAlloc(id,el){
 
 function deleteCard(id){
   try{ const gone=CR_DATA.find(d=>d.id===id);
-    if(gone&&gone.fromDash){ const n=String(gone.name).toLowerCase();
+    if(gone&&(gone.fromDash||gone.userAdded)){ const n=String(gone.name).toLowerCase();
       localStorage.setItem(CR_ADDED_KEY, JSON.stringify(crAddedList().filter(x=>String(x.name).toLowerCase()!==n)));
       const ig=crIgnoreList(); if(ig.indexOf(n)<0){ ig.push(n); localStorage.setItem(CR_IGNORE_KEY, JSON.stringify(ig)); } } }catch(e){}
   CR_DATA=CR_DATA.filter(d=>d.id!==id);
@@ -8667,11 +8736,16 @@ function addCompany(){
   const sector=prompt('Sector:') || 'Other';
   const group=prompt('Group (Manufacturing/Financials/Energy/Infrastructure/Consumption & Services):') || 'Manufacturing';
   const mcap=parseInt(prompt('Approx Mkt Cap Rank # (e.g. 200):') || '400');
+  // v40: NSE symbol puts the company on the tracked list (bulk/block deals, delivery, prices)
+  const nse=(prompt('NSE symbol (e.g. HDFCBANK) — needed to track its bulk/block deals and prices:', MI_NAME_TO_SYMBOL[name]||'')||'').toUpperCase().replace(/[^A-Z0-9&\-]/g,'');
   const id=nextId++;
   const sc=defaultScores(60,sector);
-  const nd={id,name,sector,group,mcap,desc:'User-added',alloc:'Rs.0',scores:sc,season:1,asOf:new Date().toISOString().slice(0,10),flag:'',hist:[]};
+  const nd={id,name,sector,group,mcap,desc:'User-added',alloc:'Rs.0',scores:sc,season:1,asOf:new Date().toISOString().slice(0,10),flag:'',hist:[],userAdded:true};
+  if(nse) nd.nse=nse;
   nd.ver=sc.map(()=>false); nd.cbSeed=60; nd.cb=calcCBFor(nd);
   CR_DATA.push(nd);
+  try{ const sv=crAddedList(); sv.push(nd); localStorage.setItem(CR_ADDED_KEY, JSON.stringify(sv)); }catch(e){}
+  if(nse) miSetSymbol(name, nse);
   sortKey='cb';sortDir=-1;
   render();
 }
@@ -8679,7 +8753,7 @@ function addCompany(){
 function resetAll(){
   if(!confirm('Reset all scores to defaults?'))return;
   CR_DATA=JSON.parse(JSON.stringify(ORIG_DATA));
-  try{ crLoadAdded(); }catch(e){}
+  try{ crLoadAdded(); miApplyExtraSyms(); }catch(e){}
   render();
 }
 
