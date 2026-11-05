@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v36 (Sector Ranker on Q1/Q2 FY27 results · reads Q2 FY27 dashboards)</title>
+<title>CB Finance26™ — Macro Pulse · v39 (Sector Ranker on Q1/Q2 FY27 results · reads Q2 FY27 dashboards)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -875,6 +875,18 @@ tr:last-child td{border-bottom:none;}
   </div>
 
 
+  <!-- v38: PUT-CALL RATIO — fetched daily by cb_pcr.py on this computer -->
+  <div id="pcrPanel" style="background:linear-gradient(135deg,#fbf5ff,#fff7ee);border:1px solid #e3cdf0;border-radius:12px;padding:12px 16px;margin-bottom:14px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+      <div style="font-size:13px;font-weight:900;color:#5b1f7a;">📊 Put-Call Ratio (PCR) — tracked daily</div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+        <span id="pcrSrvStatus" style="font-size:9.5px;font-weight:700;padding:3px 8px;border-radius:10px;background:#f1e8f7;color:#6b4a80;">● PCR fetcher: not checked</span>
+        <button id="pcrRefreshBtn" onclick="pcrRefreshNow()" style="display:none;padding:4px 10px;border-radius:7px;border:none;background:#8e24aa;color:#fff;font-size:10px;font-weight:800;cursor:pointer;">↻ Refresh PCR</button>
+      </div>
+    </div>
+    <div id="pcrBody" style="margin-top:8px;font-size:11px;color:#5a6080;">No PCR yet. On the computer where the NSE server runs, double-click <b>start_cb_pcr.bat</b> once — PCR is then fetched every trading day automatically.</div>
+  </div>
+
   <!-- PORTFOLIO BAR -->
   <div style="background:var(--card);border:1px solid var(--border-hi);padding:12px 18px;border-radius:10px;margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
     <label style="font-size:12px;font-weight:700;color:#3a3f5c;">Portfolio:</label>
@@ -1299,6 +1311,7 @@ tr:last-child td{border-bottom:none;}
       <label style="padding:8px 16px;border-radius:8px;border:1px solid var(--border-hi);background:#fff;color:#3a3f5c;font-size:11px;font-weight:700;cursor:pointer;">📁 Load files from computer<input type="file" accept=".html,.htm" multiple style="display:none;" onchange="grPickFiles(this.files)"></label>
     </div>
     <div id="grStatus" style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6;"></div>
+    <div id="grNewCos" style="display:none;margin-top:10px;"></div>
   </div>
   <div id="si-filters" style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;"></div>
   <div id="sectorImpactGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px;"></div>
@@ -1733,7 +1746,7 @@ tr:last-child td{border-bottom:none;}
         <tr style="border-bottom:1px solid #e6e2da;"><td style="padding:6px 10px;font-weight:700;">E — Earnings</td><td style="padding:6px 10px;">25%</td><td style="padding:6px 10px;">30%</td><td style="padding:6px 10px;">Real, actual results — the newest quarter each company has published (falls back to the previous quarter, up to Q4 of the previous year, and says so on the card)</td><td style="padding:6px 10px;color:#5a6270;">Ground Reality Bridge — your published dashboards</td></tr>
         <tr style="border-bottom:1px solid #e6e2da;"><td style="padding:6px 10px;font-weight:700;">F — Fundamental</td><td style="padding:6px 10px;">20%</td><td style="padding:6px 10px;">10%</td><td style="padding:6px 10px;">CB Score — business quality</td><td style="padding:6px 10px;color:#5a6270;">Company Ranker parameters</td></tr>
         <tr style="border-bottom:1px solid #e6e2da;"><td style="padding:6px 10px;font-weight:700;">M — Macro</td><td style="padding:6px 10px;">15%</td><td style="padding:6px 10px;">15%</td><td style="padding:6px 10px;">How today's macro favours this sub-sector</td><td style="padding:6px 10px;color:#5a6270;">Sector Impact rules</td></tr>
-        <tr style="border-bottom:1px solid #e6e2da;"><td style="padding:6px 10px;font-weight:700;">T — Market</td><td style="padding:6px 10px;">15%</td><td style="padding:6px 10px;">20%</td><td style="padding:6px 10px;">Live trading signals</td><td style="padding:6px 10px;color:#5a6270;">NSE Market Intel — delivery, deals, PE, price</td></tr>
+        <tr style="border-bottom:1px solid #e6e2da;"><td style="padding:6px 10px;font-weight:700;">T — Market</td><td style="padding:6px 10px;">15%</td><td style="padding:6px 10px;">20%</td><td style="padding:6px 10px;">Live trading signals</td><td style="padding:6px 10px;color:#5a6270;">NSE Market Intel — delivery, deals, PE, price · market-wide Nifty PCR timing tilt (max ±4)</td></tr>
         <tr style="border-bottom:1px solid #e6e2da;"><td style="padding:6px 10px;font-weight:700;">CY — Cycle</td><td style="padding:6px 10px;">10%</td><td style="padding:6px 10px;">10%</td><td style="padding:6px 10px;">Sector cycle phase + stock's own cycle (price stage vs 30-week average, margin direction, lifecycle)</td><td style="padding:6px 10px;color:#5a6270;">Cycle &amp; Trigger board · auto from prints and NSE prices</td></tr>
         <tr><td style="padding:6px 10px;font-weight:700;">TG — Trigger</td><td style="padding:6px 10px;">15%</td><td style="padding:6px 10px;">15%</td><td style="padding:6px 10px;">Rated catalysts: Impact × Certainty × Timing × Priced-in</td><td style="padding:6px 10px;color:#5a6270;">Cycle &amp; Trigger board · cb-triggers-cycle.json · dashboard cb-data</td></tr>
       </tbody>
@@ -3373,6 +3386,7 @@ function mdAutoFromNSE(inr){
   }catch(err){ console.warn('mdAutoFromNSE',err); return false; }
 }
 async function mdAutoRefresh(){
+  try{ if(typeof pcrApplyStored==='function') pcrApplyStored(); }catch(e){}
   let inr=null;
   try{ const r=await fetch('https://open.er-api.com/v6/latest/USD',{cache:'no-store',signal:AbortSignal.timeout(8000)}); if(r.ok){ const j=await r.json(); if(j&&j.rates&&j.rates.INR) inr=Math.round(j.rates.INR*100)/100; } }catch(e){}
   const ok=mdAutoFromNSE(inr);
@@ -3971,6 +3985,17 @@ function grFamily(file, indexEntries){
   return bs>=0.5?best:null;
 }
 function grNormName(x){ return String(x||'').toLowerCase().replace(/\b(ltd|limited|india|industries|the)\b/g,'').replace(/[^a-z0-9]+/g,''); }
+// v37: the Company Ranker entry for a company name found inside a dashboard (same rules as cvFindCo), or null
+function grCrHit(name){
+  if(typeof CR_DATA==='undefined'||!Array.isArray(CR_DATA)||!name) return null;
+  if(typeof cvFindCo==='function'){
+    const probe=[{cos:[{n:String(name)}],sectors:[]}];
+    for(const d of CR_DATA){ if(d&&d.name&&cvFindCo(d,probe)) return d; }
+    return null;
+  }
+  const t=grNormName(name); if(t.length<3) return null;
+  return CR_DATA.find(d=>d&&grNormName(d.name)===t)||null;
+}
 function grAutoSectors(parsed, fname){
   const list=((typeof CR_DATA!=='undefined'&&Array.isArray(CR_DATA))?CR_DATA:[]).filter(d=>d&&d.name);
   const split={}, secs=[];
@@ -4179,19 +4204,42 @@ function cvSlimCos(cos){
     e:(c.ebitda!=null&&!isNaN(c.ebitda))?+c.ebitda:null, g:c.greens||0, r:c.reds||0, a:c.ambers||0,
     tg:Array.isArray(c.triggers)?c.triggers:undefined, cy:(c.cycle&&typeof c.cycle==='object')?c.cycle:undefined}));
 }
+// v37: a multi-company file whose companies sit at different quarters (one company has
+// published Q2, another only Q1) is split into one record per quarter, so a lagging
+// company is used at its own latest quarter instead of being dropped.
 function grEmit(en,parsed){
   if(en.exclude&&en.exclude.length){
-    parsed={fmt:parsed.fmt,period:parsed.period,cos:parsed.cos.filter(c=>!en.exclude.some(x=>c.name.toLowerCase().includes(x.toLowerCase())))};
+    parsed=Object.assign({},parsed,{cos:parsed.cos.filter(c=>!en.exclude.some(x=>c.name.toLowerCase().includes(x.toLowerCase())))});
   }
+  const qs=parsed.cos.map(c=>c.q).filter(q=>q>0);
+  const mq=qs.length?Math.max.apply(null,qs):0;
+  if(!mq) return grEmitOne(en,parsed);
+  const lab=k=>{ const q=((k-1)%4)+1, fy=(k-q)/4; return 'Q'+q+'FY'+(fy<10?'0':'')+fy; };
+  const byQ={};
+  parsed.cos.forEach(c=>{ const k=(c.q>0)?c.q:mq; if(mq-k>CB_QTR_MAX_LAG) return; (byQ[k]=byQ[k]||[]).push(c); });
+  let out=[];
+  Object.keys(byQ).map(Number).sort((a,b)=>b-a).forEach(k=>{
+    const sub=Object.assign({},parsed,{cos:byQ[k],dq:lab(k),period:lab(k)});
+    const recs=grEmitOne(en,sub);
+    if(k<mq) recs.forEach(r=>{ r.lagCos=true; });
+    out=out.concat(recs);
+  });
+  return out;
+}
+function grEmitOne(en,parsed){
   if(!en.split) return [{file:en.file,sectors:en.sectors,agg:grAggregate(parsed),cos:cvSlimCos(parsed.cos),sc:parsed.sc,dq:parsed.dq}];
   const bySec={};
   parsed.cos.forEach(c=>{
     const sec=Object.keys(en.split).find(k=>c.name.toLowerCase().includes(k.toLowerCase())||k.toLowerCase().includes(c.name.toLowerCase()));
-    const s=sec?en.split[sec]:null; if(!s) return;
+    let s=sec?en.split[sec]:null;
+    // v37: a company added to a multi-sector file after its split list was written is no longer
+    // dropped — its sector comes from Company Ranker, else the file's first (main) sector
+    if(!s){ const hit=grCrHit(c.name); s=(hit&&hit.sector)||((en.sectors&&en.sectors[0])||null); }
+    if(!s) return;
     (bySec[s]=bySec[s]||[]).push(c);
   });
   const out=Object.keys(bySec).map(s=>({file:en.file,sectors:[s],agg:grAggregate({fmt:parsed.fmt,period:parsed.period,cos:bySec[s]}),cos:cvSlimCos(bySec[s]),dq:parsed.dq}));
-  return out.length?out:[{file:en.file,sectors:en.sectors,agg:grAggregate(parsed),cos:cvSlimCos(parsed.cos)}];
+  return out.length?out:[{file:en.file,sectors:en.sectors,agg:grAggregate(parsed),cos:cvSlimCos(parsed.cos),dq:parsed.dq}];
 }
 function grKw(fname){
   const f=String(fname).split('/').pop().toLowerCase(); const out=[];
@@ -4592,7 +4640,9 @@ function grDeepCO(doc, htmlText){
   }
   var found={};
   function addCo(nm,rec){ if(!nm||!rec||!(rec.rev>0)) return; var k=String(nm).toLowerCase();
-    var sc=(rec.revYoY!=null?2:0)+(rec.ebitda!=null?1:0); if(!found[k]||found[k]._s<sc){ rec._s=sc; rec.name=String(nm); found[k]=rec; } }
+    var sc=(rec.revYoY!=null?2:0)+(rec.ebitda!=null?1:0), f0=found[k], q1=rec.q||0, q0=f0?(f0.q||0):0;
+    // v37: a company's newest quarter wins; within the same quarter, the more complete record wins
+    if(!f0||q1>q0||(q1===q0&&f0._s<sc)){ rec._s=sc; rec.name=String(nm); found[k]=rec; } }
   function fromTable(labels, t, nm){
     var n=labels.length, R=pick(t,REV,n); if(!R) return;
     var cur=-1, best=-1; labels.forEach(function(v,i){ if(v!=null&&v>best&&R[i]!=null){ best=v; cur=i; } }); if(cur<0) return;
@@ -4645,7 +4695,9 @@ function grDeepCO(doc, htmlText){
   }
   var out=Object.keys(found).map(function(k){ var r=found[k]; delete r._s; return r; });
   var mq=Math.max.apply(null,out.map(function(r){return r.q||0;}));
-  if(mq>0) out=out.filter(function(r){ return !r.q||r.q===mq; });
+  // v37: companies whose data stops a quarter or two earlier are KEPT (tagged with their own quarter);
+  // grEmit files them under that quarter so they are scored on their latest print, not dropped
+  if(mq>0) out=out.filter(function(r){ return !r.q||(mq-r.q)<=CB_QTR_MAX_LAG; });
   if(out.length&&mq>0){ var qq=((mq-1)%4)+1, fy=(mq-qq)/4; out.dq='Q'+qq+'FY'+(fy<10?'0':'')+fy; }
   return out.length?out:null;
 }
@@ -4821,6 +4873,7 @@ async function grFetchAll(){
     // v23: an older file is still USED when it is the newest available for its sector (fallback)
     const newer=q&&out.files.some(g=>g!==f&&g.agg&&(g.sectors||[]).some(s=>(f.sectors||[]).includes(s))&&(grFileQtr(g)||{key:-1}).key>q.key);
     const isFb=!isCur&&q&&latest&&!newer&&(latest.key-q.key)<=CB_QTR_MAX_LAG;
+    if(f.lagCos) return '📅 '+grBaseName(f.file)+' ['+(q?q.label:'period?')+(srcTag[f.from]||'')+'] — '+f.agg.n+' lagging co(s) → '+f.sectors.join(', ')+' <span style="color:#b35c00;">(v37: '+(f.cos||[]).map(c=>c.n).join(', ')+' — newest data in this file is '+(q?grPretty(q.label):'older')+'; scored on that print)</span>';
     return (isCur?'✅ ':isFb?'📅 ':'⏸ ')+grBaseName(f.file)+(f.auto?' <span style="color:#1d6fa5;font-weight:700;">· auto-found'+(f.fam?' (like '+f.fam+')':' (sector from its companies)')+'</span>':'')+' ['+(q?q.label:'period?')+(srcTag[f.from]||'')+'] — '+f.agg.n+' cos → '+f.sectors.join(', ')+(isCur?'':isFb?' <span style="color:#b35c00;">(used as fallback — '+grPretty(latest.label)+' not yet published for this sector)</span>':' <span style="color:#9aa0b8;">(superseded — comparison only)</span>');
   });
   const ok=out.files.filter(f=>f.agg);
@@ -4829,11 +4882,93 @@ async function grFetchAll(){
   const fromAlt=ok.filter(f=>f.from==='alt').length;
   log('<strong>Current quarter: '+(latest?grPretty(latest.label):'not detected')+'</strong> · '+cur+' current record(s) used · '+fbN+' older record(s) used as fallback (sector has no newer file) · '+(ok.length-cur-fbN)+' superseded · '+autoUsed+' auto-found (not in sector-index.json) · '+fromAlt+' loaded from second repo · '+out.files.filter(f=>f.err).length+' failed · '+new Date(out.ts).toLocaleString()+tcLine+'<br>'+disc.notes.join('<br>')+(autoSkip.length?'<br><span style="color:#9aa0b8;">⏭ Auto-found but skipped (not a results dashboard / no match): '+autoSkip.slice(0,12).join(', ')+(autoSkip.length>12?' …':'')+'</span>':'')+'<br>'+lines.join('<br>'));
   const dl=document.getElementById('grDlIndex'); if(dl) dl.style.display=autoUsed?'inline-block':'none';
+  try{ grRenderNewCos(); }catch(e){}
   try{ CR_CONV=null; if(typeof render==='function') render(); }catch(e){}
   try{ if(typeof recomputeSectorLiveRanks==='function'){ recomputeSectorLiveRanks(); renderAll(); } }catch(e){}
   renderSectorImpact();
   if(typeof cvRender==='function'&&document.getElementById('page-cv')?.classList.contains('active')) cvRender();
 }
+// ── v37: NEW COMPANIES FOUND in dashboards but not in Company Ranker ─────────
+// Every company read from a current or fallback-quarter dashboard is checked against Company
+// Ranker. Those not there are listed with their file, quarter and sector so they can be added
+// (one tap) — until added they count in sector averages but get no individual score.
+function grNewCos(){
+  const cache=grLoadCache(); if(!cache||!cache.files) return [];
+  const lat=grLatestQtr(cache); const ig=crIgnoreList(); const seen={}; const out=[];
+  const junk=/^\W*$|^\?|cb research|rationale|summary|overview|metric|lens\b|sector|total|average|peer|median|industry/i;
+  cache.files.forEach(f=>{
+    if(!f.cos||!f.cos.length) return;
+    const q=grFileQtr(f); if(!q||(lat&&lat.key-q.key>CB_QTR_MAX_LAG)) return;
+    f.cos.forEach(c=>{
+      const nm=String(c.n||'').trim(); if(nm.length<2||junk.test(nm)) return;
+      const k=grNormName(nm)||nm.toLowerCase(); if(seen[k]) { if(q.key>seen[k].qk){ seen[k].q=q.label; seen[k].qk=q.key; } return; }
+      if(ig.indexOf(nm.toLowerCase())>=0) return;
+      if(grCrHit(nm)) return;
+      seen[k]={n:nm,q:q.label,qk:q.key,file:grBaseName(f.file),sectors:(f.sectors||[]).slice(),y:c.y,e:c.e};
+      out.push(seen[k]);
+    });
+  });
+  return out.sort((a,b)=>(a.sectors[0]||'').localeCompare(b.sectors[0]||'')||a.n.localeCompare(b.n));
+}
+function grAllSectors(){ const s=[]; (CR_DATA||[]).forEach(d=>{ if(d.sector&&s.indexOf(d.sector)<0) s.push(d.sector); }); return s.sort(); }
+function grRenderNewCos(){
+  const box=document.getElementById('grNewCos'); if(!box) return;
+  const list=grNewCos(); window.GR_NEWCOS=list;
+  if(!list.length){ box.style.display='none'; box.innerHTML=''; return; }
+  const all=grAllSectors();
+  const esc=x=>String(x==null?'':x).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+  const rows=list.map((c,i)=>{
+    const opts=c.sectors.concat(all.filter(s=>c.sectors.indexOf(s)<0));
+    return '<tr style="border-bottom:1px solid #f0e2cc;"><td style="padding:5px 8px;font-weight:700;">'+esc(c.n)+'</td>'+
+      '<td style="padding:5px 8px;"><select id="grNcSec'+i+'" style="font-size:10.5px;padding:2px 4px;border-radius:5px;border:1px solid #e6c9a0;background:#fffaf2;max-width:190px;">'+opts.map(s=>'<option>'+esc(s)+'</option>').join('')+'</select></td>'+
+      '<td style="padding:5px 8px;white-space:nowrap;">'+esc(grPretty(c.q))+'</td>'+
+      '<td style="padding:5px 8px;text-align:right;">'+(c.y!=null?(c.y>0?'+':'')+c.y+'%':'—')+'</td>'+
+      '<td style="padding:5px 8px;text-align:right;">'+(c.e!=null?c.e+'%':'—')+'</td>'+
+      '<td style="padding:5px 8px;color:#6b6f86;font-size:9.5px;word-break:break-all;">'+esc(c.file)+'</td>'+
+      '<td style="padding:5px 8px;white-space:nowrap;"><button onclick="grAddNewCo('+i+')" style="padding:3px 9px;border-radius:6px;border:none;background:#ff7c00;color:#fff;font-size:10px;font-weight:800;cursor:pointer;">+ Add</button> '+
+      '<button onclick="grIgnoreNewCo('+i+')" title="Not a company / do not track — hide from this list" style="padding:3px 7px;border-radius:6px;border:1px solid #d9c3a3;background:#fff;color:#7a6a55;font-size:10px;cursor:pointer;">Ignore</button></td></tr>';
+  }).join('');
+  box.style.display='block';
+  box.innerHTML='<div style="border:1px solid #f3c58a;background:#fff6ea;border-radius:10px;padding:10px 12px;">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">'+
+    '<div style="font-size:11.5px;font-weight:800;color:#8a4b00;">🆕 New companies found — not in Company Ranker ('+list.length+')</div>'+
+    '<button onclick="grAddAllNewCos()" style="padding:5px 12px;border-radius:7px;border:none;background:#ff7c00;color:#fff;font-size:10.5px;font-weight:800;cursor:pointer;">+ Add all</button></div>'+
+    '<div style="font-size:9.5px;color:#7a5a30;margin-bottom:7px;line-height:1.5;">These companies are in your results dashboards and already count in their sector averages, but get no individual score until added. Check the sector, then add. Added companies get a neutral starting score (CB 60) and are kept in this browser; use Export to make them permanent in the file.</div>'+
+    '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:10.5px;"><thead><tr style="background:#fde7c8;color:#6b3a00;text-align:left;">'+
+    '<th style="padding:5px 8px;">Company</th><th style="padding:5px 8px;">Sector</th><th style="padding:5px 8px;">Quarter</th><th style="padding:5px 8px;text-align:right;">Rev YoY</th><th style="padding:5px 8px;text-align:right;">EBITDA %</th><th style="padding:5px 8px;">Dashboard file</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+}
+function grNewCoEntry(c, sector){
+  const peer=(CR_DATA||[]).find(d=>d.sector===sector);
+  const group=peer?peer.group:'Manufacturing';
+  const sc=defaultScores(60,sector);
+  const nd={id:nextId++,name:c.n,sector:sector,group:group,mcap:400,mcap_rank:400,desc:'Added from dashboard '+c.file+' ('+grPretty(c.q)+')',
+    cb:60,alloc:'Rs.0',season:1,asOf:new Date().toISOString().slice(0,10),flag:'',scores:sc,ver:sc.map(()=>false),hist:[],cbSeed:60,fromDash:true};
+  try{ nd.cb=calcCBFor(nd); }catch(e){}
+  return nd;
+}
+function grAddNewCos(idxs){
+  const list=window.GR_NEWCOS||[]; const saved=crAddedList(); let n=0;
+  idxs.forEach(i=>{ const c=list[i]; if(!c) return;
+    const sel=document.getElementById('grNcSec'+i); const sector=(sel&&sel.value)||c.sectors[0]||'Other';
+    if(grCrHit(c.n)) return;
+    const nd=grNewCoEntry(c, sector); CR_DATA.push(nd); saved.push(nd); n++; });
+  try{ localStorage.setItem(CR_ADDED_KEY, JSON.stringify(saved)); }catch(e){}
+  try{ CR_CONV=null; }catch(e){}
+  try{ render(); }catch(e){}
+  try{ if(typeof recomputeSectorLiveRanks==='function'){ recomputeSectorLiveRanks(); renderAll(); } }catch(e){}
+  try{ if(typeof cvRender==='function'&&document.getElementById('page-cv')?.classList.contains('active')) cvRender(); }catch(e){}
+  grRenderNewCos();
+  const st=document.getElementById('grStatus'); if(st&&n) st.insertAdjacentHTML('afterbegin','<div style="color:#006b30;font-weight:700;">✅ '+n+' company(ies) added to Company Ranker.</div>');
+}
+function grAddNewCo(i){ grAddNewCos([i]); }
+function grAddAllNewCos(){ const l=window.GR_NEWCOS||[]; if(!l.length) return; if(!confirm('Add all '+l.length+' companies to Company Ranker with a neutral starting score?')) return; grAddNewCos(l.map((_,i)=>i)); }
+function grIgnoreNewCo(i){
+  const c=(window.GR_NEWCOS||[])[i]; if(!c) return;
+  const ig=crIgnoreList(); const n=c.n.toLowerCase(); if(ig.indexOf(n)<0) ig.push(n);
+  try{ localStorage.setItem(CR_IGNORE_KEY, JSON.stringify(ig)); }catch(e){}
+  grRenderNewCos();
+}
+window.addEventListener('load',function(){ setTimeout(function(){ try{ grRenderNewCos(); }catch(e){} }, 1200); });
 // ── LOCAL FILE PICKER (works without hosting) ──
 function grPickFiles(fileList){
   const st=document.getElementById('grStatus');
@@ -4847,7 +4982,7 @@ function grPickFiles(fileList){
       const parsed=grParseHTML(reader.result,f.name);
       const sectors=grKw(f.name);
       cache.files=cache.files.filter(x=>x.file!==f.name);
-      if(parsed) cache.files.push({file:f.name,sectors,agg:grAggregate(parsed),cos:cvSlimCos(parsed.cos),sc:parsed.sc});
+      if(parsed) grEmit({file:f.name,sectors,split:null},parsed).forEach(e=>cache.files.push(e));
       else cache.files.push({file:f.name,sectors,err:'no parseable table found'});
       done++;
       if(done===files.length){
@@ -4855,6 +4990,7 @@ function grPickFiles(fileList){
         grSaveCache(cache);
         if(st) st.innerHTML='✅ Loaded '+files.length+' local file(s) · sectors matched: '+(cache.files.flatMap(x=>x.sectors).join(', ')||'none — rename file to include sector keyword');
         renderSectorImpact();
+        try{ grRenderNewCos(); }catch(e){}
       }
     };
     reader.readAsText(f);
@@ -6271,6 +6407,111 @@ function miAddPe(){
 
 const MI_RENDERS={fii:miRenderFii,bulk:miRenderBulk,fo:miRenderFo,delivery:miRenderDelivery,sector:miRenderSector,pe:miRenderPe};
 
+// ── v38: PUT-CALL RATIO from cb_pcr.py (runs on this computer from Windows start-up) ──
+// cb_pcr.py reads NSE's live option chain every 15 min in market hours and the official F&O
+// bhavcopy after ~6:30 PM (final figure), and serves them at localhost:5051/api/pcr. Here we
+// keep that history ('cbf26_pcr_v1'), copy each day's PCR into the F&O records ('cbr_fo') so the
+// Dashboard tiles, FII/DII page and signal panel use it, and draw the PCR trend panel.
+const PCR_SERVER='http://localhost:5051', PCR_KEY='cbf26_pcr_v1';
+let PCR_ONLINE=null, PCR_META={};
+function pcrHist(){ try{ return JSON.parse(localStorage.getItem(PCR_KEY)||'[]')||[]; }catch(e){ return []; } }
+function pcrApplyStored(){
+  const h=pcrHist(); if(!h.length) return 0;
+  let fo=load('fo'); let n=0;
+  h.forEach(r=>{
+    if(!r||!r.date||r.pcr==null) return;
+    let row=fo.find(x=>x&&x.date===r.date);
+    if(!row){ row={date:r.date}; fo.push(row); }
+    if(+row.pcr!==+r.pcr||(r.bnpcr!=null&&+row.bnpcr!==+r.bnpcr)) n++;
+    row.pcr=r.pcr; if(r.bnpcr!=null) row.bnpcr=r.bnpcr; if(r.mp!=null) row.mp=r.mp;
+    if(r.pcrAll!=null) row.pcrAll=r.pcrAll; row.pcrSrc=r.final?'NSE bhavcopy (final)':'NSE option chain (live '+String(r.time||'').slice(11)+')';
+    if(!row.nf&&r.nf) row.nf=r.nf;
+  });
+  if(n){ fo.sort((a,b)=>String(a.date).localeCompare(String(b.date))); try{ miSafeSave('fo',fo); }catch(e){ try{ save('fo',fo); }catch(e2){} } }
+  return n;
+}
+async function pcrSync(quiet){
+  try{
+    const r=await fetch(PCR_SERVER+'/api/pcr',{cache:'no-store',signal:AbortSignal.timeout(6000)});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const j=await r.json(); PCR_ONLINE=true; PCR_META=j||{};
+    const old=pcrHist(), by={}; old.forEach(x=>{ if(x&&x.date) by[x.date]=x; });
+    (j.history||[]).forEach(x=>{ if(x&&x.date&&x.pcr!=null&&!(by[x.date]&&by[x.date].final&&!x.final)) by[x.date]=x; });
+    const all=Object.keys(by).sort().slice(-250).map(k=>by[k]);
+    try{ localStorage.setItem(PCR_KEY, JSON.stringify(all)); }catch(e){}
+    const n=pcrApplyStored();
+    if(n){ try{ CV_PCR_CACHE=null; if(typeof CR_CONV!=='undefined') CR_CONV=null; if(typeof render==='function') render();
+        if(typeof recomputeSectorLiveRanks==='function'){ recomputeSectorLiveRanks(); if(typeof renderAll==='function') renderAll(); } }catch(e){} try{ if(typeof mdAutoRefresh==='function') await mdAutoRefresh(); }catch(e){}
+      try{ if(typeof miRender==='function'&&typeof miActiveTab!=='undefined'&&miActiveTab==='fo') miRender('fo'); }catch(e){}
+      try{ if(typeof updateFIIKPIs==='function') updateFIIKPIs(); if(typeof updateFIISignal==='function') updateFIISignal(); }catch(e){} }
+  }catch(e){ PCR_ONLINE=false; }
+  pcrRender();
+}
+async function pcrRefreshNow(){
+  const b=document.getElementById('pcrRefreshBtn'); if(b){ b.disabled=true; b.textContent='Refreshing…'; }
+  try{ await fetch(PCR_SERVER+'/api/pcr/refresh',{method:'POST',signal:AbortSignal.timeout(6000)}); }catch(e){}
+  setTimeout(async()=>{ await pcrSync(); if(b){ b.disabled=false; b.textContent='↻ Refresh PCR'; } }, 25000);
+}
+var PCR_STARTED=false;
+function pcrStart(){
+  if(PCR_STARTED) return; PCR_STARTED=true;
+  setTimeout(()=>pcrSync(true), 1800);
+  setInterval(()=>{ if(typeof isAdminMode!=='function'||isAdminMode()) pcrSync(true); }, 10*60*1000);
+}
+function pcrRead(p,avg5,avg20){
+  const out=[]; const v=avg5!=null?avg5:p;
+  if(v>=1.5) out.push('Very heavy put writing — traders are strongly positioned for upside. At these extremes the market is often over-confident; contrarians watch for a pause or pullback.');
+  else if(v>1.3) out.push('Strong put writing — option sellers expect support below; bullish positioning.');
+  else if(v>1.1) out.push('Mild bullish tilt — more puts written than calls.');
+  else if(v>=0.8) out.push('Balanced — no strong positioning either way.');
+  else if(v>=0.6) out.push('Call writing dominates — traders expect resistance above; cautious.');
+  else out.push('Very heavy call writing — fear is high. Readings this low often come near short-term bottoms (contrarian bounce risk).');
+  if(avg5!=null&&avg20!=null){ const d=avg5-avg20;
+    if(d>=0.08) out.push('5-day average is rising above the 20-day — sentiment improving.');
+    else if(d<=-0.08) out.push('5-day average is falling below the 20-day — sentiment weakening.');
+    else out.push('5-day and 20-day averages are close — no sentiment shift.'); }
+  return out.join(' ');
+}
+function pcrRender(){
+  const st=document.getElementById('pcrSrvStatus'), body=document.getElementById('pcrBody'), btn=document.getElementById('pcrRefreshBtn');
+  if(!body) return;
+  if(st){
+    if(PCR_ONLINE===true){ st.textContent='● PCR fetcher online'+(PCR_META.last_live?' · live '+String(PCR_META.last_live).slice(11):'')+(PCR_META.last_error&&!PCR_META.last_live?' · last issue: '+String(PCR_META.last_error).slice(0,60):''); st.style.background='#e6f4ef'; st.style.color='#006b30'; }
+    else if(PCR_ONLINE===false){ st.textContent='● PCR fetcher offline — double-click start_cb_pcr.bat'; st.style.background='#fdf0f0'; st.style.color='#b71c1c'; }
+  }
+  if(btn) btn.style.display=PCR_ONLINE?'inline-block':'none';
+  const h=pcrHist().filter(r=>r&&r.pcr!=null);
+  if(!h.length) return;
+  const L=h[h.length-1], vals=h.map(r=>+r.pcr);
+  const avg=n=>{ const a=vals.slice(-n); return a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length*1000)/1000:null; };
+  const a5=avg(5), a20=h.length>=10?avg(20):null;
+  const col=v=>v>1.1?'#006b30':v<0.8?'#b71c1c':'#b35c00';
+  const fmtD=d=>new Date(d+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
+  const tile=(lab,val,sub,c)=>'<div style="flex:1;min-width:118px;background:#fff;border:1px solid #eadcf3;border-radius:9px;padding:7px 10px;"><div style="font-size:9.5px;font-weight:700;color:#7a6a8a;">'+lab+'</div><div style="font-size:19px;font-weight:900;color:'+(c||'#3a2a4a')+';">'+val+'</div><div style="font-size:9px;color:#6b6f86;">'+sub+'</div></div>';
+  // sparkline (last 30 sessions) with the neutral 0.8–1.1 band
+  const S=h.slice(-30), W=860, H=110, pad=26;
+  const lo=Math.min(0.5,...S.map(r=>+r.pcr))-0.05, hi=Math.max(1.5,...S.map(r=>+r.pcr))+0.05;
+  const X=i=>pad+(S.length<2?0:i*(W-pad-8)/(S.length-1)), Y=v=>6+(hi-v)*(H-18)/(hi-lo);
+  let svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;">'+
+    '<rect x="'+pad+'" y="'+Y(1.1)+'" width="'+(W-pad-8)+'" height="'+(Y(0.8)-Y(1.1))+'" fill="#fff3d6" opacity=".8"/>';
+  [[1.3,'#16a34a'],[0.6,'#dc2626'],[1.0,'#b0a0c0']].forEach(([v,c])=>{ svg+='<line x1="'+pad+'" x2="'+(W-8)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="'+c+'" stroke-dasharray="3 3" stroke-width="1"/><text x="2" y="'+(Y(v)+3)+'" font-size="9" fill="'+c+'">'+v.toFixed(1)+'</text>'; });
+  if(S.length>1) svg+='<polyline fill="none" stroke="#8e24aa" stroke-width="2" points="'+S.map((r,i)=>X(i).toFixed(1)+','+Y(+r.pcr).toFixed(1)).join(' ')+'"/>';
+  S.forEach((r,i)=>{ svg+='<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(+r.pcr).toFixed(1)+'" r="'+(i===S.length-1?3.5:2)+'" fill="'+col(+r.pcr)+'"><title>'+fmtD(r.date)+': PCR '+r.pcr+(r.bnpcr!=null?' · BankNifty '+r.bnpcr:'')+(r.final?' (final)':' (live)')+'</title></circle>'; });
+  svg+='<text x="'+pad+'" y="'+(H-1)+'" font-size="9" fill="#7a6a8a">'+fmtD(S[0].date)+'</text><text x="'+(W-8)+'" y="'+(H-1)+'" font-size="9" fill="#7a6a8a" text-anchor="end">'+fmtD(S[S.length-1].date)+'</text></svg>';
+  const age=Math.round((Date.parse(new Date(Date.now()+5.5*3600e3).toISOString().slice(0,10))-Date.parse(L.date))/864e5);
+  body.innerHTML='<div style="display:flex;gap:8px;flex-wrap:wrap;">'+
+    tile('Nifty PCR · '+fmtD(L.date), L.pcr, (L.final?'final (NSE bhavcopy)':'live '+String(L.time||'').slice(11)+' IST')+' · '+pcrSignal(+L.pcr), col(+L.pcr))+
+    tile('5-day average', a5!=null?a5:'—', 'smooths daily noise', a5!=null?col(a5):null)+
+    tile('20-day average', a20!=null?a20:'—', a20!=null?(a5-a20>=0?'▲ ':'▼ ')+'5-day vs 20-day '+(a5-a20>=0?'+':'')+(a5-a20).toFixed(2):'needs 10+ days', a20!=null?col(a20):null)+
+    tile('Bank Nifty PCR', L.bnpcr!=null?L.bnpcr:'—', L.bnpcr!=null?pcrSignal(+L.bnpcr):'', L.bnpcr!=null?col(+L.bnpcr):null)+
+    tile('Max pain (Nifty)', L.mp!=null?Math.round(L.mp).toLocaleString('en-IN'):'—', (L.nf?'spot '+Math.round(L.nf).toLocaleString('en-IN')+' · ':'')+'expiry '+(L.expiry?fmtD(L.expiry):'—'))+
+    '</div>'+
+    '<div style="margin-top:8px;background:#fff;border:1px solid #eadcf3;border-radius:9px;padding:6px 8px;">'+svg+'</div>'+
+    '<div style="margin-top:7px;font-size:11px;color:#3a2a4a;line-height:1.55;"><b>Reading:</b> '+pcrRead(+L.pcr,a5,a20)+'</div>'+
+    '<div style="margin-top:4px;font-size:9.5px;color:#7a6a8a;line-height:1.5;">PCR = total Put open interest ÷ total Call open interest, nearest Nifty expiry'+(L.pcrAll!=null?' (all expiries: '+L.pcrAll+')':'')+'. Shaded band 0.8–1.1 = neutral.'+((typeof cvPcrTilt==='function'&&cvPcrTilt())?' <b>Effect on scores:</b> '+(cvPcrTilt().pts>0?'+':'')+cvPcrTilt().pts+' to every stock\'s Market lens (5-day avg '+cvPcrTilt().a5+').':'')+' Live readings every 15 min in market hours; the day\'s final figure comes from NSE\'s F&amp;O bhavcopy after ~6:30 PM.'+(age>4?' <b style="color:#b71c1c;">Latest reading is '+age+' days old — check that start_cb_pcr.bat is running.</b>':'')+' '+h.length+' day(s) stored.</div>';
+}
+window.addEventListener('load',function(){ setTimeout(function(){ try{ pcrRender(); }catch(e){} }, 900); });
+
 // ── auto-fetch from your local server.py (same /api/data your fetcher.py populates) ──
 const MI_SERVER='http://localhost:5050';
 function miShowToast(msg,isErr=false){
@@ -6369,9 +6610,12 @@ function miMergeIntoLocalStorage(serverData){
     if(!incoming.length)continue;
     const existing=load(k);
     const byKey=new Map(existing.map(r=>[miRecordKey(r,k),r]));
-    for(const r of incoming){
+    for(let r of incoming){
       const key=miRecordKey(r,k);
       if(byKey.has(key)) updated++; else added++;
+      // v38: an F&O row from the NSE server without PCR must not wipe the PCR from cb_pcr.py
+      if(k==='fo'&&byKey.has(key)){ const o=byKey.get(key); r=Object.assign({},r);
+        ['pcr','bnpcr','mp','pcrAll','pcrSrc'].forEach(f=>{ if((r[f]==null||r[f]===''||+r[f]===0)&&o[f]!=null&&o[f]!=='') r[f]=o[f]; }); }
       byKey.set(key,r);   // fresh data always wins — replaces stale/blank rows for the same key
     }
     MI_TRIMMED+=miSafeSave(k,Array.from(byKey.values()));
@@ -6504,6 +6748,7 @@ var MI_POLL_STARTED=false;
 function miStartAdminPolling(){
   if(typeof isAdminMode!=='function' || !isAdminMode()) return;
   if(MI_POLL_STARTED) return; MI_POLL_STARTED=true;
+  try{ pcrStart(); }catch(e){}
   if(typeof miCheckServer==='function'){ miCheckServer(); setInterval(()=>{ if(isAdminMode()) miCheckServer(); }, 30000); }
   setTimeout(miAutoDaily, 2500);
 }
@@ -8193,6 +8438,19 @@ CR_DATA.forEach(d=>{
   d.cb = hasRealEdit ? calcCBFor(d) : d.cbSeed;
 });
 const ORIG_DATA = JSON.parse(JSON.stringify(CR_DATA));
+// v37: companies added from dashboards ("New companies found") are kept in this browser and re-added on load
+const CR_ADDED_KEY='cbf26_cr_added_v1', CR_IGNORE_KEY='cbf26_cr_ignore_v1';
+function crAddedList(){ try{ return JSON.parse(localStorage.getItem(CR_ADDED_KEY)||'[]')||[]; }catch(e){ return []; } }
+function crIgnoreList(){ try{ return JSON.parse(localStorage.getItem(CR_IGNORE_KEY)||'[]')||[]; }catch(e){ return []; } }
+function crLoadAdded(){
+  crAddedList().forEach(function(nd){
+    if(!nd||!nd.name) return;
+    var n=String(nd.name).toLowerCase();
+    if(CR_DATA.some(function(d){ return String(d.name).toLowerCase()===n; })) return;
+    nd=JSON.parse(JSON.stringify(nd)); nd.id=nextId++; CR_DATA.push(nd);
+  });
+}
+try{ crLoadAdded(); }catch(e){}
 
 // Format market cap for display
 function fmtMcap(cr){
@@ -8396,6 +8654,10 @@ function updateAlloc(id,el){
 }
 
 function deleteCard(id){
+  try{ const gone=CR_DATA.find(d=>d.id===id);
+    if(gone&&gone.fromDash){ const n=String(gone.name).toLowerCase();
+      localStorage.setItem(CR_ADDED_KEY, JSON.stringify(crAddedList().filter(x=>String(x.name).toLowerCase()!==n)));
+      const ig=crIgnoreList(); if(ig.indexOf(n)<0){ ig.push(n); localStorage.setItem(CR_IGNORE_KEY, JSON.stringify(ig)); } } }catch(e){}
   CR_DATA=CR_DATA.filter(d=>d.id!==id);
   render();
 }
@@ -8417,6 +8679,7 @@ function addCompany(){
 function resetAll(){
   if(!confirm('Reset all scores to defaults?'))return;
   CR_DATA=JSON.parse(JSON.stringify(ORIG_DATA));
+  try{ crLoadAdded(); }catch(e){}
   render();
 }
 
@@ -11136,8 +11399,46 @@ function cvMarket(sym){
     else if(is>ib){score-=5;parts.push('Institutions reducing ('+is+' entries)');}
   }
 
+  // v39: market-wide timing tilt from the Nifty Put-Call Ratio (same for every stock, capped ±4,
+  // applied only when the stock has its own market data). Uses the 5-day average, fresh ≤5 days.
+  if(any){ var pt=cvPcrTilt(); if(pt&&pt.pts){ score+=pt.pts; parts.push(pt.txt); } }
+
   if(!any) return null;
   return {score:Math.round(Math.max(0,Math.min(100,score))), parts:parts, work:{base:50, items:_t.w, raw:Math.round(score*10)/10}};
+}
+// v39: PCR timing tilt — moderate put writing is supportive; extremes are read contrarian
+//   5-day avg ≥1.5 → −3 (crowded bullish) · 1.2–1.5 → +3 · 1.1–1.2 → +2 · 0.8–1.1 → 0
+//   0.6–0.8 → −3 (call writing) · <0.6 → +3 (fear extreme, bounce-prone)
+//   plus ±1 when the 5-day average is ≥0.10 above / below the 20-day; total capped at ±4
+var CV_PCR_CACHE=null;
+function cvPcrTilt(){
+  if(CV_PCR_CACHE&&Date.now()-CV_PCR_CACHE.t<60000) return CV_PCR_CACHE.v;
+  var v=null;
+  try{
+    var h=(typeof pcrHist==='function'?pcrHist():[]).filter(function(r){return r&&r.pcr!=null&&!isNaN(+r.pcr);});
+    if(!h.length){ h=load('fo').filter(function(r){return r&&r.date&&r.pcr!==''&&r.pcr!=null&&!isNaN(+r.pcr)&&+r.pcr>0;})
+      .sort(function(a,b){return String(a.date).localeCompare(String(b.date));}); }
+    if(h.length){
+      var L=h[h.length-1];
+      var age=Math.round((Date.parse(new Date(Date.now()+5.5*3600e3).toISOString().slice(0,10))-Date.parse(L.date))/864e5);
+      if(age<=5){
+        var vals=h.map(function(r){return +r.pcr;}), av=function(n){ var a=vals.slice(-n); return a.reduce(function(x,y){return x+y;},0)/a.length; };
+        var a5=av(5), a20=h.length>=10?av(20):null, pts=0, why;
+        if(a5>=1.5){ pts=-3; why='crowded bullish positioning — contrarian caution'; }
+        else if(a5>=1.2){ pts=3; why='strong put writing — supportive'; }
+        else if(a5>1.1){ pts=2; why='mild put-writing support'; }
+        else if(a5>=0.8){ pts=0; why='neutral'; }
+        else if(a5>=0.6){ pts=-3; why='call writing dominates — resistance above'; }
+        else { pts=3; why='fear extreme — bounce-prone (contrarian)'; }
+        var tr='';
+        if(a20!=null){ var d=a5-a20; if(d>=0.10){ pts+=1; tr=', improving vs 20-day'; } else if(d<=-0.10){ pts-=1; tr=', weakening vs 20-day'; } }
+        pts=Math.max(-4,Math.min(4,pts));
+        v={pts:pts, a5:+a5.toFixed(2), txt:'Nifty PCR 5-day '+a5.toFixed(2)+' ('+why+tr+') — market-wide timing '+(pts>0?'+':'')+pts};
+      }
+    }
+  }catch(e){ v=null; }
+  CV_PCR_CACHE={t:Date.now(), v:v};
+  return v;
 }
 
 // ════════════════════════════════════════════════════════════════════════
