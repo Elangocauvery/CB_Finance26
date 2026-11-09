@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v40 (Sector Ranker on Q1/Q2 FY27 results · reads Q2 FY27 dashboards)</title>
+<title>CB Finance26™ — Macro Pulse · v41 (Sector Ranker on Q1/Q2 FY27 results · reads Q2 FY27 dashboards)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -4025,7 +4025,8 @@ function grRepoList(){
   const v=(document.getElementById('grRepos')?.value||'').trim();
   const list=v?v.split(/[\s,]+/).map(x=>x.replace(/^https?:\/\/github\.com\//i,'').replace(/\.git$/,'').replace(/\/+$/,'')).filter(x=>/^[\w.-]+\/[\w.-]+$/.test(x)):[];
   let owner=null;
-  [location.href,(document.getElementById('grBaseUrl')?.value||''),(document.getElementById('grAltBase')?.value||'')].forEach(u=>{ if(!u) return; const k=grRepoFromUrl(u); if(k){ list.push(k); if(!owner) owner=k.split('/')[0]; } });
+  [location.href,(document.getElementById('grBaseUrl')?.value||''),(document.getElementById('grAltBase')?.value||''),
+   (typeof grIsLocal==='function'&&grIsLocal()&&typeof GR_DEFAULT_HOST!=='undefined')?GR_DEFAULT_HOST:''].forEach(u=>{ if(!u) return; const k=grRepoFromUrl(u); if(k){ list.push(k); if(!owner) owner=k.split('/')[0]; } });
   if(!owner&&list.length) owner=list[0].split('/')[0];
   // second repo on a custom domain (e.g. share-analysis.example.in): same owner, repo named after the
   // sub-domain — try "share-analysis" and "shareanalysis" (GitHub matches names case-insensitively)
@@ -4808,9 +4809,15 @@ function grAggregate(parsed){
     greens:g,reds:r,ambers:am,tone,toneScore:+toneScore.toFixed(2),top,period:parsed.period,fmt:parsed.fmt};
 }
 // ── FETCH FROM YOUR GITHUB PAGES ──
+// v41: when the app is opened from the computer (file://) with the Base URL left blank, the
+// research files are read from the hosted site instead of the local folder (GitHub Pages allows this)
+var GR_DEFAULT_HOST='https://elangocauvery.github.io/CB_Finance26';
+function grIsLocal(){ return !/^https?:/i.test(location.protocol); }
 async function grFetchAll(){
   const st=document.getElementById('grStatus');
-  const base=(document.getElementById('grBaseUrl')?.value||'').trim().replace(/\/+$/,'');
+  let base=(document.getElementById('grBaseUrl')?.value||'').trim().replace(/\/+$/,'');
+  const GR_LOCAL=grIsLocal();
+  if(!base&&GR_LOCAL) base=GR_DEFAULT_HOST;
   const alt=(document.getElementById('grAltBase')?.value||'').trim().replace(/\/+$/,'');
   try{localStorage.setItem(GR_URL_KEY,base);localStorage.setItem(GR_ALT_KEY,alt);localStorage.setItem(GR_REPO_KEY,(document.getElementById('grRepos')?.value||'').trim());}catch(e){}
   const isAbs=p=>/^https?:\/\//i.test(p);
@@ -4829,14 +4836,21 @@ async function grFetchAll(){
   }
   log('Fetching sector-index.json …');
   let index;
-  try{
-    const r=await fetch(join(base,'sector-index.json'),{cache:'no-store'});
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    index=await r.json();
-  }catch(e){
-    log('❌ Could not fetch sector-index.json ('+e.message+'). If you are testing locally (file://), use "Load files from computer" instead — fetching works once this app is hosted on your GitHub Pages.');
+  // v41: try this app's folder, then the second-repo site, then the hosted site
+  const idxTries=[]; [base, alt, GR_DEFAULT_HOST].forEach(b=>{ const u=join(b,'sector-index.json'); if(idxTries.indexOf(u)<0) idxTries.push(u); });
+  const idxErr=[];
+  for(const u of idxTries){
+    try{ const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); index=await r.json(); break; }
+    catch(e){ idxErr.push((u.indexOf('://')>0?u.replace(/^https?:\/\//,'').replace(/\/sector-index\.json$/,''):'this folder')+': '+e.message); }
+  }
+  if(!index){
+    const offline=(typeof navigator!=='undefined'&&navigator.onLine===false);
+    log('❌ Could not fetch sector-index.json — '+idxErr.join(' · ')+'.<br>'+
+      (offline?'This computer looks <b>offline</b> — check the internet connection and press Fetch again.':
+       '<b>"Failed to fetch"</b> means the site could not be reached (internet, firewall/antivirus, or the site is down); <b>"HTTP 404"</b> means sector-index.json is missing from that repo. Open '+GR_DEFAULT_HOST+'/sector-index.json in a browser tab to check.'));
     return;
   }
+  if(GR_LOCAL) log('Opened from this computer — reading research files from '+base+' …');
   const entries=(Array.isArray(index)?index:[]).map(grMapFile);
   GR_LAST_INDEX=Array.isArray(index)?index:[];
   // v24: find new quarter dashboards in the repo(s) that are not listed in sector-index.json
