@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v41 (Sector Ranker on Q1/Q2 FY27 results · reads Q2 FY27 dashboards)</title>
+<title>CB Finance26™ — Macro Pulse · v44 (Sector Ranker on Q1/Q2 FY27 results · reads Q2 FY27 dashboards)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -1738,6 +1738,7 @@ tr:last-child td{border-bottom:none;}
     </div>
   </div>
 
+  <div id="cv-watch" style="margin-bottom:16px;"></div>
   <div style="background:#fff;border:1.5px solid #e6e2da;border-radius:12px;padding:18px 22px;margin-bottom:16px;">
     <div style="font-size:13px;font-weight:800;color:#1c1f26;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">ℹ️ How the Conviction score is built — the 6 lenses</div>
     <table style="width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:12px;">
@@ -4203,6 +4204,7 @@ function grMapFile(entry){
 function cvSlimCos(cos){
   return (cos||[]).map(c=>({n:c.name, v:+(c.rev||0), y:(c.revYoY!=null&&!isNaN(c.revYoY))?+c.revYoY:null,
     e:(c.ebitda!=null&&!isNaN(c.ebitda))?+c.ebitda:null, g:c.greens||0, r:c.reds||0, a:c.ambers||0, s:c.sym||undefined,
+    py:(c.patYoY!=null&&!isNaN(c.patYoY))?+c.patYoY:undefined, ey:(c.ebitdaPY!=null&&!isNaN(c.ebitdaPY))?+c.ebitdaPY:undefined,
     tg:Array.isArray(c.triggers)?c.triggers:undefined, cy:(c.cycle&&typeof c.cycle==='object')?c.cycle:undefined}));
 }
 // v37: a multi-company file whose companies sit at different quarters (one company has
@@ -4261,15 +4263,56 @@ function grQtrPretty(q){ return String(q||'').replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2
 function grLatestQtr(cache){ cache=cache||grLoadCache(); if(!cache||!cache.files) return null; let best=null; cache.files.forEach(f=>{ if(!f.agg&&!(f.cos&&f.cos.length)) return; const q=grFileQtr(f); if(q&&(!best||q.key>best.key)) best=q; }); return best; }
 function grPretty(label){ return String(label||'').replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2'); }
 function grBaseName(f){ return String(f||'').split('/').pop(); }
-function grLoadCache(){ try{return JSON.parse(localStorage.getItem(GR_KEY)||'null');}catch(e){return null;} }
-function grSaveCache(d){ try{localStorage.setItem(GR_KEY,JSON.stringify(d));}catch(e){} }
+// v43: LATEST RESULTS ENTERED DIRECTLY — for a company whose newest quarter is out but has no
+// results dashboard yet. Used only when no loaded dashboard already carries that company for that
+// quarter; a dashboard, once published, always wins. Fields: y = revenue YoY %, e = EBITDA margin %,
+// ey = same quarter last year's EBITDA margin %, py = PAT YoY %, v = revenue ₹ Cr, p = PAT ₹ Cr.
+var CV_MANUAL_PRINTS=[
+  {name:"Divi's Laboratories", sym:'DIVISLAB', q:'Q2FY27', sector:'Pharma (CDMO)', v:3676, y:35.4, e:42.6, ey:38.0, p:1127, py:63.6,
+   src:'Company results 07-Nov-2026: revenue from operations ₹3,676 Cr (Q2 FY26 ₹2,715 Cr), EBITDA ₹1,566 Cr (₹1,033 Cr), PAT ₹1,127 Cr (₹689 Cr)'}
+];
+function grManualFiles(files){
+  var out=[];
+  try{
+    CV_MANUAL_PRINTS.forEach(function(m){
+      var same=(files||[]).filter(function(f){ var k=grFileQtr(f); return k&&k.label===m.q&&f.cos&&f.cos.length; });
+      var d={name:m.name, sector:m.sector};
+      if(same.length&&typeof cvFindCo==='function'&&cvFindCo(d,same)) return;      // a dashboard has it — use that
+      out.push({file:'Results entered directly ('+m.q.replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2')+')', dq:m.q, sectors:[m.sector], manual:true, src:m.src,
+        agg:{n:1}, cos:[{n:m.name, v:m.v, y:m.y, e:m.e, ey:m.ey, py:m.py, g:0, r:0, a:0, s:m.sym}]});
+    });
+  }catch(e){}
+  return out;
+}
+function grLoadCache(){ try{ var c=JSON.parse(localStorage.getItem(GR_KEY)||'null');
+  if(c&&Array.isArray(c.files)){ c.files=c.files.filter(function(f){return !f.manual;}); c.files=c.files.concat(grManualFiles(c.files)); }
+  return c; }catch(e){return null;} }
+function grSaveCache(d){ try{ if(d&&Array.isArray(d.files)) d=Object.assign({},d,{files:d.files.filter(function(f){return !f.manual;})}); localStorage.setItem(GR_KEY,JSON.stringify(d));}catch(e){} }
+// v44: the standard cb-data block in every results dashboard —
+//   {"period":"Q2FY27","companies":[{"name":"…","sym":"NSE","rev":3676,"revPY":2715,"revYoY":35.4,
+//     "ebitda":42.6,"ebitdaPY":38.0,"pat":1127,"patPY":689,"patYoY":63.6, "triggers":[…], "cycle":{…}}]}
+//   ebitda / ebitdaPY are EBITDA MARGIN %; YoY figures are worked out when only the PY values are given.
+function grNormCbData(list){
+  return (Array.isArray(list)?list:[]).map(function(c){
+    if(!c||typeof c!=='object') return c;
+    var o=Object.assign({},c), n=function(v){ v=(v==null||v==='')?null:+String(v).replace(/,/g,''); return (v==null||isNaN(v))?null:v; };
+    o.rev=n(o.rev); var rpy=n(o.revPY);
+    if(o.revYoY==null&&o.rev>0&&rpy>0) o.revYoY=+((o.rev/rpy-1)*100).toFixed(1);
+    o.ebitda=n(o.ebitda); if(o.ebitdaPY==null&&o.opmPY!=null) o.ebitdaPY=n(o.opmPY); else o.ebitdaPY=n(o.ebitdaPY);
+    o.pat=n(o.pat); var ppy=n(o.patPY);
+    if(o.patYoY==null&&o.pat!=null&&ppy>0) o.patYoY=+((o.pat/ppy-1)*100).toFixed(1); else o.patYoY=n(o.patYoY);
+    if(!o.sym&&o.nse) o.sym=o.nse;
+    o.greens=o.greens||0; o.reds=o.reds||0; o.ambers=o.ambers||0;
+    return o;
+  });
+}
 // ── PARSER: works on your real file formats ──
 function grParseHTML(htmlText,fname,opts){
   opts=opts||{};
   const doc=new DOMParser().parseFromString(htmlText,'text/html');
   // Priority 1: future machine-readable block
   const jb=doc.querySelector('script#cb-data[type="application/json"]');
-  if(jb){ try{const d=JSON.parse(jb.textContent); if(d&&d.companies) return {fmt:'cb-data',period:d.period||'',cos:d.companies,sc:(d.sectorCycle&&typeof d.sectorCycle==='object')?d.sectorCycle:undefined};}catch(e){} }
+  if(jb){ try{const d=JSON.parse(jb.textContent); if(d&&d.companies) return {fmt:'cb-data',period:d.period||'',cos:grNormCbData(d.companies),sc:(d.sectorCycle&&typeof d.sectorCycle==='object')?d.sectorCycle:undefined};}catch(e){} }
   // Priority 2: rows with data-name + data-rev attributes (your geo tables)
   let rows=[...doc.querySelectorAll('tr[data-name][data-rev]')];
   let fmt='data-attrs';
@@ -4648,9 +4691,12 @@ function grDeepCO(doc, htmlText){
     var n=labels.length, R=pick(t,REV,n); if(!R) return;
     var cur=-1, best=-1; labels.forEach(function(v,i){ if(v!=null&&v>best&&R[i]!=null){ best=v; cur=i; } }); if(cur<0) return;
     var yi=labels.indexOf(best-4), rev=+R[cur], yoy=(yi>=0&&R[yi]>0)?+((rev/R[yi]-1)*100).toFixed(1):null;
-    var M=pick(t,EBM,n), E=pick(t,EB,n), P=pick(t,PAT,n), em=null;
+    var M=pick(t,EBM,n), E=pick(t,EB,n), P=pick(t,PAT,n), em=null, emY=null, pY=null;
     if(M&&M[cur]!=null) em=+M[cur]; else if(E&&E[cur]!=null&&rev) em=+(E[cur]/rev*100).toFixed(1);
-    addCo(nm,{rev:rev,revYoY:yoy,ebitda:em,pat:P&&P[cur]!=null?+P[cur]:0,greens:0,reds:0,ambers:0,q:best});
+    // v43: year-ago margin and PAT growth from the same series
+    if(yi>=0){ if(M&&M[yi]!=null) emY=+M[yi]; else if(E&&E[yi]!=null&&R[yi]>0) emY=+(E[yi]/R[yi]*100).toFixed(1);
+      if(P&&P[cur]!=null&&P[yi]!=null&&+P[yi]>0) pY=+((P[cur]/P[yi]-1)*100).toFixed(1); }
+    addCo(nm,{rev:rev,revYoY:yoy,ebitda:em,ebitdaPY:emY,patYoY:pY,pat:P&&P[cur]!=null?+P[cur]:0,greens:0,reds:0,ambers:0,q:best});
   }
   var symOf={};
   function scanNode(node,key,root,depth){
@@ -4767,7 +4813,7 @@ function grFromCO(doc, htmlText){
     const tick=(o.ticker&&typeof o.ticker==='object')?(o.ticker.nse||o.ticker.bse):(o.ticker||o.nse||o.symbol||null);
     let name=o.name||o.plain||o.company||o.full||grSymToName(tick)||grSymToName(key)||(tick?String(tick):null);
     if(!name) return;
-    let rev=null,py=null,eb=null,ebm=null,pat=null,yoy=null;
+    let rev=null,py=null,eb=null,ebm=null,pat=null,yoy=null,patPY=null,patG=null,ebPY=null,ebmPY=null;
     let qb=(qk&&o[qk]&&typeof o[qk]==='object'&&!Array.isArray(o[qk]))?o[qk]:null;
     const hasRev=v=>v&&typeof v==='object'&&!Array.isArray(v)&&(v.rev!=null||v.revenue!=null||v.revenueFromOps_cr!=null||v.totalIncome_cr!=null);
     if(!qb||!hasRev(qb)) qb=['q','qtr','latest','cur','q1','q2','q3','q4','consolidated','consol','standalone'].map(x=>o[x]).find(hasRev)||null;
@@ -4775,18 +4821,25 @@ function grFromCO(doc, htmlText){
       py=grNum(qb.revPY??qb.revPy??qb.rev_py??qb.prevRev??qb.revLY);
       eb=grNum(qb.ebitda); ebm=grNum(qb.opm??qb.ebitdaM??qb.ebitdaMargin??qb.ebitda_margin);
       pat=grNum(qb.pat??qb.netProfit??qb.adj_pat??qb.pat_total??qb.patConsolidated_cr);
-      yoy=grNum(qb.revYoY??qb.revGr??((qb.yoy&&typeof qb.yoy==='object')?qb.yoy.revenue:qb.yoy)); }
+      yoy=grNum(qb.revYoY??qb.revGr??((qb.yoy&&typeof qb.yoy==='object')?qb.yoy.revenue:qb.yoy));
+      // v43: PAT growth and year-ago margin when the dashboard gives them
+      patPY=grNum(qb.patPY??qb.patPy??qb.pat_py??qb.prevPat??qb.patLY);
+      patG=grNum(qb.patYoY??qb.patGr??qb.profitYoY??((qb.yoy&&typeof qb.yoy==='object')?(qb.yoy.pat??qb.yoy.profit??qb.yoy.netProfit):null));
+      ebPY=grNum(qb.ebitdaPY??qb.ebitdaPy??qb.ebitda_py??qb.ebitdaLY); ebmPY=grNum(qb.opmPY??qb.ebitdaMPY??qb.ebitdaMarginPY??qb.opmLY); }
     if(rev==null&&Array.isArray(o.res)){
       const row=re=>o.res.find(r=>Array.isArray(r)&&re.test(String(r[0])));
       const rr=row(/^(total income|revenue|net sales|income from operations|revenue from operations|total revenue)/i)||row(/net interest income|\bnii\b/i);
       if(rr){ rev=grNum(rr[1]); py=grNum(rr[2]); const c=String(rr[3]||'').match(/(-?[\d.]+)\s*%/); if(c) yoy=parseFloat(c[1]); }
       const er=row(/ebitda|ppop|pre-provision|operating profit/i); if(er) eb=grNum(er[1]);
-      const pr=row(/^pat|net profit|profit after tax/i); if(pr) pat=grNum(pr[1]);
+      const pr=row(/^pat|net profit|profit after tax/i); if(pr){ pat=grNum(pr[1]); patPY=grNum(pr[2]); }
+      if(er) ebPY=grNum(er[2]);
     }
     if(rev==null||!(rev>0)) return;
     if(yoy==null&&py>0) yoy=+((rev/py-1)*100).toFixed(1);
     if(ebm==null&&eb!=null) ebm=+(eb/rev*100).toFixed(1);
-    out.push({name:String(name),rev,revYoY:yoy,ebitda:ebm,pat:pat||0,greens:0,reds:0,ambers:0,sym:(typeof tick==='string'&&/^[A-Z0-9&-]{2,20}$/.test(tick))?tick:undefined});
+    if(patG==null&&pat!=null&&patPY>0) patG=+((pat/patPY-1)*100).toFixed(1);
+    if(ebmPY==null&&ebPY!=null&&py>0) ebmPY=+(ebPY/py*100).toFixed(1);
+    out.push({name:String(name),rev,revYoY:yoy,ebitda:ebm,ebitdaPY:ebmPY,patYoY:patG,pat:pat||0,greens:0,reds:0,ambers:0,sym:(typeof tick==='string'&&/^[A-Z0-9&-]{2,20}$/.test(tick))?tick:undefined});
   });
   return out;
 }
@@ -4811,15 +4864,16 @@ function grAggregate(parsed){
 // ── FETCH FROM YOUR GITHUB PAGES ──
 // v41: when the app is opened from the computer (file://) with the Base URL left blank, the
 // research files are read from the hosted site instead of the local folder (GitHub Pages allows this)
-var GR_DEFAULT_HOST='https://elangocauvery.github.io/CB_Finance26';
+// the hosted address is remembered from the Base URL box (typed once when opened from the computer)
+var GR_DEFAULT_HOST=(function(){ try{ return (localStorage.getItem('cbf26_gr_baseurl_v1')||'').trim().replace(/\/+$/,''); }catch(e){ return ''; } })();
 function grIsLocal(){ return !/^https?:/i.test(location.protocol); }
 async function grFetchAll(){
   const st=document.getElementById('grStatus');
   let base=(document.getElementById('grBaseUrl')?.value||'').trim().replace(/\/+$/,'');
   const GR_LOCAL=grIsLocal();
-  if(!base&&GR_LOCAL) base=GR_DEFAULT_HOST;
   const alt=(document.getElementById('grAltBase')?.value||'').trim().replace(/\/+$/,'');
   try{localStorage.setItem(GR_URL_KEY,base);localStorage.setItem(GR_ALT_KEY,alt);localStorage.setItem(GR_REPO_KEY,(document.getElementById('grRepos')?.value||'').trim());}catch(e){}
+  if(!base&&GR_LOCAL) base=GR_DEFAULT_HOST||alt;
   const isAbs=p=>/^https?:\/\//i.test(p);
   const join=(b,p)=>isAbs(p)?p:(b?b+'/'+p:p);
   const log=m=>{ if(st) st.innerHTML=m; };
@@ -4837,7 +4891,7 @@ async function grFetchAll(){
   log('Fetching sector-index.json …');
   let index;
   // v41: try this app's folder, then the second-repo site, then the hosted site
-  const idxTries=[]; [base, alt, GR_DEFAULT_HOST].forEach(b=>{ const u=join(b,'sector-index.json'); if(idxTries.indexOf(u)<0) idxTries.push(u); });
+  const idxTries=[]; [base, alt, GR_DEFAULT_HOST].forEach(b=>{ if(GR_LOCAL&&!b) return; const u=join(b,'sector-index.json'); if(idxTries.indexOf(u)<0) idxTries.push(u); });
   const idxErr=[];
   for(const u of idxTries){
     try{ const r=await fetch(u,{cache:'no-store'}); if(!r.ok) throw new Error('HTTP '+r.status); index=await r.json(); break; }
@@ -4847,7 +4901,8 @@ async function grFetchAll(){
     const offline=(typeof navigator!=='undefined'&&navigator.onLine===false);
     log('❌ Could not fetch sector-index.json — '+idxErr.join(' · ')+'.<br>'+
       (offline?'This computer looks <b>offline</b> — check the internet connection and press Fetch again.':
-       '<b>"Failed to fetch"</b> means the site could not be reached (internet, firewall/antivirus, or the site is down); <b>"HTTP 404"</b> means sector-index.json is missing from that repo. Open '+GR_DEFAULT_HOST+'/sector-index.json in a browser tab to check.'));
+       (GR_LOCAL?'This copy was opened <b>from this computer</b> — type your Macro Pulse web address (the GitHub Pages folder) in the <b>Base URL</b> box once and press Fetch; it is remembered. Or open Macro Pulse from that web address instead. ':'')+
+       '<b>"Failed to fetch"</b> means the site could not be reached (internet, firewall/antivirus, or the site is down); <b>"HTTP 404"</b> means sector-index.json is missing from that folder — open it in a browser tab to check.'));
     return;
   }
   if(GR_LOCAL) log('Opened from this computer — reading research files from '+base+' …');
@@ -4910,29 +4965,84 @@ async function grFetchAll(){
 // Every company read from a current or fallback-quarter dashboard is checked against Company
 // Ranker. Those not there are listed with their file, quarter and sector so they can be added
 // (one tap) — until added they count in sector averages but get no individual score.
+// v42: aliases — dashboard names confirmed as the same company as a Company Ranker entry
+const CR_ALIAS_KEY='cbf26_cr_alias_v1', CR_NOTSAME_KEY='cbf26_cr_notsame_v1';
+function crAliasAll(){ try{ return JSON.parse(localStorage.getItem(CR_ALIAS_KEY)||'{}')||{}; }catch(e){ return {}; } }
+function crAliasOf(name){ const a=crAliasAll()[name]; return Array.isArray(a)?a:[]; }
+function crNotSame(){ try{ return JSON.parse(localStorage.getItem(CR_NOTSAME_KEY)||'[]')||[]; }catch(e){ return []; } }
+// chart/table titles that the parser picked up as if they were company names
+function grLooksJunk(nm){
+  const t=String(nm).trim();
+  if(t.length<2||/^\W*$|^\?/.test(t)) return true;
+  if(/cb research|rationale|summary|overview|metric|lens\b|sector|total|average|peer|median|industry|trend|roadmap|capacity|guidance|outlook|volume|\bunits?\b|lakh|crore|\(cr\)|\bcr\)|\( ?cr ?\)|\(sa\)|\(cons|standalone|consolidated|segment|margin|growth|\bshare\b|\bmix\b|revenue|ebitda|profit|\bpat\b|yoy|qoq|%|\bfy\d|\bq[1-4]\b|\d{3,}|vs\.?\s/i.test(t)) return true;
+  const parts=t.split(/\s+&\s+|\s+and\s+|\s*\/\s*/i);
+  if(parts.length>1&&parts.filter(x=>x.trim().split(/\s+/).length>=2).length>=2) return true;   // two companies in one row
+  if(t.split(/\s+/).length>7) return true;
+  return false;
+}
+const GR_GENERIC=/\b(ltd|limited|india|indian|the|company|co|corp|corporation|industries|industry|motor|motors|technologies|technology|tech|enterprises|holdings|group|services|pvt|private|plc|inc)\b/g;
+const GR_GROUPS=/^(prudential|max|sun|aditya|larsen|mahanagar|oriental|ultratech|united|eicher|apollo|asian|power|adani|tata|bajaj|mahindra|reliance|birla|aditya|godrej|jsw|hdfc|icici|kotak|axis|sbi|minda|hero|tvs|murugappa|torrent|jindal|piramal|lupin|shriram|muthoot|bharat|hindustan|national|state|union|central|indo|new)$/;
+// sector words never prove two names are the same company ("HDFC AMC" ≠ "Nippon India AMC")
+const GR_SECTORW=/^(amc|bank|banks|finance|financial|fin|life|insurance|general|health|power|energy|green|renewable|renewables|solar|cement|cements|pharma|pharmaceuticals|labs|laboratories|steel|metals|auto|cars|paints|chemicals|foods|food|consumer|products|infra|infrastructure|realty|housing|capital|securities|electric|electricals|cables|wires|textiles|sugar|hotels|hospitals|airlines|ports|logistics|trust|invit|reit|exchange|digital|systems|solutions|engineering|electronics|retail|fashion|motor|tyres|tyre|batteries|gas|oil|petroleum|refineries)$/;
+function grCoreTokens(nm){
+  return String(nm).toLowerCase().replace(/asset management( company)?/g,'amc').replace(/&/g,' ').replace(/[^a-z0-9 ]+/g,' ')
+    .replace(GR_GENERIC,' ').split(/\s+/).filter(Boolean);
+}
 function grNewCos(){
-  const cache=grLoadCache(); if(!cache||!cache.files) return [];
-  const lat=grLatestQtr(cache); const ig=crIgnoreList(); const seen={}; const out=[];
-  const junk=/^\W*$|^\?|cb research|rationale|summary|overview|metric|lens\b|sector|total|average|peer|median|industry/i;
+  const cache=grLoadCache(); if(!cache||!cache.files){ window.GR_NEWCOS_MAYBE=[]; window.GR_NEWCOS_HID={junk:0,covered:0,dup:0}; return []; }
+  const lat=grLatestQtr(cache); const ig=crIgnoreList(); const notSame=crNotSame();
+  const crSyms={}; const crCores=[];
+  (CR_DATA||[]).forEach(d=>{ if(!d||!d.name) return; const sy=MI_NAME_TO_SYMBOL[d.name]; if(sy) crSyms[String(sy).toUpperCase()]=d.name;
+    const tk=grCoreTokens(d.name); if(tk.length) crCores.push({name:d.name,tk:tk}); });
+  const seen={}, out=[], maybe=[], hid={junk:0,covered:0,dup:0};
   cache.files.forEach(f=>{
     if(!f.cos||!f.cos.length) return;
     const q=grFileQtr(f); if(!q||(lat&&lat.key-q.key>CB_QTR_MAX_LAG)) return;
     f.cos.forEach(c=>{
-      const nm=String(c.n||'').trim(); if(nm.length<2||junk.test(nm)) return;
-      const k=grNormName(nm)||nm.toLowerCase(); if(seen[k]) { if(q.key>seen[k].qk){ seen[k].q=q.label; seen[k].qk=q.key; } return; }
+      const nm=String(c.n||'').trim();
       if(ig.indexOf(nm.toLowerCase())>=0) return;
-      if(grCrHit(nm)) return;
-      seen[k]={n:nm,q:q.label,qk:q.key,file:grBaseName(f.file),sectors:(f.sectors||[]).slice(),y:c.y,e:c.e,s:c.s||(MI_NAME_TO_SYMBOL[nm]||'')};
-      out.push(seen[k]);
+      if(grLooksJunk(nm)){ hid.junk++; return; }
+      if(grCrHit(nm)){ return; }
+      const sym=String(c.s||MI_NAME_TO_SYMBOL[nm]||(/^[A-Z0-9&-]{2,12}$/.test(nm)?nm:'')).toUpperCase();
+      if(sym&&crSyms[sym]){ hid.covered++; return; }
+      if(Object.keys(crAliasAll()).some(k=>crAliasOf(k).indexOf(cvNorm(nm))>=0)){ hid.covered++; return; }
+      const tk=grCoreTokens(nm); const key=tk.slice().sort().join(' ')||nm.toLowerCase();
+      if(seen[key]){ hid.dup++; const o=seen[key]; if(q.key>o.qk){ o.q=q.label; o.qk=q.key; o.file=grBaseName(f.file); o.y=c.y; o.e=c.e; } if(!o.s&&sym) o.s=sym; if(nm.length<o.n.length) o.n=nm; return; }
+      // fuzzy: every distinctive word of one name appears in the other (group words like Tata/Adani don't count)
+      let hint=null;
+      if(notSame.indexOf(nm.toLowerCase())<0){
+        const dist=x=>x.filter(w=>w.length>=3&&!GR_GROUPS.test(w)&&!GR_SECTORW.test(w));
+        const a=dist(tk);
+        if(a.length) for(const cc of crCores){ const b=dist(cc.tk); if(!b.length) continue;
+          const sub=(x,y)=>x.every(w=>y.indexOf(w)>=0);
+          if(sub(a,b)||sub(b,a)){ hint=cc.name; break; } }
+      }
+      const rec={n:nm,q:q.label,qk:q.key,file:grBaseName(f.file),sectors:(f.sectors||[]).slice(),y:c.y,e:c.e,s:sym||'',hint:hint};
+      seen[key]=rec; (hint?maybe:out).push(rec);
     });
   });
+  window.GR_NEWCOS_MAYBE=maybe; window.GR_NEWCOS_HID=hid;
   return out.sort((a,b)=>(a.sectors[0]||'').localeCompare(b.sectors[0]||'')||a.n.localeCompare(b.n));
+}
+function grSameCo(i){
+  const m=(window.GR_NEWCOS_MAYBE||[])[i]; if(!m||!m.hint) return;
+  const al=crAliasAll(); const k=cvNorm(m.n); al[m.hint]=(al[m.hint]||[]).filter(x=>x!==k).concat([k]);
+  try{ localStorage.setItem(CR_ALIAS_KEY, JSON.stringify(al)); }catch(e){}
+  if(m.s&&!MI_NAME_TO_SYMBOL[m.hint]) try{ miSetSymbol(m.hint, m.s); }catch(e){}
+  try{ CR_CONV=null; if(typeof render==='function') render(); }catch(e){}
+  grRenderNewCos();
+}
+function grNotSameCo(i){
+  const m=(window.GR_NEWCOS_MAYBE||[])[i]; if(!m) return;
+  const ns=crNotSame(); ns.push(m.n.toLowerCase()); try{ localStorage.setItem(CR_NOTSAME_KEY, JSON.stringify(ns)); }catch(e){}
+  grRenderNewCos();
 }
 function grAllSectors(){ const s=[]; (CR_DATA||[]).forEach(d=>{ if(d.sector&&s.indexOf(d.sector)<0) s.push(d.sector); }); return s.sort(); }
 function grRenderNewCos(){
   const box=document.getElementById('grNewCos'); if(!box) return;
   const list=grNewCos(); window.GR_NEWCOS=list;
-  if(!list.length){ box.style.display='none'; box.innerHTML=''; return; }
+  const maybe=window.GR_NEWCOS_MAYBE||[], hid=window.GR_NEWCOS_HID||{junk:0,covered:0,dup:0};
+  if(!list.length&&!maybe.length){ box.style.display='none'; box.innerHTML=''; return; }
   const all=grAllSectors();
   const esc=x=>String(x==null?'':x).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
   const rows=list.map((c,i)=>{
@@ -4951,10 +5061,15 @@ function grRenderNewCos(){
   box.innerHTML='<div style="border:1px solid #f3c58a;background:#fff6ea;border-radius:10px;padding:10px 12px;">'+
     '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">'+
     '<div style="font-size:11.5px;font-weight:800;color:#8a4b00;">🆕 New companies found — not in Company Ranker ('+list.length+')</div>'+
-    '<button onclick="grAddAllNewCos()" style="padding:5px 12px;border-radius:7px;border:none;background:#ff7c00;color:#fff;font-size:10.5px;font-weight:800;cursor:pointer;">+ Add all</button></div>'+
+    (list.length?'<button onclick="grAddAllNewCos()" style="padding:5px 12px;border-radius:7px;border:1px solid #ff7c00;background:#fff;color:#c25e00;font-size:10.5px;font-weight:800;cursor:pointer;">+ Add all '+list.length+'</button>':'')+'</div>'+
+    '<div style="font-size:9.5px;color:#6b6f86;margin-bottom:5px;">Already filtered out: '+hid.junk+' chart/table labels (not companies) · '+hid.covered+' already in Company Ranker under another name or symbol · '+hid.dup+' duplicate spellings.</div>'+
     '<div style="font-size:9.5px;color:#7a5a30;margin-bottom:7px;line-height:1.5;">These companies are in your results dashboards and already count in their sector averages, but get no individual score until added. Check the sector and NSE symbol (the symbol puts it on the tracked list for bulk/block deals and prices), then add. Added companies get a neutral starting score (CB 60) and are kept in this browser; use Export to make them permanent in the file.</div>'+
     '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:10.5px;"><thead><tr style="background:#fde7c8;color:#6b3a00;text-align:left;">'+
-    '<th style="padding:5px 8px;">Company</th><th style="padding:5px 8px;">Sector</th><th style="padding:5px 8px;">NSE symbol</th><th style="padding:5px 8px;">Quarter</th><th style="padding:5px 8px;text-align:right;">Rev YoY</th><th style="padding:5px 8px;text-align:right;">EBITDA %</th><th style="padding:5px 8px;">Dashboard file</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div></div>';
+    '<th style="padding:5px 8px;">Company</th><th style="padding:5px 8px;">Sector</th><th style="padding:5px 8px;">NSE symbol</th><th style="padding:5px 8px;">Quarter</th><th style="padding:5px 8px;text-align:right;">Rev YoY</th><th style="padding:5px 8px;text-align:right;">EBITDA %</th><th style="padding:5px 8px;">Dashboard file</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>'+
+    (maybe.length?'<details style="margin-top:9px;"><summary style="cursor:pointer;font-size:11px;font-weight:800;color:#5b1f7a;">🔍 Possibly already in Company Ranker under another name ('+maybe.length+') — confirm once</summary>'+
+      '<div style="font-size:9.5px;color:#6b6f86;margin:5px 0;">"Same company" links the name so its results feed that company\'s score from now on. "Different" moves it up into the new-companies list.</div>'+
+      '<table style="width:100%;border-collapse:collapse;font-size:10.5px;">'+maybe.map((m,i)=>'<tr style="border-bottom:1px solid #eadcf3;"><td style="padding:4px 8px;font-weight:700;">'+esc(m.n)+'</td><td style="padding:4px 8px;">same as <b>'+esc(m.hint)+'</b>?</td><td style="padding:4px 8px;color:#6b6f86;font-size:9.5px;">'+esc(grPretty(m.q))+' · '+esc(m.file)+'</td><td style="padding:4px 8px;white-space:nowrap;"><button onclick="grSameCo('+i+')" style="padding:3px 8px;border-radius:6px;border:none;background:#2e7d32;color:#fff;font-size:10px;font-weight:800;cursor:pointer;">✓ Same company</button> <button onclick="grNotSameCo('+i+')" style="padding:3px 8px;border-radius:6px;border:1px solid #d9c3a3;background:#fff;color:#7a6a55;font-size:10px;cursor:pointer;">Different</button></td></tr>').join('')+'</table></details>':'')+
+    '</div>';
 }
 function grNewCoEntry(c, sector){
   const peer=(CR_DATA||[]).find(d=>d.sector===sector);
@@ -4983,7 +5098,7 @@ function grAddNewCos(idxs){
   const st=document.getElementById('grStatus'); if(st&&n) st.insertAdjacentHTML('afterbegin','<div style="color:#006b30;font-weight:700;">✅ '+n+' company(ies) added to Company Ranker and to the tracked list for bulk/block deals.'+(noSym.length?' <span style="color:#b71c1c;">No NSE symbol for: '+noSym.join(', ')+' — set it in NSE Market Intel → Bulk/Block → Tracked list.</span>':'')+'</div>');
 }
 function grAddNewCo(i){ grAddNewCos([i]); }
-function grAddAllNewCos(){ const l=window.GR_NEWCOS||[]; if(!l.length) return; if(!confirm('Add all '+l.length+' companies to Company Ranker with a neutral starting score?')) return; grAddNewCos(l.map((_,i)=>i)); }
+function grAddAllNewCos(){ const l=window.GR_NEWCOS||[]; if(!l.length) return; if(!confirm('Add all '+l.length+' companies to Company Ranker?\n\nEach starts at a neutral CB 60 and joins the rankings and the bulk/block tracked list. Companies without an NSE symbol will not get deal or price data until one is set.\n\nTip: adding only the companies you actually want to follow keeps the rankings meaningful.')) return; grAddNewCos(l.map((_,i)=>i)); }
 function grIgnoreNewCo(i){
   const c=(window.GR_NEWCOS||[])[i]; if(!c) return;
   const ig=crIgnoreList(); const n=c.n.toLowerCase(); if(ig.indexOf(n)<0) ig.push(n);
@@ -8260,7 +8375,7 @@ let CR_DATA=[
 {id:62,name:"Sun Pharma",sector:"Pharma",group:"Manufacturing",mcap:428000,mcap_rank:10,desc:"Specialty + GLP-1 + branded",cb:84,alloc:"Rs.0",season:1,asOf:"2026-07-06",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:63,name:"Alkem Laboratories",sector:"Pharma",group:"Manufacturing",mcap:28000,mcap_rank:100,desc:"Domestic; chronic therapy strong",cb:80,alloc:"Rs.0",season:1,asOf:"2026-07-06",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:64,name:"Torrent Pharma",sector:"Pharma",group:"Manufacturing",mcap:88000,mcap_rank:49,desc:"28% EBITDA; branded domestic",cb:78,alloc:"Rs.0",season:1,asOf:"2026-07-06",flag:"",scores:[4,4,4,3,5,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
-{id:65,name:"Divi's Laboratories",sector:"Pharma (CDMO)",group:"Manufacturing",mcap:225000,mcap_rank:24,desc:"Custom synthesis/CDMO + generic APIs; Q1FY27 rev +28%, PAT +65.5% (re-seeded 27-Oct-2026 on Q1FY27 actuals; Q2FY27 not yet out)",cb:82,alloc:"Rs.0",season:1,asOf:"2026-10-27",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
+{id:65,name:"Divi's Laboratories",sector:"Pharma (CDMO)",group:"Manufacturing",mcap:300000,mcap_rank:24,desc:"Custom synthesis/CDMO + generic APIs, net-cash; Q2FY27 rev ₹3,676Cr +35.4%, EBITDA 42.6% (+4.6pp YoY), PAT ₹1,127Cr +64%; CS +44%; weak H1 OCF (₹384Cr vs ₹1,645Cr) (re-seeded 09-Nov-2026 on Q2FY27 actuals)",cb:84,cbSeed:84,alloc:"Rs.0",season:1,asOf:"2026-11-09",flag:"",scores:[5,5,5,4,4,4,5,2,2,2,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:66,name:"Cipla",sector:"Pharma",group:"Manufacturing",mcap:128000,mcap_rank:36,desc:"gRevlimid expiry hit; respiratory steady",cb:66,alloc:"Rs.0",season:4,asOf:"2026-07-06",flag:"",scores:[4,3,4,3,4,4,1,4,3,3,4],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:67,name:"Dr Reddys",sector:"Pharma",group:"Manufacturing",mcap:88000,mcap_rank:45,desc:"Weakest large pharma; shelf-stock adj",cb:60,alloc:"Rs.0",season:1,asOf:"2026-07-06",flag:"",scores:[3,3,3,3,3,3,1,3,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
 {id:68,name:"ICICI Bank",sector:"Banking (Private)",group:"Financials",mcap:908000,mcap_rank:4,desc:"Best large bank; ROA ~2.4%",cb:80,alloc:"Rs.0",season:1,asOf:"2026-07-06",flag:"",scores:[5,4,5,3,5,4,1,5,3,3,1],ver:[false,false,false,false,false,false,false,false,false,false,false],hist:[]},
@@ -11248,13 +11363,20 @@ function cvFindCo(d, files){
   if(!files) return null;
   var target = cvNorm(d.name);
   var best=null, bestScore=-1;
+  // v42: the same company written differently in a dashboard is matched by NSE symbol
+  // (ticker in the dashboard, a known alias name, or the name itself being the symbol)
+  // and by "same company" links saved from the New-companies panel
+  var dsym=(typeof MI_NAME_TO_SYMBOL!=='undefined'&&MI_NAME_TO_SYMBOL[d.name])?String(MI_NAME_TO_SYMBOL[d.name]).toUpperCase():'';
+  var dals=(typeof crAliasOf==='function')?crAliasOf(d.name):[];
   files.forEach(function(f){
     if(!f.cos) return;
     var secMatch = cvSecIn(f.sectors, d.sector);
     f.cos.forEach(function(c){
       var cn = cvNorm(c.n); if(!cn) return;
       var s=-1;
-      if(cn===target||(cvCoreName(c.n).length>=4&&cvCoreName(c.n)===cvCoreName(d.name))) s=3;
+      if(dals.length&&dals.indexOf(cn)>=0) s=3;
+      else if(dsym&&((c.s&&String(c.s).toUpperCase()===dsym)||(MI_NAME_TO_SYMBOL[c.n]&&String(MI_NAME_TO_SYMBOL[c.n]).toUpperCase()===dsym)||cn===cvNorm(dsym))) s=3;
+      else if(cn===target||(cvCoreName(c.n).length>=4&&cvCoreName(c.n)===cvCoreName(d.name))) s=3;
       else {
         // v21: no loose substring matches — "HAL" must not match "cHALet Hotels", "BEL" not "RR KaBEL"
         var sh=cn.length<=target.length?cn:target, lg=cn.length<=target.length?target:cn;
@@ -11271,6 +11393,15 @@ function cvFindCo(d, files){
     });
   });
   return best;
+}
+// v43: sector average PAT growth (outliers above +300% / below −100% clipped)
+function cvSectorAvgPat(sector, files){
+  var vals=[];
+  (files||[]).forEach(function(f){
+    if(!cvSecIn(f.sectors, sector)||!f.cos) return;
+    f.cos.forEach(function(c){ if(c.py!=null&&!isNaN(c.py)) vals.push(Math.max(-100,Math.min(300,+c.py))); });
+  });
+  return vals.length>=2 ? vals.reduce(function(a,b){return a+b;},0)/vals.length : null;
 }
 function cvSectorAvgYoY(sector, files){
   var vals=[];
@@ -11305,6 +11436,18 @@ function cvEarnings(d){
     parts.push('Rev '+(c.y>0?'+':'')+c.y+'% YoY');
   }
   if(c.e!=null) parts.push('EBITDA '+c.e+'%');
+  // v43: profit growth counts too — +35% revenue with +64% PAT is a better print than +35% with flat PAT
+  if(c.py!=null&&!isNaN(c.py)){
+    var avgP=cvSectorAvgPat(d.sector, files), pyc=Math.max(-100,Math.min(300,+c.py));
+    if(avgP!=null){ score += Math.max(-10, Math.min(10, (pyc-avgP)*0.3)); parts.push('PAT '+(c.py>0?'+':'')+c.py+'% YoY vs sector avg '+(avgP>0?'+':'')+avgP.toFixed(1)+'%'); }
+    else { score += Math.max(-8, Math.min(8, (pyc-10)*0.25)); parts.push('PAT '+(c.py>0?'+':'')+c.py+'% YoY'); }
+  }
+  // v43: margin expansion / contraction against the same quarter last year
+  if(c.e!=null&&c.ey!=null&&!isNaN(c.ey)){
+    var dEy=+c.e-(+c.ey);
+    score += Math.max(-6, Math.min(6, dEy*1.2));
+    parts.push('EBITDA margin '+(dEy>=0?'+':'')+dEy.toFixed(1)+'pp YoY');
+  }
   // (3) QoQ momentum vs previous-quarter snapshot (accrues from next quarter on)
   // previous quarter used ONLY as a comparison base for QoQ momentum
   var prevFiles = rs.prevFiles;
@@ -11323,7 +11466,7 @@ function cvEarnings(d){
       }
     }
   }
-  var _raw=score; return {score:Math.round(Math.max(0,Math.min(100,score))), parts:parts, src:hit.file, q:rs.q, lag:rs.lag, basis:cvBasisTxt(rs.q, rs.lag), work:{base:50, items:_t.w, raw:Math.round(_raw*10)/10}};
+  var _raw=score; return {score:Math.round(Math.max(0,Math.min(100,score))), parts:parts, src:hit.file, q:rs.q, lag:rs.lag, basis:cvBasisTxt(rs.q, rs.lag), inp:{py:c.py!=null, ey:c.ey!=null, manual:/^Results entered directly/.test(String(hit.file||''))}, work:{base:50, items:_t.w, raw:Math.round(_raw*10)/10}};
 }
 
 // v31: share of the Fundamental lens that comes from the latest results (0 = Q4 FY26 score only)
@@ -11725,10 +11868,26 @@ function cvCycle(d, sym, pr){
 }
 
 // ── LAYER TG ──
+// v43: trigger research carried in the file — merged with cb-triggers-cycle.json (a published or
+// locally edited trigger with the same name always wins). I = impact 1–5, C = certainty, W = timing,
+// P = how much is still un-priced (1.0 = not moved … 0.2 = priced in).
+var CV_TC_BUILTIN={
+  "Divi's Laboratories":[
+    {name:'Unit-3 Kakinada backward integration lifting gross margin', I:3, C:1.0, W:1.0, P:0.7, status:'Executing', src:'Q2 FY27: gross/EBITDA margin expansion credited to Unit-3 backward integration (ICICI Securities)', added:'2026-11-09'},
+    {name:'Three dedicated custom-synthesis projects (~₹650–700 Cr capex each) commercialising H2 FY27/FY28', I:5, C:0.7, W:0.7, P:0.7, status:'Approved', src:'Brokerage notes after Q2 FY27; capex backed by customer commitments and capacity-reservation advances', added:'2026-11-09'},
+    {name:'Earnings upgrades after Q2 FY27 beat (FY27/FY28 EPS raised ~16%/23%)', I:3, C:1.0, W:1.0, P:0.4, status:'Executing', src:'ICICI Securities post-Q2 FY27; stock already up ~15% in two days', added:'2026-11-09'},
+    {name:'Peptide CDMO build-out (SPPS/LPPS fragments in validation)', I:4, C:0.4, W:0.4, P:1.0, status:'Watch', src:'Q1/Q2 FY27 earnings calls', added:'2026-11-09'},
+    {name:'Weak H1 FY27 cash conversion — operating cash flow ₹384 Cr vs ₹1,645 Cr a year ago (working-capital build)', sign:'-', I:2, C:0.7, W:1.0, P:1.0, status:'Watch', src:'H1 FY27 cash flow statement, 07-Nov-2026', added:'2026-11-09'},
+    {name:'Lumpy custom-synthesis quarters (validation / approval timing)', sign:'-', I:2, C:0.4, W:1.0, P:1.0, status:'Watch', src:'Management caution, Q1 FY27 call', added:'2026-11-09'},
+    {name:'Generic API price erosion', sign:'-', I:2, C:0.7, W:0.7, P:0.7, status:'Executing', src:'Q1/Q2 FY27 commentary on generics pricing', added:'2026-11-09'}
+  ]
+};
 function cvTriggerList(d, pr){
   var m=cvTCModel(), list=[];
   var ck=cvTCFindKey(m.companies,d.name);
   ((ck&&m.companies[ck].triggers)||[]).forEach(function(t){ list.push(Object.assign({scope:'company'},t)); });
+  try{ var bk=cvTCFindKey(CV_TC_BUILTIN,d.name); if(bk){ var hv={}; list.forEach(function(t){ hv[cvNorm(t.name)]=1; });
+    CV_TC_BUILTIN[bk].forEach(function(t){ if(!hv[cvNorm(t.name)]) list.push(Object.assign({scope:'company'},t)); }); } }catch(e){}
   var sk=cvTCFindKey(m.sectorTriggers,d.sector);
   var coRec=ck?m.companies[ck]:{};
   ((sk&&m.sectorTriggers[sk])||[]).forEach(function(t){
@@ -11766,6 +11925,186 @@ function cvTrigger(d, pr){
     work:{tg:true, top:top.map(function(t){return [t.name+(t.scope==='sector'?' (sector)':''), t.I, t.C, t.W, (t.P===undefined||t.P===''||t.P===null)?1:t.P, t.pts];}), neg:neg.map(function(t){return [t.name+(t.scope==='sector'?' (sector)':''), t.I, t.C, t.W, (t.P===undefined||t.P===''||t.P===null)?1:t.P, t.pts];}), unused:pos.slice(3).map(function(t){return [t.name, t.pts];}), sp:Math.round(sp*100)/100, sn:Math.round(sn*100)/100}};
 }
 
+// ════════════════════════════════════════════════════════════════════════
+// v44 — PRICE-MOVE CHECK + DATA HEALTH (runs by itself on every Conviction render)
+//  Price moves: every tracked company whose price jumped or fell sharply versus the market
+//  (1 day ≥ ±5% beyond the market, or ~1 week ≥ ±8% beyond the market) is checked against
+//  the facts we hold — latest results, bulk/block deals, delivery %, promoter/insider filings,
+//  researched catalysts, PE — and each lens is re-read. A rise nothing explains gets a small
+//  caution gate (chasing risk); a rise explained by results not yet loaded is flagged so the
+//  dashboard/results get loaded. Nifty 500 movers outside Company Ranker are listed too.
+//  Data health: companies whose score rests on old or incomplete inputs, top-ranked first.
+// ════════════════════════════════════════════════════════════════════════
+var CV_MOVE_DAY_PCT=5, CV_MOVE_WEEK_PCT=8, CV_MOVE_GATE_PCT=12, CV_MOVE_GATE_PTS=3;
+var CV_MOVES=null;
+function cvMedian(a){ a=a.filter(function(v){return v!=null&&!isNaN(v);}).sort(function(x,y){return x-y;}); if(!a.length) return null; var m=Math.floor(a.length/2); return a.length%2?a[m]:(a[m-1]+a[m])/2; }
+function cvPriceSeries(rows, sym){
+  return rows.filter(function(r){ return (r.sym||'').toUpperCase()===sym&&r.cp&&+r.cp>0; })
+    .sort(function(a,b){return String(a.date).localeCompare(String(b.date));})
+    .filter(function(r,i,arr){ return i===arr.length-1||arr[i+1].date!==r.date; });
+}
+function cvMovesAll(){
+  if(CV_MOVES) return CV_MOVES;
+  var res={bySym:{}, list:[], mkt1:null, mktW:null, latest:null};
+  try{
+    var del=load('delivery'), bulk=load('bulk'), prom=load('promoter');
+    var syms={}; (CR_DATA||[]).forEach(function(d){ if(d&&d.name){ var s=MI_NAME_TO_SYMBOL[d.name]; if(s) syms[String(s).toUpperCase()]=d; } });
+    var ser={}, r1=[], rW=[];
+    Object.keys(syms).forEach(function(sy){
+      var p=cvPriceSeries(del, sy); if(p.length<2) return;
+      var last=p[p.length-1], prev=p[p.length-2];
+      var wi=Math.max(0,p.length-6), wp=p[wi];
+      var d1=(+last.cp/+prev.cp-1)*100;
+      // a 1-day move counts only if the previous close is the trading day just before (≤5 calendar days)
+      if((Date.parse(last.date)-Date.parse(prev.date))/864e5>5) d1=null;
+      var w=(p.length>=3&&(Date.parse(last.date)-Date.parse(wp.date))/864e5<=12)?(+last.cp/+wp.cp-1)*100:null;
+      ser[sy]={p:p, last:last, d1:d1, w:w, wn:p.length-1-wi};
+      if(d1!=null) r1.push(d1); if(w!=null) rW.push(w);
+      if(!res.latest||last.date>res.latest) res.latest=last.date;
+    });
+    res.mkt1=cvMedian(r1)||0; res.mktW=cvMedian(rW)||0;
+    Object.keys(ser).forEach(function(sy){
+      var S=ser[sy], d=syms[sy];
+      if(S.last.date!==res.latest) return;                             // stale series — no "today" move
+      var ex1=S.d1!=null?S.d1-res.mkt1:0, exW=S.w!=null?S.w-res.mktW:0;
+      var up=(S.d1!=null&&S.d1>=CV_MOVE_DAY_PCT&&ex1>=CV_MOVE_DAY_PCT)||(S.w!=null&&S.w>=CV_MOVE_WEEK_PCT&&exW>=CV_MOVE_WEEK_PCT);
+      var dn=(S.d1!=null&&S.d1<=-CV_MOVE_DAY_PCT&&ex1<=-CV_MOVE_DAY_PCT)||(S.w!=null&&S.w<=-CV_MOVE_WEEK_PCT&&exW<=-CV_MOVE_WEEK_PCT);
+      if(!up&&!dn) return;
+      var mv={sym:sy, d:d, up:up, d1:S.d1, w:S.w!=null?S.w:(S.d1||0), wn:S.w!=null?S.wn:1, ex1:ex1, exW:exW, cp:+S.last.cp, date:S.last.date, ev:[], against:[], todo:[]};
+      cvMoveEvidence(mv, S, bulk, prom);
+      res.bySym[sy]=mv; res.list.push(mv);
+    });
+    res.list.sort(function(a,b){ return Math.abs(b.w)-Math.abs(a.w); });
+  }catch(e){ console.warn('cvMovesAll',e); }
+  CV_MOVES=res; return res;
+}
+function cvMoveFor(sym){ if(!sym) return null; var m=cvMovesAll(); return m.bySym[String(sym).toUpperCase()]||null; }
+function cvMoveEvidence(mv, S, bulk, prom){
+  var d=mv.d, up=mv.up, sy=mv.sym, ev=mv.ev, ag=mv.against, todo=mv.todo, explained=0, maybe=0;
+  var since=new Date(Date.parse(mv.date)-12*864e5).toISOString().slice(0,10);
+  // 1. results
+  var E=null; try{ E=cvEarnings(d); }catch(e){}
+  if(!E){ todo.push('No results print loaded for this company — publish its results dashboard'); maybe++; }
+  else if(E.lag>0){ todo.push('Earnings lens is on '+String(E.q).replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2')+' — newer results may be out: load its '+String(CV_CURRENT_QTR).replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2')+' dashboard or enter them'); maybe++; }
+  else if(up&&E.score>=60){ ev.push('Strong latest results (Earnings '+E.score+': '+(E.parts||[]).slice(0,2).join(', ')+')'); explained++; }
+  else if(!up&&E.score<=45){ ev.push('Weak latest results (Earnings '+E.score+')'); explained++; }
+  else if(up&&E.score<=45){ ag.push('Latest results are weak (Earnings '+E.score+') — the rise is not backed by the print'); }
+  else if(!up&&E.score>=60){ ag.push('Latest results are strong (Earnings '+E.score+') — the fall is not explained by the print'); }
+  // 2. bulk / block deals in the last ~12 days
+  var bk=bulk.filter(function(r){ return (r.sym||'').toUpperCase()===sy&&String(r.date)>=since; });
+  if(bk.length){
+    var bv=0, sv=0, who=[];
+    bk.forEach(function(r){ var v=(+r.qty||0)*(+r.pr||0)/1e7; if(r.bs==='B') bv+=v; else sv+=v; if(who.length<3&&r.cl) who.push((r.bs==='B'?'buy ':'sell ')+r.cl); });
+    var net=bv-sv, txt=bk.length+' bulk/block deal(s): net '+(net>=0?'buying':'selling')+' ₹'+Math.abs(net).toFixed(1)+' Cr'+(who.length?' ('+who.join('; ')+')':'');
+    if((up&&net>0)||(!up&&net<0)){ ev.push(txt); explained++; } else ag.push(txt);
+  }
+  // 3. delivery %
+  var dl=S.p.filter(function(r){ return r.dp!==undefined&&r.dp!==''&&!isNaN(+r.dp); });
+  if(dl.length>=2){
+    var dNow=+dl[dl.length-1].dp, base=cvMedian(dl.slice(-11,-1).map(function(r){return +r.dp;}));
+    if(base!=null){
+      var dtxt='Delivery '+dNow.toFixed(0)+'% vs usual '+base.toFixed(0)+'%';
+      if(dNow>=base+10&&dNow>=45){ (up?ev:ag).push(dtxt+' — genuine '+(up?'buying':'selling')+', not intraday'); if(up) explained++; else explained++; }
+      else if(dNow<=Math.min(30,base-10)){ (up?ag:ev).push(dtxt+' — mostly intraday/speculative volume'); }
+    }
+  }
+  // 4. promoter / insider filings (last ~30 days)
+  var since30=new Date(Date.parse(mv.date)-30*864e5).toISOString().slice(0,10);
+  var pr=prom.filter(function(r){ return (r.sym||'').toUpperCase()===sy&&String(r.date)>=since30; });
+  if(pr.length){
+    var buys=pr.filter(function(r){return /buy/i.test(r.act||'');}).length, sells=pr.length-buys;
+    var ptxt='Promoter/insider filings: '+buys+' buy, '+sells+' sell (30 days)';
+    if((up&&buys>sells)||(!up&&sells>buys)){ ev.push(ptxt); explained++; } else ag.push(ptxt);
+  }
+  // 5. researched catalysts
+  try{
+    var tl=cvTriggerList(d), pos=tl.filter(function(t){return !t.neg;}).sort(function(a,b){return b.pts-a.pts;}), neg=tl.filter(function(t){return t.neg;});
+    if(up&&pos.length&&pos[0].pts>=1){ ev.push('Catalyst on file: '+pos[0].name+' ('+pos[0].pts.toFixed(1)+' pts)'); explained++; }
+    else if(!up&&neg.length){ ev.push('Risk on file: '+neg[0].name); explained++; }
+    else if(!tl.length) todo.push('No catalyst research for this company — check the news and add triggers');
+  }catch(e){}
+  // 6. valuation
+  try{
+    var pe=load('pe').filter(function(r){return r.type==='Stock'&&(r.sym||'').toUpperCase()===sy;}).sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+    if(pe.length>=3){ var l=+pe[0].pe, h=pe.slice(1,21).map(function(r){return +r.pe;}).filter(function(v){return v>0;}); var a=h.length?h.reduce(function(x,y){return x+y;},0)/h.length:null;
+      if(l>0&&a){ var c=(l/a-1)*100; if(up&&c>=15) ag.push('PE '+l.toFixed(1)+'x is now '+c.toFixed(0)+'% above its recent band — valuation running ahead'); } }
+  }catch(e){}
+  mv.verdict = explained>0 ? 'explained' : (maybe>0 ? 'check-results' : 'unexplained');
+  mv.E=E;
+}
+// quarter-end date for a label like Q2FY27 (FY27 = Apr-2026 → Mar-2027)
+function cvQtrEnd(q){ var m=String(q||'').match(/^Q([1-4])FY(\d{2})$/); if(!m) return null; var fy=2000+(+m[2]); var ends={1:(fy-1)+'-06-30',2:(fy-1)+'-09-30',3:(fy-1)+'-12-31',4:fy+'-03-31'}; return ends[m[1]]; }
+function cvHealth(all){
+  var out=[], cnt={stale:0,inp:0,tg:0,seed:0,mkt:0,unr:0};
+  // research-type gaps (catalysts, re-seed) are listed only where they can change the top 25
+  var r25=(all||[]).filter(function(x){return x.rank===25;})[0], cut=r25?r25.conv:0;
+  (all||[]).forEach(function(x){
+    var is=[], L=x.L, d=x.d, near=(x.rank&&x.rank<=40)||(x.conv>=cut-5);
+    if(!L.E){ is.push(['stale','No results print loaded — Earnings lens missing']); cnt.stale++; }
+    else if(L.E.lag>0){ is.push(['stale','Scored on '+String(L.E.q).replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2')+' — '+String(CV_CURRENT_QTR).replace(/^Q(\d)FY(\d+)$/,'Q$1 FY$2')+' print not loaded (dashboard or results entry needed)']); cnt.stale++; }
+    if(L.E&&L.E.inp&&!L.E.inp.py&&!L.E.inp.ey){ is.push(['inp','Earnings lens is revenue-only — dashboard has no year-ago PAT / margin (add the cb-data block)']); cnt.inp++; }
+    if(near&&L.TG&&L.TG.missing){ is.push(['tg','No catalyst research — Trigger lens neutral 50']); cnt.tg++; }
+    var qe=cvQtrEnd(L.E?L.E.q:null);
+    if(near&&qe&&d.asOf&&String(d.asOf)<qe){ is.push(['seed','Base score dated '+d.asOf+' is older than the results it is compared with — re-seed']); cnt.seed++; }
+    if(!L.T){ is.push(['mkt','No NSE market data — check the symbol / tracked list']); cnt.mkt++; }
+    if(x.avail<3){ is.push(['unr','Not ranked — fewer than 3 of Earnings/Fundamental/Macro/Market available']); cnt.unr++; }
+    if(is.length) out.push({x:x, is:is});
+  });
+  out.sort(function(a,b){ var ra=a.x.rank||9999, rb=b.x.rank||9999; return ra-rb||b.x.conv-a.x.conv; });
+  return {list:out, cnt:cnt};
+}
+var CV_WATCH_TAB='moves';
+function cvWatchRender(all){
+  var box=document.getElementById('cv-watch'); if(!box) return;
+  var M=cvMovesAll(), H=cvHealth(all);
+  var esc=function(x){ return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); };
+  var byName={}; all.forEach(function(x){ byName[x.d.name]=x; });
+  var pct=function(v){ return v==null?'—':(v>0?'+':'')+v.toFixed(1)+'%'; };
+  // movers outside Company Ranker (from the fetcher's Nifty 500 movers list)
+  var mvRows=load('movers'), lastMv=mvRows.reduce(function(a,r){return r.date>a?r.date:a;},'');
+  var tracked={}; Object.keys(MI_NAME_TO_SYMBOL).forEach(function(n){ tracked[String(MI_NAME_TO_SYMBOL[n]).toUpperCase()]=1; });
+  var outside=mvRows.filter(function(r){ return r.date===lastMv&&!tracked[String(r.sym).toUpperCase()]; }).sort(function(a,b){return Math.abs(b.chg)-Math.abs(a.chg);});
+  // repeat movers outside the list over the last 2 weeks
+  var rep={}; var since=lastMv?new Date(Date.parse(lastMv)-14*864e5).toISOString().slice(0,10):'';
+  mvRows.forEach(function(r){ if(r.date>=since&&!tracked[String(r.sym).toUpperCase()]) rep[r.sym]=(rep[r.sym]||0)+1; });
+  var vcol={explained:['#e6f4ef','#006b30','✅ Explained'], 'check-results':['#fff6e0','#8a5a00','🔎 Check results'], unexplained:['#fdecec','#b71c1c','⚠️ Unexplained']};
+  var tabBtn=function(k,lab){ var on=CV_WATCH_TAB===k; return '<button onclick="CV_WATCH_TAB=\''+k+'\';cvWatchRender(cvCompute());" style="padding:5px 12px;border-radius:14px;border:1px solid '+(on?'#ff7c00':'#e0d6c8')+';background:'+(on?'#fff1e0':'#fff')+';color:'+(on?'#b35c00':'#5a6270')+';font-size:11px;font-weight:800;cursor:pointer;">'+lab+'</button>'; };
+  var h='<div style="background:#fffaf3;border:1.5px solid #f1d9b8;border-radius:12px;padding:14px 18px;">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">'+
+    '<div style="font-size:13px;font-weight:900;color:#7a3e00;">🩺 Automatic checks — price moves & data health</div>'+
+    '<div style="display:flex;gap:6px;flex-wrap:wrap;">'+tabBtn('moves','📈 Price moves ('+M.list.length+')')+tabBtn('outside','🆕 Movers outside list ('+outside.length+')')+tabBtn('health','🩺 Data health ('+H.list.length+')')+'</div></div>';
+  if(CV_WATCH_TAB==='moves'){
+    h+='<div style="font-size:10.5px;color:#6b5a45;margin:6px 0 8px;line-height:1.5;">Tracked companies that moved sharply versus the market (market move today '+pct(M.mkt1)+', ~1 week '+pct(M.mktW)+', latest prices '+(M.latest||'—')+'). Each is checked against results, deals, delivery, insider filings and catalysts. <b>Unexplained</b> rises of '+CV_MOVE_GATE_PCT+'%+ get a −'+CV_MOVE_GATE_PTS+' caution in Conviction until the reason is found.</div>';
+    if(!M.list.length) h+='<div style="font-size:11px;color:#5a6270;">No unusual moves in the latest NSE data.</div>';
+    M.list.slice(0,40).forEach(function(m){
+      var x=byName[m.d.name], vc=vcol[m.verdict], L=x?x.L:{};
+      var lens=['E','F','T','TG'].map(function(k){ return k+' '+(L[k]?L[k].score:'—'); }).join(' · ');
+      h+='<div style="background:#fff;border:1px solid #efe3d2;border-left:4px solid '+(m.up?'#16a34a':'#dc2626')+';border-radius:8px;padding:8px 11px;margin-top:7px;">'+
+        '<div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;"><div style="font-size:12px;font-weight:900;color:#1c1f26;">'+(m.up?'▲':'▼')+' '+esc(m.d.name)+' <span style="color:#7a7f99;font-weight:600;">'+esc(m.sym)+' ₹'+m.cp.toLocaleString('en-IN')+'</span></div>'+
+        '<div style="font-size:11px;font-weight:800;color:'+(m.up?'#006b30':'#b71c1c')+';">1 day '+pct(m.d1)+' · '+m.wn+' sessions '+pct(m.w)+' <span style="padding:2px 8px;border-radius:10px;background:'+vc[0]+';color:'+vc[1]+';margin-left:6px;">'+vc[2]+'</span></div></div>'+
+        '<div style="font-size:10.5px;color:#3a3f5c;margin-top:4px;line-height:1.55;">'+
+        (m.ev.length?'<div>✔ '+m.ev.map(esc).join('<br>✔ ')+'</div>':'')+
+        (m.against.length?'<div style="color:#b35c00;">✖ '+m.against.map(esc).join('<br>✖ ')+'</div>':'')+
+        (m.todo.length?'<div style="color:#1d4ed8;">→ '+m.todo.map(esc).join('<br>→ ')+'</div>':'')+
+        '<div style="color:#6b6f86;margin-top:2px;">Lenses now: '+lens+(x?' · Conviction '+x.conv+(x.rank?' (#'+x.rank+')':' (unranked)'):'')+'</div></div></div>';
+    });
+  } else if(CV_WATCH_TAB==='outside'){
+    h+='<div style="font-size:10.5px;color:#6b5a45;margin:6px 0 8px;">Nifty 500 stocks that moved 5% or more on '+(lastMv||'—')+' but are <b>not in Company Ranker</b> (from your NSE fetcher). "Seen" = how many days in the last 2 weeks it was a big mover. Repeated movers with high delivery are worth a look.</div>';
+    if(!outside.length) h+='<div style="font-size:11px;color:#5a6270;">'+(mvRows.length?'None today.':'No movers data yet — it arrives with the updated fetcher.py on the next NSE fetch.')+'</div>';
+    else h+='<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;"><thead><tr style="background:#fde7c8;color:#6b3a00;text-align:left;"><th style="padding:5px 8px;">Symbol</th><th style="padding:5px 8px;text-align:right;">Change</th><th style="padding:5px 8px;text-align:right;">Close ₹</th><th style="padding:5px 8px;text-align:right;">Delivery %</th><th style="padding:5px 8px;text-align:right;">Turnover ₹ Cr</th><th style="padding:5px 8px;text-align:right;">Seen (2 wks)</th></tr></thead><tbody>'+
+      outside.slice(0,40).map(function(r){ return '<tr style="border-bottom:1px solid #f0e2cc;"><td style="padding:4px 8px;font-weight:800;">'+esc(r.sym)+'</td><td style="padding:4px 8px;text-align:right;font-weight:800;color:'+(r.chg>0?'#006b30':'#b71c1c')+';">'+pct(+r.chg)+'</td><td style="padding:4px 8px;text-align:right;">'+(+r.cp).toLocaleString('en-IN')+'</td><td style="padding:4px 8px;text-align:right;">'+(r.dp!=null?r.dp:'—')+'</td><td style="padding:4px 8px;text-align:right;">'+(r.to!=null?(r.to/100).toLocaleString('en-IN',{maximumFractionDigits:1}):'—')+'</td><td style="padding:4px 8px;text-align:right;">'+(rep[r.sym]||1)+'×</td></tr>'; }).join('')+'</tbody></table></div>';
+  } else {
+    var c=H.cnt;
+    h+='<div style="font-size:10.5px;color:#6b5a45;margin:6px 0 8px;line-height:1.6;">Companies whose score rests on old or incomplete inputs — highest-ranked first, because those change the top 25. '+
+      '<b>'+c.stale+'</b> on an older quarter · <b>'+c.inp+'</b> revenue-only Earnings · <b>'+c.tg+'</b> no catalyst research (top-25 contenders) · <b>'+c.seed+'</b> base score older than results (top-25 contenders) · <b>'+c.mkt+'</b> no market data · <b>'+c.unr+'</b> not ranked.</div>';
+    var col={stale:'#b71c1c',inp:'#b35c00',tg:'#6b4a80',seed:'#8a5a00',mkt:'#1d4ed8',unr:'#5a6270'};
+    h+='<div style="max-height:420px;overflow-y:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;"><thead><tr style="background:#fde7c8;color:#6b3a00;text-align:left;position:sticky;top:0;"><th style="padding:5px 8px;">#</th><th style="padding:5px 8px;">Company</th><th style="padding:5px 8px;text-align:right;">Conviction</th><th style="padding:5px 8px;">What needs attention</th></tr></thead><tbody>'+
+      H.list.slice(0,120).map(function(r){ return '<tr style="border-bottom:1px solid #f0e2cc;vertical-align:top;"><td style="padding:4px 8px;">'+(r.x.rank||'—')+'</td><td style="padding:4px 8px;font-weight:800;">'+esc(r.x.d.name)+'</td><td style="padding:4px 8px;text-align:right;">'+r.x.conv+'</td><td style="padding:4px 8px;">'+r.is.map(function(i){ return '<div style="color:'+col[i[0]]+';">• '+esc(i[1])+'</div>'; }).join('')+'</td></tr>'; }).join('')+'</tbody></table></div>';
+  }
+  h+='</div>';
+  box.innerHTML=h;
+}
+
 // ── FUSION ────────────────────────────────────────────────────────────────
 function cvVerdict(score){
   if(score>=75) return {t:'High Conviction', c:'#006b30', bg:'#e6f4ef'};
@@ -11793,7 +12132,7 @@ function cvDivergence(L){
 }
 function cvCompute(weights){
   var W = weights || CV_W;
-  CV_MACRO_CACHE = null; CV_CYCLE_CACHE = null;
+  CV_MACRO_CACHE = null; CV_CYCLE_CACHE = null; CV_MOVES=null;
   var seen={}, out=[];
   var list = (typeof CR_DATA!=='undefined'&&Array.isArray(CR_DATA))?CR_DATA:[];
   list.forEach(function(d){
@@ -11862,6 +12201,8 @@ function cvCompute(weights){
     if(L.CY&&L.CY.peTrap){ conv-=5; gates.push('⚠️ Cyclical P/E trap — cheap P/E on peak margins (−5)'); }
     if(L.CY&&L.CY.stage&&L.CY.stage.stage4&&conv>55){ conv=55; gates.push('📉 Price in Stage 4 decline — Conviction capped at 55'); }
     if(L.TG&&L.TG.serious.length&&conv>50){ conv=50; gates.push('⛔ Serious negative trigger ('+L.TG.serious[0].name+') — Conviction capped at 50'); }
+    // v44: a sharp price jump that nothing in our data explains — don't let momentum alone carry it
+    try{ var mv=cvMoveFor(sym); if(mv&&mv.up&&mv.verdict==='unexplained'&&mv.w>=CV_MOVE_GATE_PCT){ conv-=CV_MOVE_GATE_PTS; gates.push('⚠️ Price up '+mv.w.toFixed(1)+'% in '+mv.wn+' sessions with no supporting results, deals, delivery or catalyst in our data — chasing risk (−'+CV_MOVE_GATE_PTS+'); check the news'); } }catch(e){}
     conv=Math.round(Math.max(0,Math.min(100,conv)));
     var basisQ=(L.E&&L.E.q)||pr.q||null, basisLag=L.E?L.E.lag:pr.lag;
     out.push({wSum:wSum, base:Math.round(base*10)/10, W:W, pos:pos, neg:neg, posNeed:posNeed, basisQ:basisQ, basisLag:basisLag, basis:basisQ?cvBasisTxt(basisQ,basisLag):'No results print loaded', d:d, sym:sym, L:L, avail:avail, availAll:availAll, conv:conv, agree:agree, agreeTxt:agreeTxt, gates:gates, div:cvDivergence(L)});
@@ -12407,6 +12748,7 @@ function cvRender(){
   if(exportBar) exportBar.style.display=isAdmin?'flex':'none';
   var all=cvCompute();
   try{ cvTCRender(all); }catch(e){ console.warn('cvTCRender',e); }
+  try{ cvWatchRender(all); }catch(e){ console.warn('cvWatchRender',e); }
   if(isAdmin) cvMaybeAutoExport();
   var groups=['All']; all.forEach(function(x){ if(x.d.group&&groups.indexOf(x.d.group)<0) groups.push(x.d.group); });
   var fl=document.getElementById('cv-filters');
