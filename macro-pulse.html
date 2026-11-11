@@ -3647,7 +3647,7 @@ function mfSaveGroup(k){
 // ══════════════════════════════════════════════════════════════════════════
 var PX_WIN=[['d1','1 Day',1],['w1','1 Week',7],['d15','15 Days',15],['m1','1 Month',30],['m3','3 Months',91]];
 var PX_TOL={w1:4,d15:5,m1:7,m3:12};
-var PX_STATE={view:'co',sort:'w1',dir:-1,q:'',sec:'All'};
+var PX_STATE={view:'co',sort:'rk',dir:-1,q:'',sec:'All',uni:'radar'};
 function pxHistory(){
   const H={};
   try{ JSON.parse(localStorage.getItem('cbr_px')||'[]').forEach(r=>{ if(r&&r.date&&r.p) H[r.date]=Object.assign(H[r.date]||{},r.p); }); }catch(e){}
@@ -3659,29 +3659,49 @@ function pxHistory(){
 function pxCalc(sym,P,today){
   if(!sym||!P.dates.length) return null; sym=String(sym).toUpperCase();
   let i=P.dates.length-1; while(i>=0&&!(P.H[P.dates[i]][sym]>0)) i--; if(i<0) return null;
-  const d=P.dates[i], c=P.H[d][sym], out={c,d,ref:{}};
-  for(let j=i-1;j>=0;j--){ const x=P.H[P.dates[j]][sym]; if(x>0){ if((Date.parse(d)-Date.parse(P.dates[j]))/864e5<=6){ out.d1=(c/x-1)*100; out.ref.d1=P.dates[j]; } break; } }
+  const d=P.dates[i], c=P.H[d][sym], out={c,d,ref:{},rp:{}};
+  for(let j=i-1;j>=0;j--){ const x=P.H[P.dates[j]][sym]; if(x>0){ if((Date.parse(d)-Date.parse(P.dates[j]))/864e5<=6){ out.d1=(c/x-1)*100; out.ref.d1=P.dates[j]; out.rp.d1=x; } break; } }
   const t0=Date.parse(today);
   PX_WIN.slice(1).forEach(([k,,n])=>{
     const target=t0-n*864e5, lo=target-PX_TOL[k]*864e5; out[k]=null;
-    for(let j=P.dates.length-1;j>=0;j--){ const tj=Date.parse(P.dates[j]); if(tj>target) continue; if(tj<lo) break; const x=P.H[P.dates[j]][sym]; if(x>0&&P.dates[j]<d){ out[k]=(c/x-1)*100; out.ref[k]=P.dates[j]; break; } }
+    for(let j=P.dates.length-1;j>=0;j--){ const tj=Date.parse(P.dates[j]); if(tj>target) continue; if(tj<lo) break; const x=P.H[P.dates[j]][sym]; if(x>0&&P.dates[j]<d){ out[k]=(c/x-1)*100; out.ref[k]=P.dates[j]; out.rp[k]=x; break; } }
   });
   return out;
 }
 function pxMed(a){ a=a.filter(v=>v!=null&&!isNaN(v)).sort((x,y)=>x-y); const n=a.length; return n?(n%2?a[(n-1)/2]:(a[n/2-1]+a[n/2])/2):null; }
+// Nifty 500 list: from the NSE fetch (store 'n500') or a CSV imported once (NSE ind_nifty500list.csv)
+function pxN500(){
+  let L=[]; try{ L=JSON.parse(localStorage.getItem('cbr_n500')||'[]'); }catch(e){}
+  if(!L.length){ try{ L=JSON.parse(localStorage.getItem('cbf26_n500_list')||'[]'); }catch(e){} }
+  const M={}; L.forEach(r=>{ const s=String(r.sym||r.Symbol||'').toUpperCase().trim(); if(s) M[s]={n:r.name||r['Company Name']||s, ind:r.ind||r.Industry||''}; }); return M;
+}
+function pxImportN500(inp){
+  const f=inp.files&&inp.files[0]; if(!f) return; const rd=new FileReader();
+  rd.onload=()=>{ const lines=String(rd.result).split(/\r?\n/).filter(x=>x.trim()); const hd=lines.shift().split(',').map(x=>x.replace(/"/g,'').trim().toLowerCase());
+    const iS=hd.indexOf('symbol'), iN=hd.indexOf('company name'), iI=hd.indexOf('industry'); if(iS<0){ alert('This file has no Symbol column — use NSE ind_nifty500list.csv'); return; }
+    const out=lines.map(l=>{ const c=l.split(',').map(x=>x.replace(/"/g,'').trim()); return {sym:c[iS],name:iN>=0?c[iN]:c[iS],ind:iI>=0?c[iI]:''}; }).filter(r=>r.sym);
+    try{ localStorage.setItem('cbf26_n500_list',JSON.stringify(out)); }catch(e){}
+    alert(out.length+' Nifty 500 companies loaded. Their prices arrive with the next NSE fetch.'); pxRender(); };
+  rd.readAsText(f);
+}
+function pxRanks(){
+  const R={}; try{ if(typeof cvCompute==='function'){ cvCompute().forEach(x=>{ if(x&&x.d&&x.avail>=3) R[x.d.name]={r:x.rank,c:Math.round(x.conv)}; }); } }catch(e){ console.warn('ranks',e); }
+  return R;
+}
 function pxRows(){
-  const P=pxHistory(), today=mfIstToday(), seen={}, rows=[];
+  const P=pxHistory(), today=mfIstToday(), seen={}, rows=[], N5=pxN500(), RK=pxRanks();
   const list=(typeof CR_DATA!=='undefined'&&Array.isArray(CR_DATA))?CR_DATA:[];
   const map=(typeof MI_NAME_TO_SYMBOL!=='undefined')?MI_NAME_TO_SYMBOL:{};
-  list.forEach(d=>{ const s=(d.sym||map[d.name]||'').toUpperCase(); if(!s||seen[s]) return; seen[s]=1; const m=pxCalc(s,P,today); rows.push({n:d.name,s:d.sector||'—',sym:s,m}); });
+  list.forEach(d=>{ const s=(d.sym||map[d.name]||'').toUpperCase(); if(!s||seen[s]) return; seen[s]=1; const m=pxCalc(s,P,today); const rk=RK[d.name]; rows.push({n:d.name,s:d.sector||'—',sym:s,m,radar:true,n5:!!N5[s],rk:rk?rk.r:null,cv:rk?rk.c:null}); });
+  Object.keys(N5).forEach(s=>{ if(seen[s]) return; seen[s]=1; rows.push({n:N5[s].n,s:N5[s].ind||'Nifty 500',sym:s,m:pxCalc(s,P,today),radar:false,n5:true,rk:null,cv:null}); });
   const extra={}; P.dates.forEach(dt=>Object.keys(P.H[dt]).forEach(s=>{ if(!seen[s]&&s!=='NIFTY 50') extra[s]=1; }));
-  Object.keys(extra).forEach(s=>{ rows.push({n:s,s:'Other tracked',sym:s,m:pxCalc(s,P,today)}); });
-  return {P,today,rows,nifty:pxCalc('NIFTY 50',P,today)};
+  Object.keys(extra).forEach(s=>{ rows.push({n:s,s:'Other tracked',sym:s,m:pxCalc(s,P,today),radar:false,n5:false,rk:null,cv:null}); });
+  return {P,today,rows,nifty:pxCalc('NIFTY 50',P,today),n5count:Object.keys(N5).length};
 }
-function pxCell(v,ref){
+function pxCell(v,ref,rp){
   if(v==null||isNaN(v)) return '<td class="px-c" style="color:#c0c4d4;" title="No closing price near that date yet">—</td>';
   const a=Math.min(0.6,Math.abs(v)/14+0.06), bg=v>=0?`rgba(0,150,80,${a})`:`rgba(220,40,40,${a})`, fg=Math.abs(v)>7?'#fff':(v>=0?'#004d26':'#8b1010');
-  return `<td class="px-c" style="background:${bg};color:${fg};font-weight:800;" title="${ref?'vs close of '+mfFmtD(ref):''}">${v>=0?'+':''}${v.toFixed(1)}%</td>`;
+  return `<td class="px-c" style="background:${bg};color:${fg};font-weight:800;" title="${ref?'vs close of '+mfFmtD(ref):''}">${v>=0?'+':''}${v.toFixed(1)}%${rp!=null?`<div style="font-size:9.5px;font-weight:600;opacity:.85;">from ₹${(+rp).toLocaleString('en-IN',{maximumFractionDigits:2})}${ref?' · '+mfFmtD(ref).slice(0,6):''}</div>`:''}</td>`;
 }
 function pxSectorMacro(sec){ try{ if(typeof cvSectorMacro==='function'){ const m=cvSectorMacro(sec); if(m) return m; } }catch(e){} return null; }
 function pxEvents(D){
@@ -3702,7 +3722,7 @@ function pxEvents(D){
 }
 function pxRender(){
   const el=document.getElementById('pxBody'); if(!el) return;
-  const D=pxRows(), st=PX_STATE, N=D.nifty;
+  const D=pxRows(), st=PX_STATE, N=D.nifty; if(!st.uni) st.uni='radar';
   const withData=D.rows.filter(r=>r.m), last=D.P.dates.length?D.P.dates[D.P.dates.length-1]:null, first=D.P.dates[0];
   const age=last?mfDays(last):null;
   let h='';
@@ -3722,19 +3742,21 @@ function pxRender(){
     ['co','sec'].map(v=>`<button onclick="PX_STATE.view='${v}';pxRender()" style="padding:6px 13px;border-radius:18px;border:1px solid ${st.view===v?'#ff7c00':'#e0dccf'};background:${st.view===v?'#ff7c00':'#fff'};color:${st.view===v?'#fff':'#3a3f5c'};font-weight:800;font-size:12px;cursor:pointer;">${v==='co'?'🏢 Companies':'🧭 Sectors vs macro'}</button>`).join('')+
     (st.view==='co'?`<input id="pxQ" placeholder="Search company or symbol…" value="${st.q.replace(/"/g,'&quot;')}" oninput="PX_STATE.q=this.value;pxRender();const q=document.getElementById('pxQ');q.focus();q.setSelectionRange(q.value.length,q.value.length);" style="flex:1;min-width:170px;padding:7px 11px;border:1px solid #e0dccf;border-radius:18px;font-size:12px;">
      <select onchange="PX_STATE.sec=this.value;pxRender()" style="padding:6px 8px;border:1px solid #e0dccf;border-radius:8px;font-size:12px;max-width:220px;">${secs.map(s=>`<option${s===st.sec?' selected':''}>${s}</option>`).join('')}</select>`:'')+
+    (st.view==='co'?['radar','n500','all'].map(u=>`<button onclick="PX_STATE.uni='${u}';pxRender()" style="padding:5px 11px;border-radius:8px;border:1px solid ${st.uni===u?'#1e3a8a':'#d6d9e6'};background:${st.uni===u?'#eef3ff':'#fff'};color:#1e3a8a;font-weight:800;font-size:11.5px;cursor:pointer;">${u==='radar'?'🎯 Our radar':u==='n500'?'📊 Nifty 500 ('+D.n5count+')':'All'}</button>`).join(''):'')+
+    '<label style="padding:6px 10px;border-radius:8px;border:1px dashed #b0b7d0;font-size:11px;color:#3a3f5c;cursor:pointer;" title="Only needed if the NSE fetch has not brought the list: load NSE ind_nifty500list.csv once">📥 Nifty 500 list<input type="file" accept=".csv" style="display:none;" onchange="pxImportN500(this)"></label>'+
     '<button onclick="pxCsv()" style="padding:6px 12px;border-radius:8px;border:1px solid #ff7c00;background:#fff3e0;color:#9a4a00;font-weight:800;font-size:11.5px;cursor:pointer;">⬇ CSV</button></div>';
   h+=`<div style="font-size:10.5px;color:${age!=null&&age>4?'#b71c1c':'#6b7498'};margin-bottom:6px;">Today ${mfFmtD(D.today)} · latest close in this browser ${last?mfFmtD(last)+(age>4?' ⚠ '+age+' days old — run the NSE fetch':''):'none'} · ${D.P.dates.length} price day(s) stored${first?' since '+mfFmtD(first):''} · ${withData.length} of ${D.rows.length} companies priced. Each window compares the latest close with the close on or just before today minus 1 / 7 / 15 / 30 / 91 days (hover a cell to see that date).</div>`;
   const hdr=(k,l)=>`<th onclick="if(PX_STATE.sort==='${k}')PX_STATE.dir*=-1;else{PX_STATE.sort='${k}';PX_STATE.dir=-1;}pxRender()" style="cursor:pointer;">${l}${st.sort===k?(st.dir<0?' ▼':' ▲'):''}</th>`;
   if(st.view==='co'){
     const q=st.q.trim().toLowerCase();
-    let L=D.rows.filter(r=>(st.sec==='All'||r.s===st.sec)&&(!q||r.n.toLowerCase().includes(q)||r.sym.toLowerCase().includes(q)));
-    const val=r=>{ if(st.sort==='n') return r.n; if(st.sort==='c') return r.m?r.m.c:null; if(st.sort==='vn') return r.m&&r.m.m1!=null&&N&&N.m1!=null?r.m.m1-N.m1:null; return r.m?r.m[st.sort]:null; };
+    let L=D.rows.filter(r=>(st.uni==='all'||(st.uni==='radar'?r.radar:r.n5))&&(st.sec==='All'||r.s===st.sec)&&(!q||r.n.toLowerCase().includes(q)||r.sym.toLowerCase().includes(q)));
+    const val=r=>{ if(st.sort==='n') return r.n; if(st.sort==='rk') return r.rk==null?null:-r.rk; if(st.sort==='c') return r.m?r.m.c:null; if(st.sort==='vn') return r.m&&r.m.m1!=null&&N&&N.m1!=null?r.m.m1-N.m1:null; return r.m?r.m[st.sort]:null; };
     L.sort((a,b)=>{ const x=val(a),y=val(b); if(x==null&&y==null) return 0; if(x==null) return 1; if(y==null) return -1; return (typeof x==='string'?x.localeCompare(y):x-y)*st.dir; });
-    h+='<div style="overflow-x:auto;max-height:70vh;border:1px solid #ece8de;border-radius:10px;"><table class="px-t"><thead><tr>'+hdr('n','Company')+hdr('c','Close ₹')+PX_WIN.map(([k,l])=>hdr(k,l)).join('')+hdr('vn','1M vs Nifty')+'</tr></thead><tbody>';
+    h+='<div style="overflow-x:auto;max-height:70vh;border:1px solid #ece8de;border-radius:10px;"><table class="px-t"><thead><tr>'+hdr('rk','CB Rank')+hdr('n','Company')+hdr('c','Close ₹ (latest)')+PX_WIN.map(([k,l])=>hdr(k,l)).join('')+hdr('vn','1M vs Nifty')+'</tr></thead><tbody>';
     L.forEach(r=>{ const m=r.m;
-      h+=`<tr><td><b>${r.n}</b><div style="font-size:10px;color:#8a90a8;">${r.sym} · ${r.s}</div></td><td class="px-c" style="font-weight:700;">${m?m.c.toLocaleString('en-IN',{maximumFractionDigits:2})+'<div style="font-size:9px;color:#9aa0b8;font-weight:600;">'+mfFmtD(m.d)+'</div>':'—'}</td>`+
-        PX_WIN.map(([k])=>pxCell(m?m[k]:null,m?m.ref[k]:null)).join('')+pxCell(m&&m.m1!=null&&N&&N.m1!=null?m.m1-N.m1:null,null)+'</tr>'; });
-    if(!L.length) h+='<tr><td colspan="8" style="text-align:center;padding:16px;color:#9aa0b8;">No company matches.</td></tr>';
+      h+=`<tr><td class="px-c" title="${r.cv!=null?'CB Conviction '+r.cv+' / 100':'Not ranked (outside our radar or too little data)'}">${r.rk!=null?'<b style="font-size:14px;color:#b35c00;">#'+r.rk+'</b><div style="font-size:9.5px;color:#8a90a8;">score '+r.cv+'</div>':'<span style="color:#c0c4d4;">—</span>'}</td><td><b>${r.n}</b>${r.n5?' <span style="font-size:9px;background:#eef3ff;color:#1e3a8a;border-radius:4px;padding:1px 4px;font-weight:800;">N500</span>':''}<div style="font-size:10px;color:#8a90a8;">${r.sym} · ${r.s}</div></td><td class="px-c" style="font-weight:700;">${m?m.c.toLocaleString('en-IN',{maximumFractionDigits:2})+'<div style="font-size:9px;color:#9aa0b8;font-weight:600;">'+mfFmtD(m.d)+'</div>':'—'}</td>`+
+        PX_WIN.map(([k])=>pxCell(m?m[k]:null,m?m.ref[k]:null,m?m.rp[k]:null)).join('')+pxCell(m&&m.m1!=null&&N&&N.m1!=null?m.m1-N.m1:null,null)+'</tr>'; });
+    if(!L.length) h+='<tr><td colspan="9" style="text-align:center;padding:16px;color:#9aa0b8;">'+(st.uni==='n500'&&!D.n5count?'Nifty 500 list not loaded yet — it comes with the next NSE fetch (new fetcher.py), or load NSE ind_nifty500list.csv with the 📥 button.':'No company matches.')+'</td></tr>';
     h+='</tbody></table></div>';
   } else {
     const by={}; D.rows.forEach(r=>{ if(!r.m) return; (by[r.s]=by[r.s]||[]).push(r); });
@@ -3754,8 +3776,8 @@ function pxRender(){
   el.innerHTML=h;
 }
 function pxCsv(){
-  const D=pxRows(), L=[['Company','Symbol','Sector','Close','Close date'].concat(PX_WIN.map(w=>w[1]+' %'))];
-  D.rows.forEach(r=>{ const m=r.m; L.push([r.n,r.sym,r.s,m?m.c:'',m?m.d:''].concat(PX_WIN.map(([k])=>m&&m[k]!=null?m[k].toFixed(2):''))); });
+  const D=pxRows(), L=[['CB Rank','CB Conviction','Company','Symbol','Sector','On radar','Nifty 500','Close','Close date'].concat(...PX_WIN.map(w=>[w[1]+' ref price',w[1]+' ref date',w[1]+' %']))];
+  D.rows.forEach(r=>{ const m=r.m; L.push([r.rk==null?'':r.rk,r.cv==null?'':r.cv,r.n,r.sym,r.s,r.radar?'Y':'',r.n5?'Y':'',m?m.c:'',m?m.d:''].concat(...PX_WIN.map(([k])=>[m&&m.rp[k]!=null?m.rp[k]:'',m&&m.ref[k]?m.ref[k]:'',m&&m[k]!=null?m[k].toFixed(2):'']))); });
   const csv=L.map(a=>a.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='Price_Moves_'+D.today+'.csv'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},400);
 }
@@ -7609,7 +7631,10 @@ function miSetSymbol(name, sym){
 function miTrackedPayload(){
   miApplyExtraSyms();
   const names={}; Object.keys(MI_NAME_TO_SYMBOL).forEach(n=>{ const s=String(MI_NAME_TO_SYMBOL[n]).toUpperCase(); if(!names[s]) names[s]=n; });
-  return {symbols:Object.keys(names).sort(), names:names, source:'macro-pulse', at:new Date().toISOString()};
+  // v45: Nifty 500 symbols are sent separately — the fetcher stores only their closing prices
+  // (cheap: same daily NSE price file), not bulk/PE/promoter data, so the fetch stays fast.
+  let px500=[]; try{ px500=Object.keys(pxN500()); }catch(e){}
+  return {symbols:Object.keys(names).sort(), names:names, px_symbols:px500, want_n500:true, px_days:[1,7,15,30,91], source:'macro-pulse', at:new Date().toISOString()};
 }
 
 // ══ COMPANY RANKER (merged) ══
