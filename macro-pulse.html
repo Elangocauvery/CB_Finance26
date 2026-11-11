@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CB Finance26™ — Macro Pulse · v44 (Sector Ranker on Q1/Q2 FY27 results · reads Q2 FY27 dashboards)</title>
+<title>CB Finance26™ — Macro Pulse · v45 (13 Indicators auto-update · Price Moves tab · macro-event capture)</title>
 <meta name="robots" content="noindex, nofollow, noarchive, noimageindex">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
@@ -772,6 +772,7 @@ tr:last-child td{border-bottom:none;}
 .size-S{background:#fce7f3;color:#9d174d;}
 .v5-export-ta{width:100%;height:340px;font-family:'DM Mono',monospace;font-size:10.5px;border:1.5px solid var(--slate-m);border-radius:8px;padding:10px;white-space:pre;overflow:auto;}
 </style>
+<style>.px-t{border-collapse:collapse;width:100%;min-width:860px;font-size:12px;background:#fff}.px-t th{position:sticky;top:0;background:#fff3e6;padding:8px 6px;font-size:11px;border-bottom:1px solid #ecdcc6;white-space:nowrap;user-select:none}.px-t td{padding:6px;border-bottom:1px solid #f3efe6}.px-c{text-align:center;white-space:nowrap}.px-t tbody tr:hover td{filter:brightness(0.97)}</style>
 </head>
 <body>
 
@@ -807,6 +808,7 @@ tr:last-child td{border-bottom:none;}
     <button class="nav-tab" onclick="showPage('market',this)">📈 Market Data</button>
     <button class="nav-tab" onclick="showPage('fiidii',this)">🌍 FII / DII</button>
     <button class="nav-tab" onclick="showPage('indicators',this)">🎛 13 Indicators</button>
+    <button class="nav-tab" onclick="showPage('px',this)">📈 Price Moves</button>
     <button class="nav-tab" onclick="showPage('scenarios',this)">🎭 Scenarios</button>
     <button class="nav-tab" onclick="showPage('sectors',this)">🧭 Sector Impact</button>
     <button class="nav-tab" onclick="showPage('risks',this)">⚠️ Risk Map</button>
@@ -905,7 +907,7 @@ tr:last-child td{border-bottom:none;}
   <div class="g2">
     <div class="card">
       <h2><span class="ico">🎛</span>Market Signal Score</h2>
-      <div class="sec">Based on 13 indicators — set them in the Indicators tab</div>
+      <div class="sec">Based on 13 indicators — auto-updated from live data and official releases</div>
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap;">
         <div class="score-box" style="padding:10px;border-top:none;margin-top:0;flex:1;min-width:140px;">
           <div class="score-num" id="scoreNum" style="color:var(--orange);">—</div>
@@ -1227,7 +1229,7 @@ tr:last-child td{border-bottom:none;}
 <div class="page" id="page-indicators">
   <div class="hdr">
     <h1>🎛 13 Macro Indicators</h1>
-    <p>Set each to match today's conditions — score and allocation update live</p>
+    <p>Each indicator now follows live data and the latest official release by itself — pick a value only to override it</p>
     <div class="hdr-meta">
       <span class="badge">Score: <span id="ind-score">—</span></span>
       <span class="badge">Stance: <span id="ind-stance">—</span></span>
@@ -1268,7 +1270,22 @@ tr:last-child td{border-bottom:none;}
       </div>
     </div>
   </div>
+  <div class="card" style="margin-top:14px;">
+    <h2><span class="ico">📌</span>Official releases — enter a figure once when it is published</h2>
+    <div class="sec">RBI, MoSPI, CGA, AMFI, IMD and the US Fed publish these monthly or less often; the browser cannot download them. A built-in set (as of 11 Nov 2026) is already loaded — type a newer figure here and the matching indicator moves by itself. Crude, rupee, FII, DII, Nifty PE and VIX need nothing: they come from the daily NSE fetch.</div>
+    <div id="mfOfficial"></div>
+  </div>
   <div class="footer">CB Finance26™ · 13 Indicator Framework · Not Financial Advice</div>
+</div>
+
+<!-- ═══ PRICE MOVES (v45) ═══ -->
+<div class="page" id="page-px">
+  <div class="hdr">
+    <h1>📈 Price Moves</h1>
+    <p>Share-price change over 1 day, 1 week, 15 days, 1 month and 3 months — every window counted back from today — with the macro moves behind them</p>
+  </div>
+  <div id="pxBody"></div>
+  <div class="footer">CB Finance26™ · Price Moves · NSE closing prices · Not Financial Advice</div>
 </div>
 
 <!-- ═══ SCENARIOS ═══ -->
@@ -3217,6 +3234,8 @@ function showPage(id,tab){
   // data has been entered since this page last loaded.
   if(id==='mi' && typeof miInitTabs==='function') miInitTabs();
   // Market Data & FII/DII are read-only views of NSE Market Intel data — refresh on open
+  if(id==='px' && typeof pxRender==='function') pxRender();
+  if(id==='indicators'){ try{ miAutoLinkIndicators(); renderAllIndicators(); }catch(e){} }
   if(id==='market'){ if(typeof renderMDHistory==='function')renderMDHistory(); if(typeof updateSignalPanel==='function')updateSignalPanel(); }
   if(id==='fiidii'){ if(typeof renderFDHistory==='function')renderFDHistory(); if(typeof updateFIIKPIs==='function')updateFIIKPIs(); if(typeof updateFIISignal==='function')updateFIISignal(); if(typeof renderFlowChart==='function')renderFlowChart(); }
   if(id==='cr' && typeof render==='function'){ if(typeof showAdminBadge==='function')showAdminBadge(); render(); }
@@ -3393,6 +3412,7 @@ async function mdAutoRefresh(){
   const ok=mdAutoFromNSE(inr);
   try{ mdFillForm(); }catch(e){}
   if(ok){ try{ if(typeof renderMarketSnapshot==='function') renderMarketSnapshot(); if(typeof updateSignalPanel==='function') updateSignalPanel(); if(typeof renderMDHistory==='function') renderMDHistory(); }catch(e){} }
+  try{ miAutoLinkIndicators(); renderAllIndicators(); updateAll(); const pg=document.getElementById('page-px'); if(pg&&pg.classList.contains('active')) pxRender(); }catch(e){ console.warn('auto indicators',e); }
   return ok;
 }
 // v33: Market Data form shows the newest value of every field (with its date) instead of fixed numbers
@@ -3426,6 +3446,318 @@ function getLatestFo(){
   let fo=[]; try{fo=JSON.parse(localStorage.getItem('cbr_fo')||'[]');}catch(e){}
   fo=fo.filter(r=>r&&r.date).sort((a,b)=>b.date.localeCompare(a.date));
   return fo[0]||null;
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════
+// v45 AUTO-INDICATOR ENGINE — all 13 indicators follow the real data.
+//   Before v45 only FII, DII and Nifty PE moved on their own; the other 10 sat at
+//   whatever was last picked by hand (crude "above $100", global "risk-off" …), so a
+//   rally on falling crude / FII buying / a US event never reached the sector rules.
+//   Now every indicator is resolved in this order:
+//     1. LIVE   — numbers already in this browser (NSE fetch: FII/DII, PE, VIX, crude,
+//                 INR, Nifty; open.er-api INR; results dashboards for earnings)
+//     2. OFFICIAL — dated official releases (RBI, MoSPI CPI, CGA capex, AMFI SIP, IMD
+//                 monsoon, US Fed). A built-in set is shipped; newer figures typed in the
+//                 "Official releases" box on the 13 Indicators tab replace it.
+//     3. YOUR SETTING — a value picked from the dropdown. It wins only until a newer
+//                 data point arrives (or 30 days pass), then auto takes over again.
+// ══════════════════════════════════════════════════════════════════════════
+var MF_BUILTIN={
+  updated:'2026-11-11',
+  rbi:{date:'2026-10-07',repo:5.50,last:'hike',stance:'calibrated tightening',hikes12m:25,cuts12m:25,src:'RBI MPC 5–7 Oct 2026: +25 bps to 5.50%'},
+  cpi:{date:'2026-10-12',month:'2026-09',v:5.54,src:'MoSPI CPI Sep 2026',next:'2026-11-12'},
+  crude:{date:'2026-11-05',v:93.5,src:'Brent futures, 5 Nov 2026'},
+  inr:{date:'2026-11-05',v:94.35,src:'Interbank open, 5 Nov 2026'},
+  capex:{date:'2026-10-30',month:'2026-09',pctBE:53.6,yoy:12.9,src:'CGA Apr–Sep FY27: ₹6.55 L Cr = 53.6% of BE',next:'2026-11-30'},
+  sip:{date:'2026-10-12',month:'2026-09',cr:32490,prev:32297,src:'AMFI Sep 2026 SIP',next:'2026-11-12'},
+  monsoon:{date:'2026-09-30',season:2026,lpa:87,src:'IMD end-of-season: 87% of LPA'},
+  global:{date:'2026-10-28',fed:'hold',fedPrev:'hike',us10y:5.03,src:'FOMC 28 Oct 2026: hold at 3.75–4.00% after Sep hike'},
+  earnings:{date:'2026-11-11',q:'Q2FY27',med:20.8,src:'Q2 FY27 season so far: median PAT growth (partial)'},
+  liquidity:null
+};
+var MF_USER_KEY='cbf26_macro_facts_user', MF_OVR_KEY='cbf26_macro_ovr_v1';
+var MI_AUTO_REASON={};      // i -> {txt, kind:'live'|'official'|'manual'|'override', date, src, stale}
+function mfIstToday(){ return new Date(Date.now()+5.5*3600e3).toISOString().slice(0,10); }
+function mfDays(d){ if(!d) return 9999; const t=Date.parse(String(d).slice(0,10)); return isNaN(t)?9999:Math.round((Date.parse(mfIstToday())-t)/864e5); }
+function mfFmtD(d){ try{ return new Date(String(d).slice(0,10)+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}); }catch(e){ return d; } }
+function mfLS(k,def){ try{ const v=JSON.parse(localStorage.getItem(k)||'null'); return v==null?def:v; }catch(e){ return def; } }
+function mfUserFacts(){ return mfLS(MF_USER_KEY,{}); }
+function mfFacts(){
+  const u=mfUserFacts(), out={};
+  Object.keys(MF_BUILTIN).forEach(k=>{ if(k==='updated') return; const b=MF_BUILTIN[k], x=u[k];
+    out[k]=(x&&x.date&&(!b||String(x.date)>=String(b.date)))?Object.assign({},x,{user:true}):b; });
+  return out;
+}
+function mfNum(v){ const x=parseFloat(String(v==null?'':v).replace(/,/g,'')); return isNaN(x)?null:x; }
+function mfBand(v,cuts){ for(let i=0;i<cuts.length;i++) if(v<cuts[i]) return i; return cuts.length; }
+// newest value of a Market-Data field, and its % change versus ~N days earlier
+function mfMDLatest(k){ const h=getMDHistory(); for(let i=h.length-1;i>=0;i--){ const v=mfNum(h[i][k]); if(v!=null&&v>0) return {v,date:h[i].date}; } return null; }
+function mfMDChange(k,days){
+  const h=getMDHistory().filter(r=>mfNum(r[k])>0).sort((a,b)=>a.date.localeCompare(b.date)); if(h.length<2) return null;
+  const last=h[h.length-1], lim=Date.parse(last.date)-days*864e5; let ref=null;
+  for(let i=h.length-2;i>=0;i--){ const t=Date.parse(h[i].date); if(t<=lim){ if(lim-t<=8*864e5) ref=h[i]; break; } }
+  if(!ref) return null; return {from:+ref[k],to:+last[k],pct:(+last[k]/+ref[k]-1)*100,fromDate:ref.date,toDate:last.date};
+}
+function mfFlows(){
+  let rows=[]; try{ rows=JSON.parse(localStorage.getItem('cbr_fii')||'[]'); }catch(e){}
+  rows=rows.filter(r=>r&&r.date&&(r.fb||r.fs||r.db||r.ds)).sort((a,b)=>String(b.date).localeCompare(String(a.date)));
+  if(!rows.length) return null;
+  const sum=(arr,f)=>arr.reduce((s,r)=>s+f(r),0), fN=r=>(+r.fb||0)-(+r.fs||0), dN=r=>(+r.db||0)-(+r.ds||0);
+  const r20=rows.slice(0,20), r5=rows.slice(0,5);
+  return {date:rows[0].date, n20:r20.length, n5:r5.length, f20:sum(r20,fN), f5:sum(r5,fN), d20:sum(r20,dN), d5:sum(r5,dN)};
+}
+// 20-session sum alone reacts weeks late (₹35k Cr October selling kept "Heavy Outflow" on while
+// FIIs were buying record amounts in November) — shift the option toward the last 5 sessions.
+function mfFlowOpt(base,m5,m20,small,big){
+  if(Math.sign(m5)===Math.sign(m20)||Math.abs(m5)<small) return base;
+  const steps=Math.abs(m5)>=big?2:1;
+  return Math.max(0,Math.min(4,base+(m5>0?-steps:steps)));
+}
+function mfCr(v){ return (v>=0?'+':'−')+'₹'+Math.abs(Math.round(v)).toLocaleString('en-IN')+' Cr'; }
+function mfMonthsIntoFY(month){ const m=/^(\d{4})-(\d{2})/.exec(month||''); if(!m) return null; const mo=+m[2]; return mo>=4?mo-3:mo+9; }
+function mfEarningsLive(){
+  try{
+    const cache=(typeof grLoadCache==='function')?grLoadCache():null; if(!cache||!cache.files) return null;
+    const by={}; cache.files.forEach(f=>{ const q=(typeof grFileQtr==='function')?grFileQtr(f):null; if(!q||!f.cos) return; (by[q.key]=by[q.key]||{q:q,vals:{}}); f.cos.forEach(c=>{ if(c&&c.py!=null&&!isNaN(c.py)&&c.n) by[q.key].vals[c.n]=+c.py; }); });
+    const ks=Object.keys(by).sort(); if(!ks.length) return null;
+    const med=a=>{ a=a.slice().sort((x,y)=>x-y); const n=a.length; return n?(n%2?a[(n-1)/2]:(a[n/2-1]+a[n/2])/2):null; };
+    const cur=by[ks[ks.length-1]], cv=Object.values(cur.vals); if(cv.length<15) return null;
+    const pv=ks.length>1?Object.values(by[ks[ks.length-2]].vals):[];
+    return {q:cur.q.label||ks[ks.length-1], med:med(cv), n:cv.length, prev:pv.length>=15?med(pv):null, beat:cv.filter(v=>v>0).length};
+  }catch(e){ return null; }
+}
+// one resolver per indicator (matched by name fragment) → {opt, txt, kind, date, src}
+var MF_RESOLVERS={
+  'RBI Interest':(F)=>{ const r=F.rbi; const md=mfMDLatest('repo'); if(!r&&!md) return null;
+    let o=r?Object.assign({},r):{repo:md.v,date:md.date,last:'hold',stance:''};
+    if(md&&r&&md.date>r.date&&Math.abs(md.v-r.repo)>=0.1){ o={repo:md.v,date:md.date,last:md.v>r.repo?'hike':'cut',stance:'',src:'Market Data tab repo '+md.v+'%'}; }
+    const s=String(o.stance||'').toLowerCase();
+    let opt; if(/tighten/.test(s)||o.last==='hike') opt=(+o.hikes12m||0)>=100?4:3; else if(/accommodat/.test(s)||o.last==='cut') opt=(+o.cuts12m||0)>=100?0:1; else opt=2;
+    return {opt, txt:`Repo ${(+o.repo).toFixed(2)}% · last move: ${o.last||'hold'}${o.stance?' · stance '+o.stance:''}`, kind:'official', date:o.date, src:o.src||'RBI', lim:75}; },
+  'Inflation':(F)=>{ const md=mfMDLatest('cpi'); let c=F.cpi; if(md&&(!c||md.date>c.date)) c={v:md.v,date:md.date,src:'Market Data tab CPI'}; if(!c) return null;
+    return {opt:mfBand(+c.v,[2,4,5,6.5]), txt:`CPI ${(+c.v).toFixed(2)}%${c.month?' ('+c.month+')':''}`+(c.next?` · next print ${mfFmtD(c.next)}`:''), kind:'official', date:c.date, src:c.src, lim:45, next:c.next}; },
+  'Crude Oil':(F)=>{ const md=mfMDLatest('crude'); const live=md&&mfDays(md.date)<=10; const c=live?{v:md.v,date:md.date,src:'NSE fetch / Market Data'}:F.crude; if(!c) return null;
+    const ch=mfMDChange('crude',30);
+    return {opt:mfBand(+c.v,[60,75,85,100.0001]), txt:`Brent $${(+c.v).toFixed(1)}`+(ch?` · 1M ${ch.pct>=0?'+':''}${ch.pct.toFixed(1)}%`:''), kind:live?'live':'official', date:c.date, src:c.src, lim:live?10:20}; },
+  'RBI Liquidity':(F)=>{ const l=F.liquidity; if(!l||l.laf==null) return null;
+    const v=+l.laf; const opt=v>=3?0:v>=0.5?1:v>-0.5?2:v>-2?3:4;
+    return {opt, txt:`Net LAF ${v>=0?'surplus':'deficit'} ₹${Math.abs(v).toFixed(2)} lakh Cr`, kind:'official', date:l.date, src:l.src||'RBI money-market data', lim:30}; },
+  'Government Capex':(F)=>{ const c=F.capex; if(!c) return null; const mo=mfMonthsIntoFY(c.month)||6, ratio=(+c.pctBE)/(mo*100/12), y=+c.yoy||0;
+    const opt=y<=-10?4:(ratio>=1.15&&y>=15)?0:(ratio>=1.0&&y>=5)?1:ratio>=0.9?2:3;
+    return {opt, txt:`${(+c.pctBE).toFixed(1)}% of Budget spent in ${mo} months (pace ${ratio.toFixed(2)}× · YoY ${y>=0?'+':''}${y.toFixed(1)}%)`, kind:'official', date:c.date, src:c.src, lim:50, next:c.next}; },
+  'Rupee':(F)=>{ const md=mfMDLatest('inr'); const live=md&&mfDays(md.date)<=10; const c=live?{v:md.v,date:md.date,src:'open.er-api / NSE fetch'}:F.inr; if(!c) return null;
+    const ch=mfMDChange('inr',30);
+    return {opt:mfBand(+c.v,[84,88,92,96.0001]), txt:`₹${(+c.v).toFixed(2)}/USD`+(ch?` · 1M ${ch.pct>=0?'weaker ':'stronger '}${Math.abs(ch.pct).toFixed(1)}%`:''), kind:live?'live':'official', date:c.date, src:c.src, lim:live?10:20}; },
+  'Global Risk':(F)=>{ const g=F.global, fl=mfFlows(), parts=[]; let pts=0, any=false, date=g?g.date:null;
+    if(g){ any=true; if(g.fed==='hike'){pts-=1;parts.push('Fed hiked −1');} else if(g.fed==='cut'){pts+=1;parts.push('Fed cut +1');} else if(g.fedPrev==='hike'){pts-=0.5;parts.push('Fed on hold after a hike −½');} else if(g.fedPrev==='cut'){pts+=0.5;parts.push('Fed on hold after a cut +½');}
+      if(+g.us10y>=4.75){pts-=1;parts.push('US 10Y '+g.us10y+'% −1');} else if(+g.us10y&&+g.us10y<=4){pts+=1;parts.push('US 10Y '+g.us10y+'% +1');} }
+    if(fl&&mfDays(fl.date)<=10){ any=true; if(fl.date>date) date=fl.date; const f=fl.f5; const p=f>=10000?1.5:f>=3000?0.5:f<=-10000?-1.5:f<=-3000?-0.5:0; if(p){pts+=p;parts.push('FII 5-day '+mfCr(f)+' '+(p>0?'+':'')+p);} }
+    const ic=mfMDChange('inr',30); if(ic&&mfDays(ic.toDate)<=10){ any=true; if(ic.pct<=-1){pts+=1;parts.push('Rupee 1M stronger +1');} else if(ic.pct>=1.5){pts-=1;parts.push('Rupee 1M weaker −1');} }
+    const cc=mfMDChange('crude',30); if(cc&&mfDays(cc.toDate)<=10){ any=true; if(cc.pct<=-8){pts+=1;parts.push('Crude 1M '+cc.pct.toFixed(0)+'% +1');} else if(cc.pct>=10){pts-=1;parts.push('Crude 1M +'+cc.pct.toFixed(0)+'% −1');} }
+    const vx=mfMDLatest('vix'); if(vx&&mfDays(vx.date)<=7){ any=true; if(vx.v>=20){pts-=1;parts.push('India VIX '+vx.v.toFixed(1)+' −1');} else if(vx.v<=13){pts+=0.5;parts.push('India VIX '+vx.v.toFixed(1)+' +½');} }
+    if(!any) return null;
+    const opt=pts>=2.5?0:pts>=1?1:pts>=-1?2:pts>=-3?3:4;
+    return {opt, txt:`Composite ${pts>=0?'+':''}${pts}: ${parts.join(' · ')||'no stress signals'}`, kind:(fl&&mfDays(fl.date)<=10)?'live':'official', date, src:(g?g.src:'')+(fl?' + NSE flows/VIX/INR/crude':''), lim:45}; },
+  'Corporate Earnings':(F)=>{ const L=mfEarningsLive(); let e=null;
+    if(L) e={med:L.med,prev:L.prev,q:L.q,date:mfIstToday(),src:`${L.n} companies in your loaded ${L.q} dashboards`,kind:'live'};
+    else if(F.earnings) e=Object.assign({kind:'official'},F.earnings);
+    if(!e) return null; const m=+e.med;
+    const opt=(m>=15&&e.prev!=null&&m>e.prev+3)?0:m>=15?1:m>=8?2:m>=0?3:4;
+    return {opt, txt:`${e.q}: median PAT growth ${m>=0?'+':''}${m.toFixed(1)}%`+(e.prev!=null?` (previous quarter ${e.prev>=0?'+':''}${(+e.prev).toFixed(1)}%)`:''), kind:e.kind, date:e.date, src:e.src, lim:120}; },
+  'Market Valuations':(F)=>{ let rows=[]; try{ rows=JSON.parse(localStorage.getItem('cbr_pe')||'[]'); }catch(e){}
+    const r=rows.filter(x=>x.type==='Index'&&x.sym==='NIFTY 50'&&+x.pe>0).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
+    const md=mfMDLatest('pe'); const pe=r?{v:+r.pe,date:r.date}:md; if(!pe) return null;
+    return {opt:mfBand(pe.v,[16,20,23,28]), txt:`Nifty 50 PE ${pe.v.toFixed(2)}x`, kind:'live', date:pe.date, src:'NSE', lim:10}; },
+  'FII / FPI':(F)=>{ const fl=mfFlows(); if(!fl) return null; const v=fl.f20;
+    const base=v>15000?0:v>500?1:v>=-500?2:v>-15000?3:4; const opt=mfFlowOpt(base,fl.f5,v,5000,15000);
+    return {opt, txt:`FII net ${mfCr(v)} over ${fl.n20} sessions · last 5 sessions ${mfCr(fl.f5)}`+(opt!==base?' → trend turning, moved '+Math.abs(opt-base)+' step(s)':''), kind:'live', date:fl.date, src:'NSE FII/DII', lim:10}; },
+  'SIP / Domestic':(F)=>{ const s=F.sip; if(!s) return null; const cr=+s.cr, pv=+s.prev||cr;
+    const opt=(cr>25000&&cr>=pv)?0:(cr>=20000&&cr>=pv*0.97)?1:(cr>=15000&&cr>=pv*0.97)?2:(cr<pv*0.9)?4:3;
+    return {opt, txt:`SIP ₹${cr.toLocaleString('en-IN')} Cr (${s.month||''}) vs ₹${pv.toLocaleString('en-IN')} Cr prior month`+(s.next?` · next AMFI data ~${mfFmtD(s.next)}`:''), kind:'official', date:s.date, src:s.src, lim:45, next:s.next}; },
+  'DII (Domestic':(F)=>{ const fl=mfFlows(); if(!fl) return null; const v=fl.d20;
+    const base=v>20000?0:v>10000?1:v>0?2:v>=-2000?3:4; const opt=mfFlowOpt(base,fl.d5,v,5000,15000);
+    return {opt, txt:`DII net ${mfCr(v)} over ${fl.n20} sessions · last 5 sessions ${mfCr(fl.d5)}`+(opt!==base?' → trend turning, moved '+Math.abs(opt-base)+' step(s)':''), kind:'live', date:fl.date, src:'NSE FII/DII', lim:10}; },
+  'Monsoon':(F)=>{ const m=F.monsoon; if(!m) return null; const v=+m.lpa;
+    return {opt:v>110?0:v>=105?1:v>=96?2:v>=90?3:4, txt:`${m.season||''} monsoon ${v}% of LPA${m.final===false?' (season in progress)':''}`, kind:'official', date:m.date, src:m.src, lim:300}; }
+};
+function mfOverrides(){ return mfLS(MF_OVR_KEY,{}); }
+function mfSetOverride(i,opt){ const o=mfOverrides(); o[i]={opt:+opt,ts:Date.now(),d:mfIstToday()}; try{ localStorage.setItem(MF_OVR_KEY,JSON.stringify(o)); }catch(e){} }
+function mfClearOverride(i){ const o=mfOverrides(); delete o[i]; try{ localStorage.setItem(MF_OVR_KEY,JSON.stringify(o)); }catch(e){} miAutoLinkIndicators(); renderAllIndicators(); updateAll(); }
+function miAutoLinkIndicators(){
+  MI_AUTO_REASON={};
+  const F=mfFacts(), O=mfOverrides();
+  MACRO_INDICATORS.forEach((ind,i)=>{
+    const key=Object.keys(MF_RESOLVERS).find(k=>ind.name.includes(k));
+    let r=null; try{ r=key?MF_RESOLVERS[key](F):null; }catch(e){ console.warn('auto indicator',ind.name,e); }
+    const ov=O[i];
+    if(r){
+      const age=mfDays(r.date), stale=age>(r.lim||30), dead=age>2*(r.lim||30);
+      const ovValid=ov&&(Date.now()-ov.ts)<30*864e5&&ov.d>=String(r.date||'').slice(0,10);
+      if(ovValid){ sel[i]=ov.opt; MI_AUTO_REASON[i]={kind:'override',txt:'Your setting from '+mfFmtD(ov.d)+' — data says: '+ind.options[r.opt].label.split('—')[0].trim()+' ('+r.txt+')',date:ov.d,auto:r}; return; }
+      if(dead){ MI_AUTO_REASON[i]={kind:'manual',txt:'Latest data is '+age+' days old ('+r.txt+') — too old to use. Enter the newest release below.',date:r.date,stale:true}; return; }
+      sel[i]=r.opt; MI_AUTO_REASON[i]={kind:r.kind,txt:r.txt,date:r.date,src:r.src,stale,next:r.next};
+    } else {
+      if(ov) sel[i]=ov.opt;
+      MI_AUTO_REASON[i]={kind:'manual',txt:ov?'Your setting from '+mfFmtD(ov.d):'No data source yet — set by hand, or enter the official figure below',date:ov?ov.d:null};
+    }
+  });
+}
+// ── "Official releases" box — type a figure once when it is published ──
+var MF_FORM=[
+  {k:'rbi',t:'🏦 RBI policy',f:[['repo','Repo %','number'],['last','Last move','sel:hike,hold,cut'],['stance','Stance','text'],['date','Decision date','date']]},
+  {k:'cpi',t:'🌡 CPI inflation',f:[['v','CPI YoY %','number'],['month','For month','month'],['date','Released on','date'],['next','Next release','date']]},
+  {k:'liquidity',t:'💧 Banking liquidity',f:[['laf','Net LAF ₹ lakh Cr (+surplus / −deficit)','number'],['date','As of','date']]},
+  {k:'capex',t:'🏗 Govt capex (CGA)',f:[['pctBE','% of Budget spent','number'],['yoy','YoY growth %','number'],['month','Up to month','month'],['date','Released on','date']]},
+  {k:'sip',t:'🏠 SIP (AMFI)',f:[['cr','SIP ₹ Cr this month','number'],['prev','Previous month ₹ Cr','number'],['month','For month','month'],['date','Released on','date']]},
+  {k:'monsoon',t:'🌧 Monsoon (IMD)',f:[['lpa','% of LPA','number'],['season','Season year','number'],['date','As of','date']]},
+  {k:'global',t:'🌐 US Fed / yields',f:[['fed','Last Fed action','sel:hike,hold,cut'],['fedPrev','Move before that','sel:hike,hold,cut'],['us10y','US 10Y %','number'],['date','As of','date']]},
+  {k:'crude',t:'🛢 Brent (if NSE fetch is off)',f:[['v','$/bbl','number'],['date','As of','date']]},
+  {k:'earnings',t:'📊 Earnings season',f:[['med','Median PAT growth %','number'],['prev','Previous quarter %','number'],['q','Quarter','text'],['date','As of','date']]}
+];
+function mfRenderForm(){
+  const el=document.getElementById('mfOfficial'); if(!el) return;
+  const F=mfFacts();
+  el.innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;">'+MF_FORM.map(g=>{
+    const cur=F[g.k]||{}, age=cur.date?mfDays(cur.date):null;
+    return '<div style="background:#fffaf3;border:1px solid #f1dcc0;border-radius:10px;padding:10px;"><div style="font-weight:800;font-size:12px;margin-bottom:4px;">'+g.t+'</div>'+
+      '<div style="font-size:9.5px;color:'+(age!=null&&cur.next&&mfDays(cur.next)>=0?'#b71c1c':'#6b7498')+';margin-bottom:6px;">'+(cur.date?('Using: '+(cur.user?'your entry':'built-in')+' · '+mfFmtD(cur.date)+(cur.next?(' · next due '+mfFmtD(cur.next)+(mfDays(cur.next)>=0?' ⚠ due now':'')):'')):'Not set')+'</div>'+
+      g.f.map(([fk,lab,ty])=>{ const v=cur[fk]==null?'':cur[fk]; const id='mf-'+g.k+'-'+fk;
+        if(ty.startsWith('sel:')) return '<label style="display:block;font-size:10px;color:#5a6080;margin-top:4px;">'+lab+'<select id="'+id+'" style="width:100%;padding:4px;border:1px solid #e0d6c6;border-radius:6px;font-size:11px;">'+ty.slice(4).split(',').map(o=>'<option'+(o===v?' selected':'')+'>'+o+'</option>').join('')+'</select></label>';
+        return '<label style="display:block;font-size:10px;color:#5a6080;margin-top:4px;">'+lab+'<input id="'+id+'" type="'+ty+'" step="any" value="'+String(v).replace(/"/g,'&quot;')+'" style="width:100%;padding:4px;border:1px solid #e0d6c6;border-radius:6px;font-size:11px;box-sizing:border-box;"></label>'; }).join('')+
+      '<button onclick="mfSaveGroup(\''+g.k+'\')" style="margin-top:7px;width:100%;padding:5px;border:none;border-radius:6px;background:#ff7c00;color:#fff;font-weight:800;font-size:11px;cursor:pointer;">Save</button></div>';
+  }).join('')+'</div>';
+}
+function mfSaveGroup(k){
+  const g=MF_FORM.find(x=>x.k===k); if(!g) return; const o={};
+  g.f.forEach(([fk,lab,ty])=>{ const el=document.getElementById('mf-'+k+'-'+fk); if(!el) return; let v=el.value; if(v==='') return; if(ty==='number') v=+v; o[fk]=v; });
+  if(!o.date) o.date=mfIstToday();
+  if(k==='rbi'&&o.repo!=null){ const F=mfFacts(); const prev=F.rbi; if(prev&&!o.last) o.last=o.repo>prev.repo?'hike':o.repo<prev.repo?'cut':'hold'; o.src='Your entry: RBI '+mfFmtD(o.date); }
+  if(!o.src) o.src='Your entry ('+mfFmtD(o.date)+')';
+  const u=mfUserFacts(); u[k]=o; try{ localStorage.setItem(MF_USER_KEY,JSON.stringify(u)); }catch(e){}
+  miAutoLinkIndicators(); renderAllIndicators(); updateAll(); mfRenderForm();
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════
+// v45 📈 PRICE MOVES TAB — 1 Day · 1 Week · 15 Days · 1 Month · 3 Months, every window
+// counted back from TODAY (IST). Reads the NSE closing prices already stored by the fetch
+// (cbr_px + delivery close), so it needs no extra download. Also shows what moved the
+// market (crude, rupee, FII flows) and which sectors are running ahead of the macro view.
+// ══════════════════════════════════════════════════════════════════════════
+var PX_WIN=[['d1','1 Day',1],['w1','1 Week',7],['d15','15 Days',15],['m1','1 Month',30],['m3','3 Months',91]];
+var PX_TOL={w1:4,d15:5,m1:7,m3:12};
+var PX_STATE={view:'co',sort:'w1',dir:-1,q:'',sec:'All'};
+function pxHistory(){
+  const H={};
+  try{ JSON.parse(localStorage.getItem('cbr_px')||'[]').forEach(r=>{ if(r&&r.date&&r.p) H[r.date]=Object.assign(H[r.date]||{},r.p); }); }catch(e){}
+  try{ JSON.parse(localStorage.getItem('cbr_delivery')||'[]').forEach(r=>{ const v=parseFloat(r&&r.cp); if(r&&r.date&&r.sym&&v>0){ const d=H[r.date]||(H[r.date]={}); const s=String(r.sym).toUpperCase(); if(!d[s]) d[s]=v; } }); }catch(e){}
+  try{ getMDHistory().forEach(r=>{ const v=mfNum(r.nifty); if(r.date&&v>0){ const d=H[r.date]||(H[r.date]={}); d['NIFTY 50']=v; } }); }catch(e){}
+  try{ JSON.parse(localStorage.getItem('cbr_vix')||'[]').forEach(r=>{ const v=mfNum(r&&r.nf); if(r&&r.date&&v>0){ const d=H[r.date]||(H[r.date]={}); if(!d['NIFTY 50']) d['NIFTY 50']=v; } }); }catch(e){}
+  return {H, dates:Object.keys(H).filter(d=>/^\d{4}-\d{2}-\d{2}/.test(d)).sort()};
+}
+function pxCalc(sym,P,today){
+  if(!sym||!P.dates.length) return null; sym=String(sym).toUpperCase();
+  let i=P.dates.length-1; while(i>=0&&!(P.H[P.dates[i]][sym]>0)) i--; if(i<0) return null;
+  const d=P.dates[i], c=P.H[d][sym], out={c,d,ref:{}};
+  for(let j=i-1;j>=0;j--){ const x=P.H[P.dates[j]][sym]; if(x>0){ if((Date.parse(d)-Date.parse(P.dates[j]))/864e5<=6){ out.d1=(c/x-1)*100; out.ref.d1=P.dates[j]; } break; } }
+  const t0=Date.parse(today);
+  PX_WIN.slice(1).forEach(([k,,n])=>{
+    const target=t0-n*864e5, lo=target-PX_TOL[k]*864e5; out[k]=null;
+    for(let j=P.dates.length-1;j>=0;j--){ const tj=Date.parse(P.dates[j]); if(tj>target) continue; if(tj<lo) break; const x=P.H[P.dates[j]][sym]; if(x>0&&P.dates[j]<d){ out[k]=(c/x-1)*100; out.ref[k]=P.dates[j]; break; } }
+  });
+  return out;
+}
+function pxMed(a){ a=a.filter(v=>v!=null&&!isNaN(v)).sort((x,y)=>x-y); const n=a.length; return n?(n%2?a[(n-1)/2]:(a[n/2-1]+a[n/2])/2):null; }
+function pxRows(){
+  const P=pxHistory(), today=mfIstToday(), seen={}, rows=[];
+  const list=(typeof CR_DATA!=='undefined'&&Array.isArray(CR_DATA))?CR_DATA:[];
+  const map=(typeof MI_NAME_TO_SYMBOL!=='undefined')?MI_NAME_TO_SYMBOL:{};
+  list.forEach(d=>{ const s=(d.sym||map[d.name]||'').toUpperCase(); if(!s||seen[s]) return; seen[s]=1; const m=pxCalc(s,P,today); rows.push({n:d.name,s:d.sector||'—',sym:s,m}); });
+  const extra={}; P.dates.forEach(dt=>Object.keys(P.H[dt]).forEach(s=>{ if(!seen[s]&&s!=='NIFTY 50') extra[s]=1; }));
+  Object.keys(extra).forEach(s=>{ rows.push({n:s,s:'Other tracked',sym:s,m:pxCalc(s,P,today)}); });
+  return {P,today,rows,nifty:pxCalc('NIFTY 50',P,today)};
+}
+function pxCell(v,ref){
+  if(v==null||isNaN(v)) return '<td class="px-c" style="color:#c0c4d4;" title="No closing price near that date yet">—</td>';
+  const a=Math.min(0.6,Math.abs(v)/14+0.06), bg=v>=0?`rgba(0,150,80,${a})`:`rgba(220,40,40,${a})`, fg=Math.abs(v)>7?'#fff':(v>=0?'#004d26':'#8b1010');
+  return `<td class="px-c" style="background:${bg};color:${fg};font-weight:800;" title="${ref?'vs close of '+mfFmtD(ref):''}">${v>=0?'+':''}${v.toFixed(1)}%</td>`;
+}
+function pxSectorMacro(sec){ try{ if(typeof cvSectorMacro==='function'){ const m=cvSectorMacro(sec); if(m) return m; } }catch(e){} return null; }
+function pxEvents(D){
+  const ev=[], secMed=(re,k)=>{ const v=pxMed(D.rows.filter(r=>re.test(r.s)&&r.m).map(r=>r.m[k])); return v==null?'':` <span style="color:#5a6080;">(their median 1W: ${v>=0?'+':''}${v.toFixed(1)}%)</span>`; };
+  const cw=mfMDChange('crude',7), cm=mfMDChange('crude',30), iw=mfMDChange('inr',7), fl=mfFlows(), nw=D.nifty&&D.nifty.w1;
+  const cr=cw&&Math.abs(cw.pct)>=5?cw:(cm&&Math.abs(cm.pct)>=8?cm:null);
+  if(cr){ const down=cr.pct<0, per=cr===cw?'1 week':'1 month';
+    ev.push([down?'🟢':'🔴',`Brent ${down?'fell':'rose'} ${Math.abs(cr.pct).toFixed(1)}% in ${per} ($${cr.from.toFixed(1)} → $${cr.to.toFixed(1)})`,
+      (down?'Tailwind':'Headwind')+' for oil users — OMCs, paints, aviation, tyres, chemicals'+secMed(/OMC|Downstream|Paint|Aviation|Tyre|Chemical/i,'w1')+'; '+(down?'headwind':'tailwind')+' for upstream producers'+secMed(/Upstream/i,'w1')]); }
+  if(iw&&Math.abs(iw.pct)>=0.6){ const strong=iw.pct<0;
+    ev.push([strong?'🟢':'🟠',`Rupee ${strong?'strengthened':'weakened'} ${Math.abs(iw.pct).toFixed(1)}% in 1 week (₹${iw.from.toFixed(2)} → ₹${iw.to.toFixed(2)})`,
+      strong?'Helps importers and lowers imported inflation; small drag on IT / pharma exporters'+secMed(/IT Services|Pharma/i,'w1'):'Lifts USD earners — IT, pharma, textiles'+secMed(/IT Services|Pharma|Textile/i,'w1')+'; hurts importers']); }
+  if(fl&&mfDays(fl.date)<=10&&Math.abs(fl.f5)>=7500){ const buy=fl.f5>0;
+    ev.push([buy?'🟢':'🔴',`FIIs ${buy?'bought':'sold'} ${mfCr(Math.abs(fl.f5)).slice(1)} net in the last ${fl.n5} sessions`+(Math.sign(fl.f5)!==Math.sign(fl.f20)?` — a turn after ${mfCr(fl.f20)} over 20 sessions`:''),
+      'Foreign flows move large-cap banks and IT first'+secMed(/^Banking|IT Services/i,'w1')]); }
+  if(nw!=null&&Math.abs(nw)>=2.5) ev.push([nw>0?'🟢':'🔴',`Nifty 50 ${nw>0?'up':'down'} ${Math.abs(nw).toFixed(1)}% in 1 week`, nw>0?'Broad rally — check the sector table for leaders':'Broad sell-off — check which sectors held up']);
+  return ev;
+}
+function pxRender(){
+  const el=document.getElementById('pxBody'); if(!el) return;
+  const D=pxRows(), st=PX_STATE, N=D.nifty;
+  const withData=D.rows.filter(r=>r.m), last=D.P.dates.length?D.P.dates[D.P.dates.length-1]:null, first=D.P.dates[0];
+  const age=last?mfDays(last):null;
+  let h='';
+  // headline strip — Nifty plus the macro drivers
+  const tiles=[['Nifty 50',N?N.c.toLocaleString('en-IN',{maximumFractionDigits:0}):'—',N?PX_WIN.map(([k,l])=>`<span style="margin-right:7px;">${({d1:'1D',w1:'1W',d15:'15D',m1:'1M',m3:'3M'})[k]} <b style="color:${N[k]==null?'#9aa0b8':N[k]>=0?'#006b30':'#b71c1c'}">${N[k]==null?'—':(N[k]>=0?'+':'')+N[k].toFixed(1)+'%'}</b></span>`).join(''):'No Nifty closes stored yet']];
+  const cb=mfMDLatest('crude'), cw=mfMDChange('crude',7), cm=mfMDChange('crude',30); tiles.push(['Brent $/bbl',cb?cb.v.toFixed(1):'—',(cw?`1W <b>${cw.pct>=0?'+':''}${cw.pct.toFixed(1)}%</b> · `:'')+(cm?`1M <b>${cm.pct>=0?'+':''}${cm.pct.toFixed(1)}%</b>`:'')||'needs daily fetch']);
+  const ib=mfMDLatest('inr'), iw=mfMDChange('inr',7), im=mfMDChange('inr',30); tiles.push(['₹ / USD',ib?ib.v.toFixed(2):'—',(iw?`1W <b>${iw.pct>=0?'+':''}${iw.pct.toFixed(2)}%</b> · `:'')+(im?`1M <b>${im.pct>=0?'+':''}${im.pct.toFixed(2)}%</b>`:'')||'needs daily fetch']);
+  const fl=mfFlows(); tiles.push(['FII net (5 / 20 sessions)',fl?mfCr(fl.f5):'—',fl?'20 sessions '+mfCr(fl.f20)+' · DII 5 sessions '+mfCr(fl.d5):'needs NSE fetch']);
+  h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:12px;">'+tiles.map(t=>`<div class="card" style="padding:10px 12px;margin:0;"><div style="font-size:10px;font-weight:800;color:#8a90a8;text-transform:uppercase;">${t[0]}</div><div style="font-size:20px;font-weight:900;color:#1a1e2e;">${t[1]}</div><div style="font-size:10.5px;color:#5a6080;margin-top:2px;">${t[2]}</div></div>`).join('')+'</div>';
+  // macro events
+  const ev=pxEvents(D);
+  h+='<div class="card" style="margin-bottom:12px;"><h2 style="margin-top:0;"><span class="ico">⚡</span>What moved the market</h2>'+(ev.length?ev.map(e=>`<div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid #f3efe6;"><span style="font-size:16px;">${e[0]}</span><div><div style="font-size:12px;font-weight:800;color:#1a1e2e;">${e[1]}</div><div style="font-size:11px;color:#3a3f5c;">${e[2]}</div></div></div>`).join(''):'<div style="font-size:11.5px;color:#6b7498;">No big crude, rupee, FII or Nifty move in the stored data. Events appear here automatically once the daily NSE fetch has a few days of history.</div>')+
+    '<div style="font-size:10.5px;color:#6b7498;margin-top:6px;">These same numbers now feed the 13 Indicators automatically, so the Sector Impact and Conviction scores move with them.</div></div>';
+  // controls
+  const secs=['All'].concat(Array.from(new Set(D.rows.map(r=>r.s))).sort());
+  h+='<div class="card" style="margin:0;"><div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px;">'+
+    ['co','sec'].map(v=>`<button onclick="PX_STATE.view='${v}';pxRender()" style="padding:6px 13px;border-radius:18px;border:1px solid ${st.view===v?'#ff7c00':'#e0dccf'};background:${st.view===v?'#ff7c00':'#fff'};color:${st.view===v?'#fff':'#3a3f5c'};font-weight:800;font-size:12px;cursor:pointer;">${v==='co'?'🏢 Companies':'🧭 Sectors vs macro'}</button>`).join('')+
+    (st.view==='co'?`<input id="pxQ" placeholder="Search company or symbol…" value="${st.q.replace(/"/g,'&quot;')}" oninput="PX_STATE.q=this.value;pxRender();const q=document.getElementById('pxQ');q.focus();q.setSelectionRange(q.value.length,q.value.length);" style="flex:1;min-width:170px;padding:7px 11px;border:1px solid #e0dccf;border-radius:18px;font-size:12px;">
+     <select onchange="PX_STATE.sec=this.value;pxRender()" style="padding:6px 8px;border:1px solid #e0dccf;border-radius:8px;font-size:12px;max-width:220px;">${secs.map(s=>`<option${s===st.sec?' selected':''}>${s}</option>`).join('')}</select>`:'')+
+    '<button onclick="pxCsv()" style="padding:6px 12px;border-radius:8px;border:1px solid #ff7c00;background:#fff3e0;color:#9a4a00;font-weight:800;font-size:11.5px;cursor:pointer;">⬇ CSV</button></div>';
+  h+=`<div style="font-size:10.5px;color:${age!=null&&age>4?'#b71c1c':'#6b7498'};margin-bottom:6px;">Today ${mfFmtD(D.today)} · latest close in this browser ${last?mfFmtD(last)+(age>4?' ⚠ '+age+' days old — run the NSE fetch':''):'none'} · ${D.P.dates.length} price day(s) stored${first?' since '+mfFmtD(first):''} · ${withData.length} of ${D.rows.length} companies priced. Each window compares the latest close with the close on or just before today minus 1 / 7 / 15 / 30 / 91 days (hover a cell to see that date).</div>`;
+  const hdr=(k,l)=>`<th onclick="if(PX_STATE.sort==='${k}')PX_STATE.dir*=-1;else{PX_STATE.sort='${k}';PX_STATE.dir=-1;}pxRender()" style="cursor:pointer;">${l}${st.sort===k?(st.dir<0?' ▼':' ▲'):''}</th>`;
+  if(st.view==='co'){
+    const q=st.q.trim().toLowerCase();
+    let L=D.rows.filter(r=>(st.sec==='All'||r.s===st.sec)&&(!q||r.n.toLowerCase().includes(q)||r.sym.toLowerCase().includes(q)));
+    const val=r=>{ if(st.sort==='n') return r.n; if(st.sort==='c') return r.m?r.m.c:null; if(st.sort==='vn') return r.m&&r.m.m1!=null&&N&&N.m1!=null?r.m.m1-N.m1:null; return r.m?r.m[st.sort]:null; };
+    L.sort((a,b)=>{ const x=val(a),y=val(b); if(x==null&&y==null) return 0; if(x==null) return 1; if(y==null) return -1; return (typeof x==='string'?x.localeCompare(y):x-y)*st.dir; });
+    h+='<div style="overflow-x:auto;max-height:70vh;border:1px solid #ece8de;border-radius:10px;"><table class="px-t"><thead><tr>'+hdr('n','Company')+hdr('c','Close ₹')+PX_WIN.map(([k,l])=>hdr(k,l)).join('')+hdr('vn','1M vs Nifty')+'</tr></thead><tbody>';
+    L.forEach(r=>{ const m=r.m;
+      h+=`<tr><td><b>${r.n}</b><div style="font-size:10px;color:#8a90a8;">${r.sym} · ${r.s}</div></td><td class="px-c" style="font-weight:700;">${m?m.c.toLocaleString('en-IN',{maximumFractionDigits:2})+'<div style="font-size:9px;color:#9aa0b8;font-weight:600;">'+mfFmtD(m.d)+'</div>':'—'}</td>`+
+        PX_WIN.map(([k])=>pxCell(m?m[k]:null,m?m.ref[k]:null)).join('')+pxCell(m&&m.m1!=null&&N&&N.m1!=null?m.m1-N.m1:null,null)+'</tr>'; });
+    if(!L.length) h+='<tr><td colspan="8" style="text-align:center;padding:16px;color:#9aa0b8;">No company matches.</td></tr>';
+    h+='</tbody></table></div>';
+  } else {
+    const by={}; D.rows.forEach(r=>{ if(!r.m) return; (by[r.s]=by[r.s]||[]).push(r); });
+    let S=Object.keys(by).map(s=>{ const a=by[s], o={s,n:a.length}; PX_WIN.forEach(([k])=>o[k]=pxMed(a.map(r=>r.m[k]))); const best=a.filter(r=>r.m.m1!=null).sort((x,y)=>y.m.m1-x.m.m1);
+      o.top=best[0]?best[0].n+' '+(best[0].m.m1>=0?'+':'')+best[0].m.m1.toFixed(1)+'%':''; o.mac=pxSectorMacro(s);
+      const rel=o.m1!=null&&N&&N.m1!=null?o.m1-N.m1:null; o.vn=rel;
+      o.flag=(rel!=null&&o.mac)?(rel>=4&&o.mac.pts<=-1?['🔍 Price ahead of macro','Market is pricing an improvement the macro rules do not show yet — check crude, rupee, rates and news for this sector','#9a4a00']:rel<=-4&&o.mac.pts>=1?['🔍 Price lagging macro','Macro rules are positive but the shares are falling — a stock-specific or sentiment issue may be at work','#1e3a8a']:null):null; return o; });
+    const k=st.sort; S.sort((a,b)=>{ const x=k==='n'?a.s:k==='mac'?(a.mac?a.mac.pts:null):a[k], y=k==='n'?b.s:k==='mac'?(b.mac?b.mac.pts:null):b[k]; if(x==null&&y==null) return 0; if(x==null) return 1; if(y==null) return -1; return (typeof x==='string'?x.localeCompare(y):x-y)*st.dir; });
+    h+='<div style="font-size:10.5px;color:#5a6080;margin-bottom:6px;">Median move of each sector\'s companies. <b>Macro</b> = this sector\'s points from the Sector Impact rules (which now use the auto-updated indicators). A 🔍 flag means price and macro disagree by a wide margin.</div>';
+    h+='<div style="overflow-x:auto;max-height:70vh;border:1px solid #ece8de;border-radius:10px;"><table class="px-t"><thead><tr>'+hdr('n','Sector')+'<th>Cos</th>'+PX_WIN.map(([k,l])=>hdr(k,l)).join('')+hdr('vn','1M vs Nifty')+hdr('mac','Macro')+'<th style="text-align:left;">Check</th></tr></thead><tbody>';
+    S.forEach(o=>{ h+=`<tr><td><b>${o.s}</b>${o.top?'<div style="font-size:10px;color:#8a90a8;">1M leader: '+o.top+'</div>':''}</td><td class="px-c">${o.n}</td>`+PX_WIN.map(([k])=>pxCell(o[k],null)).join('')+pxCell(o.vn,null)+
+      `<td class="px-c" style="font-weight:800;color:${!o.mac?'#9aa0b8':o.mac.pts>0?'#006b30':o.mac.pts<0?'#b71c1c':'#b35c00'};">${o.mac?(o.mac.pts>0?'+':'')+o.mac.pts:'—'}</td><td style="font-size:10.5px;min-width:200px;">${o.flag?'<b style="color:'+o.flag[2]+'">'+o.flag[0]+'</b><div style="color:#5a6080;">'+o.flag[1]+'</div>':''}</td></tr>`; });
+    if(!S.length) h+='<tr><td colspan="10" style="text-align:center;padding:16px;color:#9aa0b8;">No price data yet — press Fetch in NSE Market Intel.</td></tr>';
+    h+='</tbody></table></div>';
+  }
+  h+='</div>';
+  el.innerHTML=h;
+}
+function pxCsv(){
+  const D=pxRows(), L=[['Company','Symbol','Sector','Close','Close date'].concat(PX_WIN.map(w=>w[1]+' %'))];
+  D.rows.forEach(r=>{ const m=r.m; L.push([r.n,r.sym,r.s,m?m.c:'',m?m.d:''].concat(PX_WIN.map(([k])=>m&&m[k]!=null?m[k].toFixed(2):''))); });
+  const csv=L.map(a=>a.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='Price_Moves_'+D.today+'.csv'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},400);
 }
 
 // ── SCORE / ALLOC HELPERS ─────────────────────────────────────────────────
@@ -3840,18 +4172,26 @@ function renderFDHistory(){
 
 // ── INDICATORS ────────────────────────────────────────────────────────────
 function renderAllIndicators(){
-  document.getElementById('allIndicators').innerHTML=MACRO_INDICATORS.map((ind,i)=>{
-    const opt=ind.options[sel[i]];
-    const autoTag=(typeof MI_AUTO_REASON!=='undefined'&&MI_AUTO_REASON[i])?`<div class="mi-auto-tag">🔄 Auto-linked from NSE data: ${MI_AUTO_REASON[i]}</div>`:'';
+  const R=(typeof MI_AUTO_REASON!=='undefined')?MI_AUTO_REASON:{};
+  const KIND={live:['🟢 LIVE','#006b30','#e6f4ef'],official:['📌 OFFICIAL','#1e3a8a','#eef3ff'],override:['✋ YOUR SETTING','#9a4a00','#fff3e0'],manual:['✋ MANUAL','#7a7f99','#f2f3f7']};
+  let nAuto=0,nStale=0;
+  const rows=MACRO_INDICATORS.map((ind,i)=>{
+    const opt=ind.options[sel[i]], a=R[i]||{kind:'manual',txt:'No data source'};
+    const k=KIND[a.kind]||KIND.manual; if(a.kind==='live'||a.kind==='official') nAuto++; if(a.stale) nStale++;
+    const when=a.date?' · as of '+mfFmtD(a.date)+(a.stale?' ⚠ old':''):'';
+    const tag=`<div style="flex-basis:100%;font-size:10px;line-height:1.5;margin:3px 0 2px;padding:4px 8px;border-radius:6px;background:${k[2]};color:${k[1]};"><b>${k[0]}</b> ${a.txt}${when}${a.src&&a.kind!=='override'?' <span style="color:#8a90a8;">('+a.src+')</span>':''}${a.kind==='override'?` <a href="javascript:void(0)" onclick="mfClearOverride(${i})" style="color:#ff7c00;font-weight:800;margin-left:6px;">↺ use live data</a>`:''}</div>`;
     return `<div class="mrow" style="flex-wrap:wrap;">
       <div class="mlabel" style="cursor:pointer;text-decoration:underline dotted;" onclick="showIndExplainer(${i})">${ind.icon} ${ind.name}</div>
       <select class="msel" onchange="changeMacro(${i},this.value)">
         ${ind.options.map((o,j)=>`<option value="${j}"${j===sel[i]?' selected':''}>${o.label}</option>`).join('')}
       </select>
       <div class="mbadge ${opt.cls}" id="badge-${i}">${opt.score>=0?'+':''}${opt.score}</div>
-      ${autoTag}
+      ${tag}
     </div>`;
   }).join('');
+  const head=`<div style="font-size:11px;background:#fff8ee;border:1px solid #f1dcc0;border-radius:8px;padding:7px 10px;margin-bottom:8px;color:#3a3f5c;"><b>${nAuto} of ${MACRO_INDICATORS.length}</b> indicators now follow the data automatically${nStale?` · <span style="color:#b71c1c;font-weight:700;">${nStale} need a newer official figure</span>`:''}. Picking a value by hand is kept only until newer data arrives (max 30 days).</div>`;
+  document.getElementById('allIndicators').innerHTML=head+rows;
+  try{ mfRenderForm(); }catch(e){}
 }
 function showIndExplainer(i){
   const ind=MACRO_INDICATORS[i];
@@ -3869,6 +4209,7 @@ function showIndExplainer(i){
 }
 function changeMacro(i,v){
   sel[i]=parseInt(v);
+  try{ mfSetOverride(i,parseInt(v)); miAutoLinkIndicators(); renderAllIndicators(); }catch(e){}
   const opt=MACRO_INDICATORS[i].options[parseInt(v)];
   const b=document.getElementById('badge-'+i);
   if(b){b.className='mbadge '+opt.cls;b.textContent=(opt.score>=0?'+':'')+opt.score;}
@@ -3921,7 +4262,9 @@ const RISK_DEFS=[
   {label:"Market Valuation",icon:"📐",explain:"Nifty PE above 25x = expensive. Above 28x = euphoric danger zone. Below 18x = buying opportunity. After Apr 2021 NSE uses consolidated earnings — long-term avg is now ~22–23x not 20x. Always compare PE to its own historical range, not absolute numbers.",sectorNote:"Banks: P/Book, Insurance: P/EV, Hospitals: EV/EBITDA. Single PE misleading across sectors.",
    calc:()=>{const s=mscore();return s>8?{d:'🟢',l:'Low Risk',c:'#006b30',bg:'#e6f4ef'}:s>2?{d:'🟡',l:'Medium',c:'#b35c00',bg:'#fff3e0'}:{d:'🔴',l:'High — Expensive',c:'#b71c1c',bg:'#fce8e8'};}},
   {label:"Price Momentum",icon:"📈",explain:"20%+ rally in 6 months often means good news is priced in. Momentum works in bull markets; in bear markets it accelerates losses. Best entry points come when valuation is low AND momentum is just starting.",sectorNote:"Sector RSI. If a sector doubled in 12 months, upside may be limited even if thesis intact.",
-   calc:()=>{const s=mscore();return s>5?{d:'🟢',l:'Strong Momentum',c:'#006b30',bg:'#e6f4ef'}:s>0?{d:'🟡',l:'Moderate',c:'#b35c00',bg:'#fff3e0'}:{d:'🔴',l:'Weak / Reversal Risk',c:'#b71c1c',bg:'#fce8e8'};}},
+   calc:()=>{let n=null;try{n=pxCalc('NIFTY 50',pxHistory(),mfIstToday());}catch(e){}
+     if(n&&n.m1!=null){const v=n.m1,t=' (Nifty 1M '+(v>=0?'+':'')+v.toFixed(1)+'%)';return v>=4?{d:'🟢',l:'Strong Momentum'+t,c:'#006b30',bg:'#e6f4ef'}:v>=-2?{d:'🟡',l:'Moderate'+t,c:'#b35c00',bg:'#fff3e0'}:{d:'🔴',l:'Weak / Reversal Risk'+t,c:'#b71c1c',bg:'#fce8e8'};}
+     const s=mscore();return s>5?{d:'🟢',l:'Strong Momentum',c:'#006b30',bg:'#e6f4ef'}:s>0?{d:'🟡',l:'Moderate',c:'#b35c00',bg:'#fff3e0'}:{d:'🔴',l:'Weak / Reversal Risk',c:'#b71c1c',bg:'#fce8e8'};}},
   {label:"FII Activity",icon:"🌍",explain:"FIIs hold 14.2% of NSE mkt cap. When FIIs sell, markets fall regardless of domestic fundamentals. Sustained FII buying (3+ months) = strong bull signal. DIIs now act as buffer but large FII outflows still hurt. Check FII/DII tab for live data.",sectorNote:"IT and Banking see maximum FII impact. FMCG, hospitals, power are more insulated.",
    calc:()=>{const s=mscore();return s>6?{d:'🟢',l:'FII Inflow',c:'#006b30',bg:'#e6f4ef'}:s>1?{d:'🟡',l:'Neutral',c:'#b35c00',bg:'#fff3e0'}:{d:'🔴',l:'FII Outflow',c:'#b71c1c',bg:'#fce8e8'};}},
   {label:"Credit Growth",icon:"🏦",explain:"Bank credit growth above 14% = strong economy. Below 8% = stress. Tightening cycles hit real estate, autos, NBFCs first. RBI rate cuts fuel credit expansion — AMC, NBFC, housing benefit. Watch MSME credit for small-cap signal.",sectorNote:"MSME credit = small-cap indicator. Retail loans = consumer confidence. Corporate credit = capex revival.",
@@ -6798,6 +7141,7 @@ async function miLoadFromServerCore(){
   refresh(()=>{ if(typeof CR_CONV!=='undefined') CR_CONV=null; if(typeof render==='function')render(); });
   refresh(()=>{ if(typeof recomputeSectorLiveRanks==='function') recomputeSectorLiveRanks(); if(typeof renderAll==='function')renderAll(); });
   refresh(()=>{ if(typeof mdAutoRefresh==='function') mdAutoRefresh(); });
+  refresh(()=>{ const pg=document.getElementById('page-px'); if(pg&&pg.classList.contains('active')&&typeof pxRender==='function') pxRender(); });
   return {added,updated,purged,trimmed:MI_TRIMMED};
 }
 function miExplainError(e){
@@ -6862,47 +7206,7 @@ async function miTriggerFetch(){
 }
 
 
-// ── AUTO-LINK: drive 3 of the 13 macro indicators from NSE-fetched data ──
-// (FII Flow Trend + DII Activity from cbr_fii, Market Valuations from cbr_pe).
-// Crude Oil and Rupee are NOT auto-linked — fetcher.py doesn't pull those,
-// so they stay on the manual Market Data tab as before. VIX/PCR are NOT
-// mapped to "Global Risk" either — that indicator is about US Fed/global
-// stress, not India's own options sentiment, so forcing that mapping would
-// inject a misleading signal rather than a real one.
-let MI_AUTO_REASON={};
-function miFindIndicator(fr){return MACRO_INDICATORS.findIndex(x=>x.name.includes(fr));}
-function miSetIndicatorAuto(idx,optIdx,reason){
-  if(idx<0)return;
-  sel[idx]=optIdx;
-  MI_AUTO_REASON[idx]=reason;
-}
-function miAutoLinkIndicators(){
-  MI_AUTO_REASON={};
-  const fiiIdx=miFindIndicator('FII / FPI');
-  const diiIdx=miFindIndicator('DII (Domestic');
-  const peIdx=miFindIndicator('Market Valuations');
-
-  // FII/DII: rolling sum over the last ~20 fetched sessions as a "per month" proxy
-  const fiiRows=load('fii').sort((a,b)=>b.date.localeCompare(a.date)).slice(0,20);
-  if(fiiRows.length){
-    const fiiNet=fiiRows.reduce((s,r)=>s+Number(r.fb||0)-Number(r.fs||0),0);
-    const diiNet=fiiRows.reduce((s,r)=>s+Number(r.db||0)-Number(r.ds||0),0);
-    let fOpt; if(fiiNet>15000)fOpt=0;else if(fiiNet>500)fOpt=1;else if(fiiNet>=-500)fOpt=2;else if(fiiNet>-15000)fOpt=3;else fOpt=4;
-    miSetIndicatorAuto(fiiIdx,fOpt,`FII net ${sign(fiiNet)}${fmtN(fiiNet)}Cr over last ${fiiRows.length} session(s) fetched`);
-    let dOpt; if(diiNet>20000)dOpt=0;else if(diiNet>10000)dOpt=1;else if(diiNet>0)dOpt=2;else if(diiNet>=-2000)dOpt=3;else dOpt=4;
-    miSetIndicatorAuto(diiIdx,dOpt,`DII net ${sign(diiNet)}${fmtN(diiNet)}Cr over last ${fiiRows.length} session(s) fetched`);
-  }
-
-  // Nifty 50 PE -> Market Valuations
-  const peRows=load('pe').filter(r=>r.type==='Index'&&r.sym==='NIFTY 50').sort((a,b)=>b.date.localeCompare(a.date));
-  if(peRows.length){
-    const pe=Number(peRows[0].pe);
-    if(pe>0){
-      let pOpt; if(pe<16)pOpt=0;else if(pe<20)pOpt=1;else if(pe<23)pOpt=2;else if(pe<28)pOpt=3;else pOpt=4;
-      miSetIndicatorAuto(peIdx,pOpt,`Nifty 50 PE ${pe.toFixed(2)}x as of ${peRows[0].date}`);
-    }
-  }
-}
+// v45: the auto-link engine (all 13 indicators) now lives next to MACRO_INDICATORS — see "AUTO-INDICATOR ENGINE".
 
 // NSE Market Intel — restored as admin-only. Members never see the tab (button
 // hidden, and showPage('mi') itself redirects non-admins). The server-poll loop
@@ -11532,23 +11836,21 @@ function cvMarket(sym){
   // price series (needs the v18 fetcher's cp field)
   var rows=load('delivery').filter(function(r){return (r.sym||'').toUpperCase()===sym;})
     .sort(function(a,b){return String(a.date).localeCompare(String(b.date));});
-  var px=rows.filter(function(r){return r.cp&&!isNaN(+r.cp)&&+r.cp>0;});
-  if(px.length>=5){
+  // v45: momentum is read from EVERY stored close (cbr_px + delivery), by calendar window counted
+  // from today. Before, only delivery rows were used (needed 5+), so most stocks had no price
+  // signal at all and a macro-driven rally never showed up. A 1-week term now catches fast moves.
+  if(!CV_PXH&&typeof pxHistory==='function') CV_PXH=pxHistory();
+  var pm=CV_PXH?pxCalc(sym,CV_PXH,mfIstToday()):null, nm=CV_PXH?pxCalc('NIFTY 50',CV_PXH,mfIstToday()):null;
+  if(pm&&(pm.m1!=null||pm.w1!=null)){
     any=true;
-    var win=px.slice(-21);                       // up to ~1 month of sessions
-    var p0=+win[0].cp, p1=+win[win.length-1].cp;
-    var ret=(p1-p0)/p0*100;
-    var md=getMDHistory();
-    var n0=cvNiftyAt(win[0].date,md), n1=cvNiftyAt(win[win.length-1].date,md);
-    var n1m=(!(n0&&n1)&&win.length>=15)?cvNifty1M():null;
-    if(n1m){ n0=100; n1=100*(1+n1m.m/100); }
-    if(n0&&n1){
-      var nret=(n1-n0)/n0*100, rs=ret-nret;
-      score += Math.max(-12, Math.min(12, rs*1.5));
-      parts.push('RS '+(rs>=0?'+':'')+rs.toFixed(1)+'% vs Nifty over '+win.length+' sessions (stock '+(ret>=0?'+':'')+ret.toFixed(1)+'%, Nifty '+(nret>=0?'+':'')+nret.toFixed(1)+'%)');
-    }else{
-      score += Math.max(-10, Math.min(10, ret*1.0));
-      parts.push('Price '+(ret>=0?'+':'')+ret.toFixed(1)+'% over '+win.length+' sessions');
+    if(pm.m1!=null){
+      var n1=(nm&&nm.m1!=null)?nm.m1:(function(){var x=cvNifty1M();return x?x.m:null;})();
+      if(n1!=null){ var rs=pm.m1-n1; score+=Math.max(-12,Math.min(12,rs*1.5)); parts.push('RS '+(rs>=0?'+':'')+rs.toFixed(1)+'% vs Nifty over 1 month (stock '+(pm.m1>=0?'+':'')+pm.m1.toFixed(1)+'%, Nifty '+(n1>=0?'+':'')+n1.toFixed(1)+'%)'); }
+      else { score+=Math.max(-10,Math.min(10,pm.m1)); parts.push('Price '+(pm.m1>=0?'+':'')+pm.m1.toFixed(1)+'% over 1 month'); }
+    }
+    if(pm.w1!=null){
+      var nw=(nm&&nm.w1!=null)?nm.w1:null, rw=nw!=null?pm.w1-nw:pm.w1;
+      score+=Math.max(-6,Math.min(6,rw*0.8)); parts.push('1-week move '+(pm.w1>=0?'+':'')+pm.w1.toFixed(1)+'%'+(nw!=null?' ('+(rw>=0?'+':'')+rw.toFixed(1)+'% vs Nifty)':''));
     }
   }
 
@@ -11936,7 +12238,7 @@ function cvTrigger(d, pr){
 //  Data health: companies whose score rests on old or incomplete inputs, top-ranked first.
 // ════════════════════════════════════════════════════════════════════════
 var CV_MOVE_DAY_PCT=5, CV_MOVE_WEEK_PCT=8, CV_MOVE_GATE_PCT=12, CV_MOVE_GATE_PTS=3;
-var CV_MOVES=null;
+var CV_MOVES=null; var CV_PXH=null;
 function cvMedian(a){ a=a.filter(function(v){return v!=null&&!isNaN(v);}).sort(function(x,y){return x-y;}); if(!a.length) return null; var m=Math.floor(a.length/2); return a.length%2?a[m]:(a[m-1]+a[m])/2; }
 function cvPriceSeries(rows, sym){
   return rows.filter(function(r){ return (r.sym||'').toUpperCase()===sym&&r.cp&&+r.cp>0; })
@@ -12132,7 +12434,7 @@ function cvDivergence(L){
 }
 function cvCompute(weights){
   var W = weights || CV_W;
-  CV_MACRO_CACHE = null; CV_CYCLE_CACHE = null; CV_MOVES=null;
+  CV_MACRO_CACHE = null; CV_CYCLE_CACHE = null; CV_MOVES=null; CV_PXH=null;
   var seen={}, out=[];
   var list = (typeof CR_DATA!=='undefined'&&Array.isArray(CR_DATA))?CR_DATA:[];
   list.forEach(function(d){
@@ -12317,7 +12619,8 @@ function slDetail(r){
   return h+'</div>';
 }
 function slPct(v){ if(v==null) return '<td class="sl-c sl-px" style="color:#c0c4d4;" title="Builds up as daily prices are fetched">—</td>'; var c=v>0?'#006b30':v<0?'#b71c1c':'#5a6080'; return '<td class="sl-c sl-px" style="color:'+c+';font-weight:700;">'+(v>0?'+':'')+v.toFixed(1)+'%</td>'; }
-function slPxCells(p){ if(!p) return '<td class="sl-c sl-px" style="color:#c0c4d4;">—</td>'+slPct(null)+slPct(null)+slPct(null);
+function slPxCells(p){ return ''; }
+function slPxCellsOld(p){ if(!p) return '<td class="sl-c sl-px" style="color:#c0c4d4;">—</td>'+slPct(null)+slPct(null)+slPct(null);
   var dd=new Date(p.d+'T00:00:00').toLocaleDateString('en-IN',{day:'2-digit',month:'short'});
   return '<td class="sl-c sl-px"><b>'+Number(p.c).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})+'</b><div class="sl-w">'+dd+'</div></td>'+slPct(p.w1)+slPct(p.w2)+slPct(p.m1); }
 function slRender(data,el,state){
@@ -12325,12 +12628,12 @@ function slRender(data,el,state){
   var list=slRowsFor(data,state.mode,state.q);
   var h='<div class="sl-bar"><button class="sl-tab'+(state.mode==='top'?' on':'')+'" data-m="top">🏆 Top 25</button><button class="sl-tab'+(state.mode==='all'?' on':'')+'" data-m="all">All '+data.rows.length+' companies</button><input class="sl-q" placeholder="Search company or sector…" value="'+slEsc(state.q)+'"></div>';
   h+='<div class="sl-hint">Tap any company to see exactly how its score was arrived at. Green = Good (60+), amber = Average, red = Weak (42 or less).</div>';
-  h+='<div class="sl-wrap"><table class="sl-t"><thead><tr><th>#</th><th style="text-align:left;">Company</th>'+SL_K.map(function(k){return '<th title="'+SL_ASK[k]+'"><span style="color:'+SL_COL[k]+'">'+SL_NAME[k]+'</span><div class="sl-w">'+SL_W[k]+'%</div></th>';}).join('')+'<th>Average</th><th>Bonus / cap</th><th>Final</th><th class="sl-pxh">Close ₹</th><th class="sl-pxh">1 Week</th><th class="sl-pxh">2 Weeks</th><th class="sl-pxh">1 Month</th></tr></thead><tbody>';
+  h+='<div class="sl-wrap"><table class="sl-t"><thead><tr><th>#</th><th style="text-align:left;">Company</th>'+SL_K.map(function(k){return '<th title="'+SL_ASK[k]+'"><span style="color:'+SL_COL[k]+'">'+SL_NAME[k]+'</span><div class="sl-w">'+SL_W[k]+'%</div></th>';}).join('')+'<th>Average</th><th>Bonus / cap</th><th>Final</th></tr></thead><tbody>';
   list.forEach(function(r,i){ var adj=(r.agree?(r.agree>0?'+5':'−5'):'')+(r.gates&&r.gates.length?(r.agree?' · ':'')+'cap':'');
     h+='<tr class="sl-r" data-n="'+slEsc(r.n)+'"><td class="sl-c sl-rk">'+(state.mode==='top'?(i+1):r.r)+(state.mode==='top'?'<div class="sl-w">overall '+r.r+'</div>':'')+'</td><td><b>'+slEsc(r.n)+'</b><div class="sl-sec">'+slEsc(r.s)+'</div></td>'+SL_K.map(function(k){return slCell(r.L[k]);}).join('')+'<td class="sl-c">'+Math.round(r.base)+'</td><td class="sl-c" style="font-weight:700;color:'+(r.gates&&r.gates.length?'#b71c1c':r.agree>0?'#006b30':r.agree<0?'#b71c1c':'#9aa0b8')+'">'+(adj||'—')+'</td><td class="sl-c sl-fn">'+r.c+'</td>'+slPxCells(r.px)+'</tr>';
-    if(state.open===r.n) h+='<tr><td colspan="15" style="padding:0;">'+slDetail(r)+'</td></tr>';
+    if(state.open===r.n) h+='<tr><td colspan="11" style="padding:0;">'+slDetail(r)+'</td></tr>';
   });
-  if(!list.length) h+='<tr><td colspan="15" style="text-align:center;padding:16px;color:#9aa0b8;">No company matches.</td></tr>';
+  if(!list.length) h+='<tr><td colspan="11" style="text-align:center;padding:16px;color:#9aa0b8;">No company matches.</td></tr>';
   h+='</tbody></table></div>';
   el.innerHTML=h;
   el.querySelectorAll('.sl-tab').forEach(function(b){ b.onclick=function(){ state.mode=b.getAttribute('data-m'); state.open=null; slRender(data,el,state); }; });
@@ -12389,7 +12692,7 @@ function cvOpenSimple(){
   var data=cvSimpleData(), m=document.getElementById('cv-sl-modal');
   if(!m){ m=document.createElement('div'); m.id='cv-sl-modal'; m.style.cssText='position:fixed;inset:0;background:rgba(20,24,40,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px;'; document.body.appendChild(m); m.onclick=function(e){ if(e.target===m) m.remove(); }; }
   if(!document.getElementById('sl-css')){ var st=document.createElement('style'); st.id='sl-css'; st.textContent=SL_CSS; document.head.appendChild(st); }
-  m.innerHTML='<div style="background:#fff;border-radius:12px;max-width:1250px;width:100%;max-height:92vh;display:flex;flex-direction:column;"><div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #ece8de;flex-wrap:wrap;"><b style="flex:1;font-size:15px;">📋 Simple ranking list — how every company\u2019s score is arrived at</b><button onclick="cvSaveSimpleReport()" style="padding:6px 12px;border-radius:8px;border:1px solid #ff7c00;background:#fff3e0;color:#9a4a00;font-weight:700;cursor:pointer;">⬇ Save as report</button><button onclick="document.getElementById(\'cv-sl-modal\').remove()" style="padding:6px 12px;border-radius:8px;border:1px solid #d6d9e6;background:#fff;cursor:pointer;">Close</button></div><div style="overflow:auto;padding:10px 16px 16px;"><div style="overflow-x:auto;">'+cvSimpleFlowSvg()+'</div>'+(data.withT?'':'<div style="font-size:11.5px;color:#9a4a00;background:#fff4e0;border-radius:8px;padding:6px 10px;margin:6px 0;">Market column is blank — no NSE data in this browser yet. Press Fetch in NSE Market Intel; its 15% is shared by the other five until then.</div>')+(data.withPx?'':'<div style="font-size:11.5px;color:#1e3a8a;background:#eef3ff;border-radius:8px;padding:6px 10px;margin:6px 0;">Price columns fill after the next NSE fetch with the new fetcher.py. The first fetch also back-fills prices from 1 week, 2 weeks, 1 month and 3 months ago.</div>')+'<div id="cv-sl-body"></div></div></div>';
+  m.innerHTML='<div style="background:#fff;border-radius:12px;max-width:1250px;width:100%;max-height:92vh;display:flex;flex-direction:column;"><div style="display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #ece8de;flex-wrap:wrap;"><b style="flex:1;font-size:15px;">📋 Simple ranking list — how every company\u2019s score is arrived at</b><button onclick="cvSaveSimpleReport()" style="padding:6px 12px;border-radius:8px;border:1px solid #ff7c00;background:#fff3e0;color:#9a4a00;font-weight:700;cursor:pointer;">⬇ Save as report</button><button onclick="document.getElementById(\'cv-sl-modal\').remove()" style="padding:6px 12px;border-radius:8px;border:1px solid #d6d9e6;background:#fff;cursor:pointer;">Close</button></div><div style="overflow:auto;padding:10px 16px 16px;"><div style="overflow-x:auto;">'+cvSimpleFlowSvg()+'</div>'+(data.withT?'':'<div style="font-size:11.5px;color:#9a4a00;background:#fff4e0;border-radius:8px;padding:6px 10px;margin:6px 0;">Market column is blank — no NSE data in this browser yet. Press Fetch in NSE Market Intel; its 15% is shared by the other five until then.</div>')+'<div style="font-size:11.5px;color:#1e3a8a;background:#eef3ff;border-radius:8px;padding:6px 10px;margin:6px 0;">Share-price changes (1 day to 3 months) now have their own 📈 Price Moves tab.</div>'+'<div id="cv-sl-body"></div></div></div>';
   slRender(data, document.getElementById('cv-sl-body'), {mode:'top',q:''});
 }
 function cvSaveSimpleReport(){
